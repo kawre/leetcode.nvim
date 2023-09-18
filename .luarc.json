@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
+  "diagnostics": {
+    "globals": [
+      "vim"
+    ]
+  },
+  "format": {
+    "enable": false
+  },
+  "runtime": {
+    "version": "LuaJIT"
+  },
+    "workspace.library": [
+        "/home/kawre/.local/share/nvim/lazy/neodev.nvim/types/stable",
+        "/usr/share/nvim/runtime/lua",
+        "/home/kawre/projects/leetcode.nvim/lua",
+        "${3rd}/luv/library"
+    ]
+}
