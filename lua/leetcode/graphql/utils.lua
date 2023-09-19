@@ -22,7 +22,7 @@ function M.query(query, variables)
   })
 
   local ok, data = pcall(vim.json.decode, response["body"])
-  assert(ok and data and data["data"])
+  assert(ok and data and data["data"], "Failed to query data")
 
   return data["data"]
 end

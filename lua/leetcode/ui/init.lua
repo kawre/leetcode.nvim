@@ -1,3 +1,7 @@
+local logger = require("leetcode.logger")
+local components = require("leetcode.ui.components")
+local gql = require("leetcode.graphql")
+
 ---@class lc.UI
 local Ui = {}
 
@@ -15,40 +19,50 @@ end
 
 function Ui.input(opts, callback) vim.ui.input(opts, callback) end
 
-function Ui.oldfiles() Ui.create_win() end
+---@param problem lc.Problem
+function Ui.create_leetcode_win(problem)
+  local start_win = vim.api.nvim_get_current_win()
 
-function Ui.create_win()
-  -- We save handle to window from which we open the navigation
-  start_win = vim.api.nvim_get_current_win()
+  local Split = require("nui.split")
+  local split = Split({
+    relative = "win",
+    position = "left",
+    size = "30%",
+  })
+  split:mount()
 
-  vim.api.nvim_command("topleft vnew") -- We open a new vertical window at the far right
-  win = vim.api.nvim_get_current_win() -- We save our navigation window handle...
-  buf = vim.api.nvim_get_current_buf() -- ...and it's buffer handle.
+  local title = gql.question.title(problem.title_slug)
+  local content = gql.question.content(problem.title_slug)
 
-  -- We should name our buffer. All buffers in vim must have unique names.
-  -- The easiest solution will be adding buffer handle to it
-  -- because it is already unique and it's just a number.
-  vim.api.nvim_buf_set_name(buf, "Oldfiles #" .. buf)
+  local win = vim.api.nvim_get_current_win() -- We save our navigation window handle...
+  local buf = vim.api.nvim_get_current_buf() -- ...and it's buffer handle.
 
-  -- Now we set some options for our buffer.
-  -- nofile prevent mark buffer as modified so we never get warnings about not saved changes.
-  -- Also some plugins treat nofile buffers different.
-  -- For example coc.nvim don't triggers aoutcompletation for these.
-  vim.api.nvim_buf_set_option(buf, "buftype", "nofile")
-  -- We do not need swapfile for this buffer.
-  vim.api.nvim_buf_set_option(buf, "swapfile", false)
-  -- And we would rather prefer that this buffer will be destroyed when hide.
-  vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
-  -- It's not necessary but it is good practice to set custom filetype.
-  -- This allows users to create their own autocommand or colorschemes on filetype.
-  -- and prevent collisions with other plugins.
+  vim.api.nvim_buf_set_name(buf, "LeetCode")
+
   vim.api.nvim_buf_set_option(buf, "filetype", "leetcode.nvim")
+  vim.api.nvim_buf_set_option(buf, "swapfile", false)
+  vim.api.nvim_buf_set_option(buf, "buftype", "nofile")
+  vim.api.nvim_buf_set_option(buf, "buflisted", false)
+  -- vim.api.nvim_buf_set_option(buf, "modifiable", true)
 
-  -- For better UX we will turn off line wrap and turn on current line highlight.
-  vim.api.nvim_win_set_option(win, "wrap", false)
-  vim.api.nvim_win_set_option(win, "cursorline", true)
+  vim.api.nvim_win_set_option(win, "wrap", true)
+  vim.api.nvim_win_set_option(win, "number", false)
+  vim.api.nvim_win_set_option(win, "signcolumn", "no")
 
-  set_mappings() -- At end we will set mappings for our navigation.
+  vim.api.nvim_buf_set_keymap(buf, "n", "<esc>", "<cmd>hide<CR>", { noremap = true })
+  vim.api.nvim_buf_set_keymap(buf, "n", "q", "<cmd>hide<CR>", { noremap = true })
+
+  local line = require("nui.line")()
+  line:append("")
+
+  components.problem.link(problem.title_slug):render(buf, -1, 1)
+  line:render(buf, -1, 2)
+
+  components.problem.title(title):render(buf, -1, 3)
+  components.problem.stats(title):render(buf, -1, 4)
+  line:render(buf, -1, 5)
+
+  components.problem.content(content):render(buf, -1, 6)
 end
 
 return Ui

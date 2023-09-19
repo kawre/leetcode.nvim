@@ -1,0 +1,25 @@
+{
+  "neodev": {
+    "library": {
+      "enabled": true,
+      "plugins": [
+        "telescope",
+        "notify",
+        "plenary",
+        "nui"
+      ]
+    }
+  },
+  "neoconf": {
+    "plugins": {
+      "lua_ls": {
+        "enabled": true
+      }
+    }
+  },
+  "lspconfig": {
+    "lua_ls": {
+      "Lua.completion.callSnippet": "Replace"
+    }
+  }
+}

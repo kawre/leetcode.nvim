@@ -1,5 +1,5 @@
 local cache = require("leetcode.cache")
-local logger = require("leetcode.logger")
+local log = require("leetcode.logger")
 local config = require("leetcode.config")
 
 local ui = require("leetcode.ui")
@@ -29,8 +29,8 @@ function M.lc_problems()
 
       if not file:exists() then
         local editor_data = gql.question.editor_data(problem.title_slug)
-        local code
 
+        local code
         if editor_data.code_snippets ~= vim.NIL then
           for _, v in ipairs(editor_data.code_snippets) do
             if v.langSlug == config.user.lang or v.langSlug == config.user.sql then
@@ -39,20 +39,46 @@ function M.lc_problems()
             end
           end
         end
-        assert(code, "Failed to fetch code snippet")
 
-        file:write(code, "w")
+        if not code then
+          log.error("failed to fetch code snippet")
+        else
+          file:write(code, "w")
+        end
       end
 
       vim.cmd("cd " .. dir)
       vim.cmd("e " .. file:absolute())
+
+      ui.create_leetcode_win(problem)
     end
   )
 end
 
 function M.leetcode()
+  M.authenticate()
   dashboard.setup()
-  vim.cmd("Alpha | bd #")
+  vim.cmd("Alpha | bd#")
 end
+
+function M.cookie_prompt()
+  local cookie = require("leetcode.cache.cookie")
+
+  ui.input(
+    "Enter cookie",
+    ---@param cookie_str string
+    function(cookie_str)
+      if not cookie_str then return end
+
+      cookie.new(cookie_str)
+      require("leetcode.ui.dashboard").update()
+    end
+  )
+end
+
+---Merge configurations into default configurations and set it as user configurations.
+---
+---@return lc.UserStatus | nil
+function M.authenticate() gql.auth.user_status() end
 
 return M

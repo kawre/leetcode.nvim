@@ -1,5 +1,7 @@
 local utils = require("leetcode.utils")
 local gql = require("leetcode.graphql")
+local config = require("leetcode.config")
+local log = require("leetcode.logger")
 
 local M = {}
 
@@ -48,8 +50,8 @@ local footer = {
 }
 
 function M.setup()
-  local user = gql.auth.user_status()
-  local is_signed_in = (user ~= nil and user.isSignedIn)
+  local auth = config.auth
+  local is_signed_in = auth and auth.is_signed_in
 
   local alpha = require("alpha")
   local dashboard = require("alpha.themes.dashboard")
@@ -72,7 +74,7 @@ function M.setup()
         dashboard.button(
           "c",
           "󰆘 " .. " Update cookie",
-          "<cmd>lua require('leetcode.utils').prompt_for_cookie()<cr>"
+          "<cmd>lua require('leetcode.api').cmd.cookie_prompt()<cr>"
         ),
         dashboard.button(
           "s",
@@ -85,12 +87,12 @@ function M.setup()
       dashboard.button(
         "s",
         " " .. " Sign in (By Cookie)",
-        "<cmd>lua require('leetcode.utils').prompt_for_cookie()<cr>"
+        "<cmd>lua require('leetcode.api').cmd.cookie_prompt()<cr>"
       ),
       dashboard.button("q", "󰩈 " .. " Exit LeetCode", "<cmd>qa!<CR>"),
     }
 
-  footer.val = is_signed_in and "Signed in as: " .. user.username or ""
+  footer.val = is_signed_in and "Signed in as: " .. auth.username or ""
 
   local section = {
     header = header,
@@ -99,10 +101,10 @@ function M.setup()
     footer = footer,
   }
 
-  local config = {
+  local cfg = {
     layout = {
       -- header
-      { type = "padding", val = 4 },
+      { type = "padding", val = 2 },
       section.header,
 
       -- notifications
@@ -121,7 +123,7 @@ function M.setup()
     },
   }
 
-  alpha.setup(config)
+  alpha.setup(cfg)
 end
 
 function M.update()

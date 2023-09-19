@@ -1,10 +1,15 @@
 local gql = require("leetcode.graphql.utils")
-local logger = require("leetcode.logger")
+local log = require("leetcode.logger")
 
 local M = {}
 
+---@class lc.Question.Content
+---@field content string
+
 ---@param title_slug string
-function M.get_by_title_slug(title_slug)
+---
+---@return lc.Question.Content
+function M.content(title_slug)
   local variables = {
     titleSlug = title_slug,
   }
@@ -22,9 +27,7 @@ function M.get_by_title_slug(title_slug)
   local ok, res = pcall(gql.query, query, variables)
   assert(ok)
 
-  logger.inspect(res)
-
-  return res["questionContent"]
+  return res["question"]
 end
 
 ---@param title_slug string
@@ -55,6 +58,31 @@ function M.editor_data(title_slug)
   assert(ok)
 
   return res["question"]
+end
+
+---@param title_slug string
+function M.title(title_slug)
+  local variables = {
+    titleSlug = title_slug,
+  }
+
+  local query = [[
+    query questionTitle($titleSlug: String!) {
+      question(titleSlug: $titleSlug) {
+        questionId
+        questionFrontendId
+        title
+        titleSlug
+        isPaidOnly
+        difficulty
+        likes
+        dislikes
+        categoryTitle
+      }
+    }
+  ]]
+
+  return gql.query(query, variables)["question"]
 end
 
 return M

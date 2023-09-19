@@ -16,7 +16,11 @@ local M = {
   ---| "oraclesql"
   sql = "mysql",
 
+  ---@type string
   directory = vim.fn.stdpath("data") .. "/leetcode",
+
+  ---@type boolean
+  logging = true,
 }
 
 return M
