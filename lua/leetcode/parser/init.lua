@@ -5,14 +5,21 @@ local Text = require("nui.text")
 local M = {}
 
 ---@type TreesitterModule, string, NuiText[]
-local ts, html, res
+local ts, html, nui_texts
 
 local theme = {
-    ["p"] = "Comment",
-    ["em"] = "DiagnosticHint",
-    ["code"] = "DiagnosticWarn",
-    ["strong"] = "SpellRare",
-    ["pre"] = "SpellRare",
+    ["p"] = "LeetCodePTag",
+    ["em"] = "LeetCodeEmTag",
+    ["strong"] = "LeetCodeStrongTag",
+    ["code"] = "LeetCodeCodeTag",
+    ["sup"] = "LeetCodeSupTag",
+    ["pre"] = "LeetCodePreTag",
+}
+
+local entities = {
+    ["&lt;"] = "<",
+    ["&gt;"] = ">",
+    ["&nbsp;"] = " ",
 }
 
 ---@param node TSNode
@@ -21,11 +28,17 @@ local theme = {
 ---@return NuiText
 local highlight_node = function(node, tag_name)
     local text = ts.get_node_text(node, html)
+
+    if node:type() == "entity" then text = entities[text] or text end
+    if tag_name == "sup" then text = "^" .. text end
+
     local nui_text = Text(text, theme[tag_name] or "Normal")
-    table.insert(res, nui_text)
+
+    table.insert(nui_texts, nui_text)
 end
 
 ---@param node TSNode
+---
 ---@return string|nil
 local function get_tag_name(node)
     local tag_name
@@ -44,11 +57,11 @@ local function parse_nodes(node)
     local tag_name
 
     for child in node:iter_children() do
-        local type = child:type()
+        local ntype = child:type()
 
-        if not tag_name and type == "start_tag" or type == "end_tag" then
+        if not tag_name and ntype == "start_tag" or ntype == "end_tag" then
             tag_name = get_tag_name(child)
-        elseif type == "text" then
+        elseif ntype == "text" or ntype == "entity" then
             highlight_node(child, tag_name)
         elseif child:named() then
             parse_nodes(child)
@@ -60,14 +73,14 @@ end
 ---
 ---@return NuiText[]
 function M.parse(to_parse)
-    ts, html, res = vim.treesitter, to_parse, {}
+    ts, html, nui_texts = vim.treesitter, to_parse, {}
 
     local parser = ts.get_string_parser(html, "html")
     local tree = parser:parse()[1]
 
     parse_nodes(tree:root())
 
-    return res
+    return nui_texts
 end
 
 return M

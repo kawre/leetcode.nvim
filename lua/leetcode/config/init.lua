@@ -27,6 +27,13 @@ function Config.apply(cfg)
 
     local ok, notify = pcall(require, "notify")
     if ok then vim.notify = notify end
+
+    vim.api.nvim_set_hl(0, "LeetCodePTag", { link = "Comment" })
+    vim.api.nvim_set_hl(0, "LeetCodeEmTag", { italic = true })
+    vim.api.nvim_set_hl(0, "LeetCodeStrongTag", { bold = true })
+    vim.api.nvim_set_hl(0, "LeetCodeCodeTag", { link = "MatchParen" })
+    vim.api.nvim_set_hl(0, "LeetCodeSupTag", { link = "MatchParen" })
+    vim.api.nvim_set_hl(0, "LeetCodePreTag", { link = "@text" })
 end
 
 ---Merge configurations into default configurations and set it as user configurations.

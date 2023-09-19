@@ -1,6 +1,6 @@
 ---@class lc.Ui.Components
 local Components = {
-    problem = require("leetcode.ui.components.problem"),
+    question = require("leetcode.ui.components.question"),
 }
 
 return Components

@@ -55,16 +55,16 @@ function Ui.create_leetcode_win(problem)
     local sep = Line()
     sep:append("")
 
-    components.problem.link(problem.title_slug):render(buf, -1, 1)
+    components.question.link(problem.title_slug):render(buf, -1, 1)
     sep:render(buf, -1, 2)
 
-    components.problem.title(title):render(buf, -1, 3)
-    components.problem.stats(title):render(buf, -1, 4)
+    components.question.title(title):render(buf, -1, 3)
+    components.question.stats(title):render(buf, -1, 4)
     sep:render(buf, -1, 5)
 
     local line_index = 6
-    for _, line in ipairs(components.problem.content(content)) do
-        Line(line):render(buf, -1, line_index)
+    for _, line in ipairs(components.question.content(content)) do
+        line:render(buf, -1, line_index)
         sep:render(buf, -1, line_index + 1)
         line_index = line_index + 2
     end

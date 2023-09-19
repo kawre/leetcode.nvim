@@ -50,21 +50,34 @@ end
 ---
 ---@return NuiLine[]
 function M.content(question)
-    local s = vim.split(question.content, "\n\n<p>&nbsp;</p>\n", { trimempty = true })
+    local s = vim.split(question.content, "\n\n<p>&nbsp;</p>\n")
+    local lines = {}
 
-    local desc = parser.parse(s[1])
-    local exam = parser.parse(s[2])
-    local cons = parser.parse(s[3])
-    local foll = parser.parse(s[4])
+    vim.list_extend(lines, M.description(s[1]))
+    vim.list_extend(lines, M.examples(s[2]))
+    -- local cons = parser.parse(s[3])
+    -- local foll = parser.parse(s[4])
 
-    return { desc, exam, cons, foll }
+    return lines
 end
 
 ---@param html string
-function M.description(html) return parser.parse(html) end
+---
+---@return NuiLine[]
+function M.description(html)
+    local lines = {}
 
----@param examples string
-function M.examples(examples) end
+    for s in vim.gsplit(html, "\n\n") do
+        table.insert(lines, Line(parser.parse(s:gsub(" ", "&nbsp;"))))
+    end
+
+    return lines
+end
+
+---@param html string
+---
+---@return NuiLine[]
+function M.examples(html) end
 
 ---@param constrains string
 function M.constrains(constrains) end
