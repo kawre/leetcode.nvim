@@ -13,18 +13,18 @@ local M = {}
 ---
 ---@return table
 function M.query(query, variables)
-  local response = curl.post(endpoint, {
-    headers = headers.get(),
-    body = vim.json.encode({
-      query = query,
-      variables = variables or {},
-    }),
-  })
+    local response = curl.post(endpoint, {
+        headers = headers.get(),
+        body = vim.json.encode({
+            query = query,
+            variables = variables or {},
+        }),
+    })
 
-  local ok, data = pcall(vim.json.decode, response["body"])
-  assert(ok and data and data["data"], "Failed to query data")
+    local ok, data = pcall(vim.json.decode, response["body"])
+    assert(ok and data and data["data"], "Failed to query data")
 
-  return data["data"]
+    return data["data"]
 end
 
 return M

@@ -12,7 +12,7 @@ local M = {}
 
 ---@return lc.UserStatus | nil
 function M.user_status()
-  local query = [[
+    local query = [[
     query globalData {
       userStatus {
         userId
@@ -26,13 +26,13 @@ function M.user_status()
     }
   ]]
 
-  local ok, res = pcall(gql.query, query)
-  if not ok then return end
+    local ok, res = pcall(gql.query, query)
+    if not ok then return end
 
-  local status = res["userStatus"]
-  config.authenticate(status)
+    local status = res["userStatus"]
+    config.authenticate(status)
 
-  return res["userStatus"]
+    return res["userStatus"]
 end
 
 return M

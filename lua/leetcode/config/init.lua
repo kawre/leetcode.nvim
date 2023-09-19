@@ -2,8 +2,8 @@ local template = require("leetcode.config.template")
 
 ---@class lc.Settings
 local Config = {
-  name = "leetcode.nvim",
-  debug = true,
+    name = "leetcode.nvim",
+    debug = true,
 }
 
 ---Default configurations.
@@ -23,10 +23,10 @@ Config.auth = nil
 ---
 ---@param cfg lc.Config Configurations to be merged.
 function Config.apply(cfg)
-  Config.user = vim.tbl_deep_extend("force", template, cfg)
+    Config.user = vim.tbl_deep_extend("force", template, cfg)
 
-  local ok, notify = pcall(require, "notify")
-  if ok then vim.notify = notify end
+    local ok, notify = pcall(require, "notify")
+    if ok then vim.notify = notify end
 end
 
 ---Merge configurations into default configurations and set it as user configurations.

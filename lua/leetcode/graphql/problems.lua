@@ -6,7 +6,7 @@ local M = {}
 
 ---@return integer
 function M.total_num()
-  local query = [[
+    local query = [[
     query problemsetQuestionList {
       problemsetQuestionList: questionList(
         categorySlug: ""
@@ -17,18 +17,18 @@ function M.total_num()
     }
   ]]
 
-  local total = gql.query(query)["problemsetQuestionList"]["total"]
+    local total = gql.query(query)["problemsetQuestionList"]["total"]
 
-  return total
+    return total
 end
 
 ---@return lc.Problem[]
 function M.all()
-  local variables = {
-    limit = 3000,
-  }
+    local variables = {
+        limit = 3000,
+    }
 
-  local query = [[
+    local query = [[
     query problemsetQuestionList($limit: Int) {
       problemsetQuestionList: questionList(
           categorySlug: ""
@@ -46,14 +46,14 @@ function M.all()
     }
   ]]
 
-  local ok, res = pcall(gql.query, query, variables)
-  assert(ok)
+    local ok, res = pcall(gql.query, query, variables)
+    assert(ok)
 
-  return res["problemsetQuestionList"]["questions"]
+    return res["problemsetQuestionList"]["questions"]
 end
 
 function M.question_of_today()
-  local query = [[
+    local query = [[
     query questionOfToday {
       activeDailyCodingChallengeQuestion {
         userStatus
@@ -73,12 +73,12 @@ function M.question_of_today()
     }
   ]]
 
-  local ok, res = pcall(gql.query, query)
-  assert(ok)
+    local ok, res = pcall(gql.query, query)
+    assert(ok)
 
-  logger.inspect(res)
+    logger.inspect(res)
 
-  return res["activeDailyCodingChallengeQuestion"]
+    return res["activeDailyCodingChallengeQuestion"]
 end
 
 return M

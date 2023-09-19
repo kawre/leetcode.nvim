@@ -10,11 +10,11 @@ local M = {}
 ---
 ---@return lc.Question.Content
 function M.content(title_slug)
-  local variables = {
-    titleSlug = title_slug,
-  }
+    local variables = {
+        titleSlug = title_slug,
+    }
 
-  local query = [[
+    local query = [[
     query questionContent($titleSlug: String!) {
       question(titleSlug: $titleSlug) {
         content
@@ -24,19 +24,19 @@ function M.content(title_slug)
     }
   ]]
 
-  local ok, res = pcall(gql.query, query, variables)
-  assert(ok)
+    local ok, res = pcall(gql.query, query, variables)
+    assert(ok)
 
-  return res["question"]
+    return res["question"]
 end
 
 ---@param title_slug string
 function M.editor_data(title_slug)
-  local variables = {
-    titleSlug = title_slug,
-  }
+    local variables = {
+        titleSlug = title_slug,
+    }
 
-  local query = [[
+    local query = [[
     query questionEditorData($titleSlug: String!) {
       question(titleSlug: $titleSlug) {
         questionId
@@ -54,19 +54,19 @@ function M.editor_data(title_slug)
     }
   ]]
 
-  local ok, res = pcall(gql.query, query, variables)
-  assert(ok)
+    local ok, res = pcall(gql.query, query, variables)
+    assert(ok)
 
-  return res["question"]
+    return res["question"]
 end
 
 ---@param title_slug string
 function M.title(title_slug)
-  local variables = {
-    titleSlug = title_slug,
-  }
+    local variables = {
+        titleSlug = title_slug,
+    }
 
-  local query = [[
+    local query = [[
     query questionTitle($titleSlug: String!) {
       question(titleSlug: $titleSlug) {
         questionId
@@ -82,7 +82,7 @@ function M.title(title_slug)
     }
   ]]
 
-  return gql.query(query, variables)["question"]
+    return gql.query(query, variables)["question"]
 end
 
 return M

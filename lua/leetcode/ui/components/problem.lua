@@ -11,89 +11,91 @@ local M = {}
 
 ---@param title any
 function M.title(title)
-  local line = Line()
+    local line = Line()
 
-  line:append(title.questionFrontendId .. ". " .. title.title)
+    line:append(title.questionFrontendId .. ". " .. title.title)
 
-  return line
+    return line
 end
 
 ---@param title_slug string
 function M.link(title_slug)
-  local line = Line()
+    local line = Line()
 
-  line:append("https://leetcode.com/problems/" .. title_slug .. "/", "Comment")
-  line:append("")
+    line:append("https://leetcode.com/problems/" .. title_slug .. "/", "Comment")
+    line:append("")
 
-  return line
+    return line
 end
 
 ---@param title any
 function M.stats(title)
-  local line = Line()
+    local line = Line()
 
-  line:append(
-    title.difficulty,
-    title.difficulty == "Easy" and "DiagnosticOk"
-      or title.difficulty == "Medium" and "DiagnosticWarn"
-      or "DiagnosticError"
-  )
-  line:append(" | ")
-  line:append(title.likes .. "  ", "Comment")
-  line:append(title.dislikes .. "  ", "Comment")
+    line:append(
+        title.difficulty,
+        title.difficulty == "Easy" and "DiagnosticOk"
+            or title.difficulty == "Medium" and "DiagnosticWarn"
+            or "DiagnosticError"
+    )
+    line:append(" | ")
+    line:append(title.likes .. "  ", "Comment")
+    line:append(title.dislikes .. "  ", "Comment")
 
-  return line
+    return line
 end
 
 ---@param content any
 function M.content(content)
-  local line = Line()
+    local line = Line()
 
-  local s = vim.split(content.content, "\n\n<p>&nbsp;</p>\n", { trimempty = true })
+    local s = vim.split(content.content, "\n\n", { trimempty = true })
 
-  local desc = M.description(s[1])
-  local exam = M.examples(s[2])
-  local cons = M.constrains(s[3])
-  local foll = M.follow_up(s[4])
+    for _, v in ipairs(s) do
+        log.info(v)
+    end
 
-  line:append({ desc, exam, cons, foll })
+    -- local desc = M.description(s[1])
+    -- line:append(desc)
 
-  return line
+    -- local exam = M.examples(s[2])
+    -- local cons = M.constrains(s[3])
+    -- local foll = M.follow_up(s[4])
+
+    -- line:append({ desc, exam, cons, foll })
+
+    return line
 end
 
 ---@param p string
 local parse_paragraph = function(p)
-  -- for s in vim.gsplit(p, " ", { trimempty = true }) do
-  --   log.info(s)
-  -- end
+    local ts = vim.treesitter
+    local parser = ts.get_string_parser(p, "html")
+    local tree = parser:parse()[1]
 
-  local ts = vim.treesitter
-  local parser = ts.get_string_parser(p, "html")
-
-  local tree = parser:parse()[1]
-  local function get_text(node)
-    local text = {}
-    for _, child in ipairs(node) do
-      if child:type() == "text" then
-        table.insert(text, child:subtree_text())
-      elseif child:named() then
-        table.insert(text, get_text(child))
-      end
+    local t = {}
+    local function get_text(node, text)
+        for child in node:iter_children() do
+            if child:type() == "text" then
+                local txt = ts.get_node_text(child, p)
+                table.insert(text, txt)
+            elseif child:named() then
+                get_text(child, text)
+            end
+        end
     end
-    return table.concat(text)
-  end
-  local text = get_text(tree:root())
+    get_text(tree:root(), t)
 
-  log.info(text)
+    return table.concat(t, " ")
 end
 
 ---@param description string
 function M.description(description)
-  local lines = { "Description:" }
+    local lines = { "Description:" }
 
-  for v in vim.gsplit(description, "\n\n", { trimempty = true }) do
-    parse_paragraph(utils.strip_html_tag(v, "p"))
-  end
+    -- for v in vim.gsplit(description, "\n\n", { trimempty = true }) do
+    return parse_paragraph(description)
+    -- end
 end
 
 ---@param examples string
