@@ -68,7 +68,7 @@ function M.description(html)
     local lines = {}
 
     for s in vim.gsplit(html, "\n\n") do
-        table.insert(lines, Line(parser.parse(s:gsub(" ", "&nbsp;"))))
+        table.insert(lines, Line(parser.parse(s:gsub("s(?![^<>]*>)", "&nbsp;"))))
     end
 
     return lines
@@ -77,12 +77,24 @@ end
 ---@param html string
 ---
 ---@return NuiLine[]
-function M.examples(html) end
+function M.examples(html)
+    local lines = {}
 
----@param constrains string
-function M.constrains(constrains) end
+    for s in vim.gsplit(html, "\n\n") do
+        table.insert(lines, Line(parser.parse(s:gsub("s(?![^<>]*>)", "&nbsp;"))))
+    end
 
----@param follow_up string
-function M.follow_up(follow_up) end
+    return lines
+end
+
+---@param html string
+---
+---@return NuiLine[]
+function M.constrains(html) end
+
+---@param html string
+---
+---@return NuiLine[]
+function M.follow_up(html) end
 
 return M

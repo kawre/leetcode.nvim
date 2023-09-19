@@ -23,46 +23,93 @@ local entities = {
 }
 
 ---@param node TSNode
----@param tag_name string
+---
+---@return string
+local function get_text(node) return ts.get_node_text(node, html) end
+
+---@param node TSNode
+---
+---@return lc.Parser.Tag.Attr
+local function get_attr(node)
+    ---@class lc.Parser.Tag.Attr
+    ---@field name string
+    ---@field value string
+    local attr = {}
+
+    for child in node:iter_children() do
+        local ntype = child:type()
+
+        if ntype == "attribute_name" and child:named() then
+            attr.name = get_text(child)
+        elseif ntype == "quoted_attribute_value" and child:named() then
+            attr.value = get_text(child):gsub("\"", "")
+        end
+    end
+
+    return attr
+end
+
+---@param node TSNode
+---
+---@return lc.Parser.Tag
+local function get_tag_data(node)
+    ---@class lc.Parser.Tag
+    ---@field name string
+    ---@field attrs lc.Parser.Tag.Attr[]
+    local data = {
+        attrs = {},
+    }
+
+    for child in node:iter_children() do
+        local ntype = child:type()
+
+        if ntype == "tag_name" then
+            data.tag = get_text(child)
+        elseif ntype == "attribute" then
+            table.insert(data.attrs, get_attr(child))
+        end
+    end
+
+    return data
+end
+
+---@param node TSNode
+---@param tag_data lc.Parser.Tag
 ---
 ---@return NuiText
-local highlight_node = function(node, tag_name)
-    local text = ts.get_node_text(node, html)
+local function highlight_node(node, tag_data)
+    if not tag_data then return Text("") end
+
+    local data = tag_data
+    local text = get_text(node)
+    local tag = data.tag
 
     if node:type() == "entity" then text = entities[text] or text end
-    if tag_name == "sup" then text = "^" .. text end
+    if tag == "sup" then text = "^" .. text end
 
-    local nui_text = Text(text, theme[tag_name] or "Normal")
+    local nui_text = Text(text, theme[tag] or "Normal")
+
+    for _, attr in ipairs(data.attrs) do
+        if attr.name == "class" and attr.value == "example" then
+            nui_text = Text(text, "DiagnosticInfo")
+        end
+    end
 
     table.insert(nui_texts, nui_text)
 end
 
 ---@param node TSNode
----
----@return string|nil
-local function get_tag_name(node)
-    local tag_name
-
-    for child in node:iter_children() do
-        if child:type() == "tag_name" and child:named() then
-            tag_name = ts.get_node_text(child, html)
-        end
-    end
-
-    return tag_name
-end
-
----@param node TSNode
 local function parse_nodes(node)
-    local tag_name
+    ---@type lc.Parser.Tag
+    local tag_data
 
     for child in node:iter_children() do
         local ntype = child:type()
 
-        if not tag_name and ntype == "start_tag" or ntype == "end_tag" then
-            tag_name = get_tag_name(child)
+        if ntype == "start_tag" then
+            tag_data = get_tag_data(child)
         elseif ntype == "text" or ntype == "entity" then
-            highlight_node(child, tag_name)
+            highlight_node(child, tag_data)
         elseif child:named() then
             parse_nodes(child)
         end
