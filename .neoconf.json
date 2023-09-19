@@ -3,23 +3,11 @@
     "library": {
       "enabled": true,
       "plugins": [
-        "telescope",
-        "notify",
-        "plenary",
-        "nui"
+        "nvim-notify",
+        "telescope.nvim",
+        "plenary.nvim",
+        "nui.nvim"
       ]
-    }
-  },
-  "neoconf": {
-    "plugins": {
-      "lua_ls": {
-        "enabled": true
-      }
-    }
-  },
-  "lspconfig": {
-    "lua_ls": {
-      "Lua.completion.callSnippet": "Replace"
     }
   }
 }
