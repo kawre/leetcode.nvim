@@ -1,6 +1,7 @@
-local logger = require("leetcode.logger")
+local log = require("leetcode.logger")
 local components = require("leetcode.ui.components")
 local gql = require("leetcode.graphql")
+local Line = require("nui.line")
 
 ---@class lc.UI
 local Ui = {}
@@ -49,20 +50,24 @@ function Ui.create_leetcode_win(problem)
     vim.api.nvim_win_set_option(win, "number", false)
     vim.api.nvim_win_set_option(win, "signcolumn", "no")
 
-    vim.api.nvim_buf_set_keymap(buf, "n", "<esc>", "<cmd>hide<CR>", { noremap = true })
-    vim.api.nvim_buf_set_keymap(buf, "n", "q", "<cmd>hide<CR>", { noremap = true })
-
-    local line = require("nui.line")()
-    line:append("")
+    -- vim.api.nvim_buf_set_keymap(buf, "n", "<esc>", "<cmd>hide<CR>", { noremap = true })
+    -- vim.api.nvim_buf_set_keymap(buf, "n", "q", "<cmd>hide<CR>", { noremap = true })
+    local sep = Line()
+    sep:append("")
 
     components.problem.link(problem.title_slug):render(buf, -1, 1)
-    line:render(buf, -1, 2)
+    sep:render(buf, -1, 2)
 
     components.problem.title(title):render(buf, -1, 3)
     components.problem.stats(title):render(buf, -1, 4)
-    line:render(buf, -1, 5)
+    sep:render(buf, -1, 5)
 
-    components.problem.content(content):render(buf, -1, 6)
+    local line_index = 6
+    for _, line in ipairs(components.problem.content(content)) do
+        Line(line):render(buf, -1, line_index)
+        sep:render(buf, -1, line_index + 1)
+        line_index = line_index + 2
+    end
 end
 
 return Ui
