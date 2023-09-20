@@ -1,5 +1,6 @@
 local config = require("leetcode.config")
 local api = require("leetcode.api")
+local dashboard = require("leetcode-ui")
 
 local M = {}
 
@@ -15,7 +16,7 @@ function M.setup(cfg)
         pattern = "*",
         nested = true,
         callback = function()
-            if config.user.invoke_name == vim.fn.expand("%") then api.cmd.leetcode() end
+            if config.user.invoke_name == vim.fn.expand("%") then dashboard.setup() end
         end,
     })
 end

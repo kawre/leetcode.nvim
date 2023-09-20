@@ -29,22 +29,22 @@ function M.all()
     }
 
     local query = [[
-    query problemsetQuestionList($limit: Int) {
-      problemsetQuestionList: questionList(
-          categorySlug: ""
-          limit: $limit
-          filters: {}
-      ) {
-        questions: data {
-          index: questionFrontendId
-          title
-          title_slug: titleSlug
-          ac_rate: acRate
-          difficulty
+        query problemsetQuestionList($limit: Int) {
+          problemsetQuestionList: questionList(
+              categorySlug: ""
+              limit: $limit
+              filters: {}
+          ) {
+            questions: data {
+              index: questionFrontendId
+              title
+              title_slug: titleSlug
+              ac_rate: acRate
+              difficulty
+            }
+          }
         }
-      }
-    }
-  ]]
+      ]]
 
     local ok, res = pcall(gql.query, query, variables)
     assert(ok)
@@ -54,24 +54,24 @@ end
 
 function M.question_of_today()
     local query = [[
-    query questionOfToday {
-      activeDailyCodingChallengeQuestion {
-        userStatus
-        link
-        question {
-          acRate
-          difficulty
-          freqBar
-          index: questionFrontendId
-          isFavor
-          paidOnly: isPaidOnly
-          status
-          title
-          titleSlug
+        query questionOfToday {
+          activeDailyCodingChallengeQuestion {
+            userStatus
+            link
+            question {
+              acRate
+              difficulty
+              freqBar
+              index: questionFrontendId
+              isFavor
+              paidOnly: isPaidOnly
+              status
+              title
+              titleSlug
+            }
+          }
         }
-      }
-    }
-  ]]
+      ]]
 
     local ok, res = pcall(gql.query, query)
     assert(ok)

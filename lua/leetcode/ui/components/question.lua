@@ -1,14 +1,20 @@
 local log = require("leetcode.logger")
+local gql = require("leetcode.graphql")
 
-local Text = require("nui.text")
 local Line = require("nui.line")
-local Layout = require("nui.layout")
+local Split = require("nui.split")
 local parser = require("leetcode.parser")
-
-local utils = require("leetcode.utils")
 
 ---@class lc.Ui.Components.Problem
 local M = {}
+
+---@type integer, NuiSplit
+local curr_line, split
+
+---Increment current line
+---
+---@return nil
+local function inc_line() curr_line = curr_line + 1 end
 
 ---@param title any
 function M.title(title)
@@ -46,19 +52,16 @@ function M.stats(title)
     return line
 end
 
----@param question any
+---@param content string
 ---
----@return NuiLine[]
-function M.content(question)
-    local s = vim.split(question.content, "\n\n<p>&nbsp;</p>\n")
-    local lines = {}
+---@return nil
+function M.content(content)
+    local s = vim.gsplit(content, "\n", {})
 
-    vim.list_extend(lines, M.description(s[1]))
-    vim.list_extend(lines, M.examples(s[2]))
-    -- local cons = parser.parse(s[3])
-    -- local foll = parser.parse(s[4])
-
-    return lines
+    for l in s do
+        parser.parse(l):render(split.bufnr, -1, curr_line)
+        inc_line()
+    end
 end
 
 ---@param html string
@@ -90,11 +93,70 @@ end
 ---@param html string
 ---
 ---@return NuiLine[]
-function M.constrains(html) end
+function M.constrains(html)
+    local lines = {}
+
+    for s in vim.gsplit(html, "\n\n") do
+        log.info(s)
+        table.insert(lines, Line(parser.parse(s:gsub("s(?![^<>]*>)", "&nbsp;"))))
+    end
+
+    return lines
+end
 
 ---@param html string
 ---
 ---@return NuiLine[]
 function M.follow_up(html) end
+
+---Render question split
+---
+---@param question lc.Problem
+---
+---@return nil
+function M.open(question)
+    curr_line = 1
+
+    split = Split({
+        relative = "editor",
+        position = "left",
+        size = "40%",
+        buf_options = {
+            modifiable = true,
+            readonly = false,
+            filetype = "leetcode.nvim",
+            swapfile = false,
+            buftype = "nofile",
+            buflisted = false,
+        },
+        win_options = {
+            -- winblend = 10,
+            -- winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+            foldcolumn = "1",
+            wrap = true,
+            number = false,
+            signcolumn = "no",
+        },
+        enter = true,
+        focusable = true,
+    })
+    split:mount()
+
+    vim.api.nvim_buf_set_name(split.bufnr, "LeetCode")
+
+    local title = gql.question.title(question.title_slug)
+    local content = gql.question.content(question.title_slug).content
+
+    M.link(question.title_slug):render(split.bufnr, -1, curr_line)
+    inc_line()
+
+    M.title(title):render(split.bufnr, -1, curr_line)
+    inc_line()
+
+    M.stats(title):render(split.bufnr, -1, curr_line)
+    inc_line()
+
+    M.content(content)
+end
 
 return M

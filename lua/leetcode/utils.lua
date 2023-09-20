@@ -3,7 +3,7 @@ local Utils = {}
 
 function Utils.remove_cookie()
     require("leetcode.cache.cookie").delete()
-    require("leetcode.ui.dashboard").update()
+    -- require("leetcode.ui.dashboard").apply("default")
 end
 
 function Utils.alpha_move_cursor_top()

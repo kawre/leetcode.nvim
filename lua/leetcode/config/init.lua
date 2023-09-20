@@ -31,7 +31,7 @@ function Config.apply(cfg)
     vim.api.nvim_set_hl(0, "LeetCodePTag", { link = "Comment" })
     vim.api.nvim_set_hl(0, "LeetCodeEmTag", { italic = true })
     vim.api.nvim_set_hl(0, "LeetCodeStrongTag", { bold = true })
-    vim.api.nvim_set_hl(0, "LeetCodeCodeTag", { link = "MatchParen" })
+    vim.api.nvim_set_hl(0, "LeetCodeCodeTag", { link = "DiagnosticHint" })
     vim.api.nvim_set_hl(0, "LeetCodeSupTag", { link = "MatchParen" })
     vim.api.nvim_set_hl(0, "LeetCodePreTag", { link = "@text" })
 end

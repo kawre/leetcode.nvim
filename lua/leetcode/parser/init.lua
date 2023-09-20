@@ -1,11 +1,12 @@
 local log = require("leetcode.logger")
 local Text = require("nui.text")
+local Line = require("nui.line")
 
 ---@class lc.Parser
 local M = {}
 
----@type TreesitterModule, string, NuiText[]
-local ts, html, nui_texts
+---@type TreesitterModule, string, NuiLine
+local ts, html, line
 
 local theme = {
     ["p"] = "LeetCodePTag",
@@ -20,6 +21,7 @@ local entities = {
     ["&lt;"] = "<",
     ["&gt;"] = ">",
     ["&nbsp;"] = " ",
+    ["&quot;"] = "\"",
 }
 
 ---@param node TSNode
@@ -76,26 +78,30 @@ end
 ---@param node TSNode
 ---@param tag_data lc.Parser.Tag
 ---
----@return NuiText
+---@return nil
 local function highlight_node(node, tag_data)
-    if not tag_data then return Text("") end
+    local text = get_text(node)
+    if not tag_data then
+        text = text:gsub("&nbsp;", " ")
+        return line:append(text)
+    end
 
     local data = tag_data
-    local text = get_text(node)
     local tag = data.tag
 
     if node:type() == "entity" then text = entities[text] or text end
     if tag == "sup" then text = "^" .. text end
+    if tag == "sub" then text = "_" .. text end
 
     local nui_text = Text(text, theme[tag] or "Normal")
 
     for _, attr in ipairs(data.attrs) do
-        if attr.name == "class" and attr.value == "example" then
-            nui_text = Text(text, "DiagnosticInfo")
+        if attr.name == "class" then
+            if attr.value == "example" then nui_text = Text(text, "DiagnosticInfo") end
         end
     end
 
-    table.insert(nui_texts, nui_text)
+    line:append(nui_text)
 end
 
 ---@param node TSNode
@@ -118,16 +124,17 @@ end
 
 ---@param to_parse string
 ---
----@return NuiText[]
+---@return NuiLine
 function M.parse(to_parse)
-    ts, html, nui_texts = vim.treesitter, to_parse, {}
+    to_parse = to_parse:gsub(" ", "&nbsp;")
+    ts, html, line = vim.treesitter, to_parse, Line()
 
     local parser = ts.get_string_parser(html, "html")
     local tree = parser:parse()[1]
 
     parse_nodes(tree:root())
 
-    return nui_texts
+    return line
 end
 
 return M

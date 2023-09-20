@@ -6,7 +6,8 @@
         "nvim-notify",
         "telescope.nvim",
         "plenary.nvim",
-        "nui.nvim"
+        "nui.nvim",
+        "alpha-nvim"
       ]
     }
   }

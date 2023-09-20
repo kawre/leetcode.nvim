@@ -1,7 +1,8 @@
-local log = require("leetcode.logger")
 local components = require("leetcode.ui.components")
+
+local Split = require("nui.split")
 local gql = require("leetcode.graphql")
-local Line = require("nui.line")
+local Popup = require("nui.popup")
 
 ---@class lc.UI
 local Ui = {}
@@ -20,54 +21,47 @@ end
 
 function Ui.input(opts, callback) vim.ui.input(opts, callback) end
 
----@param problem lc.Problem
-function Ui.create_leetcode_win(problem)
-    local start_win = vim.api.nvim_get_current_win()
+---@param question lc.Problem
+function Ui.create_leetcode_win(question) components.question.open(question) end
 
-    local Split = require("nui.split")
-    local split = Split({
-        relative = "win",
-        position = "left",
-        size = "30%",
+---@param question lc.Problem
+function Ui.open_qot()
+    local qot = gql.problems.question_of_today()
+
+    local popup = Popup({
+        position = "50%",
+        size = {
+            width = 80,
+            height = 40,
+        },
+        enter = true,
+        focusable = true,
+        zindex = 50,
+        relative = "editor",
+        border = {
+            padding = {
+                top = 2,
+                bottom = 2,
+                left = 3,
+                right = 3,
+            },
+            style = "rounded",
+            text = {
+                top = " I am top title ",
+                top_align = "center",
+                bottom = "I am bottom title",
+                bottom_align = "left",
+            },
+        },
+        buf_options = {
+            modifiable = true,
+            readonly = false,
+        },
+        win_options = {
+            winblend = 10,
+            winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+        },
     })
-    split:mount()
-
-    local title = gql.question.title(problem.title_slug)
-    local content = gql.question.content(problem.title_slug)
-
-    local win = vim.api.nvim_get_current_win() -- We save our navigation window handle...
-    local buf = vim.api.nvim_get_current_buf() -- ...and it's buffer handle.
-
-    vim.api.nvim_buf_set_name(buf, "LeetCode")
-
-    vim.api.nvim_buf_set_option(buf, "filetype", "leetcode.nvim")
-    vim.api.nvim_buf_set_option(buf, "swapfile", false)
-    vim.api.nvim_buf_set_option(buf, "buftype", "nofile")
-    vim.api.nvim_buf_set_option(buf, "buflisted", false)
-    -- vim.api.nvim_buf_set_option(buf, "modifiable", true)
-
-    vim.api.nvim_win_set_option(win, "wrap", true)
-    vim.api.nvim_win_set_option(win, "number", false)
-    vim.api.nvim_win_set_option(win, "signcolumn", "no")
-
-    -- vim.api.nvim_buf_set_keymap(buf, "n", "<esc>", "<cmd>hide<CR>", { noremap = true })
-    -- vim.api.nvim_buf_set_keymap(buf, "n", "q", "<cmd>hide<CR>", { noremap = true })
-    local sep = Line()
-    sep:append("")
-
-    components.question.link(problem.title_slug):render(buf, -1, 1)
-    sep:render(buf, -1, 2)
-
-    components.question.title(title):render(buf, -1, 3)
-    components.question.stats(title):render(buf, -1, 4)
-    sep:render(buf, -1, 5)
-
-    local line_index = 6
-    for _, line in ipairs(components.question.content(content)) do
-        line:render(buf, -1, line_index)
-        sep:render(buf, -1, line_index + 1)
-        line_index = line_index + 2
-    end
 end
 
 return Ui
