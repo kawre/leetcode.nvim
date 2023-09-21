@@ -3,32 +3,31 @@
 ---| "center"
 ---| "right"
 
----@class lc.db.Layout.padding
+---@class lc-ui.Layout.padding
 ---@field top
 ---@field right
 ---@field bot
 ---@field left
 
----@class lc.db.Component.config.opts
----@field position  position
----@field hl string
+---@class lc-ui.Component.config.opts
+---@field position?  position
+---@field hl? string
+---@field on_press? function
 
----@class lc.db.Group.config.opts
+---@class lc-ui.Group.config.opts
 ---@field spacing integer
 --@field position  position
 
----@class lc.db.Component.config
+---@class lc-ui.Component.config
 ---@field lines? NuiLine[] | string[]
----@field opts? lc.db.Component.config.opts
+---@field opts? lc-ui.Component.config.opts
 
----@class lc.db.Group.config
----@field components? lc.db.Component[]
----@field opts? lc.db.Group.config.opts
+---@class lc-ui.Group.config
 
----@class lc.db.Layout.opts
+---@class lc-ui.Layout.opts
 ---@field margin? integer
----@field padding? lc.db.Layout.padding | integer
+---@field padding? lc-ui.Layout.padding | integer
 
----@class lc.db.Layout.config
----@field opts lc.db.Layout.opts
----@field contents lc.db.Component[]
+---@class lc-ui.Layout.config
+---@field opts lc-ui.Layout.opts
+---@field contents lc-ui.Component[]

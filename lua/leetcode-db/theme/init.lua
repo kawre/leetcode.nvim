@@ -5,7 +5,7 @@ local log = require("leetcode.logger")
 
 local M = {}
 
----@alias lc.db.Theme
+---@alias lc-db.Theme
 ---| "cache"
 ---| "cookie"
 ---| "default"
@@ -13,7 +13,7 @@ local M = {}
 ---| "problems"
 ---| "stats"
 
----@param theme lc.db.Theme
+---@param theme lc-db.Theme
 function M.apply(theme)
     local alpha = require("alpha")
     utils.alpha_move_cursor_top()

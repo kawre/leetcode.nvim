@@ -1,7 +1,7 @@
 local component = require("leetcode-ui.component")
 local utils = require("leetcode-ui.utils")
 
----@class lc.db.Text: lc.db.Component
+---@class lc-ui.Text: lc-ui.Component
 local text = {}
 text.__index = text
 setmetatable(text, component)
@@ -14,20 +14,16 @@ setmetatable(text, component)
 --- Constructor
 --------------------------------------------------------
 
----@param config lc.db.Component.config
+---@param config lc-ui.Component.config
 ---
----@return lc.db.Text
+---@return lc-ui.Text
 function text:init(config)
-    local parsed_lines = utils.parse_lines(config)
-    config.lines = parsed_lines
+    local obj = {
+        lines = utils.parse_lines(config),
+        opts = config.opts or {},
+    }
 
-    local o = setmetatable(config, self)
-    self.__index = self
-
-    self.lines = parsed_lines
-    self.opts = config.opts or {}
-
-    return o
+    return setmetatable(obj, self)
 end
 
 return text

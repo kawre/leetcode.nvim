@@ -56,52 +56,13 @@ end
 ---
 ---@return nil
 function M.content(content)
-    local s = vim.gsplit(content, "\n", {})
+    -- local s = vim.gsplit(content, "\n", {})
 
-    for l in s do
-        parser.parse(l):render(split.bufnr, -1, curr_line)
-        inc_line()
-    end
-end
-
----@param html string
----
----@return NuiLine[]
-function M.description(html)
-    local lines = {}
-
-    for s in vim.gsplit(html, "\n\n") do
-        table.insert(lines, Line(parser.parse(s:gsub("s(?![^<>]*>)", "&nbsp;"))))
-    end
-
-    return lines
-end
-
----@param html string
----
----@return NuiLine[]
-function M.examples(html)
-    local lines = {}
-
-    for s in vim.gsplit(html, "\n\n") do
-        table.insert(lines, Line(parser.parse(s:gsub("s(?![^<>]*>)", "&nbsp;"))))
-    end
-
-    return lines
-end
-
----@param html string
----
----@return NuiLine[]
-function M.constrains(html)
-    local lines = {}
-
-    for s in vim.gsplit(html, "\n\n") do
-        log.info(s)
-        table.insert(lines, Line(parser.parse(s:gsub("s(?![^<>]*>)", "&nbsp;"))))
-    end
-
-    return lines
+    parser.parse(content):render(split.bufnr, -1, curr_line)
+    -- for l in s do
+    --     parser.parse(l):render(split.bufnr, -1, curr_line)
+    --     inc_line()
+    -- end
 end
 
 ---@param html string

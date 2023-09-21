@@ -18,7 +18,7 @@ end
 ---@param split NuiSplit
 function utils.win_width(split) return vim.api.nvim_win_get_width(split.winid) end
 
----@param config lc.db.Component.config
+---@param config lc-ui.Component.config
 ---
 ---@return NuiLine[]
 function utils.parse_lines(config)

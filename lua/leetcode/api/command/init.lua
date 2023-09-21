@@ -85,12 +85,12 @@ function M.authenticate() gql.auth.user_status() end
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---
----@param theme lc.db.Theme
+---@param theme lc-db.Theme
 function M.dashboard(theme) dashboard.apply(theme) end
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---
----@param theme lc.db.Theme
-function M.qot(theme) ui.open_qot() end
+--@param theme lc-db.Theme
+function M.qot() ui.open_qot() end
 
 return M

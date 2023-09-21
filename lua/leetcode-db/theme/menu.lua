@@ -1,40 +1,33 @@
+local log = require("leetcode.logger")
 local layout = require("leetcode-ui.layout")
-local template = require("leetcode-ui.theme.template")
+local template = require("leetcode-db.theme.template")
 local padding = require("leetcode-ui.component.padding")
 local button = require("leetcode-ui.component.button")
 local group = require("leetcode-ui.component.group")
 
-local section = template.section
+local section = template.get()
 
-local problems = button:init(
-    "p",
-    "Problems",
-    "",
-    true
+local problems = button:init({ icon = "", src = "Problems" }, "p", function()
+    local bufnr = vim.api.nvim_get_current_buf()
+    dashboards[bufnr]:set_layout("problems")
     -- "<cmd>lua require('leetcode.api').cmd.dashboard('problems')<CR>"
-)
-local statistics = button:init(
-    "s",
-    "Statistics",
-    "󰄪",
-    true
+end, true)
+
+local statistics = button:init({ icon = "󰄪", src = "Statistics" }, "s", function()
     -- "<cmd>lua require('leetcode.api').cmd.dashboard('stats')<cr>"
-)
-local cookie = button:init(
-    "c",
-    "Cookie",
-    "󰆘",
-    true
+end, true)
+
+local cookie = button:init({ src = "Cookie", icon = "󰆘" }, "c", function()
     -- "<cmd>lua require('leetcode.api').cmd.dashboard('cookie')<cr>"
-)
-local cache = button:init(
-    "n",
-    "Cache",
-    "",
-    true
+    local bufnr = vim.api.nvim_get_current_buf()
+    dashboards[bufnr]:set_layout("cookie")
+end, true)
+
+local cache = button:init({ src = "Cache", icon = "" }, "n", function()
     -- "<cmd>lua require('leetcode.api').cmd.dashboard('cache')<cr>"
-)
-local exit = button:init("q", "Exit", "󰩈")
+end, true)
+
+local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", function() end)
 
 local buttons = group:init({
     components = {
@@ -53,7 +46,7 @@ section.title:append("Menu", "Comment")
 
 section.footer:append("Signed in as: " .. "kawre", "Keyword")
 
-local menu = layout:init({
+return layout:init({
     contents = {
         padding:init(2),
         section.header,
@@ -74,5 +67,3 @@ local menu = layout:init({
         margin = 5,
     },
 })
-
-return menu

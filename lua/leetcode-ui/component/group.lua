@@ -1,28 +1,30 @@
 local component = require("leetcode-ui.component")
 local utils = require("leetcode-ui.utils")
 local padding = require("leetcode-ui.component.padding")
----@class lc.db.Group: lc.db.Component
+
+---@class lc-ui.Group: lc-ui.Component
+---@field components lc-ui.Component[]
+---@field opts lc-ui.Group.config.opts
 local group = {}
 group.__index = group
 setmetatable(group, component)
 
----@param config lc.db.Group.config
+---@param config lc-ui.Group
 ---
----@return lc.db.Group
+---@return lc-ui.Group
 function group:init(config)
-    local o = setmetatable(config, self)
-    self.__index = self
+    return setmetatable(config, self)
 
     -- self:append(config.components or {})
-    self.components = config.components or {}
-    self.opts = config.opts or {}
-
-    return o
+    -- self.components = config.components or {}
+    -- self.opts = config.opts or {}
+    --
+    -- return o
 end
 
----@param cmp lc.db.Component | lc.db.Component[]
+---@param cmp lc-ui.Component | lc-ui.Component[]
 ---
----@return lc.db.Group
+---@return lc-ui.Group
 function group:append(cmp)
     table.insert(self.components, cmp)
 

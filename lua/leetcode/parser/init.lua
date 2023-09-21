@@ -126,7 +126,7 @@ end
 ---
 ---@return NuiLine
 function M.parse(to_parse)
-    to_parse = to_parse:gsub(" ", "&nbsp;")
+    -- to_parse = to_parse:gsub(" ", "&nbsp;")
     ts, html, line = vim.treesitter, to_parse, Line()
 
     local parser = ts.get_string_parser(html, "html")
