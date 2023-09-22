@@ -12,7 +12,7 @@ local dashboard = { split = {} } ---@diagnostic disable-line
 dashboard.__index = dashboard
 
 ---@type table<bufnr, lc-db.Dashboard>
-dashboards = {}
+db = {}
 
 function dashboard:clear() vim.api.nvim_buf_set_lines(self.split.bufnr, 0, -1, false, {}) end
 
@@ -67,8 +67,9 @@ end
 function dashboard:init()
     local split = Split({
         relative = "win",
-        size = "100%",
+        -- size = "100%",
         enter = true,
+        name = "LeetCode",
         focusable = true,
         buf_options = {
             modifiable = true,
@@ -76,23 +77,24 @@ function dashboard:init()
             filetype = "leetcode.nvim",
             swapfile = false,
             buftype = "nofile",
-            buflisted = false,
+            buflisted = true,
         },
         win_options = {
             foldcolumn = "1",
-            wrap = true,
+            wrap = false,
             number = false,
             signcolumn = "no",
             cursorline = false,
         },
     })
+    vim.api.nvim_buf_set_name(split.bufnr, "LeetCode")
 
     local menu = require("leetcode-db.theme.menu")
     local obj = setmetatable({
         split = split,
         layout = menu,
     }, self)
-    dashboards[split.bufnr] = obj
+    db[split.bufnr] = obj
 
     return obj
 end

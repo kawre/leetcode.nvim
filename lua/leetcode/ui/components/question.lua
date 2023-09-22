@@ -42,8 +42,8 @@ function M.stats(title)
     line:append(
         title.difficulty,
         title.difficulty == "Easy" and "DiagnosticOk"
-            or title.difficulty == "Medium" and "DiagnosticWarn"
-            or "DiagnosticError"
+        or title.difficulty == "Medium" and "DiagnosticWarn"
+        or "DiagnosticError"
     )
     line:append(" | ")
     line:append(title.likes .. "  ", "Comment")
@@ -76,19 +76,17 @@ function M.follow_up(html) end
 ---
 ---@return nil
 function M.open(question)
-    curr_line = 1
-
     split = Split({
         relative = "editor",
         position = "left",
-        size = "40%",
+        -- size = "40%",
         buf_options = {
             modifiable = true,
             readonly = false,
             filetype = "leetcode.nvim",
             swapfile = false,
             buftype = "nofile",
-            buflisted = false,
+            buflisted = true,
         },
         win_options = {
             -- winblend = 10,
@@ -102,11 +100,6 @@ function M.open(question)
         focusable = true,
     })
     split:mount()
-
-    vim.api.nvim_buf_set_name(split.bufnr, "LeetCode")
-
-    local title = gql.question.title(question.title_slug)
-    local content = gql.question.content(question.title_slug).content
 
     M.link(question.title_slug):render(split.bufnr, -1, curr_line)
     inc_line()

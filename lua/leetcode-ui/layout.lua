@@ -2,7 +2,7 @@ local log = require("leetcode.logger")
 
 ---@class lc-ui.Layout
 ---@field contents lc-ui.Component[]
----@field opts lc-ui.Layout.opts
+---@field opts? lc-ui.Layout.opts
 ---@field line_idx? integer
 ---@field on_presses? table<integer, function>
 local layout = {}
@@ -17,7 +17,8 @@ function layout:draw(split)
     state[split.bufnr] = self
     self.line_idx = 1
 
-    for _, cmp in ipairs(self.contents) do
+    for _, cmp in pairs(self.contents) do
+        -- log.inspect(cmp)
         cmp:draw(split)
     end
 end
@@ -42,7 +43,7 @@ function layout:set_on_press(line, fn) self.on_presses[line] = fn end
 function layout:init(config)
     local obj = setmetatable({
         contents = config.contents,
-        opts = config.opts,
+        opts = config.opts or {},
         line_idx = 1,
         on_presses = {},
     }, self)

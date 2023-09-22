@@ -23,7 +23,7 @@ end
 
 ---@return lc.Problem[] | nil
 function M.read()
-    async.run(M.update)
+    M.update()
 
     local contents = file:read()
 
@@ -48,6 +48,16 @@ function M.update()
         -- logger.info("Updating cache. This way take a while...")
         assert(populate())
     end
+end
+
+function M.get_by_title_slug(title_slug)
+    local problems = M.read()
+
+    for _, p in ipairs(problems or {}) do
+        if p.title_slug == title_slug then return p end
+    end
+
+    return nil
 end
 
 ---@param problem lc.Problem

@@ -1,5 +1,6 @@
 local headers = require("leetcode.api.headers")
 local config = require("leetcode.config")
+local log = require("leetcode.logger")
 
 local curl = require("plenary.curl")
 
@@ -22,6 +23,7 @@ function M.query(query, variables)
     })
 
     local ok, data = pcall(vim.json.decode, response["body"])
+    if not ok then log.error(data) end
     assert(ok and data and data["data"], "Failed to query data")
 
     return data["data"]

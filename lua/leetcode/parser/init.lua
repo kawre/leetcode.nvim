@@ -1,12 +1,15 @@
-local log = require("leetcode.logger")
-local Text = require("nui.text")
+local Text = require("leetcode-ui.component.text")
 local Line = require("nui.line")
+local log = require("leetcode.logger")
 
----@class lc.Parser
-local M = {}
-
----@type TreesitterModule, string, NuiLine
-local ts, html, line
+---@class lc.Parser2
+---@field str string
+---@field lang string
+---@field parser LanguageTree
+---@field ts TreesitterModule
+---@field text lc-ui.Text
+local parser = {}
+parser.__index = parser
 
 local theme = {
     ["p"] = "LeetCodePTag",
@@ -22,17 +25,15 @@ local entities = {
     ["&gt;"] = ">",
     ["&nbsp;"] = " ",
     ["&quot;"] = "\"",
+    ["&lctab;"] = "  ",
 }
 
----@param node TSNode
+---@private
 ---
----@return string
-local function get_text(node) return ts.get_node_text(node, html) end
-
 ---@param node TSNode
 ---
 ---@return lc.Parser.Tag.Attr
-local function get_attr(node)
+function parser:get_attr(node)
     ---@class lc.Parser.Tag.Attr
     ---@field name string
     ---@field value string
@@ -42,70 +43,94 @@ local function get_attr(node)
         local ntype = child:type()
 
         if ntype == "attribute_name" and child:named() then
-            attr.name = get_text(child)
+            attr.name = self:get_text(child)
         elseif ntype == "quoted_attribute_value" and child:named() then
-            attr.value = get_text(child):gsub("\"", "")
+            attr.value = self:get_text(child):gsub("\"", "")
         end
     end
 
     return attr
 end
 
+---@private
+---
 ---@param node TSNode
 ---
 ---@return lc.Parser.Tag
-local function get_tag_data(node)
+function parser:get_tag_data(node)
     ---@class lc.Parser.Tag
     ---@field name string
     ---@field attrs lc.Parser.Tag.Attr[]
-    local data = {
-        attrs = {},
-    }
+    local data = { attrs = {} }
 
     for child in node:iter_children() do
         local ntype = child:type()
 
         if ntype == "tag_name" then
-            data.tag = get_text(child)
+            data.tag = self:get_text(child)
         elseif ntype == "attribute" then
-            table.insert(data.attrs, get_attr(child))
+            table.insert(data.attrs, self:get_attr(child))
         end
     end
 
     return data
 end
 
+---@private
+---
+---@param node TSNode
+---
+---@return string
+function parser:get_text(node) return self.ts.get_node_text(node, self.str) end
+
+---@private
+---
 ---@param node TSNode
 ---@param tag_data lc.Parser.Tag
 ---
 ---@return nil
-local function highlight_node(node, tag_data)
-    local text = get_text(node)
-    if not tag_data then
-        text = text:gsub("&nbsp;", " ")
-        return line:append(text)
-    end
+---TODO: problem 591, <u>...</u> tag,
+function parser:highlight_node(node, tag_data)
+    local text = self:get_text(node)
+    -- log.info(text)
+    -- if not tag_data then
+    --     text = text:gsub("&nbsp;", " ")
+    --     return self.text:append(text)
+    -- end
 
-    local data = tag_data
+    local data = tag_data or {}
     local tag = data.tag
 
-    if node:type() == "entity" then text = entities[text] or text end
+    if node:type() == "entity" then
+        if text == "&lcnl;" then
+            self.text:append(self.line)
+            self.line = Line()
+            return
+        else
+            text = entities[text] or text
+        end
+    end
     if tag == "sup" then text = "^" .. text end
     if tag == "sub" then text = "_" .. text end
 
-    local nui_text = Text(text, theme[tag] or "Normal")
+    local nui_text = Line()
+    nui_text:append(text, theme[tag])
 
-    for _, attr in ipairs(data.attrs) do
+    for _, attr in ipairs(data.attrs or {}) do
         if attr.name == "class" then
-            if attr.value == "example" then nui_text = Text(text, "DiagnosticInfo") end
+            if attr.value == "example" then
+                nui_text = Line()
+                nui_text:append(text, "DiagnosticInfo")
+            end
         end
     end
 
-    line:append(nui_text)
+    self.line:append(nui_text)
 end
 
+---@private
 ---@param node TSNode
-local function parse_nodes(node)
+function parser:rec_parse(node)
     ---@type lc.Parser.Tag
     local tag_data
 
@@ -113,28 +138,45 @@ local function parse_nodes(node)
         local ntype = child:type()
 
         if ntype == "start_tag" then
-            tag_data = get_tag_data(child)
+            tag_data = self:get_tag_data(child)
         elseif ntype == "text" or ntype == "entity" then
-            highlight_node(child, tag_data)
+            self:highlight_node(child, tag_data)
         elseif child:named() then
-            parse_nodes(child)
+            self:rec_parse(child)
         end
     end
 end
 
----@param to_parse string
----
----@return NuiLine
-function M.parse(to_parse)
-    -- to_parse = to_parse:gsub(" ", "&nbsp;")
-    ts, html, line = vim.treesitter, to_parse, Line()
+---@return lc-ui.Text
+function parser:parse()
+    local root = self.parser:parse()[1]:root()
 
-    local parser = ts.get_string_parser(html, "html")
-    local tree = parser:parse()[1]
-
-    parse_nodes(tree:root())
-
-    return line
+    self:rec_parse(root)
+    return self.text
 end
 
-return M
+---@param str string
+local function normalize(str)
+    local res = str:gsub("\n", "&lcnl;"):gsub("\t", "&lctab;"):gsub(" ", "&nbsp;")
+    return res
+end
+
+---@param str string
+---@param lang string
+function parser:init(str, lang)
+    local ts = vim.treesitter
+    str = normalize(str)
+    local _parser = ts.get_string_parser(normalize(str), lang)
+
+    local obj = setmetatable({
+        str = str,
+        ts = ts,
+        parser = _parser,
+        text = Text:init({}),
+        line = Line(),
+    }, self)
+
+    return obj
+end
+
+return parser

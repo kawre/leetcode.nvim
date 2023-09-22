@@ -37,22 +37,22 @@ function M.editor_data(title_slug)
     }
 
     local query = [[
-    query questionEditorData($titleSlug: String!) {
-      question(titleSlug: $titleSlug) {
-        questionId
-        questionFrontendId
-        code_snippets: codeSnippets {
-          lang
-          langSlug
-          code
+        query questionEditorData($titleSlug: String!) {
+          question(titleSlug: $titleSlug) {
+            questionId
+            questionFrontendId
+            code_snippets: codeSnippets {
+              lang
+              langSlug
+              code
+            }
+            envInfo
+            enableRunCode
+            hasFrontendPreview
+            frontendPreviews
+          }
         }
-        envInfo
-        enableRunCode
-        hasFrontendPreview
-        frontendPreviews
-      }
-    }
-  ]]
+      ]]
 
     local ok, res = pcall(gql.query, query, variables)
     assert(ok)
@@ -67,22 +67,38 @@ function M.title(title_slug)
     }
 
     local query = [[
-    query questionTitle($titleSlug: String!) {
-      question(titleSlug: $titleSlug) {
-        questionId
-        questionFrontendId
-        title
-        titleSlug
-        isPaidOnly
-        difficulty
-        likes
-        dislikes
-        categoryTitle
-      }
-    }
-  ]]
+        query questionTitle($titleSlug: String!) {
+          question(titleSlug: $titleSlug) {
+            questionId
+            questionFrontendId
+            title
+            titleSlug
+            isPaidOnly
+            difficulty
+            likes
+            dislikes
+            categoryTitle
+          }
+        }
+    ]]
 
     return gql.query(query, variables)["question"]
+end
+
+function M.random()
+    local variables = {
+        categorySlug = "",
+    }
+
+    local query = [[
+      query randomQuestion($categorySlug: String) {
+        randomQuestion(categorySlug: $categorySlug, filters: {}) {
+          title_slug: titleSlug
+        }
+      }
+    ]]
+
+    return gql.query(query, variables)["randomQuestion"]
 end
 
 return M

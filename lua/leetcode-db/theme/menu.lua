@@ -9,7 +9,7 @@ local section = template.get()
 
 local problems = button:init({ icon = "", src = "Problems" }, "p", function()
     local bufnr = vim.api.nvim_get_current_buf()
-    dashboards[bufnr]:set_layout("problems")
+    db[bufnr]:set_layout("problems")
     -- "<cmd>lua require('leetcode.api').cmd.dashboard('problems')<CR>"
 end, true)
 
@@ -20,7 +20,7 @@ end, true)
 local cookie = button:init({ src = "Cookie", icon = "󰆘" }, "c", function()
     -- "<cmd>lua require('leetcode.api').cmd.dashboard('cookie')<cr>"
     local bufnr = vim.api.nvim_get_current_buf()
-    dashboards[bufnr]:set_layout("cookie")
+    db[bufnr]:set_layout("cookie")
 end, true)
 
 local cache = button:init({ src = "Cache", icon = "" }, "n", function()

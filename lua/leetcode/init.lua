@@ -8,9 +8,9 @@ local M = {}
 function M.setup(cfg)
     config.apply(cfg or {})
 
-    vim.cmd([[highlight LcProblemEasy guifg=##00b8a3]])
-    vim.cmd([[highlight LcProblemMedium guifg=#ffb800]])
-    vim.cmd([[highlight LcProblemHard guifg=#ef4743]])
+    vim.api.nvim_set_hl(0, "LcProblemEasy", { fg = "#00b8a3" })
+    vim.api.nvim_set_hl(0, "LcProblemMedium", { fg = "#ffb800" })
+    vim.api.nvim_set_hl(0, "LcProblemHard", { fg = "#ef4743" })
 
     vim.api.nvim_create_autocmd("VimEnter", {
         pattern = "*",

@@ -12,6 +12,12 @@ section.title:append("Problems")
 
 local list_btn = button:init({ src = "List", icon = "" }, "p", function() api.cmd.problems() end)
 
+local random_btn = button:init(
+    { src = "Random", icon = "" },
+    "r",
+    function() api.cmd.random_question() end
+)
+
 local qot_btn = button:init(
     { src = "Question of Today", icon = "󰃭" },
     "t",
@@ -20,12 +26,13 @@ local qot_btn = button:init(
 
 local back_btn = button:init({ src = "Back", icon = "…" }, "q", function()
     local bufnr = vim.api.nvim_get_current_buf()
-    dashboards[bufnr]:set_layout("menu")
+    db[bufnr]:set_layout("menu")
 end)
 
 local buttons = group:init({
     components = {
         list_btn,
+        random_btn,
         qot_btn,
         back_btn,
 

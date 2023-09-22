@@ -1,6 +1,7 @@
 local cache = require("leetcode.cache")
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
+local problem = require("leetcode.ui.components.problem")
 
 local ui = require("leetcode.ui")
 -- local dashboard = require("leetcode.ui.dashboard")
@@ -19,38 +20,11 @@ function M.problems()
         "Select a Problem",
         cache.problems.formatter,
 
-        ---@param problem lc.Problem
-        function(problem)
-            if not problem then return end
+        ---@param item lc.Problem
+        function(item)
+            if not item then return end
 
-            local dir = config.user.directory .. "/solutions/"
-            local fn = problem.index .. "." .. problem.title_slug .. ".java"
-            local file = path:new(dir .. fn)
-
-            if not file:exists() then
-                local editor_data = gql.question.editor_data(problem.title_slug)
-
-                local code
-                if editor_data.code_snippets ~= vim.NIL then
-                    for _, v in ipairs(editor_data.code_snippets) do
-                        if v.langSlug == config.user.lang or v.langSlug == config.user.sql then
-                            code = v.code
-                            break
-                        end
-                    end
-                end
-
-                if not code then
-                    log.error("failed to fetch code snippet")
-                else
-                    file:write(code, "w")
-                end
-            end
-
-            vim.cmd("cd " .. dir)
-            vim.cmd("e " .. file:absolute())
-
-            ui.create_leetcode_win(problem)
+            problem:init(item):mount()
         end
     )
 end
@@ -92,5 +66,13 @@ function M.dashboard(theme) dashboard.apply(theme) end
 ---
 --@param theme lc-db.Theme
 function M.qot() ui.open_qot() end
+
+function M.random_question()
+    local title_slug = gql.question.random().title_slug
+    local item = cache.problems.get_by_title_slug(title_slug) or {}
+    problem:init(item):mount()
+end
+
+function M.testcase() ui.testcase() end
 
 return M

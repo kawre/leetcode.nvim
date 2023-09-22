@@ -7,15 +7,15 @@ local M = {}
 ---@return integer
 function M.total_num()
     local query = [[
-    query problemsetQuestionList {
-      problemsetQuestionList: questionList(
-        categorySlug: ""
-        filters: {}
-      ) {
-        total: totalNum
+        query problemsetQuestionList {
+          problemsetQuestionList: questionList(
+            categorySlug: ""
+            filters: {}
+          ) {
+            total: totalNum
+            }
         }
-    }
-  ]]
+    ]]
 
     local total = gql.query(query)["problemsetQuestionList"]["total"]
 
@@ -44,7 +44,7 @@ function M.all()
             }
           }
         }
-      ]]
+    ]]
 
     local ok, res = pcall(gql.query, query, variables)
     assert(ok)
