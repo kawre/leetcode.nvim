@@ -16,10 +16,6 @@ local console = {}
 console.__index = console
 
 function console:mount()
-    -- self.popup:mount()
-    -- fsadf/
-    -- self.testcase.layout:draw(self.popup)
-    -- self.layout:append(self.testcase)
     self.layout:mount()
 
     return self
@@ -31,26 +27,6 @@ end
 
 function console:hide()
     -- fasdf/
-end
-
----@private
-function console.navbar()
-    local testcase_text = NuiText(" (t) testcase ", "MasonHeader")
-    local result_text = NuiText(" (r) result ", "MasonHeader")
-    local run_text = NuiText(" (R) run ", "MasonHeader")
-    local submit_text = NuiText(" (S) submit ", "MasonHeader")
-
-    local nui_line = NuiLine({
-        -- testcase_text,
-        -- NuiText("\t"),
-        -- result_text,
-        -- NuiText("\t"),
-    })
-
-    return Text:init({
-        lines = { nui_line },
-        opts = { position = "center" },
-    })
 end
 
 ---@param parent lc.Question

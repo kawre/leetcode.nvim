@@ -1,6 +1,6 @@
 local config = require("leetcode.config")
 local api = require("leetcode.api")
-local dashboard = require("leetcode-db")
+local dashboard = require("leetcode-menu")
 
 local M = {}
 

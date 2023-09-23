@@ -18,12 +18,8 @@ function testcase:init(parent)
     end
 
     local popup = NuiPopup({
-        -- position = "50%",
-        -- size = config.user.console.size,
-        -- enter = true,
-        -- focusable = true,
-        -- zindex = 50,
-        -- relative = "editor",
+        enter = true,
+        focusable = true,
         border = {
             padding = {
                 top = 1,

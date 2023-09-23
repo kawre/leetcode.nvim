@@ -18,6 +18,7 @@ function result:init(parent)
     end
 
     local popup = NuiPopup({
+        focusable = true,
         border = {
             padding = {
                 top = 1,

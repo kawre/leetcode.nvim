@@ -40,7 +40,7 @@ end
 
 ---@param layout layouts
 function dashboard:set_layout(layout)
-    local ok, res = pcall(require, "leetcode-db.theme." .. layout)
+    local ok, res = pcall(require, "leetcode-menu.theme." .. layout)
     if ok then self.layout = res end
 
     self:redraw()
@@ -89,7 +89,7 @@ function dashboard:init()
     })
     vim.api.nvim_buf_set_name(split.bufnr, "LeetCode")
 
-    local menu = require("leetcode-db.theme.menu")
+    local menu = require("leetcode-menu.theme.menu")
     local obj = setmetatable({
         split = split,
         layout = menu,

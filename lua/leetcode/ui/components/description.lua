@@ -38,14 +38,14 @@ function description:populate()
     linkline:append("https://leetcode.com/problems/" .. q.title_slug .. "/", "Comment")
 
     local titleline = NuiLine()
-    titleline:append(" " .. q.frontend_id .. ". " .. q.title .. " ", "MiniStatuslineModeInsert")
+    titleline:append(" " .. q.frontend_id .. ". " .. q.title .. " ", "MasonHeader")
 
     local statsline = NuiLine()
     statsline:append(
         q.difficulty,
         q.difficulty == "Easy" and "DiagnosticOk"
-            or q.difficulty == "Medium" and "DiagnosticWarn"
-            or "DiagnosticError"
+        or q.difficulty == "Medium" and "DiagnosticWarn"
+        or "DiagnosticError"
     )
     statsline:append(" | ")
     statsline:append(q.likes .. "  ", "Comment")

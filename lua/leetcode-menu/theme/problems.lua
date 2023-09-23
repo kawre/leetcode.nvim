@@ -5,7 +5,7 @@ local button = require("leetcode-ui.component.button")
 local layout = require("leetcode-ui.layout")
 local api = require("leetcode.api")
 
-local template = require("leetcode-db.theme.template")
+local template = require("leetcode-menu.theme.template")
 local section = template.get()
 
 section.title:append("Problems")

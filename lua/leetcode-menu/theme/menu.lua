@@ -1,6 +1,6 @@
 local log = require("leetcode.logger")
 local layout = require("leetcode-ui.layout")
-local template = require("leetcode-db.theme.template")
+local template = require("leetcode-menu.theme.template")
 local padding = require("leetcode-ui.component.padding")
 local button = require("leetcode-ui.component.button")
 local group = require("leetcode-ui.component.group")
