@@ -1,7 +1,7 @@
 local components = require("leetcode.ui.components")
 
 local Split = require("nui.split")
-local gql = require("leetcode.graphql")
+local gql = require("leetcode.api.graphql")
 local Popup = require("nui.popup")
 
 ---@class lc.UI

@@ -3,7 +3,7 @@ local path = require("plenary.path")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 local Description = require("leetcode.ui.components.description")
-local gql = require("leetcode.graphql")
+local gql = require("leetcode.api.graphql")
 local Console = require("leetcode.ui.components.console")
 
 ---@class lc.Question

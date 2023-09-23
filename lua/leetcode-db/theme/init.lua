@@ -1,5 +1,5 @@
 local utils = require("leetcode.utils")
-local gql = require("leetcode.graphql")
+local gql = require("leetcode.api.graphql")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 

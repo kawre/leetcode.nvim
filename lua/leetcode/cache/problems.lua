@@ -2,7 +2,7 @@ local path = require("plenary.path")
 local async = require("plenary.async")
 
 local config = require("leetcode.config")
-local gql = require("leetcode.graphql")
+local gql = require("leetcode.api.graphql")
 
 local file = path:new(config.user.directory .. "/.problems")
 

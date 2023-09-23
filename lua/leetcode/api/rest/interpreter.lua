@@ -1,4 +1,4 @@
-local utils = require("leetcode.rest.utils")
+local utils = require("leetcode.api.rest.utils")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 local async_util = require("plenary.async.util")

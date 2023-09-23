@@ -7,7 +7,7 @@ local Console = require("leetcode.ui.components.console")
 
 local ui = require("leetcode.ui")
 -- local dashboard = require("leetcode.ui.dashboard")
-local gql = require("leetcode.graphql")
+local gql = require("leetcode.api.graphql")
 
 local path = require("plenary.path")
 

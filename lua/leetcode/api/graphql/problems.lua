@@ -1,5 +1,5 @@
 local logger = require("leetcode.logger")
-local utils = require("leetcode.graphql.utils")
+local utils = require("leetcode.api.graphql.utils")
 
 ---@class lc.ProblemsApi
 local M = {}

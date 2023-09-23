@@ -1,5 +1,5 @@
 local log = require("leetcode.logger")
-local rest = require("leetcode.rest")
+local rest = require("leetcode.api.rest")
 local utils = require("leetcode.runner.utils")
 
 ---@class lc.Runner
