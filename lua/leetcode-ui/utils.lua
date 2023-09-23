@@ -42,7 +42,7 @@ end
 
 ---@param lines NuiLine[]
 ---@param position position
----@param split NuiSplit
+---@param split NuiSplit | NuiSplit
 ---
 ---@return string
 function utils.get_padding(lines, position, split)

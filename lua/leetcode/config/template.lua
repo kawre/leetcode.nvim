@@ -27,7 +27,7 @@ local M = {
             width = "75%", ---@type string | integer
             height = "75%", ---@type string | integer
         },
-        dir = "col", ---@type "col" | "row"
+        dir = "row", ---@type "col" | "row"
     },
 
     description = {

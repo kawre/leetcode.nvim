@@ -5,12 +5,12 @@ local log = require("leetcode.logger")
 local Description = require("leetcode.ui.components.description")
 local gql = require("leetcode.api.graphql")
 local Console = require("leetcode.ui.components.console")
+local Runner = require("leetcode.runner")
 
 ---@class lc.Question
 ---@field file Path
 ---@field q lc.QuestionResponse
 ---@field description lc.Description
----@field testcases string[]
 ---@field bufnr bufnr
 ---@field console lc.Console
 local question = {}
@@ -56,6 +56,8 @@ function question:mount()
 end
 
 function question:run()
+    local runner = Runner:init(self)
+    local res = runner:run()
     -- fasdf//
 end
 
@@ -74,7 +76,6 @@ function question:init(problem)
     local obj = setmetatable({
         file = file,
         q = q,
-        testcases = q.testcase_list,
     }, self)
 
     return obj

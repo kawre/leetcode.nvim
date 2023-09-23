@@ -83,8 +83,12 @@ function cmd.run()
 end
 
 function cmd.console()
-    local console = Console:init()
-    console:mount()
+    local q = problems[curr_question]
+    if q then
+        q.console:open()
+    else
+        log.error("No current question found")
+    end
 end
 
 return cmd

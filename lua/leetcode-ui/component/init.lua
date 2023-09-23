@@ -19,19 +19,20 @@ function component:append(content, highlight)
     if type(content) == "table" then
         table.insert(self.lines, content)
     else
-        local line = Line():append(content, highlight)
+        local line = Line():append(content, highlight or "")
         table.insert(self.lines, line)
     end
 
     return self
 end
 
----@param split NuiSplit
+---@param split NuiSplit | NuiPopup
 function component:draw(split)
     local padding = utils.get_padding(self.lines, self.opts.position, split)
     local layout = state[split.bufnr]
 
     for _, line in pairs(self.lines) do
+        -- log.info(line:content())
         local new_line = Line()
         new_line:append(padding)
         new_line:append(line)
@@ -43,6 +44,8 @@ function component:draw(split)
         if self.opts.on_press then layout:set_on_press(line_idx, self.opts.on_press) end
     end
 end
+
+function component:clear() self.lines = {} end
 
 component.on_press = function() end
 

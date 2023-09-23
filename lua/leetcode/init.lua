@@ -1,6 +1,7 @@
 local config = require("leetcode.config")
 local api = require("leetcode.api")
 local dashboard = require("leetcode-menu")
+local utils = require("leetcode.utils")
 
 local M = {}
 
@@ -19,6 +20,14 @@ function M.setup(cfg)
             if config.user.invoke_name == vim.fn.expand("%") then dashboard:init():mount() end
         end,
     })
+
+    ---@param fn string
+    local function cmd(fn)
+        return string.format("<cmd>lua require('leetcode.api.command').%s()<cr>", fn)
+    end
+
+    utils.map("n", "<leader>lc", cmd("console"))
+    -- vim.keymap.set("n", '<leader>lc', rhs, opts)
 end
 
 return M

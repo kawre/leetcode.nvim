@@ -13,15 +13,22 @@ layout.__index = layout
 ---@type table<bufnr, lc-ui.Layout>
 state = {} ---@diagnostic disable-line
 
----@param split NuiSplit
+---@param split NuiSplit | NuiPopup
 function layout:draw(split)
     state[split.bufnr] = self
     self.line_idx = 1
 
     for _, cmp in pairs(self.contents) do
-        -- log.inspect(cmp)
         cmp:draw(split)
     end
+end
+
+function layout:clear()
+    self.contents = {}
+    self.line_idx = 1
+    self.on_presses = {}
+
+    return self
 end
 
 ---@param val? integer Optional value to increment line index by

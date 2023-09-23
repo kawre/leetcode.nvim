@@ -10,9 +10,8 @@ local interpreter = {}
 ---@param question lc.QuestionResponse
 ---@param typed_code string
 ---@param data_input string
----
----@return submission
-function interpreter.interpret_solution(question, typed_code, data_input)
+---@param callback function
+function interpreter.interpret_solution(question, typed_code, data_input, callback)
     local url =
         string.format(config.domain .. "/problems/%s/interpret_solution/", question.title_slug)
 
@@ -22,6 +21,7 @@ function interpreter.interpret_solution(question, typed_code, data_input)
         typed_code = typed_code,
         data_input = data_input,
     }
+    log.inspect(body)
 
     ---@type boolean, submission
     local ok, res = pcall(utils.post, url, body)
@@ -42,9 +42,7 @@ function interpreter.interpret_solution(question, typed_code, data_input)
                 async_util.sleep(750)
             end
         end
-    end, function() end)
-
-    return res or {}
+    end, callback)
 end
 
 ---@param interpret_id string
