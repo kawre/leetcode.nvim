@@ -49,9 +49,7 @@ end
 
 function spinner:done()
     self:stop()
-    self:set_noti(nil, {
-        icon = "",
-    })
+    self:set_noti(nil, { icon = "" })
 end
 
 function spinner:stop() self.spinner = nil end

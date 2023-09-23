@@ -1,4 +1,5 @@
 local log = require("leetcode.logger")
+local Line = require("nui.line")
 
 ---@class lc-ui.Layout
 ---@field contents lc-ui.Component[]
@@ -39,10 +40,18 @@ end
 ---@param fn function
 function layout:set_on_press(line, fn) self.on_presses[line] = fn end
 
----@param config lc-ui.Layout
+---@param content lc-ui.Component
+function layout:append(content)
+    table.insert(self.contents, content)
+    return self
+end
+
+---@param config? lc-ui.Layout
 function layout:init(config)
+    config = config or {}
+
     local obj = setmetatable({
-        contents = config.contents,
+        contents = config.contents or {},
         opts = config.opts or {},
         line_idx = 1,
         on_presses = {},

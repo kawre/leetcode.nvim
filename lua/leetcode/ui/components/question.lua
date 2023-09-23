@@ -2,8 +2,9 @@ local Split = require("nui.split")
 local path = require("plenary.path")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
-local description = require("leetcode.ui.components.description")
+local Description = require("leetcode.ui.components.description")
 local gql = require("leetcode.graphql")
+local Console = require("leetcode.ui.components.console")
 
 ---@class lc.Question
 ---@field file Path
@@ -11,6 +12,7 @@ local gql = require("leetcode.graphql")
 ---@field description lc.Description
 ---@field testcases string[]
 ---@field bufnr bufnr
+---@field console lc.Console
 local question = {}
 question.__index = question
 
@@ -46,12 +48,19 @@ function question:mount()
     vim.cmd("edit " .. self.file:absolute())
 
     self.bufnr = vim.api.nvim_get_current_buf()
+    curr_question = self.bufnr
     problems[self.bufnr] = self
 
-    self.description = description:init(self)
-    self.description:mount()
+    self.description = Description:init(self):mount()
+    self.console = Console:init(self):mount()
+end
 
-    curr_question = self.bufnr
+function question:run()
+    -- fasdf//
+end
+
+function question:submit()
+    -- fasdf/
 end
 
 ---@param problem lc.Problem

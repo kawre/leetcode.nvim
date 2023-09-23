@@ -100,13 +100,6 @@ function Ui.testcase()
         },
     })
 
-    local testcases = problems[curr_question].q.testcase_list
-    for i, t in ipairs(testcases) do
-        testcases[i] = t:gsub("\n", " ")
-    end
-
-    vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, testcases)
-
     popup:mount()
 end
 

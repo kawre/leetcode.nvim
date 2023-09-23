@@ -3,6 +3,7 @@ local log = require("leetcode.logger")
 local config = require("leetcode.config")
 local question = require("leetcode.ui.components.question")
 local Runner = require("leetcode.runner")
+local Console = require("leetcode.ui.components.console")
 
 local ui = require("leetcode.ui")
 -- local dashboard = require("leetcode.ui.dashboard")
@@ -79,6 +80,11 @@ function cmd.testcase() ui.testcase() end
 function cmd.run()
     local runner = Runner:init()
     runner:run()
+end
+
+function cmd.console()
+    local console = Console:init()
+    console:mount()
 end
 
 return cmd

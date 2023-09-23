@@ -7,6 +7,7 @@ local Text = require("leetcode-ui.component.text")
 local padding = require("leetcode-ui.component.padding")
 local NuiText = require("nui.text")
 local NuiLine = require("nui.line")
+local config = require("leetcode.config")
 
 ---@class lc.Description
 ---@field split NuiSplit
@@ -23,6 +24,8 @@ function description:mount()
     self:populate()
     self.split:mount()
     self:draw()
+
+    return self
 end
 
 function description:draw() self.layout:draw(self.split) end
@@ -81,24 +84,27 @@ function description:init(parent)
     local split = Split({
         relative = "win",
         position = "left",
-        size = "50%",
+        size = config.user.description.width,
         buf_options = {
             modifiable = true,
             readonly = false,
             filetype = "leetcode.nvim",
             swapfile = false,
             buftype = "nofile",
-            buflisted = false,
+            buflisted = true,
         },
         win_options = {
             foldcolumn = "1",
             wrap = true,
             number = false,
             signcolumn = "no",
+            -- winhighlight = "Normal:Normal,NormalNC:NormalNC",
+            winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
         },
         enter = true,
         focusable = true,
     })
+    vim.api.nvim_buf_set_name(split.bufnr, "Description")
 
     local obj = setmetatable({
         split = split,
