@@ -1,5 +1,5 @@
 local logger = require("leetcode.logger")
-local gql = require("leetcode.graphql.utils")
+local utils = require("leetcode.graphql.utils")
 
 ---@class lc.ProblemsApi
 local M = {}
@@ -17,7 +17,7 @@ function M.total_num()
         }
     ]]
 
-    local total = gql.query(query)["problemsetQuestionList"]["total"]
+    local total = utils.query(query)["problemsetQuestionList"]["total"]
 
     return total
 end
@@ -46,7 +46,7 @@ function M.all()
         }
     ]]
 
-    local ok, res = pcall(gql.query, query, variables)
+    local ok, res = pcall(utils.query, query, variables)
     assert(ok)
 
     return res["problemsetQuestionList"]["questions"]
@@ -73,7 +73,7 @@ function M.question_of_today()
         }
       ]]
 
-    local ok, res = pcall(gql.query, query)
+    local ok, res = pcall(utils.query, query)
     assert(ok)
 
     logger.inspect(res)

@@ -1,4 +1,4 @@
-local gql = require("leetcode.graphql.utils")
+local utils = require("leetcode.graphql.utils")
 local log = require("leetcode.logger")
 
 local question = {}
@@ -41,8 +41,8 @@ function question.by_title_slug(title_slug)
     local query = [[
         query ($titleSlug: String!) {
           question(titleSlug: $titleSlug) {
-            question_id:  questionId
-            question_frontend_id: questionFrontendId
+            id:  questionId
+            frontend_id: questionFrontendId
             title
             title_slug: titleSlug
             is_paid_only: isPaidOnly
@@ -63,7 +63,7 @@ function question.by_title_slug(title_slug)
         }
     ]]
 
-    local ok, res = pcall(gql.query, query, variables)
+    local ok, res = pcall(utils.query, query, variables)
     assert(ok)
 
     return res["question"]
@@ -82,7 +82,7 @@ function question.random()
       }
     ]]
 
-    return gql.query(query, variables)["randomQuestion"]
+    return utils.query(query, variables)["randomQuestion"]
 end
 
 return question

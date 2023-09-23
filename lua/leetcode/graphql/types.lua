@@ -6,8 +6,8 @@
 ---@alias code_snippet lc.QuestionCodeSnippet
 
 ---@class lc.QuestionResponse
----@field question_id integer
----@field question_frontend_id integer
+---@field id integer
+---@field frontend_id integer
 ---@field title string
 ---@field title_slug string
 ---@field id_paid_only boolean

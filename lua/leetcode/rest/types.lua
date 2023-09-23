@@ -1,0 +1,33 @@
+---@class lc.Interpreter.Submission
+---@field interpret_id string
+---@field test_case string
+
+---@alias submission lc.Interpreter.Submission
+
+---@alias interpret.state
+---| "PENDING"
+---| "STARTED"
+---| "SUCCESS"
+
+---@class lc.Interpreter.Response
+---@field status_code integer
+---@field lang string
+---@field run_success boolean
+---@field compile_error string
+---@field full_compile_error string
+---@field status_runtime string
+---@field memory integer
+---@field code_answer table
+---@field code_output table
+---@field std_output_list table
+---@field task_finish_time integer
+---@field task_name string
+---@field total_correct any
+---@field total_testcases any
+---@field runtime_percentile any
+---@field status_memory string
+---@field memory_percentile any
+---@field pretty_lang string
+---@field submission_id string
+---@field status_msg string
+---@field state interpret.state

@@ -1,4 +1,4 @@
-local gql = require("leetcode.graphql.utils")
+local utils = require("leetcode.graphql.utils")
 local config = require("leetcode.config")
 
 ---@class lc.AuthApi
@@ -26,7 +26,7 @@ function M.user_status()
     }
   ]]
 
-    local ok, res = pcall(gql.query, query)
+    local ok, res = pcall(utils.query, query)
     if not ok then return end
 
     local status = res["userStatus"]

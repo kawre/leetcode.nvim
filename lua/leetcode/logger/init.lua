@@ -1,4 +1,5 @@
 local config = require("leetcode.config")
+local spinner = require("leetcode.logger.spinner")
 local levels = vim.log.levels
 
 ---@class lc.Logger
@@ -32,5 +33,10 @@ logger.debug = function(msg)
     if not config.debug then return end
     logger.log(msg, levels.DEBUG)
 end
+
+---@param msg msg | nil
+---
+---@return lc.Logger.Spinner
+logger.spin = function(msg) return spinner:init(tostring(msg)) end
 
 return logger

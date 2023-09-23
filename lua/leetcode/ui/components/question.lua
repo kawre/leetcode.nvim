@@ -9,6 +9,7 @@ local gql = require("leetcode.graphql")
 ---@field file Path
 ---@field q lc.QuestionResponse
 ---@field description lc.Description
+---@field testcases string[]
 ---@field bufnr bufnr
 local question = {}
 question.__index = question
@@ -58,12 +59,13 @@ function question:init(problem)
     local q = gql.question.by_title_slug(problem.title_slug)
 
     local dir = config.user.directory .. "/solutions/"
-    local fn = q.question_frontend_id .. "." .. q.title_slug .. "." .. config.user.lang
+    local fn = q.frontend_id .. "." .. q.title_slug .. "." .. config.user.lang
     local file = path:new(dir .. fn)
 
     local obj = setmetatable({
         file = file,
         q = q,
+        testcases = q.testcase_list,
     }, self)
 
     return obj

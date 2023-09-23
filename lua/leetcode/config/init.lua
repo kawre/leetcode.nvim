@@ -1,32 +1,38 @@
 local template = require("leetcode.config.template")
 
 ---@class lc.Settings
-local Config = {
+local config = {
     name = "leetcode.nvim",
     debug = true,
+    notify = false,
 }
 
 ---Default configurations.
 ---
 ---@type lc.Config
-Config.default = template
+config.default = template
 
 ---User configurations.
 ---
 ---@type lc.Config
-Config.user = Config.default
+config.user = config.default
 
 ---@type lc.UserStatus|nil
-Config.auth = nil
+config.auth = nil
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---
 ---@param cfg lc.Config Configurations to be merged.
-function Config.apply(cfg)
-    Config.user = vim.tbl_deep_extend("force", template, cfg)
+function config.apply(cfg)
+    config.user = vim.tbl_deep_extend("force", template, cfg)
 
     local ok, notify = pcall(require, "notify")
-    if ok then vim.notify = notify end
+    if ok then
+        vim.notify = notify
+        config.notify = true
+    end
+
+    config.domain = "https://leetcode." .. config.user.domain
 
     vim.api.nvim_set_hl(0, "LeetCodePTag", { link = "Comment" })
     vim.api.nvim_set_hl(0, "LeetCodeEmTag", { italic = true })
@@ -39,6 +45,6 @@ end
 ---Merge configurations into default configurations and set it as user configurations.
 ---
 ---@param status lc.UserStatus | nil
-function Config.authenticate(status) Config.auth = status end
+function config.authenticate(status) config.auth = status end
 
-return Config
+return config
