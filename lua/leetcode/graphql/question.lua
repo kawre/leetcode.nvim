@@ -1,91 +1,75 @@
 local gql = require("leetcode.graphql.utils")
 local log = require("leetcode.logger")
 
-local M = {}
+local question = {}
 
 ---@class lc.Question.Content
 ---@field content string
 
+-- ---@param title_slug string
+-- ---
+-- ---@return lc.Question.Content
+-- function question.content(title_slug)
+--     local variables = {
+--         titleSlug = title_slug,
+--     }
+--
+--     local query = [[
+--     query questionContent($titleSlug: String!) {
+--       question(titleSlug: $titleSlug) {
+--         content
+--         mysqlSchemas
+--         dataSchemas
+--       }
+--     }
+--   ]]
+--
+--     local ok, res = pcall(gql.query, query, variables)
+--     assert(ok)
+--
+--     return res["question"]
+-- end
+
 ---@param title_slug string
 ---
----@return lc.Question.Content
-function M.content(title_slug)
+---@return lc.QuestionResponse
+function question.by_title_slug(title_slug)
     local variables = {
         titleSlug = title_slug,
     }
 
     local query = [[
-    query questionContent($titleSlug: String!) {
-      question(titleSlug: $titleSlug) {
-        content
-        mysqlSchemas
-        dataSchemas
-      }
-    }
-  ]]
-
-    local ok, res = pcall(gql.query, query, variables)
-    assert(ok)
-
-    return res["question"]
-end
-
----@param title_slug string
-function M.editor_data(title_slug)
-    local variables = {
-        titleSlug = title_slug,
-    }
-
-    local query = [[
-        query questionEditorData($titleSlug: String!) {
+        query ($titleSlug: String!) {
           question(titleSlug: $titleSlug) {
-            questionId
-            questionFrontendId
-            code_snippets: codeSnippets {
-              lang
-              langSlug
-              code
-            }
-            envInfo
-            enableRunCode
-            hasFrontendPreview
-            frontendPreviews
-          }
-        }
-      ]]
-
-    local ok, res = pcall(gql.query, query, variables)
-    assert(ok)
-
-    return res["question"]
-end
-
----@param title_slug string
-function M.title(title_slug)
-    local variables = {
-        titleSlug = title_slug,
-    }
-
-    local query = [[
-        query questionTitle($titleSlug: String!) {
-          question(titleSlug: $titleSlug) {
-            questionId
-            questionFrontendId
+            question_id:  questionId
+            question_frontend_id: questionFrontendId
             title
-            titleSlug
-            isPaidOnly
+            title_slug: titleSlug
+            is_paid_only: isPaidOnly
             difficulty
             likes
             dislikes
-            categoryTitle
+            category_title: categoryTitle
+            content
+            mysql_schemas: mysqlSchemas
+            data_schemas: dataSchemas
+            code_snippets: codeSnippets {
+              lang
+              lang_slug: langSlug
+              code
+            }
+            testcase_list: exampleTestcaseList
           }
         }
     ]]
 
-    return gql.query(query, variables)["question"]
+    local ok, res = pcall(gql.query, query, variables)
+    assert(ok)
+
+    return res["question"]
 end
 
-function M.random()
+function question.random()
     local variables = {
         categorySlug = "",
     }
@@ -101,4 +85,4 @@ function M.random()
     return gql.query(query, variables)["randomQuestion"]
 end
 
-return M
+return question

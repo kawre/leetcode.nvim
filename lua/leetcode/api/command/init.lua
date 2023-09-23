@@ -1,7 +1,7 @@
 local cache = require("leetcode.cache")
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
-local problem = require("leetcode.ui.components.problem")
+local question = require("leetcode.ui.components.question")
 
 local ui = require("leetcode.ui")
 -- local dashboard = require("leetcode.ui.dashboard")
@@ -24,7 +24,7 @@ function M.problems()
         function(item)
             if not item then return end
 
-            problem:init(item):mount()
+            question:init(item):mount()
         end
     )
 end
@@ -70,7 +70,7 @@ function M.qot() ui.open_qot() end
 function M.random_question()
     local title_slug = gql.question.random().title_slug
     local item = cache.problems.get_by_title_slug(title_slug) or {}
-    problem:init(item):mount()
+    question:init(item):mount()
 end
 
 function M.testcase() ui.testcase() end

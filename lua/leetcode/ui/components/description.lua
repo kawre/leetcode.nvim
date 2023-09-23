@@ -10,7 +10,7 @@ local NuiLine = require("nui.line")
 
 ---@class lc.Description
 ---@field split NuiSplit
----@field parent lc.Problem.second
+---@field parent lc.Question
 ---@field content any
 ---@field title any
 ---@field layout lc-ui.Layout
@@ -29,17 +29,34 @@ function description:draw() self.layout:draw(self.split) end
 
 ---@private
 function description:populate()
-    local title = gql.question.title(self.parent.problem.title_slug)
-    local content = gql.question.content(self.parent.problem.title_slug).content
+    local q = self.parent.q
 
     local linkline = NuiLine()
-    linkline:append("https://leetcode.com/problems/" .. title.titleSlug .. "/", "Comment")
+    linkline:append("https://leetcode.com/problems/" .. q.title_slug .. "/", "Comment")
 
     local titleline = NuiLine()
-    titleline:append(title.questionFrontendId .. ". " .. title.title, "MiniStatuslineModeInsert")
+    titleline:append(
+        " " .. q.question_frontend_id .. ". " .. q.title .. " ",
+        "MiniStatuslineModeInsert"
+    )
+
+    local statsline = NuiLine()
+    statsline:append(
+        q.difficulty,
+        q.difficulty == "Easy" and "DiagnosticOk"
+        or q.difficulty == "Medium" and "DiagnosticWarn"
+        or "DiagnosticError"
+    )
+    statsline:append(" | ")
+    statsline:append(q.likes .. "  ", "Comment")
+    statsline:append(q.dislikes .. "  ", "Comment")
 
     local titlecomp = Text:init({
         lines = { titleline },
+        opts = { position = "center" },
+    })
+    local statscomp = Text:init({
+        lines = { statsline },
         opts = { position = "center" },
     })
     local linkcomp = Text:init({
@@ -47,11 +64,12 @@ function description:populate()
         opts = { position = "center" },
     })
 
-    local contents = parser:init(content, "html"):parse()
+    local contents = parser:init(q.content, "html"):parse()
 
     self.layout = layout:init({
         contents = {
             titlecomp,
+            statscomp,
             padding:init(2),
             contents,
             padding:init(1),
@@ -61,7 +79,7 @@ function description:populate()
     })
 end
 
----@param parent lc.Problem.second
+---@param parent lc.Question
 function description:init(parent)
     local split = Split({
         relative = "win",
@@ -89,8 +107,6 @@ function description:init(parent)
         split = split,
         parent = parent,
         layout = {},
-        -- content = content,
-        -- title = title,
     }, self)
 
     return obj

@@ -1,0 +1,22 @@
+---@class lc.QuestionCodeSnippet
+---@field lang string
+---@field lang_slug string
+---@field code string
+
+---@alias code_snippet lc.QuestionCodeSnippet
+
+---@class lc.QuestionResponse
+---@field question_id integer
+---@field question_frontend_id integer
+---@field title string
+---@field title_slug string
+---@field id_paid_only boolean
+---@field difficulty string
+---@field likes integer
+---@field dislikes integer
+---@field category_title string
+---@field content string
+---@field mysql_schemas string[]
+---@field data_schemas string[]
+---@field code_snippets code_snippet[]
+---@field testcase_list string[]
