@@ -55,16 +55,6 @@ function question:mount()
     self.console = Console:init(self):mount()
 end
 
-function question:run()
-    local runner = Runner:init(self)
-    local res = runner:run()
-    -- fasdf//
-end
-
-function question:submit()
-    -- fasdf/
-end
-
 ---@param problem lc.Problem
 function question:init(problem)
     local q = gql.question.by_title_slug(problem.title_slug)

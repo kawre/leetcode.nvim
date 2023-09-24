@@ -24,7 +24,7 @@ local qot_btn = button:init(
     function() api.cmd.qot() end
 )
 
-local back_btn = button:init({ src = "Back", icon = "…" }, "q", function()
+local back_btn = button:init({ src = "Back", icon = "" }, "q", function()
     local bufnr = vim.api.nvim_get_current_buf()
     db[bufnr]:set_layout("menu")
 end)

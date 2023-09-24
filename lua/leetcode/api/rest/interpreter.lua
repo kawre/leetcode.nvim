@@ -21,14 +21,13 @@ function interpreter.interpret_solution(question, typed_code, data_input, callba
         typed_code = typed_code,
         data_input = data_input,
     }
-    log.inspect(body)
 
     ---@type boolean, submission
     local ok, res = pcall(utils.post, url, body)
     assert(ok)
 
     async.run(function() ---@diagnostic disable-line
-        local noti = log.spin():start()
+        local noti = log.spin("PENDING"):start()
 
         while true do
             ---@type lc.Interpreter.Response

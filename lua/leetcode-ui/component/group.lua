@@ -9,11 +9,14 @@ local group = {}
 group.__index = group
 setmetatable(group, component)
 
----@param config lc-ui.Group
+---@param config lc-ui.Group.config
 ---
 ---@return lc-ui.Group
 function group:init(config)
-    return setmetatable(config, self)
+    return setmetatable({
+        components = config.components or {},
+        opts = config.opts or {},
+    }, self)
 
     -- self:append(config.components or {})
     -- self.components = config.components or {}
@@ -26,7 +29,11 @@ end
 ---
 ---@return lc-ui.Group
 function group:append(cmp)
-    table.insert(self.components, cmp)
+    if getmetatable(cmp) then
+        table.insert(self.components, cmp)
+    else
+        self.lines = vim.list_extend(self.lines, cmp)
+    end
 
     return self
 end

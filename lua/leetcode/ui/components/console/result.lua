@@ -1,5 +1,7 @@
 local log = require("leetcode.logger")
 
+local Case = require("leetcode.ui.components.console.components.case")
+local Group = require("leetcode-ui.component.group")
 local Layout = require("leetcode-ui.layout")
 local Text = require("leetcode-ui.component.text")
 
@@ -14,24 +16,86 @@ local result = {}
 result.__index = result
 
 ---@param item lc.Interpreter.Response
-function result:handle(item)
-    local status_code = item.status_code
+function result:handle_runtime_error(item)
+    if item.status_code == 15 then
+        -- local header = NuiLine()
+        -- header:append("Invalid Testcase", "DiagnosticError")
+        --
+        -- text:append(header)
+        -- -- self.layout:append(text)
+        --
+        -- text = Case:init(item.case_idx + 1, "", "", item.full_runtime_error)
+    else --- code: 10
+        local header = NuiLine()
+
+        if item.correct_answer then
+            header:append("Accepted", "DiagnosticOk")
+        else
+            header:append("Wrong Answer", "DiagnosticError")
+        end
+
+        header:append(" | ")
+        header:append("Runtime: " .. item.status_runtime, "Comment")
+
+        self.layout:append(Text:init({ lines = { header, NuiLine() } }))
+
+        local group = Group:init({ opts = { spacing = 1 } })
+        for i, answer in ipairs(item.code_answer) do
+            local text = Case:init(i, "", answer, item.expected_code_answer[i])
+            group:append(text)
+        end
+        self.layout:append(group)
+    end
+end
+
+---@param item lc.Interpreter.Response
+function result:handle_compile_error(item)
     local text = Text:init({})
+    local lines = {}
 
     text:append(item.status_msg, "DiagnosticError")
     text:append("")
-
-    local lines = {}
-    if status_code == 20 then
-        lines = vim.split(item.full_compile_error, "\n")
-        for _, line in ipairs(lines) do
-            text:append("\t▎\t" .. line, "DiagnosticError")
-        end
+    lines = vim.split(item.full_compile_error, "\n")
+    for _, line in ipairs(lines) do
+        text:append("\t▎\t" .. line, "DiagnosticError")
     end
 
+    return text
+end
+
+---@param item lc.Interpreter.Response
+function result:handle_runtime(item)
+    ---fasd
+end
+
+---@param item lc.Interpreter.Response
+function result:handle(item)
     self.layout:clear()
-    self.layout = self.layout:append(text)
+    local status_code = item.status_code
+
+    self.popup.border:set_highlight(item.correct_answer and "DiagnosticOk" or "DiagnosticError")
+    log.info(status_code)
+
+    local handlers = {
+        -- runtime
+        [10] = function() self:handle_runtime_error(item) end,
+        [15] = function() self:handle_runtime(item) end,
+
+        -- compiler
+        [20] = function() self:handle_compile_error(item) end,
+
+        -- unknown
+        ["unknown"] = function() log.error("unknown runner status code: " .. item.status_code) end,
+    }
+
+    handlers[status_code or "unknown"]()
+
     self:draw()
+end
+
+function result:clear()
+    self.popup.border:set_highlight("FloatBorder")
+    vim.api.nvim_buf_set_lines(self.popup.bufnr, 0, -1, false, {})
 end
 
 function result:draw()
@@ -42,6 +106,8 @@ function result:draw()
 end
 
 ---@param parent lc.Console
+---
+---@return lc.Result
 function result:init(parent)
     local t = {}
     for _, case in ipairs(parent.parent.q.testcase_list) do
@@ -81,9 +147,6 @@ function result:init(parent)
         layout = Layout:init({ contents = {} }),
         parent = parent,
     }, self)
-
-    obj.popup:map("n", "R", function() parent.parent:run() end)
-    obj.popup:map("n", "q", function() parent:hide() end)
 
     return obj
 end

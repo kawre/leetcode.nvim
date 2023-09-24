@@ -12,6 +12,7 @@ function M.setup(cfg)
     vim.api.nvim_set_hl(0, "LcProblemEasy", { fg = "#00b8a3" })
     vim.api.nvim_set_hl(0, "LcProblemMedium", { fg = "#ffb800" })
     vim.api.nvim_set_hl(0, "LcProblemHard", { fg = "#ef4743" })
+    vim.api.nvim_set_hl(0, "LeetCodeIndent", { link = "Comment" })
 
     vim.api.nvim_create_autocmd("VimEnter", {
         pattern = "*",

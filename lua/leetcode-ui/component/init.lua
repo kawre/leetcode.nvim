@@ -1,6 +1,7 @@
 local log = require("leetcode.logger")
-local Line = require("nui.line")
+local NuiLine = require("nui.line")
 local utils = require("leetcode-ui.utils")
+local Object = require("nui.object")
 
 ---@class lc-ui.Component
 ---@field lines NuiLine[]
@@ -13,18 +14,35 @@ component.__index = component
 --- Methods
 --------------------------------------------------------
 
----@param content NuiLine | string
+---@param content NuiLine | string | NuiLine[]
 ---@param highlight? string
 function component:append(content, highlight)
-    if type(content) == "table" then
+    if type(content) == "string" then
+        local line = NuiLine():append(content, highlight or "")
+        table.insert(self.lines, line)
+    elseif getmetatable(content) then
         table.insert(self.lines, content)
     else
-        local line = Line():append(content, highlight or "")
-        table.insert(self.lines, line)
+        self.lines = vim.list_extend(self.lines, content)
     end
 
     return self
 end
+--
+-- ---@param content NuiLine | string | NuiLine[]
+-- ---@param highlight? string
+-- function component:append_front(content, highlight)
+--     if type(content) == "string" then
+--         local line = NuiLine():append(content, highlight or "")
+--         table.insert(self.lines, 1, line)
+--     elseif getmetatable(content) then
+--         table.insert(self.lines, 1, content)
+--     else
+--         self.lines = vim.list_extend(self.lines, content)
+--     end
+--
+--     return self
+-- end
 
 ---@param split NuiSplit | NuiPopup
 function component:draw(split)
@@ -33,7 +51,7 @@ function component:draw(split)
 
     for _, line in pairs(self.lines) do
         -- log.info(line:content())
-        local new_line = Line()
+        local new_line = NuiLine()
         new_line:append(padding)
         new_line:append(line)
 

@@ -75,17 +75,11 @@ function cmd.random_question()
     question:init(item):mount()
 end
 
-function cmd.testcase() ui.testcase() end
-
-function cmd.run()
-    local runner = Runner:init()
-    runner:run()
-end
-
 function cmd.console()
     local q = problems[curr_question]
+
     if q then
-        q.console:open()
+        q.console:toggle()
     else
         log.error("No current question found")
     end

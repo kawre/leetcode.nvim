@@ -54,12 +54,12 @@ function utils.get_padding(lines, position, split)
         if position == "center" then
             local width = utils.win_width(split)
             local mid = (width - longest_line) / 2
-            local spaces = string.rep(" ", mid)
+            local spaces = string.rep(" ", mid - 1)
             padding = spaces
         elseif position == "right" then
             local width = utils.win_width(split)
             local mid = width - longest_line - 1
-            local spaces = string.rep(" ", mid)
+            local spaces = string.rep(" ", mid - 1)
             padding = spaces
         end
     end

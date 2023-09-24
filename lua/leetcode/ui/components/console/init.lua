@@ -4,6 +4,7 @@ local config = require("leetcode.config")
 local Testcase = require("leetcode.ui.components.console.testcase")
 local Text = require("leetcode-ui.component.text")
 local Result = require("leetcode.ui.components.console.result")
+local Runner = require("leetcode.runner")
 
 local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
@@ -14,22 +15,57 @@ local NuiLayout = require("nui.layout")
 ---@field layout NuiLayout
 ---@field testcase lc.Testcase
 ---@field result lc.Result
+---@field opened boolean
 local console = {}
 console.__index = console
 
 function console:mount()
     self.layout:mount()
+    self.opened = true
 
     return self
 end
 
-function console:open()
+function console:run()
+    self.result:clear()
+    local runner = Runner:init(self.parent)
+    local res = runner:run()
+    -- fasdf//
+end
+
+function console:submit()
+    -- asdf
+end
+
+function console:keymaps()
+    local keymaps = {
+        ["R"] = function() self:run() end,
+        ["S"] = function() self:submit() end,
+        [{ "q", "<Esc>" }] = function() self:hide() end,
+    }
+
+    for _, p in ipairs({ self.result, self.testcase }) do
+        for key, fn in pairs(keymaps) do
+            p.popup:map("n", key, fn)
+        end
+    end
+end
+
+function console:toggle()
+    if self.opened then
+        self:hide()
+    else
+        self:show()
+    end
+end
+
+function console:show()
+    self.opened = true
     self.layout:show()
-    -- fasdf/
 end
 
 function console:hide()
-    -- fasdf/
+    self.opened = false
     self.layout:hide()
 end
 
@@ -37,6 +73,7 @@ end
 function console:init(parent)
     local obj = setmetatable({
         parent = parent,
+        opened = false,
     }, self)
 
     obj.testcase = Testcase:init(obj)
@@ -55,6 +92,8 @@ function console:init(parent)
             NuiLayout.Box(obj.result.popup, { size = "50%" }),
         }, { dir = config.user.console.dir })
     )
+
+    obj:keymaps()
 
     return obj
 end

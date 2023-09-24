@@ -26,7 +26,6 @@ function testcase:init(parent)
     local popup = NuiPopup({
         enter = true,
         focusable = true,
-        -- zindex = 5,
         border = {
             padding = {
                 top = 1,
@@ -57,8 +56,8 @@ function testcase:init(parent)
         popup = popup,
     }, self)
 
-    obj.popup:map("n", "R", function() parent.parent:run() end)
-    obj.popup:map("n", "q", function() parent:hide() end)
+    -- obj.popup:map("n", "R", function() parent:run() end)
+    -- obj.popup:map("n", "q", function() parent:hide() end)
 
     return obj
 end
