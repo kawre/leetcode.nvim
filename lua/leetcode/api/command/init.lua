@@ -1,15 +1,11 @@
 local cache = require("leetcode.cache")
 local log = require("leetcode.logger")
-local config = require("leetcode.config")
 local question = require("leetcode.ui.components.question")
-local Runner = require("leetcode.runner")
-local Console = require("leetcode.ui.components.console")
+local config = require("leetcode.config")
+local menu = require("leetcode-menu")
 
 local ui = require("leetcode.ui")
--- local dashboard = require("leetcode.ui.dashboard")
 local gql = require("leetcode.api.graphql")
-
-local path = require("plenary.path")
 
 ---@class lc.Commands
 local cmd = {}
@@ -25,8 +21,7 @@ function cmd.problems()
         ---@param item lc.Problem
         function(item)
             if not item then return end
-
-            question:init(item):mount()
+            question:init(item)
         end
     )
 end
@@ -49,7 +44,7 @@ function cmd.cookie_prompt()
             if not cookie_str then return end
 
             cookie.new(cookie_str)
-            cmd.dashboard("menu")
+            -- cmd.dashboard("menu")
         end
     )
 end
@@ -61,18 +56,13 @@ function cmd.authenticate() gql.auth.user_status() end
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---
----@param theme lc-db.Theme
-function cmd.dashboard(theme) dashboard.apply(theme) end
-
----Merge configurations into default configurations and set it as user configurations.
----
 --@param theme lc-db.Theme
 function cmd.qot() ui.open_qot() end
 
 function cmd.random_question()
     local title_slug = gql.question.random().title_slug
     local item = cache.problems.get_by_title_slug(title_slug) or {}
-    question:init(item):mount()
+    question:init(item)
 end
 
 function cmd.console()
@@ -84,5 +74,21 @@ function cmd.console()
         log.error("No current question found")
     end
 end
+
+function cmd.start()
+    if vim.fn.argc() ~= 1 then return end
+
+    local invoke, arg = config.user.invoke_name, vim.fn.argv()[1]
+    if arg ~= invoke then return end
+
+    local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+    if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return true end
+
+    menu:init()
+end
+
+function cmd.menu() vim.api.nvim_set_current_tabpage(config.user.menu_tabpage) end
+
+function cmd.questions() vim.api.nvim_set_current_tabpage(config.user.questions_tabpage) end
 
 return cmd

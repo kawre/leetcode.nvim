@@ -50,7 +50,6 @@ function component:draw(split)
     local layout = state[split.bufnr]
 
     for _, line in pairs(self.lines) do
-        -- log.info(line:content())
         local new_line = NuiLine()
         new_line:append(padding)
         new_line:append(line)

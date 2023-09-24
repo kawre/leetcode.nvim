@@ -3,12 +3,13 @@ local Text = require("leetcode-ui.component.text")
 local NuiLine = require("nui.line")
 local log = require("leetcode.logger")
 local NuiPopup = require("nui.popup")
+local console_popup = require("leetcode.ui.components.console.popup")
 
----@class lc.Testcase
----@field popup NuiPopup
+---@class lc.Testcase: lc.Console.Popup
 ---@field testcases string[]
 local testcase = {}
 testcase.__index = testcase
+setmetatable(testcase, console_popup)
 
 function testcase:content()
     self.testcases = {}
@@ -24,6 +25,23 @@ function testcase:content()
     end
 
     return testcases
+end
+
+function testcase:draw()
+    local t = {}
+    for i, case in ipairs(self.parent.parent.q.testcase_list) do
+        if i ~= 1 then table.insert(t, "") end
+
+        table.insert(self.testcases, case:gsub("\n", " ")[1])
+
+        for s in vim.gsplit(case, "\n", { trimempty = true }) do
+            table.insert(t, s)
+        end
+    end
+
+    vim.api.nvim_buf_set_lines(self.popup.bufnr, 0, -1, false, t)
+
+    return self
 end
 
 ---@param parent lc.Console
@@ -58,22 +76,10 @@ function testcase:init(parent)
     local obj = setmetatable({
         popup = popup,
         testcases = {},
+        parent = parent,
     }, self)
 
-    local t = {}
-    for i, case in ipairs(parent.parent.q.testcase_list) do
-        if i ~= 1 then table.insert(t, "") end
-
-        table.insert(obj.testcases, case:gsub("\n", " ")[1])
-
-        for s in vim.gsplit(case, "\n", { trimempty = true }) do
-            table.insert(t, s)
-        end
-    end
-
-    vim.api.nvim_buf_set_lines(obj.popup.bufnr, 0, -1, false, t)
-
-    return obj
+    return obj:draw()
 end
 
 return testcase

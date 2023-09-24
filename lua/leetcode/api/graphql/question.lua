@@ -6,33 +6,9 @@ local question = {}
 ---@class lc.Question.Content
 ---@field content string
 
--- ---@param title_slug string
--- ---
--- ---@return lc.Question.Content
--- function question.content(title_slug)
---     local variables = {
---         titleSlug = title_slug,
---     }
---
---     local query = [[
---     query questionContent($titleSlug: String!) {
---       question(titleSlug: $titleSlug) {
---         content
---         mysqlSchemas
---         dataSchemas
---       }
---     }
---   ]]
---
---     local ok, res = pcall(gql.query, query, variables)
---     assert(ok)
---
---     return res["question"]
--- end
-
 ---@param title_slug string
 ---
----@return lc.QuestionResponse
+---@return question_response
 function question.by_title_slug(title_slug)
     local variables = {
         titleSlug = title_slug,
@@ -59,12 +35,16 @@ function question.by_title_slug(title_slug)
               code
             }
             testcase_list: exampleTestcaseList
+            meta_data: metaData
           }
         }
     ]]
 
     local ok, res = pcall(utils.query, query, variables)
     assert(ok)
+    local md = res["question"].meta_data
+    local dok, decoded = pcall(vim.json.decode, md)
+    if dok then res["question"].meta_data = decoded end
 
     return res["question"]
 end

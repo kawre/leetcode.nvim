@@ -1,12 +1,13 @@
 local config = require("leetcode.config")
-local api = require("leetcode.api")
 local dashboard = require("leetcode-menu")
 local utils = require("leetcode.utils")
+local log = require("leetcode.logger")
+local cmd = require("leetcode.api.command")
 
-local M = {}
+local leetcode = {}
 
 ---@param cfg? lc.Config
-function M.setup(cfg)
+function leetcode.setup(cfg)
     config.apply(cfg or {})
 
     vim.api.nvim_set_hl(0, "LcProblemEasy", { fg = "#00b8a3" })
@@ -14,21 +15,36 @@ function M.setup(cfg)
     vim.api.nvim_set_hl(0, "LcProblemHard", { fg = "#ef4743" })
     vim.api.nvim_set_hl(0, "LeetCodeIndent", { link = "Comment" })
 
+    local group_id = vim.api.nvim_create_augroup("leetcode_start", { clear = true })
+
     vim.api.nvim_create_autocmd("VimEnter", {
+        group = group_id,
         pattern = "*",
         nested = true,
-        callback = function()
-            if config.user.invoke_name == vim.fn.expand("%") then dashboard:init():mount() end
-        end,
+        callback = function(_) cmd.start() end,
     })
 
-    ---@param fn string
-    local function cmd(fn)
-        return string.format("<cmd>lua require('leetcode.api.command').%s()<cr>", fn)
-    end
+    utils.map("n", "<leader>lc", utils.cmd("console"))
+    utils.map("n", "<leader>lm", utils.cmd("menu"))
+    utils.map("n", "<leader>lq", utils.cmd("questions"))
 
-    utils.map("n", "<leader>lc", cmd("console"))
-    -- vim.keymap.set("n", '<leader>lc', rhs, opts)
+    -- vim.api.nvim_create_user_command("LcMenu", function() vim.api.nvim_set_current_tabpage(1) end, {
+    --     bang = true,
+    --     desc = "Opens LeetCode Menu",
+    --     nargs = 0,
+    --     bar = true,
+    -- })
+    --
+    -- vim.api.nvim_create_user_command(
+    --     "LcQuestion",
+    --     function() vim.api.nvim_set_current_tabpage() end,
+    --     {
+    --         bang = true,
+    --         desc = "Opens last openned LeetCode question",
+    --         nargs = 0,
+    --         bar = true,
+    --     }
+    -- )
 end
 
-return M
+return leetcode

@@ -43,10 +43,13 @@ function button:init(text, sc, on_press, expandable, keybind, keybind_opts)
         on_press = on_press or function() end,
     }
 
-    local txt = text.icon .. " " .. text.src .. (expandable and " " .. expand or "")
-    local padding = string.rep(" ", width - txt:len())
+    local txt = text.icon .. " " .. text.src .. " " .. (expandable and expand or "")
+    local len = vim.api.nvim_strwidth(txt)
+    local sc_len = vim.api.nvim_strwidth(sc)
+    local padding = string.rep(" ", width - len - sc_len)
 
-    local line = Line():append(txt .. padding .. sc)
+    local line = Line()
+    line:append(txt .. padding .. sc)
 
     local obj = setmetatable({
         opts = opts,

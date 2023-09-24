@@ -1,31 +1,33 @@
 local component = require("leetcode-ui.component")
 local log = require("leetcode.logger")
+local utils = require("leetcode-menu.utils")
 
-local Split = require("nui.split")
 local Text = require("nui.text")
 local Line = require("nui.line")
 
 ---@class lc-db.Dashboard
----@field split NuiSplit
 ---@field layout lc-ui.Layout
-local dashboard = { split = {} } ---@diagnostic disable-line
-dashboard.__index = dashboard
+---@field bufnr integer
+---@field winid integer
+---@field tabpage integer
+local menu = {} ---@diagnostic disable-line
+menu.__index = menu
 
 ---@type table<bufnr, lc-db.Dashboard>
 db = {}
 
-function dashboard:clear() vim.api.nvim_buf_set_lines(self.split.bufnr, 0, -1, false, {}) end
+function menu:clear() vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {}) end
 
-function dashboard:redraw() self:draw() end
+function menu:redraw() self:draw() end
 
-function dashboard:draw()
+function menu:draw()
     self:clear()
 
-    self.layout:draw(self.split)
+    self.layout:draw(self)
 end
 
 ---@private
-function dashboard:autocmds()
+function menu:autocmds()
     vim.api.nvim_create_autocmd("WinResized", {
         callback = function() self:draw() end,
     })
@@ -39,7 +41,7 @@ end
 ---| "cache"
 
 ---@param layout layouts
-function dashboard:set_layout(layout)
+function menu:set_layout(layout)
     local ok, res = pcall(require, "leetcode-menu.theme." .. layout)
     if ok then self.layout = res end
 
@@ -47,56 +49,60 @@ function dashboard:set_layout(layout)
 end
 
 ---@private
-function dashboard:keymaps()
-    self.split:map("n", "<cr>", function()
-        local row = vim.api.nvim_win_get_cursor(self.split.winid)[1]
+function menu:keymaps()
+    -- self.split:map("n", "<cr>", function()
+    -- end)
+
+    vim.keymap.set("n", "<cr>", function()
+        local row = vim.api.nvim_win_get_cursor(self.winid)[1]
         self.layout:handle_press(row)
-    end)
+    end, {})
 end
 
-function dashboard:mount()
-    self.split:mount()
-    vim.cmd("bd#")
-
+function menu:mount()
     self:keymaps()
     self:autocmds()
 
     self:draw()
 end
 
-function dashboard:init()
-    local split = Split({
-        relative = "win",
-        -- size = "100%",
-        enter = true,
-        name = "LeetCode",
-        focusable = true,
-        buf_options = {
-            modifiable = true,
-            readonly = false,
-            filetype = "leetcode.nvim",
-            swapfile = false,
-            buftype = "nofile",
-            buflisted = true,
-        },
-        win_options = {
-            foldcolumn = "1",
-            wrap = false,
-            number = false,
-            signcolumn = "no",
-            cursorline = false,
-        },
+function menu:init()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local winid = vim.api.nvim_get_current_win()
+    local tabpage = vim.api.nvim_get_current_tabpage()
+    vim.api.nvim_buf_set_name(bufnr, "")
+    vim.api.nvim_set_current_tabpage(1)
+
+    utils.apply_opt_local({
+        bufhidden = "wipe",
+        buflisted = false,
+        matchpairs = "",
+        swapfile = false,
+        buftype = "nofile",
+        filetype = "leetcode.nvim",
+        synmaxcol = 0,
+        wrap = false,
+        colorcolumn = "",
+        foldlevel = 999,
+        foldcolumn = "0",
+        cursorcolumn = false,
+        cursorline = false,
+        number = false,
+        relativenumber = false,
+        list = false,
+        spell = false,
+        signcolumn = "no",
     })
-    vim.api.nvim_buf_set_name(split.bufnr, "LeetCode")
 
-    local menu = require("leetcode-menu.theme.menu")
     local obj = setmetatable({
-        split = split,
-        layout = menu,
+        bufnr = bufnr,
+        winid = winid,
+        tabpage = tabpage,
+        layout = require("leetcode-menu.theme.menu"),
     }, self)
-    db[split.bufnr] = obj
+    db[bufnr] = obj
 
-    return obj
+    return obj:mount()
 end
 
-return dashboard
+return menu

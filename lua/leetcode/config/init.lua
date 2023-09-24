@@ -5,6 +5,8 @@ local config = {
     name = "leetcode.nvim",
     debug = true,
     notify = false,
+    lang = "cpp",
+    domain = "https://leetcode.com",
 }
 
 ---Default configurations.
@@ -33,6 +35,7 @@ function config.apply(cfg)
     end
 
     config.domain = "https://leetcode." .. config.user.domain
+    config.lang = config.user.lang
 
     vim.api.nvim_set_hl(0, "LeetCodePTag", { link = "Comment" })
     vim.api.nvim_set_hl(0, "LeetCodeEmTag", { italic = true })

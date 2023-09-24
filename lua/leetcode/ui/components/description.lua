@@ -44,8 +44,8 @@ function description:populate()
     statsline:append(
         q.difficulty,
         q.difficulty == "Easy" and "DiagnosticOk"
-        or q.difficulty == "Medium" and "DiagnosticWarn"
-        or "DiagnosticError"
+            or q.difficulty == "Medium" and "DiagnosticWarn"
+            or "DiagnosticError"
     )
     statsline:append(" | ")
     statsline:append(q.likes .. "  ", "Comment")
@@ -82,7 +82,7 @@ end
 ---@param parent lc.Question
 function description:init(parent)
     local split = Split({
-        relative = "win",
+        relative = "editor",
         position = "left",
         size = config.user.description.width,
         buf_options = {
@@ -98,13 +98,11 @@ function description:init(parent)
             wrap = true,
             number = false,
             signcolumn = "no",
-            -- winhighlight = "Normal:Normal,NormalNC:NormalNC",
             winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
         },
         enter = true,
         focusable = true,
     })
-    vim.api.nvim_buf_set_name(split.bufnr, "Description")
 
     local obj = setmetatable({
         split = split,
@@ -112,7 +110,9 @@ function description:init(parent)
         layout = {},
     }, self)
 
-    return obj
+    vim.api.nvim_buf_set_name(obj.split.bufnr, "Description")
+
+    return obj:mount()
 end
 
 return description

@@ -135,9 +135,37 @@
 ---@alias compile_error lc.Interpreter.Response.compile_error
 
 --------------------------------------------
+--- Time Limit Exceeded
+--------------------------------------------
+---@class lc.Interpreter.Response.timelimit_error
+---@field code_answer table
+---@field code_output table
+---@field elapsed_time integer
+---@field lang string
+---@field memory number
+---@field memory_percentile number | nil
+---@field pretty_lang string
+---@field run_success boolean
+---@field runtime_percentile number | nil
+---@field state string
+---@field status_code number
+---@field status_memory string
+---@field status_msg string
+---@field status_runtime string
+---@field std_output_list table
+---@field submission_id string
+---@field task_finish_time number
+---@field task_name string
+---@field total_correct number | nil
+---@field total_testcases number | nil
+
+---@alias timelimit_error lc.Interpreter.Response.timelimit_error
+
+--------------------------------------------
 --- Interpreter responses
 --------------------------------------------
 ---@alias interpreter_response
 ---| runtime
 ---| runtime_error
 ---| compile_error
+---| timelimit_error

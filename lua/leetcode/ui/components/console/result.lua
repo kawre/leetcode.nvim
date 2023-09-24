@@ -1,4 +1,7 @@
 local log = require("leetcode.logger")
+local config = require("leetcode.config")
+local Stdout = require("leetcode.ui.components.console.components.stdout")
+local console_popup = require("leetcode.ui.components.console.popup")
 
 local Case = require("leetcode.ui.components.console.components.case")
 local Group = require("leetcode-ui.component.group")
@@ -9,12 +12,11 @@ local Text = require("leetcode-ui.component.text")
 local NuiLine = require("nui.line")
 local NuiPopup = require("nui.popup")
 
----@class lc.Result
----@field popup NuiPopup
+---@class lc.Result: lc.Console.Popup
 ---@field layout lc-ui.Layout
----@field parent lc.Console
 local result = {}
 result.__index = result
+setmetatable(result, console_popup)
 
 ---@private
 ---
@@ -38,9 +40,24 @@ function result:handle_runtime(item) -- status code = 10
         local text =
             Case:init(i, self.parent.testcase.testcases[i], answer, item.expected_code_answer[i])
         group:append(text)
+
+        local stdout = Stdout:init(i, item)
+        if stdout then group:append(stdout) end
     end
 
     self.layout:append(group)
+end
+
+---@private
+---
+---@param item timelimit_error
+function result:handle_timelimit_error(item) -- status code = 14
+    local header = NuiLine()
+    header:append(item.status_msg, "DiagnosticError")
+
+    self.layout:append(Text:init({ lines = { header, NuiLine() } }))
+    local stdout = Stdout:init(1, item)
+    if stdout then self.layout:append(stdout) end
 end
 
 ---@private
@@ -79,12 +96,16 @@ function result:handle(item)
     self.layout:clear()
     local status_code = item.status_code
 
+    log.info(status_code)
     self.popup.border:set_highlight(item.correct_answer and "DiagnosticOk" or "DiagnosticError")
 
     local handlers = {
         -- runtime
         [10] = function()
             self:handle_runtime(item --[[@as runtime]])
+        end,
+        [14] = function()
+            self:handle_timelimit_error(item --[[@as timelimit_error]])
         end,
         [15] = function()
             self:handle_runtime_error(item --[[@as runtime_error]])

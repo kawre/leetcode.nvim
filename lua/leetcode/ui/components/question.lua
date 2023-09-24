@@ -9,7 +9,7 @@ local Runner = require("leetcode.runner")
 
 ---@class lc.Question
 ---@field file Path
----@field q lc.QuestionResponse
+---@field q question_response
 ---@field description lc.Description
 ---@field bufnr bufnr
 ---@field console lc.Console
@@ -45,14 +45,16 @@ function question:mount()
     if not self.file:exists() then self:create_file() end
 
     vim.api.nvim_set_current_dir(self.file:parent().filename)
-    vim.cmd("edit " .. self.file:absolute())
+    vim.cmd.tabe(self.file:absolute())
 
     self.bufnr = vim.api.nvim_get_current_buf()
     curr_question = self.bufnr
     problems[self.bufnr] = self
 
-    self.description = Description:init(self):mount()
-    self.console = Console:init(self):mount()
+    self.description = Description:init(self)
+    self.console = Console:init(self)
+
+    return self
 end
 
 ---@param problem lc.Problem
@@ -60,7 +62,7 @@ function question:init(problem)
     local q = gql.question.by_title_slug(problem.title_slug)
 
     local dir = config.user.directory .. "/solutions/"
-    local fn = q.frontend_id .. "." .. q.title_slug .. "." .. config.user.lang
+    local fn = string.format("%s.%s.%s", q.frontend_id, q.title_slug, config.lang)
     local file = path:new(dir .. fn)
 
     local obj = setmetatable({
@@ -68,7 +70,7 @@ function question:init(problem)
         q = q,
     }, self)
 
-    return obj
+    return obj:mount()
 end
 
 return question

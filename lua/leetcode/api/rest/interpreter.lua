@@ -7,7 +7,7 @@ local async = require("plenary.async")
 ---@class lc.Interpreter
 local interpreter = {}
 
----@param question lc.QuestionResponse
+---@param question question_response
 ---@param typed_code string
 ---@param data_input string
 ---@param callback function
@@ -27,12 +27,18 @@ function interpreter.interpret_solution(question, typed_code, data_input, callba
     assert(ok)
 
     async.run(function() ---@diagnostic disable-line
-        local noti = log.spin("PENDING"):start()
+        local noti = log.spin():start()
+        local check_state = {
+            ["PENDING"] = "Pending…",
+            ["STARTED"] = "Judging…",
+            ["SUCCESS"] = "Finished",
+        }
 
         while true do
             ---@type lc.Interpreter.Response
             local check = interpreter.check(res.interpret_id)
-            noti:update(check.state)
+            local state = check_state[check.state]
+            noti:update(state)
 
             if check.state == "SUCCESS" then
                 noti:done()

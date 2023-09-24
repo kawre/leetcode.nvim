@@ -5,6 +5,7 @@ local Testcase = require("leetcode.ui.components.console.testcase")
 local Text = require("leetcode-ui.component.text")
 local Result = require("leetcode.ui.components.console.result")
 local Runner = require("leetcode.runner")
+local log = require("leetcode.logger")
 
 local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
@@ -21,34 +22,16 @@ console.__index = console
 
 function console:mount()
     self.layout:mount()
-    self.opened = true
-
     return self
 end
 
 function console:run()
     self.result:clear()
-    local runner = Runner:init(self.parent)
-    local res = runner:run()
-    -- fasdf//
+    Runner:init(self.parent):run()
 end
 
 function console:submit()
     -- asdf
-end
-
-function console:keymaps()
-    local keymaps = {
-        ["R"] = function() self:run() end,
-        ["S"] = function() self:submit() end,
-        [{ "q", "<Esc>" }] = function() self:hide() end,
-    }
-
-    for _, p in ipairs({ self.result, self.testcase }) do
-        for key, fn in pairs(keymaps) do
-            p.popup:map("n", key, fn)
-        end
-    end
 end
 
 function console:toggle()
@@ -60,8 +43,13 @@ function console:toggle()
 end
 
 function console:show()
+    if not self.layout._.mounted then
+        self.layout:mount()
+    else
+        self.layout:show()
+    end
+
     self.opened = true
-    self.layout:show()
 end
 
 function console:hide()
@@ -76,16 +64,21 @@ function console:init(parent)
         opened = false,
     }, self)
 
-    obj.testcase = Testcase:init(obj)
-    obj.result = Result:init(obj)
+    local keymap = {
+        ["R"] = function() obj:run() end,
+        ["S"] = function() obj:submit() end,
+        [{ "q", "<Esc>" }] = function() obj:hide() end,
+    }
+
+    obj.testcase = Testcase:init(obj):keymaps(keymap)
+    obj.result = Result:init(obj):keymaps(keymap)
+    require("lua")
+
     obj.layout = NuiLayout(
         {
             relative = "editor",
             position = "50%",
             size = config.user.console.size,
-            win_config = {
-                zindex = 250,
-            },
         },
         NuiLayout.Box({
             NuiLayout.Box(obj.testcase.popup, { size = "50%" }),
@@ -93,7 +86,7 @@ function console:init(parent)
         }, { dir = config.user.console.dir })
     )
 
-    obj:keymaps()
+    -- obj:keymaps()
 
     return obj
 end
