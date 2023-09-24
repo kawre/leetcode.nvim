@@ -95,7 +95,6 @@ function parser:get_text(node) return self.ts.get_node_text(node, self.str) end
 ---TODO: problem 591, <u>...</u> tag,
 function parser:highlight_node(node, tag_data)
     local text = self:get_text(node)
-    -- log.info(text)
     -- if not tag_data then
     --     text = text:gsub("&nbsp;", " ")
     --     return self.text:append(text)

@@ -2,6 +2,7 @@ local log = require("leetcode.logger")
 
 local Case = require("leetcode.ui.components.console.components.case")
 local Group = require("leetcode-ui.component.group")
+local Pre = require("leetcode.ui.components.console.components.pre")
 local Layout = require("leetcode-ui.layout")
 local Text = require("leetcode-ui.component.text")
 
@@ -15,74 +16,84 @@ local NuiPopup = require("nui.popup")
 local result = {}
 result.__index = result
 
----@param item lc.Interpreter.Response
-function result:handle_runtime_error(item)
-    if item.status_code == 15 then
-        -- local header = NuiLine()
-        -- header:append("Invalid Testcase", "DiagnosticError")
-        --
-        -- text:append(header)
-        -- -- self.layout:append(text)
-        --
-        -- text = Case:init(item.case_idx + 1, "", "", item.full_runtime_error)
-    else --- code: 10
-        local header = NuiLine()
+---@private
+---
+---@param item runtime
+function result:handle_runtime(item) -- status code = 10
+    local header = NuiLine()
 
-        if item.correct_answer then
-            header:append("Accepted", "DiagnosticOk")
-        else
-            header:append("Wrong Answer", "DiagnosticError")
-        end
-
-        header:append(" | ")
-        header:append("Runtime: " .. item.status_runtime, "Comment")
-
-        self.layout:append(Text:init({ lines = { header, NuiLine() } }))
-
-        local group = Group:init({ opts = { spacing = 1 } })
-        for i, answer in ipairs(item.code_answer) do
-            local text = Case:init(i, "", answer, item.expected_code_answer[i])
-            group:append(text)
-        end
-        self.layout:append(group)
-    end
-end
-
----@param item lc.Interpreter.Response
-function result:handle_compile_error(item)
-    local text = Text:init({})
-    local lines = {}
-
-    text:append(item.status_msg, "DiagnosticError")
-    text:append("")
-    lines = vim.split(item.full_compile_error, "\n")
-    for _, line in ipairs(lines) do
-        text:append("\t▎\t" .. line, "DiagnosticError")
+    if item.correct_answer then
+        header:append("Accepted", "DiagnosticOk")
+    else
+        header:append("Wrong Answer", "DiagnosticError")
     end
 
-    return text
+    header:append(" | ")
+    header:append("Runtime: " .. item.status_runtime, "Comment")
+
+    self.layout:append(Text:init({ lines = { header, NuiLine() } }))
+
+    local group = Group:init({ opts = { spacing = 1 } })
+    for i, answer in ipairs(item.code_answer) do
+        local text =
+            Case:init(i, self.parent.testcase.testcases[i], answer, item.expected_code_answer[i])
+        group:append(text)
+    end
+
+    self.layout:append(group)
 end
 
----@param item lc.Interpreter.Response
-function result:handle_runtime(item)
-    ---fasd
+---@private
+---
+---@param item runtime_error
+function result:handle_runtime_error(item) -- status code = 15
+    local header = NuiLine()
+    header:append("Invalid Testcase", "DiagnosticError")
+
+    local t = {}
+    for line in vim.gsplit(item.full_runtime_error, "\n") do
+        table.insert(t, NuiLine():append(line, "DiagnosticError"))
+    end
+
+    local pre = Pre:init(header, t)
+    self.layout:append(pre)
 end
 
----@param item lc.Interpreter.Response
+---@private
+---
+---@param item compile_error
+function result:handle_compile_error(item) -- status code = 20
+    local header = NuiLine()
+    header:append(item.status_msg, "DiagnosticError")
+
+    local t = {}
+    for line in vim.gsplit(item.full_compile_error, "\n") do
+        table.insert(t, NuiLine():append(line, "DiagnosticError"))
+    end
+
+    self.layout:append(Pre:init(header, t))
+end
+
+---@param item interpreter_response
 function result:handle(item)
     self.layout:clear()
     local status_code = item.status_code
 
     self.popup.border:set_highlight(item.correct_answer and "DiagnosticOk" or "DiagnosticError")
-    log.info(status_code)
 
     local handlers = {
         -- runtime
-        [10] = function() self:handle_runtime_error(item) end,
-        [15] = function() self:handle_runtime(item) end,
+        [10] = function()
+            self:handle_runtime(item --[[@as runtime]])
+        end,
+        [15] = function()
+            self:handle_runtime_error(item --[[@as runtime_error]])
+        end,
 
         -- compiler
-        [20] = function() self:handle_compile_error(item) end,
+        [20] = function()
+            self:handle_compile_error(item --[[@as compile_error]])
+        end,
 
         -- unknown
         ["unknown"] = function() log.error("unknown runner status code: " .. item.status_code) end,

@@ -35,3 +35,109 @@
 ---@field status_msg string
 ---@field state interpret.state
 ---@field case_idx integer
+
+--------------------------------------------
+--- Runtime Error
+--------------------------------------------
+---@class lc.Interpreter.Response.runtime_error
+---@field status_code number
+---@field lang string
+---@field run_success boolean
+---@field code_answer table
+---@field code_output table
+---@field runtime_error string
+---@field full_runtime_error string
+---@field invalid_testcase boolean
+---@field case_idx number
+---@field param_idx number
+---@field task_finish_time number
+---@field task_name string
+---@field total_correct number | nil
+---@field total_testcases number | nil
+---@field status_runtime string
+---@field runtime_percentile number | nil
+---@field status_memory string
+---@field memory_percentile number | nil
+---@field pretty_lang string
+---@field submission_id string
+---@field status_msg string
+---@field state string
+
+---@alias runtime_error lc.Interpreter.Response.runtime_error
+
+--------------------------------------------
+--- Runtime
+--------------------------------------------
+---@class lc.Interpreter.Response.runtime
+---@field status_code number
+---@field lang string
+---@field run_success boolean
+---@field status_runtime string
+---@field memory number
+---@field display_runtime string
+---@field code_answer table
+---@field code_output table
+---@field std_output_list table
+---@field elapsed_time number
+---@field task_finish_time number
+---@field task_name string
+---@field expected_status_code number
+---@field expected_lang string
+---@field expected_run_success boolean
+---@field expected_status_runtime string
+---@field expected_memory number
+---@field expected_code_answer table
+---@field expected_code_output table
+---@field expected_std_output_list table
+---@field expected_elapsed_time number
+---@field expected_task_finish_time number
+---@field expected_task_name string
+---@field correct_answer boolean
+---@field compare_result string
+---@field total_correct number
+---@field total_testcases number
+---@field runtime_percentile number | nil
+---@field status_memory string
+---@field memory_percentile number | nil
+---@field pretty_lang string
+---@field submission_id string
+---@field status_msg string
+---@field state string
+
+---@alias runtime lc.Interpreter.Response.runtime
+
+--------------------------------------------
+--- Compile Error
+--------------------------------------------
+---@class lc.Interpreter.Response.compile_error
+---@field status_code number
+---@field lang string
+---@field run_success boolean
+---@field compile_error string
+---@field full_compile_error string
+---@field status_runtime string
+---@field memory number
+---@field code_answer table
+---@field code_output table
+---@field std_output_list table
+---@field task_finish_time number
+---@field task_name string
+---@field total_correct number | nil
+---@field total_testcases number | nil
+---@field runtime_percentile number | nil
+---@field status_memory string
+---@field memory_percentile number | nil
+---@field pretty_lang string
+---@field submission_id string
+---@field status_msg string
+---@field state string
+
+---@alias compile_error lc.Interpreter.Response.compile_error
+
+--------------------------------------------
+--- Interpreter responses
+--------------------------------------------
+---@alias interpreter_response
+---| runtime
+---| runtime_error
+---| compile_error
