@@ -1,5 +1,4 @@
-local log = require("leetcode.logger")
-local layout = require("leetcode-ui.layout")
+local Layout = require("leetcode-ui.layout")
 local Title = require("leetcode-menu.components.title")
 local cmd = require("leetcode.api.command")
 
@@ -8,7 +7,7 @@ local button = require("leetcode-ui.component.button")
 local group = require("leetcode-ui.component.group")
 
 local problems = button:init(
-    { icon = "󱛖", src = "Sign in" },
+    { icon = "󱛖", src = "Sign in (By Cookie)" },
     "s",
     function() cmd.cookie_prompt() end,
     false
@@ -33,14 +32,14 @@ local buttons = group:init({
 local Header = require("leetcode-menu.components.header")
 local Footer = require("leetcode-menu.components.footer")
 
-return layout:init({
+return Layout:init({
     contents = {
         Header:init():content(),
 
         Title:init("Sign in"):content(),
-
+        --
         buttons,
-
+        --
         Footer:init():content(),
     },
     opts = {

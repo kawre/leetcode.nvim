@@ -3,6 +3,8 @@ local dashboard = require("leetcode-menu")
 local utils = require("leetcode.utils")
 local log = require("leetcode.logger")
 local cmd = require("leetcode.api.command")
+local api = require("leetcode.api")
+local cache = require("leetcode.cache")
 
 local leetcode = {}
 

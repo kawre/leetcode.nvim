@@ -1,23 +1,23 @@
 local log = require("leetcode.logger")
+local cookie = require("leetcode.cache.cookie")
 
-local M = {}
+local headers = {}
 
-M.get = function()
-    local cookie = require("leetcode.cache.cookie").read()
-    -- log.inspect(cookie or {})
+headers.get = function()
+    local c = cookie.get()
 
     return {
-        ["Referer"] = "https://leetcode.com/problems/two-sum/",
+        ["Referer"] = "https://leetcode.com/",
         ["Origin"] = "https://leetcode.com",
-        ["Cookie"] = cookie and string.format(
+        ["Cookie"] = c and string.format(
             "LEETCODE_SESSION=%s;csrftoken=%s",
-            cookie.leetcode_session,
-            cookie.csrftoken
+            c.leetcode_session,
+            c.csrftoken
         ) or "",
         ["Content-Type"] = "application/json",
         ["Accept"] = "application/json",
-        ["x-csrftoken"] = cookie and cookie.csrftoken or nil,
+        ["X-Csrftoken"] = c and c.csrftoken or nil,
     }
 end
 
-return M
+return headers

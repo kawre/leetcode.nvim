@@ -91,7 +91,7 @@ function spinner:failed(msg)
     self:stop()
 end
 
----@param msg string | nil
+---@param msg? string
 ---@param spinner_type? spinner_type
 function spinner:init(msg, spinner_type)
     local obj = setmetatable({

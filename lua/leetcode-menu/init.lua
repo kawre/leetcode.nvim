@@ -95,7 +95,8 @@ function menu:init()
         signcolumn = "no",
     })
 
-    local layout = config.auth.is_signed_in and "menu" or "signin"
+    local logged_in = config.auth.is_signed_in
+    local layout = logged_in and "menu" or "signin"
     local ok, l = pcall(require, "leetcode-menu.theme." .. layout)
     assert(ok)
 

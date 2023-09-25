@@ -1,50 +1,55 @@
+local Header = require("leetcode-menu.components.header")
+local Title = require("leetcode-menu.components.title")
+local Button = require("leetcode-ui.component.button")
+local Group = require("leetcode-ui.component.group")
+local Footer = require("leetcode-menu.components.footer")
+
+local Layout = require("leetcode-ui.layout")
+
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
+local cmd = require("leetcode.api.command")
 
-local template = require("leetcode.ui.dashboard.template")
-local section = template.section
+local update_btn = Button:init(
+    { icon = "󱛬", src = "Update" },
+    "u",
+    function() cmd.cookie_prompt() end
+)
 
-section.title.val = "Cookie"
+local delete_btn = Button:init(
+    { icon = "󱛪", src = "Delete / Sign out" },
+    "d",
+    function() cmd.cookie_prompt() end
+)
 
-section.buttons.val = {
-    template.button(
-        "s",
-        "󱛪 " .. " Sign out / Delete cookie ",
-        "<cmd>lua require('leetcode.utils').remove_cookie()<cr>"
-    ),
-    template.button(
-        "s",
-        "󱛬 " .. " Update ",
-        "<cmd>lua require('leetcode.api').cmd.cookie_prompt()<cr>"
-    ),
-    template.button(
-        "q",
-        " " .. " Back",
-        "<cmd>lua require('leetcode.api').cmd.dashboard('menu')<cr>"
-    ),
-}
+local back_btn = Button:init(
+    { icon = "", src = "Back" },
+    "q",
+    function() cmd.menu_layout("menu") end
+)
 
-return {
-    layout = {
-        -- header
-        { type = "padding", val = 2 },
-        section.header,
+local buttons = Group:init({
+    components = {
+        update_btn,
+        delete_btn,
+        back_btn,
+    },
+    opts = {
+        spacing = 1,
+    },
+})
 
-        -- notifications
-        { type = "padding", val = 2 },
-        section.notifications,
-        { type = "padding", val = 2 },
+return Layout:init({
+    contents = {
+        Header:init():content(),
 
-        -- title
-        section.title,
+        Title:init("Cookie"):content(),
 
-        -- buttons
-        section.buttons,
+        buttons,
 
-        --footer
-        section.footer,
+        Footer:init():content(),
     },
     opts = {
         margin = 5,
     },
-}
+})

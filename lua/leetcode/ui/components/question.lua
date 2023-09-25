@@ -17,10 +17,10 @@ local question = {}
 question.__index = question
 
 ---@type table<bufnr, lc.Question>
-problems = {}
+Questions = {}
 
 ---@type bufnr
-curr_question = 0
+Curr_question = 0
 
 ---@private
 function question:create_file()
@@ -48,8 +48,8 @@ function question:mount()
     vim.cmd.tabe(self.file:absolute())
 
     self.bufnr = vim.api.nvim_get_current_buf()
-    curr_question = self.bufnr
-    problems[self.bufnr] = self
+    Curr_question = self.bufnr
+    Questions[Curr_question] = self
 
     self.description = Description:init(self)
     self.console = Console:init(self)

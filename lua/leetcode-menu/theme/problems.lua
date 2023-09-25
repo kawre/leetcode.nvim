@@ -1,5 +1,5 @@
 local log = require("leetcode.logger")
-local api = require("leetcode.api")
+local cmd = require("leetcode.api.command")
 
 local Title = require("leetcode-menu.components.title")
 local Footer = require("leetcode-menu.components.footer")
@@ -10,24 +10,25 @@ local padding = require("leetcode-ui.component.padding")
 local button = require("leetcode-ui.component.button")
 local layout = require("leetcode-ui.layout")
 
-local list_btn = button:init({ src = "List", icon = "" }, "p", function() api.cmd.problems() end)
+local list_btn = button:init({ src = "List", icon = "" }, "p", function() cmd.problems() end)
 
 local random_btn = button:init(
     { src = "Random", icon = "" },
     "r",
-    function() api.cmd.random_question() end
+    function() cmd.random_question() end
 )
 
 local qot_btn = button:init(
     { src = "Question of Today", icon = "󰃭" },
     "t",
-    function() api.cmd.qot() end
+    function() cmd.qot() end
 )
 
-local back_btn = button:init({ src = "Back", icon = "" }, "q", function()
-    local bufnr = vim.api.nvim_get_current_buf()
-    _LC_MENU:set_layout("menu")
-end)
+local back_btn = button:init(
+    { src = "Back", icon = "" },
+    "q",
+    function() cmd.menu_layout("menu") end
+)
 
 local buttons = group:init({
     components = {

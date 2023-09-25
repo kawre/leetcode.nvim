@@ -1,6 +1,7 @@
 local log = require("leetcode.logger")
 local layout = require("leetcode-ui.layout")
 local Title = require("leetcode-menu.components.title")
+local cmd = require("leetcode.api.command")
 
 local padding = require("leetcode-ui.component.padding")
 local button = require("leetcode-ui.component.button")
@@ -9,7 +10,7 @@ local group = require("leetcode-ui.component.group")
 local problems = button:init(
     { icon = "", src = "Problems" },
     "p",
-    function() _LC_MENU:set_layout("problems") end,
+    function() cmd.menu_layout("problems") end,
     true
 )
 
@@ -18,14 +19,14 @@ local statistics = button:init({ icon = "󰄪", src = "Statistics" }, "s", funct
 local cookie = button:init(
     { src = "Cookie", icon = "󰆘" },
     "c",
-    function() _LC_MENU:set_layout("cookie") end,
+    function() cmd.menu_layout("cookie") end,
     true
 )
 
 local cache = button:init(
     { src = "Cache", icon = "" },
     "n",
-    function() _LC_MENU:set_layout("cache") end,
+    function() cmd.menu_layout("cache") end,
     true
 )
 

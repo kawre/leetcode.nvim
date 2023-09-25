@@ -1,4 +1,5 @@
 local template = require("leetcode.config.template")
+-- local cache = require("leetcode.cache")
 
 ---@class lc.Settings
 local config = {
@@ -17,10 +18,12 @@ local config = {
 ---@field is_signed_in boolean
 ---@field is_premium boolean
 ---@field id integer
-config.auth = nil
+config.auth = {}
 
 config.default = template ---@type lc.UserConfig Default User configuration
 config.user = template ---@type lc.UserConfig User configuration
+
+-- config.cache = {}
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---
@@ -36,6 +39,8 @@ function config.apply(cfg)
 
     config.domain = "https://leetcode." .. config.user.domain
     config.lang = config.user.lang
+
+    -- config.cache = cache.setup()
 
     vim.api.nvim_set_hl(0, "LeetCodePTag", { link = "Comment" })
     vim.api.nvim_set_hl(0, "LeetCodeEmTag", { italic = true })

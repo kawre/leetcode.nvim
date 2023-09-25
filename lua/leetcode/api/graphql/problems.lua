@@ -1,4 +1,4 @@
-local logger = require("leetcode.logger")
+local log = require("leetcode.logger")
 local utils = require("leetcode.api.graphql.utils")
 
 ---@class lc.ProblemsApi
@@ -36,9 +36,11 @@ function M.all()
               filters: {}
           ) {
             questions: data {
-              index: questionFrontendId
+              frontend_id: questionFrontendId
               title
               title_slug: titleSlug
+              status
+              paid_only: isPaidOnly
               ac_rate: acRate
               difficulty
             }
@@ -50,6 +52,49 @@ function M.all()
     assert(ok)
 
     return res["problemsetQuestionList"]["questions"]
+end
+
+---@param cb function
+---
+---@return lc.Problem[]
+function M._all(cb)
+    local variables = {
+        limit = 3000,
+    }
+
+    local query = [[
+        query problemsetQuestionList($limit: Int) {
+          problemsetQuestionList: questionList(
+              categorySlug: ""
+              limit: $limit
+              filters: {}
+          ) {
+            questions: data {
+              frontend_id: questionFrontendId
+              title
+              title_slug: titleSlug
+              status
+              paid_only: isPaidOnly
+              ac_rate: acRate
+              difficulty
+            }
+          }
+        }
+    ]]
+
+    local callback = function(res)
+        local ok, body = pcall(vim.json.decode, res["body"])
+        if not ok then return log.error("failed to decode problem list response body") end
+        assert(body)
+
+        local data = body["data"]["problemsetQuestionList"]["questions"]
+        cb(data)
+    end
+
+    utils._query({
+        query = query,
+        variables = variables,
+    }, callback)
 end
 
 function M.question_of_today()
@@ -75,8 +120,6 @@ function M.question_of_today()
 
     local ok, res = pcall(utils.query, query)
     assert(ok)
-
-    logger.inspect(res)
 
     return res["activeDailyCodingChallengeQuestion"]
 end

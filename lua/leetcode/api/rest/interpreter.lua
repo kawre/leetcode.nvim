@@ -1,10 +1,5 @@
 local utils = require("leetcode.api.rest.utils")
 local config = require("leetcode.config")
-local log = require("leetcode.logger")
-local async_util = require("plenary.async.util")
-local async = require("plenary.async")
-local curl = require("plenary.curl")
-local Job = require("plenary.job")
 local spinner = require("leetcode.logger.spinner")
 
 ---@class lc.Interpreter

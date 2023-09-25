@@ -1,6 +1,10 @@
----@class lc.Api
-local Api = {
-    cmd = require("leetcode.api.command"),
-}
+local headers = require("leetcode.api.headers")
 
-return Api
+---@class lc.Api
+local api = {}
+
+api.headers = {}
+
+function api.setup() api.headers = headers.get() end
+
+return api

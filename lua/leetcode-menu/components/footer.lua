@@ -1,5 +1,6 @@
 local Text = require("leetcode-ui.component.text")
 local config = require("leetcode.config")
+local NuiLine = require("nui.line")
 
 ---@class lc-menu.Footer
 ---@field text lc-ui.Text
@@ -12,14 +13,19 @@ function footer:content() return self.text end
 function footer:init(opts)
     opts = vim.tbl_deep_extend("force", {
         position = "center",
-        hl = "Keyword",
+        hl = "Number",
     }, opts or {})
 
     local text = Text:init({
         opts = opts,
     })
 
-    if config.auth.name then text:append("Signed in as: " .. config.auth.name, opts.hl) end
+    if config.auth.is_signed_in then
+        local line = NuiLine()
+        line:append("Signed in as: ", "Comment")
+        line:append(config.auth.name, opts.hl)
+        text:append(line)
+    end
 
     local obj = setmetatable({
         text = text,
