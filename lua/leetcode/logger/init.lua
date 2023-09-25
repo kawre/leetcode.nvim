@@ -34,9 +34,4 @@ logger.debug = function(msg)
     logger.log(msg, levels.DEBUG)
 end
 
----@param msg msg | nil
----
----@return lc.Logger.Spinner
-logger.spin = function(msg) return spinner:init(tostring(msg)) end
-
 return logger

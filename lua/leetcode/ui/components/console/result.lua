@@ -50,8 +50,8 @@ end
 
 ---@private
 ---
----@param item timelimit_error
-function result:handle_timelimit_error(item) -- status code = 14
+---@param item limit_exceeded_error
+function result:handle_limit_exceeded(item) -- status code = 14
     local header = NuiLine()
     header:append(item.status_msg, "DiagnosticError")
 
@@ -76,6 +76,15 @@ function result:handle_runtime_error(item) -- status code = 15
     self.layout:append(pre)
 end
 
+function result:handle_internal_error(item) -- status code = 16
+    log.inspect(item)
+    local header = NuiLine()
+    header:append(item.status_msg, "DiagnosticError")
+
+    local text = Text:init({ lines = { header } })
+    self.layout:append(text)
+end
+
 ---@private
 ---
 ---@param item compile_error
@@ -96,7 +105,7 @@ function result:handle(item)
     self.layout:clear()
     local status_code = item.status_code
 
-    log.info(status_code)
+    log.debug(status_code)
     self.popup.border:set_highlight(item.correct_answer and "DiagnosticOk" or "DiagnosticError")
 
     local handlers = {
@@ -104,11 +113,23 @@ function result:handle(item)
         [10] = function()
             self:handle_runtime(item --[[@as runtime]])
         end,
-        [14] = function()
-            self:handle_timelimit_error(item --[[@as timelimit_error]])
+
+        -- time limit
+        [13] = function()
+            self:handle_limit_exceeded(item --[[@as limit_exceeded_error]])
         end,
+        [14] = function()
+            self:handle_limit_exceeded(item --[[@as limit_exceeded_error]])
+        end,
+
+        -- runtime error
         [15] = function()
             self:handle_runtime_error(item --[[@as runtime_error]])
+        end,
+
+        -- internal error
+        [16] = function()
+            self:handle_internal_error(item --[[@as internal_error]])
         end,
 
         -- compiler
@@ -120,7 +141,8 @@ function result:handle(item)
         ["unknown"] = function() log.error("unknown runner status code: " .. item.status_code) end,
     }
 
-    handlers[status_code or "unknown"]()
+    if not handlers[status_code] then log.debug(status_code) end
+    (handlers[status_code] or handlers["unknown"])()
 
     self:draw()
 end

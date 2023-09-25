@@ -26,7 +26,7 @@ function M.query(query, variables)
     if not ok then log.error(data) end
     assert(ok and data and data["data"], "Failed to query data")
 
-    return data["data"]
+    return data.data
 end
 
 return M

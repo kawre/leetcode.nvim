@@ -8,6 +8,7 @@
 ---| "PENDING"
 ---| "STARTED"
 ---| "SUCCESS"
+---| "FAILURE"
 
 ---@class lc.Interpreter.Response
 ---@field status_code integer
@@ -37,7 +38,7 @@
 ---@field case_idx integer
 
 --------------------------------------------
---- Runtime Error
+--- Runtime Error | 15
 --------------------------------------------
 ---@class lc.Interpreter.Response.runtime_error
 ---@field status_code number
@@ -66,7 +67,7 @@
 ---@alias runtime_error lc.Interpreter.Response.runtime_error
 
 --------------------------------------------
---- Runtime
+--- Runtime | 10
 --------------------------------------------
 ---@class lc.Interpreter.Response.runtime
 ---@field status_code number
@@ -107,7 +108,7 @@
 ---@alias runtime lc.Interpreter.Response.runtime
 
 --------------------------------------------
---- Compile Error
+--- Compile Error | 20
 --------------------------------------------
 ---@class lc.Interpreter.Response.compile_error
 ---@field status_code number
@@ -135,9 +136,9 @@
 ---@alias compile_error lc.Interpreter.Response.compile_error
 
 --------------------------------------------
---- Time Limit Exceeded
+--- Time Limit Exceeded | 13, 14
 --------------------------------------------
----@class lc.Interpreter.Response.timelimit_error
+---@class lc.Interpreter.Response.limit.exceeded
 ---@field code_answer table
 ---@field code_output table
 ---@field elapsed_time integer
@@ -159,7 +160,17 @@
 ---@field total_correct number | nil
 ---@field total_testcases number | nil
 
----@alias timelimit_error lc.Interpreter.Response.timelimit_error
+---@alias limit_exceeded_error lc.Interpreter.Response.limit.exceeded
+
+--------------------------------------------
+--- Time Limit Exceeded | 13, 14
+--------------------------------------------
+---@class lc.Interpreter.Response.internal.error
+---@field status_code integer
+---@field status_msg string
+---@field state interpret.state
+
+---@alias internal_error lc.Interpreter.Response.internal.error
 
 --------------------------------------------
 --- Interpreter responses
@@ -168,4 +179,5 @@
 ---| runtime
 ---| runtime_error
 ---| compile_error
----| timelimit_error
+---| limit_exceeded_error
+---| internal_error

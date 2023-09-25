@@ -72,7 +72,6 @@ function console:init(parent)
 
     obj.testcase = Testcase:init(obj):keymaps(keymap)
     obj.result = Result:init(obj):keymaps(keymap)
-    require("lua")
 
     obj.layout = NuiLayout(
         {

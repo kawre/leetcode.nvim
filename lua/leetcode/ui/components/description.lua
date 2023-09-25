@@ -18,8 +18,6 @@ local config = require("leetcode.config")
 local description = {}
 description.__index = description
 
--- descriptions = {}
-
 function description:mount()
     self:populate()
     self.split:mount()

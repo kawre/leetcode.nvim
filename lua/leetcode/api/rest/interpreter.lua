@@ -3,64 +3,73 @@ local config = require("leetcode.config")
 local log = require("leetcode.logger")
 local async_util = require("plenary.async.util")
 local async = require("plenary.async")
+local curl = require("plenary.curl")
+local Job = require("plenary.job")
+local spinner = require("leetcode.logger.spinner")
 
 ---@class lc.Interpreter
 local interpreter = {}
 
----@param question question_response
----@param typed_code string
----@param data_input string
----@param callback function
-function interpreter.interpret_solution(question, typed_code, data_input, callback)
-    local url =
-        string.format(config.domain .. "/problems/%s/interpret_solution/", question.title_slug)
+local check_state = {
+    ["PENDING"] = "Pending…",
+    ["STARTED"] = "Judging…",
+    ["SUCCESS"] = "Finished",
+    ["FAILURE"] = "Failed", -- CODE: 16
+}
 
-    local body = {
-        lang = config.user.lang,
-        question_id = question.id,
-        typed_code = typed_code,
-        data_input = data_input,
-    }
+---@class lc.Interpret.body
+---@field question question_response
+---@field typed_code string
+---@field data_input string
+
+---@param title_slug string
+---@param body lc.Interpret.body
+---@param callback function
+function interpreter.interpret_solution(title_slug, body, callback)
+    local url = string.format(config.domain .. "/problems/%s/interpret_solution/", title_slug)
 
     ---@type boolean, submission
     local ok, res = pcall(utils.post, url, body)
     assert(ok)
 
-    async.run(function() ---@diagnostic disable-line
-        local noti = log.spin():start()
-        local check_state = {
-            ["PENDING"] = "Pending…",
-            ["STARTED"] = "Judging…",
-            ["SUCCESS"] = "Finished",
-        }
+    local noti = spinner:init(check_state["PENDING"], "points")
 
-        while true do
-            ---@type lc.Interpreter.Response
-            local check = interpreter.check(res.interpret_id)
-            local state = check_state[check.state]
-            noti:update(state)
-
-            if check.state == "SUCCESS" then
-                noti:done()
-                return check
-            else
-                async_util.sleep(750)
+    local function listener()
+        interpreter.check(res.interpret_id, function(item)
+            if item.status_code then
+                noti:done(check_state[item.state])
+                callback(item)
+                return
             end
-        end
-    end, callback)
+
+            noti:update(check_state[item.state])
+
+            if item.state == "PENDING" then
+                noti:change("points")
+            elseif item.state == "STARTED" then
+                noti:change("dot")
+            end
+
+            vim.defer_fn(listener, 500)
+        end)
+    end
+
+    listener()
 end
 
----@param interpret_id string
+---@param id string
+---@param cb function
 ---
 ---@return lc.Interpreter.Response
-function interpreter.check(interpret_id)
-    local url = string.format(config.domain .. "/submissions/detail/%s/check/", interpret_id)
+function interpreter.check(id, cb)
+    local url = string.format(config.domain .. "/submissions/detail/%s/check/", id)
+    utils._get(url, cb)
 
-    ---@type boolean, lc.Interpreter.Response
-    local ok, res = pcall(utils.get, url)
-    assert(ok)
-
-    return res
+    -- ---@type boolean, lc.Interpreter.Response
+    -- local ok, res = pcall(utils.get, url)
+    -- assert(ok)
+    --
+    -- return res
 end
 
 return interpreter
