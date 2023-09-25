@@ -1,38 +1,32 @@
 local utils = require("leetcode.api.graphql.utils")
 local config = require("leetcode.config")
+local log = require("leetcode.logger")
 
 ---@class lc.AuthApi
 local M = {}
 
----@class lc.UserStatus
----@field username string
----@field is_signed_in boolean
----@field is_premium boolean
----@field user_id integer
-
----@return lc.UserStatus | nil
-function M.user_status()
+---@return config_auth
+function M.user()
     local query = [[
-    query globalData {
-      userStatus {
-        userId
-        is_signed_in: isSignedIn
-        isMockUser
-        is_premium: isPremium
-        isVerified
-        username
-        activeSessionId
-      }
-    }
-  ]]
+        query globalData {
+          userStatus {
+            id: userId
+            is_signed_in: isSignedIn
+            is_premium: isPremium
+            name: username
+
+            isVerified
+            activeSessionId
+            isMockUser
+          }
+        }
+    ]]
 
     local ok, res = pcall(utils.query, query)
-    if not ok then return end
+    if not ok then return {} end
 
-    local status = res["userStatus"]
-    config.authenticate(status)
-
-    return res["userStatus"]
+    config.auth = res["userStatus"]
+    return config.auth
 end
 
 return M

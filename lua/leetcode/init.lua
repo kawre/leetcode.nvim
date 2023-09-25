@@ -6,7 +6,7 @@ local cmd = require("leetcode.api.command")
 
 local leetcode = {}
 
----@param cfg? lc.Config
+---@param cfg? lc.UserConfig
 function leetcode.setup(cfg)
     config.apply(cfg or {})
 

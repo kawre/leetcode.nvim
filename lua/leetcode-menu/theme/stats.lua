@@ -25,7 +25,7 @@ section.buttons.val = {
     template.button("q", "󰩈 " .. " Exit LeetCode", "<cmd>qa<CR>"),
 }
 
-section.footer.val = "Signed in as: " .. auth.username
+section.footer.val = "Signed in as: " .. auth.name
 
 return {
     layout = {

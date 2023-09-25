@@ -47,11 +47,11 @@ function utils._get(url, cb)
     Job:new({
         command = "curl",
         args = args,
-        on_exit = function(self, val)
+        on_exit = vim.schedule_wrap(function(self, val)
             local result = table.concat(self:result(), "\n")
             local decoded = vim.json.decode(result)
             cb(decoded)
-        end,
+        end),
         on_stdout = function(error, data, self)
             -- log.info(data)
         end,

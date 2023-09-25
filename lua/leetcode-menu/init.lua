@@ -1,11 +1,12 @@
 local component = require("leetcode-ui.component")
 local log = require("leetcode.logger")
 local utils = require("leetcode-menu.utils")
+local config = require("leetcode.config")
 
 local Text = require("nui.text")
 local Line = require("nui.line")
 
----@class lc-db.Dashboard
+---@class lc-menu
 ---@field layout lc-ui.Layout
 ---@field bufnr integer
 ---@field winid integer
@@ -13,8 +14,8 @@ local Line = require("nui.line")
 local menu = {} ---@diagnostic disable-line
 menu.__index = menu
 
----@type table<bufnr, lc-db.Dashboard>
-db = {}
+---@type lc-menu
+_LC_MENU = {} ---@diagnostic disable-line
 
 function menu:clear() vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {}) end
 
@@ -94,14 +95,18 @@ function menu:init()
         signcolumn = "no",
     })
 
+    local layout = config.auth.is_signed_in and "menu" or "signin"
+    local ok, l = pcall(require, "leetcode-menu.theme." .. layout)
+    assert(ok)
+
     local obj = setmetatable({
         bufnr = bufnr,
         winid = winid,
         tabpage = tabpage,
-        layout = require("leetcode-menu.theme.menu"),
+        layout = l,
     }, self)
-    db[bufnr] = obj
 
+    _LC_MENU = obj
     return obj:mount()
 end
 

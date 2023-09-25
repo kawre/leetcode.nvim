@@ -51,8 +51,8 @@ end
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---
----@return lc.UserStatus | nil
-function cmd.authenticate() gql.auth.user_status() end
+---@return lc.UserAuth | nil
+function cmd.authenticate() gql.auth.user() end
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---
@@ -83,6 +83,8 @@ function cmd.start()
 
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
     if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return true end
+
+    gql.auth.user()
 
     menu:init()
 end

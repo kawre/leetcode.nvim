@@ -1,14 +1,14 @@
 local log = require("leetcode.logger")
+local api = require("leetcode.api")
+
+local Title = require("leetcode-menu.components.title")
+local Footer = require("leetcode-menu.components.footer")
+local Header = require("leetcode-menu.components.header")
+
 local group = require("leetcode-ui.component.group")
 local padding = require("leetcode-ui.component.padding")
 local button = require("leetcode-ui.component.button")
 local layout = require("leetcode-ui.layout")
-local api = require("leetcode.api")
-
-local template = require("leetcode-menu.theme.template")
-local section = template.get()
-
-section.title:append("Problems")
 
 local list_btn = button:init({ src = "List", icon = "" }, "p", function() api.cmd.problems() end)
 
@@ -26,7 +26,7 @@ local qot_btn = button:init(
 
 local back_btn = button:init({ src = "Back", icon = "" }, "q", function()
     local bufnr = vim.api.nvim_get_current_buf()
-    db[bufnr]:set_layout("menu")
+    _LC_MENU:set_layout("menu")
 end)
 
 local buttons = group:init({
@@ -44,26 +44,19 @@ local buttons = group:init({
     opts = { spacing = 1 },
 })
 
-section.footer:append("Signed in as: ")
-
 return layout:init({
     contents = {
         -- header
-        padding:init(2),
-        section.header,
-        padding:init(2),
-
-        -- notifications
-        section.notifications,
+        Header:init():content(),
 
         -- title
-        section.title,
+        Title:init("Problems"):content(),
 
         -- buttons
         buttons,
 
         --footer
-        section.footer,
+        Footer:init():content(),
     },
     opts = {},
 })

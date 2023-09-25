@@ -1,32 +1,17 @@
 local log = require("leetcode.logger")
 local layout = require("leetcode-ui.layout")
 local Title = require("leetcode-menu.components.title")
+local cmd = require("leetcode.api.command")
 
 local padding = require("leetcode-ui.component.padding")
 local button = require("leetcode-ui.component.button")
 local group = require("leetcode-ui.component.group")
 
 local problems = button:init(
-    { icon = "", src = "Problems" },
-    "p",
-    function() _LC_MENU:set_layout("problems") end,
-    true
-)
-
-local statistics = button:init({ icon = "󰄪", src = "Statistics" }, "s", function() end, true)
-
-local cookie = button:init(
-    { src = "Cookie", icon = "󰆘" },
-    "c",
-    function() _LC_MENU:set_layout("cookie") end,
-    true
-)
-
-local cache = button:init(
-    { src = "Cache", icon = "" },
-    "n",
-    function() _LC_MENU:set_layout("cache") end,
-    true
+    { icon = "󱛖", src = "Sign in" },
+    "s",
+    function() cmd.cookie_prompt() end,
+    false
 )
 
 local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", function() vim.cmd.quitall() end)
@@ -34,9 +19,6 @@ local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", function() vim.cm
 local buttons = group:init({
     components = {
         problems,
-        statistics,
-        cookie,
-        cache,
         exit,
     },
     opts = {
@@ -55,11 +37,7 @@ return layout:init({
     contents = {
         Header:init():content(),
 
-        -- section.notifications,
-        -- padding:init(2),
-
-        -- section.title,
-        Title:init("Menu"):content(),
+        Title:init("Sign in"):content(),
 
         buttons,
 

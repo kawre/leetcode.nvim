@@ -28,7 +28,7 @@ function runner:run()
     rest.interpreter.interpret_solution(
         question.q.title_slug,
         body,
-        vim.schedule_wrap(function(item) self:callback(item) end)
+        function(item) self:callback(item) end
     )
 end
 

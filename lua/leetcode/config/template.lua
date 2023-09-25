@@ -1,4 +1,4 @@
----@class lc.Config
+---@class lc.UserConfig
 local M = {
     ---@type string
     domain = "com",
