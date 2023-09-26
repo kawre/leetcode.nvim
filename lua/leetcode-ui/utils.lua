@@ -9,14 +9,18 @@ function utils.longest_line(lines)
 
     for _, line in pairs(lines) do
         local text = line:content()
-        width = math.max(text:len(), width)
+        local len = vim.api.nvim_strwidth(text)
+        width = math.max(len, width)
     end
 
     return width
 end
 
----@param split NuiSplit
-function utils.win_width(split) return vim.api.nvim_win_get_width(split.winid) end
+---@param layout lc-ui.Layout
+function utils.win_width(layout)
+    -- local winid = vim.api.nvimbufget
+    return vim.api.nvim_win_get_width(layout.winid)
+end
 
 ---@param config lc-ui.Component.config
 ---
@@ -40,24 +44,41 @@ function utils.parse_lines(config)
     return t
 end
 
----@param lines NuiLine[]
----@param position position
----@param split NuiSplit | NuiSplit
+---@param component lc-ui.Component
+---@param layout lc-ui.Layout
 ---
 ---@return string
-function utils.get_padding(lines, position, split)
+function utils.get_padding(component, layout)
+    local position = layout.opts.position or component.opts.position
     local padding = ""
 
+    if layout.opts.padding then
+        if type(layout.opts.padding.left) == "string" then
+            padding = layout.opts.padding.left --[[@as string]]
+        elseif type(layout.opts.padding.left) == "number" then
+            padding = string.rep(" ", layout.opts.padding.left --[[@as integer]])
+        end
+    end
+
+    if component.opts.padding then
+        if type(component.opts.padding.left) == "string" then
+            padding = padding .. layout.opts.padding.left --[[@as string]]
+        elseif type(component.opts.padding.left) == "number" then
+            padding = padding .. string.rep(" ", component.opts.padding.left --[[@as integer]])
+        end
+    end
+
     if position ~= "left" then
+        local lines = component.lines
         local longest_line = utils.longest_line(lines)
 
         if position == "center" then
-            local width = utils.win_width(split)
+            local width = utils.win_width(layout)
             local mid = (width - longest_line) / 2
             local spaces = string.rep(" ", mid - 1)
             padding = spaces
         elseif position == "right" then
-            local width = utils.win_width(split)
+            local width = utils.win_width(layout)
             local mid = width - longest_line - 1
             local spaces = string.rep(" ", mid - 1)
             padding = spaces

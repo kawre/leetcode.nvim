@@ -40,14 +40,14 @@ local buttons = Group:init({
 })
 
 return Layout:init({
-    contents = {
-        Header:init():content(),
+    components = {
+        Header:init(),
 
-        Title:init("Cookie"):content(),
+        Title:init("Cookie"),
 
         buttons,
 
-        Footer:init():content(),
+        Footer:init(),
     },
     opts = {
         margin = 5,

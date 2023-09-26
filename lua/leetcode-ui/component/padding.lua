@@ -21,7 +21,7 @@ setmetatable(padding, component)
 function padding:init(int)
     local t = {}
     for _ = 1, int, 1 do
-        table.insert(t, Line():append(""))
+        table.insert(t, Line())
     end
 
     return setmetatable({ lines = t, opts = {} }, self)

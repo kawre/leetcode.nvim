@@ -1,70 +1,83 @@
 local log = require("leetcode.logger")
 local Line = require("nui.line")
+local Padding = require("leetcode-ui.component.padding")
 
 ---@class lc-ui.Layout
----@field contents lc-ui.Component[]
----@field opts? lc-ui.Layout.opts
----@field line_idx? integer
----@field on_presses? table<integer, function>
-local layout = {}
-layout.__index = layout
+---@field components lc-ui.Component[]
+---@field opts lc-ui.Layout.opts
+---@field line_idx integer
+---@field buttons table<integer, function>
+---@field bufnr integer
+---@field winid integer
+local Layout = {}
+Layout.__index = Layout
 
----@alias bufnr integer Buffer number
----@type table<bufnr, lc-ui.Layout>
-state = {} ---@diagnostic disable-line
-
----@param split NuiSplit | NuiPopup
-function layout:draw(split)
-    state[split.bufnr] = self
+---@param win NuiSplit | NuiPopup | table
+function Layout:draw(win)
     self.line_idx = 1
+    self.bufnr = win.bufnr
+    self.winid = win.winid
 
-    for _, cmp in pairs(self.contents) do
-        cmp:draw(split)
+    local padding = self.opts.padding
+    local components = vim.deepcopy(self.components)
+
+    local top_padding = padding and padding.top
+    local bot_padding = padding and padding.bot
+
+    if top_padding then table.insert(components, 1, Padding:init(top_padding)) end
+    if bot_padding then table.insert(components, Padding:init(bot_padding)) end
+
+    for _, component in pairs(components) do
+        component:draw(self)
     end
 end
 
-function layout:clear()
-    self.contents = {}
+function Layout:clear()
+    self.components = {}
     self.line_idx = 1
-    self.on_presses = {}
+    self.buttons = {}
 
     return self
 end
 
 ---@param val? integer Optional value to increment line index by
-function layout:get_line_idx(val)
+function Layout:get_line_idx(val)
     local line_idx = self.line_idx
     self.line_idx = self.line_idx + (val or 1)
     return line_idx
 end
 
 ---@param line integer The line that the click happend
-function layout:handle_press(line)
-    if self.on_presses[line] then self.on_presses[line]() end
+function Layout:handle_press(line)
+    if self.buttons[line] then self.buttons[line]() end
 end
 
 ---@param line integer
 ---@param fn function
-function layout:set_on_press(line, fn) self.on_presses[line] = fn end
+function Layout:set_on_press(line, fn) self.buttons[line] = fn end
 
 ---@param content lc-ui.Component
-function layout:append(content)
-    table.insert(self.contents, content)
+function Layout:append(content)
+    table.insert(self.components, content)
     return self
 end
 
----@param config? lc-ui.Layout
-function layout:init(config)
+---@param config? lc-ui.Layout.config
+function Layout:init(config)
     config = config or {}
 
     local obj = setmetatable({
-        contents = config.contents or {},
-        opts = config.opts or {},
+        components = config.components or {},
+        opts = config.opts or {
+            padding = {},
+        },
         line_idx = 1,
-        on_presses = {},
+        buttons = {},
+        bufnr = 0,
+        winid = 0,
     }, self)
 
     return obj
 end
 
-return layout
+return Layout

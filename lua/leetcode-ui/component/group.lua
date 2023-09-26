@@ -1,34 +1,31 @@
-local component = require("leetcode-ui.component")
+local Component = require("leetcode-ui.component")
 local utils = require("leetcode-ui.utils")
-local padding = require("leetcode-ui.component.padding")
+local Padding = require("leetcode-ui.component.padding")
+local log = require("leetcode.logger")
 
 ---@class lc-ui.Group: lc-ui.Component
 ---@field components lc-ui.Component[]
----@field opts lc-ui.Group.config.opts
-local group = {}
-group.__index = group
-setmetatable(group, component)
+---@field opts lc-ui.Group.opts
+local Group = {}
+Group.__index = Group
+setmetatable(Group, Component)
 
 ---@param config lc-ui.Group.config
 ---
 ---@return lc-ui.Group
-function group:init(config)
-    return setmetatable({
+function Group:init(config)
+    local obj = setmetatable({
         components = config.components or {},
         opts = config.opts or {},
     }, self)
 
-    -- self:append(config.components or {})
-    -- self.components = config.components or {}
-    -- self.opts = config.opts or {}
-    --
-    -- return o
+    return obj
 end
 
 ---@param cmp lc-ui.Component | lc-ui.Component[]
 ---
 ---@return lc-ui.Group
-function group:append(cmp)
+function Group:append(cmp)
     if getmetatable(cmp) then
         table.insert(self.components, cmp)
     else
@@ -38,12 +35,23 @@ function group:append(cmp)
     return self
 end
 
-function group:draw(split)
-    for i, cmp in pairs(self.components) do
+---@param layout lc-ui.Layout
+function Group:draw(layout)
+    local components = vim.deepcopy(self.components)
+
+    local padding = self.opts.padding
+    local top_padding = padding and padding.top
+    local bot_padding = padding and padding.bot
+
+    if top_padding then Padding:init(top_padding):draw(layout) end
+
+    for i, component in pairs(components) do
         local opts = self.opts
-        if opts.spacing and i ~= 1 then padding:init(opts.spacing):draw(split) end
-        cmp:draw(split)
+        if opts.spacing and i ~= 1 then Padding:init(opts.spacing):draw(layout) end
+        component:draw(layout)
     end
+
+    if bot_padding then Padding:init(bot_padding):draw(layout) end
 end
 
-return group
+return Group

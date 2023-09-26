@@ -26,19 +26,25 @@ Curr_question = 0
 function question:create_file()
     local snippets = self.q.code_snippets
 
-    local code
-    for _, snippet in pairs(snippets or {}) do
-        if snippet.lang_slug == config.user.lang or snippet.lang_slug == config.user.sql then
-            code = snippet.code
+    local snippet = {}
+
+    for _, snip in pairs(snippets ~= vim.NIL and snippets or {}) do
+        if snip.lang_slug == config.user.lang or snip.lang_slug == config.user.sql then
+            snippet.code = snip.code
+            snippet.lang = snip.lang_slug
             break
         end
     end
 
-    if not code then
-        log.error("failed to fetch code snippet")
-    else
-        self.file:write(code, "w")
-    end
+    if not snippet then return log.error("failed to fetch code snippet") end
+
+    local q = self.q
+    local dir = config.user.directory .. "/solutions/"
+    local fn = string.format("%s.%s.%s", q.frontend_id, q.title_slug, snippet.lang)
+    local file = path:new(dir .. fn)
+
+    file:write(snippet.code, "w")
+    self.file = file
 end
 
 function question:mount()

@@ -2,12 +2,11 @@ local Text = require("leetcode-ui.component.text")
 local config = require("leetcode.config")
 local NuiLine = require("nui.line")
 
----@class lc-menu.Footer
+---@class lc-menu.Footer : lc-ui.Text
 ---@field text lc-ui.Text
 local footer = {}
 footer.__index = footer
-
-function footer:content() return self.text end
+setmetatable(footer, Text)
 
 ---@param opts? any
 function footer:init(opts)
@@ -27,9 +26,7 @@ function footer:init(opts)
         text:append(line)
     end
 
-    local obj = setmetatable({
-        text = text,
-    }, self)
+    local obj = setmetatable(text, self)
 
     return obj
 end

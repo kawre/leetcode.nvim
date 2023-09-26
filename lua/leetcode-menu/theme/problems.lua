@@ -5,59 +5,50 @@ local Title = require("leetcode-menu.components.title")
 local Footer = require("leetcode-menu.components.footer")
 local Header = require("leetcode-menu.components.header")
 
-local group = require("leetcode-ui.component.group")
-local padding = require("leetcode-ui.component.padding")
-local button = require("leetcode-ui.component.button")
-local layout = require("leetcode-ui.layout")
+local Button = require("leetcode-ui.component.button")
+local Buttons = require("leetcode-menu.components.buttons")
+local Layout = require("leetcode-ui.layout")
 
-local list_btn = button:init({ src = "List", icon = "" }, "p", function() cmd.problems() end)
+local list_btn = Button:init({ src = "List", icon = "" }, "p", function() cmd.problems() end)
 
-local random_btn = button:init(
+local random_btn = Button:init(
     { src = "Random", icon = "" },
     "r",
     function() cmd.random_question() end
 )
 
-local qot_btn = button:init(
+local qot_btn = Button:init(
     { src = "Question of Today", icon = "󰃭" },
     "t",
     function() cmd.qot() end
 )
 
-local back_btn = button:init(
+local back_btn = Button:init(
     { src = "Back", icon = "" },
     "q",
     function() cmd.menu_layout("menu") end
 )
 
-local buttons = group:init({
+return Layout:init({
     components = {
-        list_btn,
-        random_btn,
-        qot_btn,
-        back_btn,
-
-        -- button:init("t", "Question of Today", " "),
-        -- button:init("t", "Random", " "),
-        -- button:init("r", "Recent", " "),
-        -- button:init("q", "Back", "… "),
-    },
-    opts = { spacing = 1 },
-})
-
-return layout:init({
-    contents = {
         -- header
-        Header:init():content(),
+        Header:init(),
 
         -- title
-        Title:init("Problems"):content(),
+        Title:init("Problems"),
 
         -- buttons
-        buttons,
+        Buttons:init({
+            components = {
+                list_btn,
+                random_btn,
+                qot_btn,
+                back_btn,
+            },
+        }),
 
         --footer
-        Footer:init():content(),
+        Footer:init(),
     },
     opts = {},
 })

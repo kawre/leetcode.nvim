@@ -198,7 +198,7 @@ function result:init(parent)
 
     local obj = setmetatable({
         popup = popup,
-        layout = Layout:init({ contents = {} }),
+        layout = Layout:init(),
         parent = parent,
     }, self)
 

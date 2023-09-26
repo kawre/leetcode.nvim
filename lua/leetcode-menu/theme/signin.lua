@@ -33,14 +33,14 @@ local Header = require("leetcode-menu.components.header")
 local Footer = require("leetcode-menu.components.footer")
 
 return Layout:init({
-    contents = {
-        Header:init():content(),
+    components = {
+        Header:init(),
 
-        Title:init("Sign in"):content(),
+        Title:init("Sign in"),
         --
         buttons,
         --
-        Footer:init():content(),
+        Footer:init(),
     },
     opts = {
         margin = 5,

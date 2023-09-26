@@ -1,9 +1,10 @@
 local Text = require("leetcode-ui.component.text")
 
----@class lc-menu.Notifications
+---@class lc-menu.Notifications : lc-ui.Text
 ---@field text lc-ui.Text
 local notifications = {}
 notifications.__index = notifications
+setmetatable(notifications, Text)
 
 ---@param opts? any
 function notifications:init(opts)
@@ -16,10 +17,7 @@ function notifications:init(opts)
         opts = opts,
     })
 
-    local obj = setmetatable({
-        text = text,
-    }, self)
-
+    local obj = setmetatable(text, self)
     return obj
 end
 
