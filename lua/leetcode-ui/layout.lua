@@ -21,11 +21,11 @@ function Layout:draw(win)
     local padding = self.opts.padding
     local components = vim.deepcopy(self.components)
 
-    local top_padding = padding and padding.top
-    local bot_padding = padding and padding.bot
+    local toppad = padding and padding.top
+    local botpad = padding and padding.bot
 
-    if top_padding then table.insert(components, 1, Padding:init(top_padding)) end
-    if bot_padding then table.insert(components, Padding:init(bot_padding)) end
+    if toppad then table.insert(components, 1, Padding:init(toppad)) end
+    if botpad then table.insert(components, Padding:init(botpad)) end
 
     for _, component in pairs(components) do
         component:draw(self)

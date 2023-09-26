@@ -1,10 +1,6 @@
 local config = require("leetcode.config")
-local dashboard = require("leetcode-menu")
 local utils = require("leetcode.utils")
-local log = require("leetcode.logger")
 local cmd = require("leetcode.api.command")
-local api = require("leetcode.api")
-local cache = require("leetcode.cache")
 
 local leetcode = {}
 
@@ -12,9 +8,10 @@ local leetcode = {}
 function leetcode.setup(cfg)
     config.apply(cfg or {})
 
-    vim.api.nvim_set_hl(0, "LcProblemEasy", { fg = "#00b8a3" })
-    vim.api.nvim_set_hl(0, "LcProblemMedium", { fg = "#ffb800" })
-    vim.api.nvim_set_hl(0, "LcProblemHard", { fg = "#ef4743" })
+    vim.api.nvim_set_hl(0, "LeetCodeEasy", { fg = "#00b8a3" })
+    vim.api.nvim_set_hl(0, "LeetCodeMedium", { fg = "#ffb800" })
+    vim.api.nvim_set_hl(0, "LeetCodeHard", { fg = "#ef4743" })
+
     vim.api.nvim_set_hl(0, "LeetCodeIndent", { link = "Comment" })
 
     local group_id = vim.api.nvim_create_augroup("leetcode_start", { clear = true })

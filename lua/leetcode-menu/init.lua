@@ -44,7 +44,7 @@ end
 
 ---@private
 function menu:autocmds()
-    local group_id = vim.api.nvim_create_augroup("leetcode_menu", {})
+    local group_id = vim.api.nvim_create_augroup("leetcode_menu", { clear = true })
 
     vim.api.nvim_create_autocmd("WinResized", {
         group = group_id,

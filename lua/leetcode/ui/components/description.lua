@@ -2,7 +2,7 @@ local Split = require("nui.split")
 local log = require("leetcode.logger")
 local parser = require("leetcode.parser")
 local gql = require("leetcode.api.graphql")
-local layout = require("leetcode-ui.layout")
+local Layout = require("leetcode-ui.layout")
 local Text = require("leetcode-ui.component.text")
 local padding = require("leetcode-ui.component.padding")
 local NuiText = require("nui.text")
@@ -64,8 +64,8 @@ function description:populate()
 
     local contents = parser:init(q.content, "html"):parse()
 
-    self.layout = layout:init({
-        contents = {
+    self.layout = Layout:init({
+        components = {
             titlecomp,
             statscomp,
             padding:init(2),

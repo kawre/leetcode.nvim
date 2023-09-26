@@ -4,6 +4,7 @@ local problems = require("leetcode.cache.problems")
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
 local api = require("leetcode.api")
+local pick = require("leetcode.ui.pickers")
 
 local ui = require("leetcode.ui")
 local question = require("leetcode.ui.components.question")
@@ -23,17 +24,19 @@ function cmd.cache_update() cache.update() end
 function cmd.problems()
     local _, res = pcall(problems.get)
 
-    ui.pick_one(
-        res,
-        "Select a Problem",
-        utils.question_formatter,
+    pick.question(res)
 
-        ---@param item lc.Problem
-        function(item)
-            if not item then return end
-            question:init(item)
-        end
-    )
+    -- ui.pick_one(
+    --     res,
+    --     "Select a Problem",
+    --     utils.question_formatter,
+    --
+    --     ---@param item lc.Problem
+    --     function(item)
+    --         if not item then return end
+    --         question:init(item)
+    --     end
+    -- )
 end
 
 function cmd.cookie_prompt()

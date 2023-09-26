@@ -11,15 +11,15 @@ local Runner = require("leetcode.runner")
 ---@field file Path
 ---@field q question_response
 ---@field description lc.Description
----@field bufnr bufnr
+---@field bufnr integer
 ---@field console lc.Console
 local question = {}
 question.__index = question
 
----@type table<bufnr, lc.Question>
+---@type table<integer, lc.Question>
 Questions = {}
 
----@type bufnr
+---@type integer
 Curr_question = 0
 
 ---@private

@@ -42,16 +42,16 @@ function Component:draw(layout)
     local lines = vim.deepcopy(self.lines)
 
     local padding = self.opts.padding
-    local top_padding = padding and padding.top
-    local left_padding = utils.get_padding(self, layout)
-    local bot_padding = padding and padding.bot
+    local toppad = padding and padding.top
+    local leftpad = utils.get_padding(self, layout)
+    local botpad = padding and padding.bot
 
-    if top_padding then lines = vim.list_extend(create_padding(top_padding), lines) end
-    if bot_padding then lines = vim.list_extend(lines, create_padding(bot_padding)) end
+    if toppad then lines = vim.list_extend(create_padding(toppad), lines) end
+    if botpad then lines = vim.list_extend(lines, create_padding(botpad)) end
 
     for _, line in pairs(lines) do
         local new_line = NuiLine()
-        new_line:append(left_padding)
+        new_line:append(leftpad)
         new_line:append(line)
 
         local line_idx = layout:get_line_idx(1)

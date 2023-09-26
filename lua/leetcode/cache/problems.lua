@@ -32,15 +32,17 @@ local function populate()
     gql.problems._all(cb)
 end
 
----@return lc.Problem[] | nil
+---@return lc.Problem[]
 function Problems.get()
     Problems.update()
 
     local r_ok, contents = pcall(path.read, file)
-    if not r_ok then return end
+    assert(r_ok)
+    -- if not r_ok then return end
 
     local ok, problems = pcall(Problems.parse, contents)
-    if not ok then return end
+    assert(ok)
+    -- if not ok then return end
 
     return problems
 end

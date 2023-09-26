@@ -40,10 +40,10 @@ function Group:draw(layout)
     local components = vim.deepcopy(self.components)
 
     local padding = self.opts.padding
-    local top_padding = padding and padding.top
-    local bot_padding = padding and padding.bot
+    local toppad = padding and padding.top
+    local botpad = padding and padding.bot
 
-    if top_padding then Padding:init(top_padding):draw(layout) end
+    if toppad then Padding:init(toppad):draw(layout) end
 
     for i, component in pairs(components) do
         local opts = self.opts
@@ -51,7 +51,7 @@ function Group:draw(layout)
         component:draw(layout)
     end
 
-    if bot_padding then Padding:init(bot_padding):draw(layout) end
+    if botpad then Padding:init(botpad):draw(layout) end
 end
 
 return Group
