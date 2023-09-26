@@ -15,7 +15,12 @@ local problems = button:init(
     true
 )
 
-local statistics = button:init({ icon = "󰄪", src = "Statistics" }, "s", function() end, true)
+local statistics = button:init(
+    { icon = "󰄪", src = "Statistics (Soon)" },
+    "s",
+    function() end,
+    true
+)
 
 local cookie = button:init(
     { src = "Cookie", icon = "󰆘" },

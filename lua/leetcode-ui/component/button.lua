@@ -41,7 +41,7 @@ function button:init(text, sc, on_press, expandable, keybind, keybind_opts)
         on_press = on_press or function() end,
     }
 
-    local width = 40
+    local width = 50
     local expand = ""
 
     local txt = text.icon .. " " .. text.src .. " " .. (expandable and expand or "")

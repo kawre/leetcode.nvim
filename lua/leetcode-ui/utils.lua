@@ -75,12 +75,12 @@ function utils.get_padding(component, layout)
         if position == "center" then
             local width = utils.win_width(layout)
             local mid = (width - longest_line) / 2
-            local spaces = string.rep(" ", mid - 1)
+            local spaces = string.rep(" ", mid)
             padding = spaces
         elseif position == "right" then
             local width = utils.win_width(layout)
             local mid = width - longest_line - 1
-            local spaces = string.rep(" ", mid - 1)
+            local spaces = string.rep(" ", mid)
             padding = spaces
         end
     end

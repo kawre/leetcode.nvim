@@ -12,14 +12,18 @@ local Padding = require("leetcode-ui.component.padding")
 local Layout = {}
 Layout.__index = Layout
 
----@param win NuiSplit | NuiPopup | table
+---@param win? NuiSplit|NuiPopup|table
 function Layout:draw(win)
     self.line_idx = 1
-    self.bufnr = win.bufnr
-    self.winid = win.winid
+
+    if win then
+        self.bufnr = win.bufnr
+        self.winid = win.winid
+    end
 
     local padding = self.opts.padding
-    local components = vim.deepcopy(self.components)
+    -- local components = vim.deepcopy(self.components)
+    local components = self.components
 
     local toppad = padding and padding.top
     local botpad = padding and padding.bot
@@ -27,9 +31,25 @@ function Layout:draw(win)
     if toppad then table.insert(components, 1, Padding:init(toppad)) end
     if botpad then table.insert(components, Padding:init(botpad)) end
 
-    for _, component in pairs(components) do
-        component:draw(self)
-    end
+    self:modifiable(function()
+        vim.api.nvim_buf_clear_namespace(self.bufnr, -1, 0, -1)
+        vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
+
+        for _, component in pairs(components) do
+            component:draw(self)
+        end
+    end)
+end
+
+---@private
+---
+---@param fn function
+function Layout:modifiable(fn)
+    local bufnr = self.bufnr
+    local modi = vim.api.nvim_buf_get_option(bufnr, "modifiable")
+    if not modi then vim.api.nvim_buf_set_option(bufnr, "modifiable", true) end
+    fn()
+    if not modi then vim.api.nvim_buf_set_option(bufnr, "modifiable", false) end
 end
 
 function Layout:clear()
@@ -37,7 +57,7 @@ function Layout:clear()
     self.line_idx = 1
     self.buttons = {}
 
-    return self
+    self:modifiable(function() vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {}) end)
 end
 
 ---@param val? integer Optional value to increment line index by
@@ -73,8 +93,8 @@ function Layout:init(config)
         },
         line_idx = 1,
         buttons = {},
-        bufnr = 0,
-        winid = 0,
+        bufnr = config.bufnr or 0,
+        winid = config.winid or 0,
     }, self)
 
     return obj

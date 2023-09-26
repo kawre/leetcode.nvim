@@ -23,7 +23,7 @@ function header:init(lines, opts)
         position = "center",
         hl = "Keyword",
         padding = {
-            top = 2,
+            top = 4,
             bot = 2,
         },
     }, opts or {})

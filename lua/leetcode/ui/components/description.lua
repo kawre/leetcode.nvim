@@ -18,7 +18,19 @@ local config = require("leetcode.config")
 local description = {}
 description.__index = description
 
+function description:autocmds()
+    local group_id = vim.api.nvim_create_augroup("leetcode_description", { clear = true })
+
+    vim.api.nvim_create_autocmd("WinResized", {
+        group = group_id,
+        buffer = self.split.bufnr,
+        callback = function() self:redraw() end,
+    })
+end
+
 function description:mount()
+    self:autocmds()
+
     self:populate()
     self.split:mount()
     self:draw()
@@ -27,6 +39,12 @@ function description:mount()
 end
 
 function description:draw() self.layout:draw(self.split) end
+
+function description:redraw()
+    local c = vim.api.nvim_win_get_cursor(self.split.winid)
+    self.layout:draw()
+    vim.api.nvim_win_set_cursor(self.split.winid, c)
+end
 
 ---@private
 function description:populate()

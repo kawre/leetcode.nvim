@@ -148,16 +148,19 @@ function result:handle(item)
 end
 
 function result:clear()
+    self.layout:clear()
     self.popup.border:set_highlight("FloatBorder")
-    vim.api.nvim_buf_set_lines(self.popup.bufnr, 0, -1, false, {})
+
+    -- local bufnr = self.popup.bufnr
+    -- local modi = vim.api.nvim_buf_get_option(bufnr, "modifiable")
+    -- if not modi then vim.api.nvim_buf_set_option(bufnr, "modifiable", true) end
+    -- vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
+    -- if not modi then vim.api.nvim_buf_set_option(bufnr, "modifiable", false) end
 end
 
-function result:draw()
-    -- vim.api.nvim_buf_set_option(self.popup.bufnr, "modifiable", true)
-    vim.api.nvim_buf_set_lines(self.popup.bufnr, 0, -1, false, {})
-    self.layout:draw(self.popup)
-    -- vim.api.nvim_buf_set_option(self.popup.bufnr, "modifiable", false)
-end
+function result:draw() self.layout:draw(self.popup) end
+
+-- function result:redraw() self.layout:draw() end
 
 ---@param parent lc.Console
 ---
@@ -188,7 +191,7 @@ function result:init(parent)
             },
         },
         buf_options = {
-            modifiable = true,
+            modifiable = false,
             readonly = true,
         },
         win_options = {
@@ -198,7 +201,10 @@ function result:init(parent)
 
     local obj = setmetatable({
         popup = popup,
-        layout = Layout:init(),
+        layout = Layout:init({
+            winid = popup.winid,
+            bufnr = popup.bufnr,
+        }),
         parent = parent,
     }, self)
 

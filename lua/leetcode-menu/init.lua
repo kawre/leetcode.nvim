@@ -15,6 +15,8 @@ local Line = require("nui.line")
 local menu = {} ---@diagnostic disable-line
 menu.__index = menu
 
+local idk = 100
+
 ---@type lc-menu
 _LC_MENU = {} ---@diagnostic disable-line
 
@@ -25,21 +27,8 @@ local function tbl_keys(t)
     return keys
 end
 
-function menu:clear() vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {}) end
-
-function menu:redraw() self:draw() end
-
 function menu:draw()
-    self:clear()
-
-    self.layout:draw(self)
-    self:cursor_adjust()
-end
-
-function menu:cursor_adjust()
-    local keys = tbl_keys(self.layout.buttons)
-    if not keys then return end
-    vim.api.nvim_win_set_cursor(self.winid, { keys[self.cursor.idx], 95 })
+    self.layout:draw({ bufnr = self.bufnr, winid = self.winid }) ---@diagnostic disable-line
 end
 
 ---@private
@@ -49,7 +38,7 @@ function menu:autocmds()
     vim.api.nvim_create_autocmd("WinResized", {
         group = group_id,
         buffer = self.bufnr,
-        callback = function() self:redraw() end,
+        callback = function() self:draw() end,
     })
 
     vim.api.nvim_create_autocmd("CursorMoved", {
@@ -60,38 +49,30 @@ function menu:autocmds()
 end
 
 function menu:cursor_move()
-    local c_curr = vim.api.nvim_win_get_cursor(self.winid)[1]
-    local c_prev = self.cursor.prev
-
-    if c_curr == c_prev then return self:cursor_adjust() end
+    local curr = vim.api.nvim_win_get_cursor(self.winid)
+    local prev = self.cursor.prev
 
     local keys = tbl_keys(self.layout.buttons)
     if not keys then return end
 
-    if c_prev then
-        if c_curr > c_prev then
+    if prev then
+        if curr[1] > prev[1] then
             self.cursor.idx = math.min(self.cursor.idx + 1, #keys)
-        else
+        elseif curr[1] < prev[1] then
             self.cursor.idx = math.max(self.cursor.idx - 1, 1)
         end
     end
 
-    local c_next = keys[self.cursor.idx]
-    vim.api.nvim_win_set_cursor(self.winid, { c_next, 95 })
+    local row = keys[self.cursor.idx]
+    local col = #vim.fn.getline(row):match("^%s*")
 
-    self.cursor.prev = c_next
-    self.cursor.curr = c_next
+    self.cursor.prev = { row, col }
+    vim.api.nvim_win_set_cursor(self.winid, self.cursor.prev)
 end
 
 function menu:cursor_reset()
-    local keys = tbl_keys(self.layout.buttons)
-    if not keys then return end
-
     self.cursor.idx = 1
-    self.cursor.curr = keys[self.cursor.idx]
-    self.cursor.prev = keys[self.cursor.idx]
-
-    self:cursor_adjust()
+    self.cursor.prev = nil
 end
 
 ---@param layout layouts
@@ -101,7 +82,7 @@ function menu:set_layout(layout)
     local ok, res = pcall(require, "leetcode-menu.theme." .. layout)
     if ok then self.layout = res end
 
-    self:redraw()
+    self:draw()
 end
 
 ---@private
@@ -138,6 +119,7 @@ function menu:init()
         filetype = "leetcode.nvim",
         synmaxcol = 0,
         wrap = false,
+        modifiable = false,
         colorcolumn = "",
         foldlevel = 999,
         foldcolumn = "0",

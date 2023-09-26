@@ -39,7 +39,7 @@ end
 
 ---@param layout lc-ui.Layout
 function Component:draw(layout)
-    local lines = vim.deepcopy(self.lines)
+    local lines = self.lines
 
     local padding = self.opts.padding
     local toppad = padding and padding.top

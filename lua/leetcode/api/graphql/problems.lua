@@ -25,7 +25,7 @@ end
 ---@return lc.Problem[]
 function M.all()
     local variables = {
-        limit = 3000,
+        limit = 9999,
     }
 
     local query = [[

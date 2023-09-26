@@ -47,5 +47,7 @@
 ---@field position? position
 
 ---@class lc-ui.Layout.config
----@field components lc-ui.Component[]
----@field opts lc-ui.Layout.opts
+---@field components? lc-ui.Component[]
+---@field opts? lc-ui.Layout.opts
+---@field bufnr? integer
+---@field winid? integer
