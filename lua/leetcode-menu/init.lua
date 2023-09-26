@@ -11,11 +11,19 @@ local Line = require("nui.line")
 ---@field bufnr integer
 ---@field winid integer
 ---@field tabpage integer
+---@field cursor lc-menu.cursor
 local menu = {} ---@diagnostic disable-line
 menu.__index = menu
 
 ---@type lc-menu
 _LC_MENU = {} ---@diagnostic disable-line
+
+local function tbl_keys(t)
+    local keys = vim.tbl_keys(t)
+    if not keys then return end
+    table.sort(keys)
+    return keys
+end
 
 function menu:clear() vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {}) end
 
@@ -25,24 +33,71 @@ function menu:draw()
     self:clear()
 
     self.layout:draw(self)
+    self:cursor_adjust()
+end
+
+function menu:cursor_adjust()
+    local keys = tbl_keys(self.layout.buttons)
+    if not keys then return end
+    vim.api.nvim_win_set_cursor(self.winid, { keys[self.cursor.idx], 95 })
 end
 
 ---@private
 function menu:autocmds()
+    local group_id = vim.api.nvim_create_augroup("leetcode_menu", {})
+
     vim.api.nvim_create_autocmd("WinResized", {
-        callback = function() self:draw() end,
+        group = group_id,
+        buffer = self.bufnr,
+        callback = function() self:redraw() end,
+    })
+
+    vim.api.nvim_create_autocmd("CursorMoved", {
+        group = group_id,
+        buffer = self.bufnr,
+        callback = function() self:cursor_move() end,
     })
 end
 
----@alias layouts
----| "menu"
----| "problems"
----| "statistics"
----| "cookie"
----| "cache"
+function menu:cursor_move()
+    local c_curr = vim.api.nvim_win_get_cursor(self.winid)[1]
+    local c_prev = self.cursor.prev
+
+    if c_curr == c_prev then return self:cursor_adjust() end
+
+    local keys = tbl_keys(self.layout.buttons)
+    if not keys then return end
+
+    if c_prev then
+        if c_curr > c_prev then
+            self.cursor.idx = math.min(self.cursor.idx + 1, #keys)
+        else
+            self.cursor.idx = math.max(self.cursor.idx - 1, 1)
+        end
+    end
+
+    local c_next = keys[self.cursor.idx]
+    vim.api.nvim_win_set_cursor(self.winid, { c_next, 95 })
+
+    self.cursor.prev = c_next
+    self.cursor.curr = c_next
+end
+
+function menu:cursor_reset()
+    local keys = tbl_keys(self.layout.buttons)
+    if not keys then return end
+
+    self.cursor.idx = 1
+    self.cursor.curr = keys[self.cursor.idx]
+    self.cursor.prev = keys[self.cursor.idx]
+
+    self:cursor_adjust()
+end
 
 ---@param layout layouts
 function menu:set_layout(layout)
+    self:cursor_reset()
+
     local ok, res = pcall(require, "leetcode-menu.theme." .. layout)
     if ok then self.layout = res end
 
@@ -105,6 +160,9 @@ function menu:init()
         winid = winid,
         tabpage = tabpage,
         layout = l,
+        cursor = {
+            idx = 1,
+        },
     }, self)
 
     _LC_MENU = obj

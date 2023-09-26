@@ -10,7 +10,7 @@ function Buttons:init(config)
         opts = {
             padding = {
                 top = 1,
-                bot = 1,
+                bot = 2,
             },
             spacing = 1,
         },

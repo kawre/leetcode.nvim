@@ -1,6 +1,7 @@
 local Layout = require("leetcode-ui.layout")
 local Title = require("leetcode-menu.components.title")
 local cmd = require("leetcode.api.command")
+local Buttons = require("leetcode-menu.components.buttons")
 
 local padding = require("leetcode-ui.component.padding")
 local button = require("leetcode-ui.component.button")
@@ -15,19 +16,12 @@ local problems = button:init(
 
 local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", function() vim.cmd.quitall() end)
 
-local buttons = group:init({
+local buttons = Buttons:init({
     components = {
         problems,
         exit,
     },
-    opts = {
-        spacing = 1,
-    },
 })
-
--- section.title:append("Menu", "Comment")
-
--- section.footer:append("Signed in as: " .. "kawre", "Keyword")
 
 local Header = require("leetcode-menu.components.header")
 local Footer = require("leetcode-menu.components.footer")
