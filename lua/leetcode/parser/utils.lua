@@ -5,23 +5,30 @@ local utils = {}
 local entities = {
     ["&lt;"] = "<",
     ["&gt;"] = ">",
+    ["&ne;"] = "!=",
+
     ["&nbsp;"] = " ",
     ["&quot;"] = "\"",
     ["&#39;"] = "'",
     ["&rarr;"] = "",
     ["&larr;"] = "",
+
+    ["&lcpad;"] = "",
+    ["&lcnl;"] = "",
+    ["&lcend;"] = "",
 }
 
 local highlights = {
-    ["p"] = "FloatTitle",
-    ["strong"] = "",
-    ["em"] = "LeetCodeEmTag",
-    ["code"] = "Type",
-    ["sup"] = "LeetCodeSupTag",
-    ["pre"] = "FloatTitle",
-    ["example"] = "DiagnosticHint",
-    ["constraints"] = "DiagnosticHint",
-    [""] = "",
+    [""] = "LeetCodeNormal",
+    ["p"] = "LeetCodeNormal",
+    ["strong"] = "LeetCodeBold",
+    ["em"] = "LeetCodeItalic",
+    ["code"] = "LeetCodeCode",
+    ["pre"] = "LeetCodeNormal",
+    ["example"] = "LeetCodeExample",
+    ["constraints"] = "LeetCodeConstraints",
+    ["ul"] = "LeetCodeNormal",
+    ["font"] = "LeetCodeNormal",
 }
 
 ---@param entity string
@@ -30,20 +37,26 @@ function utils.entity(entity)
     if entities[entity] then
         return entities[entity]
     else
-        log.error("Unknown entity: " .. entity)
-        return "!" .. entity .. "!"
+        log.error("unknown enitity: " .. entity)
+        return entity
     end
 end
 
----@param tag string
+---@param tags string[]
 ---@return string
-function utils.hi(tag)
-    if highlights[tag] then
-        return highlights[tag]
-    else
-        log.warn("Unknown tag: " .. tag)
-        return ""
+function utils.hi(tags)
+    local tag = tags[1] or ""
+    -- if not tag then return highlights["p"] end
+
+    if highlights[tag] then return highlights[tag] end
+
+    ---Inherit hi from parent tag
+    for _, t in ipairs(tags) do
+        if highlights[t] then return highlights[t] end
     end
+
+    log.warn("Unknown tag: " .. tag)
+    return ""
 end
 
 return utils

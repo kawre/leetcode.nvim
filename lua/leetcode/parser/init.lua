@@ -12,6 +12,7 @@ local NuiLine = require("nui.line")
 ---@field parser LanguageTree
 ---@field ts TreesitterModule
 ---@field text lc-ui.Text
+---@field newline_count integer
 local parser = {}
 parser.__index = parser
 
@@ -72,71 +73,76 @@ function parser:get_text(node) return self.ts.get_node_text(node, self.str) end
 
 function parser:handle_entity(entity)
     if entity == "&lcnl;" then
-        self.text:append(self.line)
-        self.line = NuiLine()
-        return
+        if self.newline_count <= 1 then
+            self.text:append(self.line)
+            self.line = NuiLine()
+        end
     elseif entity == "&lcpad;" then
         if self.line:content() ~= "" then self.text:append(self.line) end
 
         self.line = NuiLine()
         self.text:append(NuiLine())
         self.text:append(NuiLine())
-        return
     elseif entity == "&lcend;" then
         self.text:append(self.line)
-        return
     end
 
-    entity = utils.entity(entity) or entity
-    self.line:append(entity)
+    self.newline_count = (entity == "&lcnl;") and (self.newline_count + 1) or 0
+    return utils.entity(entity)
 end
 
-function parser:handle_list(node, data)
+function parser:handle_list(tags)
     if self.line:content() ~= "" then return end
 
     local function get_list_type()
-        for _, tag in ipairs(data) do
+        for _, tag in ipairs(tags) do
             if tag == "ul" or tag == "ol" then return tag end
         end
     end
 
     local li_type = get_list_type()
+    local leftpad = string.rep("\t", vim.fn.count(tags, "li"))
+
     if li_type == "ul" then
-        self.line:append("\t ", "LeetCodeIndent")
+        self.line:append(leftpad .. " ", "LeetCodeIndent")
     else
-        self.line:append("\t1. ", "LeetCodeIndent")
+        self.line:append(leftpad .. "1. ", "LeetCodeIndent")
     end
+end
+
+---@param text string
+function parser:handle_indent(text)
+    if self.line:content() ~= "" then return text end
+
+    self.line:append("\t▎\t", "LeetCodeIndent")
 end
 
 ---@private
 ---
 ---@param node TSNode
----@param data lc.Parser.Tag
+---@param tags lc.Parser.Tag
 ---
 ---@return nil
 ---TODO: problem 591, <u>...</u> tag, 429
-function parser:node_hi(node, data)
+function parser:node_hi(node, tags)
     local text = self:get_text(node)
+    local tag = tags[1]
 
-    local tag = not vim.tbl_isempty(data) and data[1] or ""
+    if vim.tbl_contains(tags, "pre") then self:handle_indent(text) end
+    if vim.tbl_contains(tags, "li") then self:handle_list(tags) end
+    if node:type() == "entity" then text = self:handle_entity(text) end
 
-    if node:type() == "entity" then return self:handle_entity(text) end
-    if vim.tbl_contains(data, "li") then self:handle_list(node, data) end
     if tag == "sup" then text = "^" .. text end
     if tag == "sub" then text = "_" .. text end
 
-    if vim.tbl_contains(data, "pre") and self.line:content() == "" then
-        self.line:append("\t▎\t", "LeetCodeIndent")
-    end
-
-    local nui_text = NuiText(text, utils.hi(tag))
+    local nui_text = NuiText(text, utils.hi(tags))
     self.line:append(nui_text)
 end
 
 ---@private
 ---@param node TSNode
----@param style table
-function parser:rec_parse(node, style)
+---@param tags table
+function parser:rec_parse(node, tags)
     ---@type lc.Parser.Tag
     local tag_data
 
@@ -146,10 +152,10 @@ function parser:rec_parse(node, style)
         if ntype == "start_tag" then
             tag_data = self:get_tag_data(child)
         else
-            if tag_data then table.insert(style, 1, tag_data.tag) end
-            if ntype == "text" or ntype == "entity" then self:node_hi(child, style) end
-            self:rec_parse(child, style)
-            if tag_data then table.remove(style, 1) end
+            if tag_data then table.insert(tags, 1, tag_data.tag) end
+            if ntype == "text" or ntype == "entity" then self:node_hi(child, tags) end
+            self:rec_parse(child, tags)
+            if tag_data then table.remove(tags, 1) end
         end
     end
 end
@@ -165,13 +171,11 @@ end
 
 ---@param str string
 local function normalize(str)
-    local res = str:gsub(
-        "<p><strong[^>]*>(Example%s*%d+:)</strong></p>(\n*)",
-        "<example>󰛨 %1</example>\n"
-    )
+    local res = str:gsub("​", "")
+        :gsub("<p><strong[^>]*>(Example%s*%d+:)</strong></p>(\n*)", "<example>󰛨 %1</example>\n")
         :gsub(
             "<p><strong[^>]*>(Constraints:)</strong></p>(\n*)",
-            "<constraints> %1<constraints>\n"
+            "<constraints> %1</constraints>\n"
         )
         :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
         :gsub("\n", "&lcnl;")
@@ -193,6 +197,7 @@ function parser:init(str, lang)
         parser = _parser,
         text = Text:init({}),
         line = NuiLine(),
+        newline_count = 0,
     }, self)
 
     return obj

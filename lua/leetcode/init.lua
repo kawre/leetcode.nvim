@@ -2,6 +2,8 @@ local config = require("leetcode.config")
 local utils = require("leetcode.utils")
 local cmd = require("leetcode.api.command")
 
+local log = require("leetcode.logger")
+
 ---@class lc
 local leetcode = {}
 
@@ -22,20 +24,24 @@ function leetcode.setup(cfg)
     config.apply(cfg or {})
     if should_skip() then return end
 
-    vim.api.nvim_set_hl(0, "LeetCodeEasy", { fg = "#00b8a3" })
-    vim.api.nvim_set_hl(0, "LeetCodeMedium", { fg = "#ffb800" })
-    vim.api.nvim_set_hl(0, "LeetCodeHard", { fg = "#ef4743" })
-    vim.api.nvim_set_hl(0, "LeetCodePTag", { link = "Comment" })
-    vim.api.nvim_set_hl(0, "LeetCodeEmTag", { italic = true })
-    vim.api.nvim_set_hl(0, "LeetCodeStrongTag", { bold = true })
-    vim.api.nvim_set_hl(0, "LeetCodeCodeTag", { link = "DiagnosticHint" })
-    vim.api.nvim_set_hl(0, "LeetCodeSupTag", { link = "MatchParen" })
-    vim.api.nvim_set_hl(0, "LeetCodePreTag", { link = "@text" })
+    vim.api.nvim_set_hl(0, "LeetCodeEasy", { fg = "#46c6c2" })
+    vim.api.nvim_set_hl(0, "LeetCodeMedium", { fg = "#fac31d" })
+    vim.api.nvim_set_hl(0, "LeetCodeHard", { fg = "#f8615c" })
+    -- vim.api.nvim_set_hl(0, "LeetCodeEasy", { link = "DiagnosticOk" })
+    -- vim.api.nvim_set_hl(0, "LeetCodeMedium", { link = "DiagnosticWarn" })
+    -- vim.api.nvim_set_hl(0, "LeetCodeHard", { link = "DiagnosticError" })
 
+    local normal = vim.api.nvim_get_hl(0, { name = "FloatTitle" })
+    vim.api.nvim_set_hl(0, "LeetCodeNormal", normal)
+    vim.api.nvim_set_hl(0, "LeetCodeItalic", vim.tbl_extend("force", normal, { italic = true }))
+    vim.api.nvim_set_hl(0, "LeetCodeBold", { bold = true })
+
+    vim.api.nvim_set_hl(0, "LeetCodeCode", { link = "Type" })
+    vim.api.nvim_set_hl(0, "LeetCodeExample", { link = "DiagnosticHint" })
+    vim.api.nvim_set_hl(0, "LeetCodeConstraints", { link = "DiagnosticInfo" })
     vim.api.nvim_set_hl(0, "LeetCodeIndent", { link = "Comment" })
 
     local group_id = vim.api.nvim_create_augroup("leetcode_start", { clear = true })
-
     vim.api.nvim_create_autocmd("VimEnter", {
         group = group_id,
         pattern = "*",

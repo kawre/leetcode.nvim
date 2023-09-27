@@ -61,13 +61,19 @@ function description:populate()
     local statsline = NuiLine()
     statsline:append(
         q.difficulty,
-        q.difficulty == "Easy" and "DiagnosticOk"
-            or q.difficulty == "Medium" and "DiagnosticWarn"
-            or "DiagnosticError"
+        ({
+            ["Easy"] = "LeetCodeEasy",
+            ["Medium"] = "LeetCodeMedium",
+            ["Hard"] = "LeetCodeHard",
+        })[q.difficulty]
     )
     statsline:append(" | ")
+
     statsline:append(q.likes .. "  ", "Comment")
-    statsline:append(q.dislikes .. "  ", "Comment")
+    statsline:append(q.dislikes .. " ", "Comment")
+    statsline:append(" | ")
+
+    statsline:append(string.format("%s of %s", q.stats.acRate, q.stats.totalSubmission), "Comment")
 
     local titlecomp = Text:init({
         lines = { titleline },
@@ -86,7 +92,9 @@ function description:populate()
 
     self.layout = Layout:init({
         components = {
+            padding:init(1),
             titlecomp,
+            padding:init(1),
             statscomp,
             linkcomp,
             padding:init(2),

@@ -36,15 +36,22 @@ function question.by_title_slug(title_slug)
             }
             testcase_list: exampleTestcaseList
             meta_data: metaData
+            ac_rate: acRate
+            stats
           }
         }
     ]]
 
     local ok, res = pcall(utils.query, query, variables)
     assert(ok)
+
     local md = res["question"].meta_data
-    local dok, decoded = pcall(vim.json.decode, md)
-    if dok then res["question"].meta_data = decoded end
+    local dok, mdecoded = pcall(vim.json.decode, md)
+    if dok then res["question"].meta_data = mdecoded end
+
+    local stats = res["question"].stats
+    local sok, sdecoded = pcall(vim.json.decode, stats)
+    if sok then res["question"].stats = sdecoded end
 
     return res["question"]
 end

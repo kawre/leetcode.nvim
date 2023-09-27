@@ -240,5 +240,13 @@
 ---@field code_snippets code_snippet[]
 ---@field testcase_list string[]
 ---@field meta_data metadata
+---@field stats question_stats
 
 ---@alias question_response lc.QuestionResponse
+
+---@class question_stats
+---@field acRate string
+---@field totalAccepted string
+---@field totalAcceptedRaw string
+---@field totalSubmission string
+---@field totalSubmissionRaw string
