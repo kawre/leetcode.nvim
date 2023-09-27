@@ -1,4 +1,4 @@
-local utils = require("leetcode.api.graphql.utils")
+local utils = require("leetcode.api.utils")
 local log = require("leetcode.logger")
 
 local question = {}

@@ -1,12 +1,9 @@
-local path = require("plenary.path")
-local async = require("plenary.async")
-local spinner = require("leetcode.logger.spinner")
+---@mod lc.cache.problems
+
 local log = require("leetcode.logger")
 
 local config = require("leetcode.config")
-local gql = require("leetcode.api.graphql")
-local gql_utils = require("leetcode.api.graphql.utils")
-
+local path = require("plenary.path")
 local file = path:new(config.user.directory .. "/.problemlist")
 
 ---@class lc.Problem
@@ -20,6 +17,7 @@ local file = path:new(config.user.directory .. "/.problemlist")
 local Problems = {}
 
 local function populate()
+    local spinner = require("leetcode.logger.spinner")
     local noti = spinner:init("Fetching Problem List", "points")
 
     local cb = function(data)
@@ -29,7 +27,7 @@ local function populate()
         noti:done("Problem List Cache Updated!")
     end
 
-    gql.problems._all(cb)
+    require("leetcode.api.problems")._all(cb)
 end
 
 ---@return lc.Problem[]

@@ -1,13 +1,15 @@
-local Split = require("nui.split")
 local log = require("leetcode.logger")
+
+local config = require("leetcode.config")
 local parser = require("leetcode.parser")
-local gql = require("leetcode.api.graphql")
+
 local Layout = require("leetcode-ui.layout")
 local Text = require("leetcode-ui.component.text")
 local padding = require("leetcode-ui.component.padding")
+
 local NuiText = require("nui.text")
 local NuiLine = require("nui.line")
-local config = require("leetcode.config")
+local Split = require("nui.split")
 
 ---@class lc.Description
 ---@field split NuiSplit

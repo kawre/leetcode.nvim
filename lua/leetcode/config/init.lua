@@ -1,4 +1,5 @@
 local template = require("leetcode.config.template")
+
 -- local cache = require("leetcode.cache")
 
 ---@class lc.Settings
@@ -41,13 +42,6 @@ function config.apply(cfg)
     config.lang = config.user.lang
 
     -- config.cache = cache.setup()
-
-    vim.api.nvim_set_hl(0, "LeetCodePTag", { link = "Comment" })
-    vim.api.nvim_set_hl(0, "LeetCodeEmTag", { italic = true })
-    vim.api.nvim_set_hl(0, "LeetCodeStrongTag", { bold = true })
-    vim.api.nvim_set_hl(0, "LeetCodeCodeTag", { link = "DiagnosticHint" })
-    vim.api.nvim_set_hl(0, "LeetCodeSupTag", { link = "MatchParen" })
-    vim.api.nvim_set_hl(0, "LeetCodePreTag", { link = "@text" })
 end
 
 return config

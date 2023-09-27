@@ -4,7 +4,7 @@ local M = {
     domain = "com",
 
     ---@type string
-    invoke_name = "leetcode.nvim",
+    arg = "leetcode.nvim",
 
     ---@type string
     lang = "java",

@@ -1,42 +1,16 @@
-local cache = require("leetcode.cache")
-local gql = require("leetcode.api.graphql")
-local problems = require("leetcode.cache.problems")
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
-local api = require("leetcode.api")
-local pick = require("leetcode.ui.pickers")
-
-local ui = require("leetcode.ui")
-local question = require("leetcode.ui.components.question")
-local utils = require("leetcode.ui.utils")
-
-local async = require("plenary.async")
-
-local menu = require("leetcode-menu")
-
-local Input = require("nui.input")
 
 ---@class lc.Commands
 local cmd = {}
 
-function cmd.cache_update() cache.update() end
+function cmd.cache_update() require("leetcode.cache").update() end
 
 function cmd.problems()
+    local problems = require("leetcode.cache.problems")
     local _, res = pcall(problems.get)
 
-    pick.question(res)
-
-    -- ui.pick_one(
-    --     res,
-    --     "Select a Problem",
-    --     utils.question_formatter,
-    --
-    --     ---@param item lc.Problem
-    --     function(item)
-    --         if not item then return end
-    --         question:init(item)
-    --     end
-    -- )
+    require("leetcode.ui.pickers.question").pick(res)
 end
 
 function cmd.cookie_prompt()
@@ -61,44 +35,33 @@ function cmd.cookie_prompt()
         },
     }
 
+    local Input = require("nui.input")
     local input = Input(popup_options, {
         prompt = " 󰆘 ",
-        on_close = function() log.info("Cookie prompt closed") end,
         on_submit = function(value) cookie.update(value) end,
     })
 
     input:map("n", { "<Esc>", "q" }, function() input:unmount() end)
-
     input:mount()
-
-    -- popup:mount()
-
-    -- ui.input(
-    --     "Enter cookie",
-    --     ---@param cookie_str string
-    --     function(cookie_str)
-    --         if not cookie_str then return end
-    --
-    --         cookie.new(cookie_str)
-    --         -- cmd.dashboard("menu")
-    --     end
-    -- )
 end
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---
 ---@return lc.UserAuth | nil
-function cmd.authenticate() gql.auth.user() end
+function cmd.authenticate() require("leetcode.api.auth").user() end
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---
 --@param theme lc-db.Theme
-function cmd.qot() ui.open_qot() end
+function cmd.qot() require("leetcode.ui").open_qot() end
 
 function cmd.random_question()
-    local title_slug = gql.question.random().title_slug
+    local problems = require("leetcode.cache.problems")
+    local question = require("leetcode.api.question")
+
+    local title_slug = question.random().title_slug
     local item = problems.get_by_title_slug(title_slug) or {}
-    question:init(item)
+    require("leetcode.ui.question"):init(item)
 end
 
 function cmd.console()
@@ -112,19 +75,18 @@ function cmd.console()
 end
 
 function cmd.start()
-    if vim.fn.argc() ~= 1 then return end
+    -- if vim.fn.argc() ~= 1 then return end
+    --
+    -- local invoke, arg = config.user.arg, vim.fn.argv()[1]
+    -- if arg ~= invoke then return end
+    --
+    -- local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+    -- if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return true end
 
-    local invoke, arg = config.user.invoke_name, vim.fn.argv()[1]
-    if arg ~= invoke then return end
-
-    local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-    if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return true end
-
-    -- async.run(function()
-    api.setup()
-    gql.auth.user()
-    cache.setup()
-    menu:init()
+    require("leetcode.api").setup()
+    require("leetcode.api.auth").user()
+    require("leetcode.cache").setup()
+    require("leetcode-menu"):init()
 end
 
 function cmd.menu() vim.api.nvim_set_current_tabpage(config.user.menu_tabpage) end

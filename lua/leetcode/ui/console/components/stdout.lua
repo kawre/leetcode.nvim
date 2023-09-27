@@ -1,7 +1,7 @@
 local config = require("leetcode.config")
 local NuiLine = require("nui.line")
 local log = require("leetcode.logger")
-local Pre = require("leetcode.ui.components.console.components.pre")
+local Pre = require("leetcode.ui.console.components.pre")
 
 local stdout = {}
 

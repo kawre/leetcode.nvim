@@ -1,5 +1,4 @@
 local config = require("leetcode.config")
-local spinner = require("leetcode.logger.spinner")
 local levels = vim.log.levels
 
 ---@class lc.Logger

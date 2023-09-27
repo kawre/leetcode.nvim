@@ -1,6 +1,6 @@
 local log = require("leetcode.logger")
 
-local Question = require("leetcode.ui.components.question")
+local Question = require("leetcode.ui.question")
 
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
@@ -21,14 +21,13 @@ end
 ---@param question lc.Problem
 local function display_difficulty(question)
     local hi = {
-        ["Easy"] = "LeetCodeEasy",
-        ["Medium"] = "LeetCodeMedium",
-        ["Hard"] = "LeetCodeHard",
+        ["Easy"] = { "E", "LeetCodeEasy" },
+        ["Medium"] = { "M", "LeetCodeMedium" },
+        ["Hard"] = { "H", "LeetCodeHard" },
     }
 
-    local diff_hi = hi[question.difficulty] or ""
-
-    return { "󱓻", diff_hi }
+    return { "󱓻", "LeetCode" .. question.difficulty }
+    -- return hi[quesiton.difficulty]
 end
 
 ---@param question lc.Problem
@@ -86,26 +85,28 @@ end
 
 local opts = require("telescope.themes").get_dropdown()
 
----@param questions lc.Problem[]
-return function(questions)
-    pickers
-        .new(opts, {
-            prompt_title = "Select a Question",
-            finder = finders.new_table({
-                results = questions,
-                entry_maker = entry_maker,
-            }),
-            sorter = conf.generic_sorter(opts),
-            attach_mappings = function(prompt_bufnr, map)
-                actions.select_default:replace(function()
-                    actions.close(prompt_bufnr)
-                    local selection = action_state.get_selected_entry()
+return {
+    ---@param questions lc.Problem[]
+    pick = function(questions)
+        pickers
+            .new(opts, {
+                prompt_title = "Select a Question",
+                finder = finders.new_table({
+                    results = questions,
+                    entry_maker = entry_maker,
+                }),
+                sorter = conf.generic_sorter(opts),
+                attach_mappings = function(prompt_bufnr, map)
+                    actions.select_default:replace(function()
+                        actions.close(prompt_bufnr)
+                        local selection = action_state.get_selected_entry()
 
-                    if not selection then return end
-                    Question:init(selection.value)
-                end)
-                return true
-            end,
-        })
-        :find()
-end
+                        if not selection then return end
+                        Question:init(selection.value)
+                    end)
+                    return true
+                end,
+            })
+            :find()
+    end,
+}

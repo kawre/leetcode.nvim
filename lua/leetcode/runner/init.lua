@@ -1,8 +1,9 @@
 local log = require("leetcode.logger")
-local rest = require("leetcode.api.rest")
+
 local utils = require("leetcode.runner.utils")
-local async = require("plenary.async")
 local config = require("leetcode.config")
+
+local interpreter = require("leetcode.api.interpreter")
 
 ---@class lc.Runner
 ---@field question lc.Question
@@ -25,7 +26,7 @@ function runner:run()
         question_id = question.q.id,
     }
 
-    rest.interpreter.interpret_solution(
+    interpreter.interpret_solution(
         question.q.title_slug,
         body,
         function(item) self:callback(item) end

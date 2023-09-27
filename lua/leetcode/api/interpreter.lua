@@ -1,4 +1,4 @@
-local utils = require("leetcode.api.rest.utils")
+local utils = require("leetcode.api.utils")
 local config = require("leetcode.config")
 local spinner = require("leetcode.logger.spinner")
 

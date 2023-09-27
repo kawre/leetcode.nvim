@@ -44,4 +44,10 @@ function utils.map(mode, lhs, rhs, opts)
     vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 
+-- ---@param module string
+-- function utils.add(module)
+--
+--
+-- end
+
 return utils

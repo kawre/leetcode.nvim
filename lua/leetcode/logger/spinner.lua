@@ -1,4 +1,5 @@
--- local log = require("leetcode.logger")
+local log = require("leetcode.logger")
+
 local config = require("leetcode.config")
 
 ---@class lc.Logger.Spinner

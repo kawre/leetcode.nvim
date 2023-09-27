@@ -1,4 +1,4 @@
-local gql = require("leetcode.api.graphql")
+local api_problems = require("leetcode.api.problems")
 local Popup = require("nui.popup")
 
 ---@class lc.UI
@@ -20,7 +20,7 @@ function Ui.input(opts, callback) vim.ui.input(opts, callback) end
 
 --@param question lc.Problem
 function Ui.open_qot()
-    local qot = gql.problems.question_of_today()
+    local qot = api_problems.question_of_today()
 
     local popup = Popup({
         position = "50%",

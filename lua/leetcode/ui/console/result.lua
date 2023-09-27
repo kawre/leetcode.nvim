@@ -1,11 +1,11 @@
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
-local Stdout = require("leetcode.ui.components.console.components.stdout")
-local console_popup = require("leetcode.ui.components.console.popup")
+local Stdout = require("leetcode.ui.console.components.stdout")
+local console_popup = require("leetcode.ui.console.popup")
 
-local Case = require("leetcode.ui.components.console.components.case")
+local Case = require("leetcode.ui.console.components.case")
 local Group = require("leetcode-ui.component.group")
-local Pre = require("leetcode.ui.components.console.components.pre")
+local Pre = require("leetcode.ui.console.components.pre")
 local Layout = require("leetcode-ui.layout")
 local Text = require("leetcode-ui.component.text")
 

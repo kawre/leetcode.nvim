@@ -3,7 +3,7 @@ local Text = require("leetcode-ui.component.text")
 local NuiLine = require("nui.line")
 local log = require("leetcode.logger")
 local NuiPopup = require("nui.popup")
-local console_popup = require("leetcode.ui.components.console.popup")
+local console_popup = require("leetcode.ui.console.popup")
 
 ---@class lc.Testcase: lc.Console.Popup
 ---@field testcases string[]
