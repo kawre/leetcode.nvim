@@ -56,7 +56,7 @@ function description:populate()
     linkline:append("https://leetcode.com/problems/" .. q.title_slug .. "/", "Comment")
 
     local titleline = NuiLine()
-    titleline:append(" " .. q.frontend_id .. ". " .. q.title .. " ", "MasonHeader")
+    titleline:append(" " .. q.frontend_id .. ". " .. q.title .. " ", "")
 
     local statsline = NuiLine()
     statsline:append(
@@ -88,10 +88,10 @@ function description:populate()
         components = {
             titlecomp,
             statscomp,
+            linkcomp,
             padding:init(2),
             contents,
             padding:init(1),
-            linkcomp,
         },
         opts = { margin = 5 },
     })
