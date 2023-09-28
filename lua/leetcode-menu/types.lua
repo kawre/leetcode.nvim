@@ -1,4 +1,3 @@
-
 ---@class lc-menu.cursor.pos
 ---@field row integer
 ---@field col integer
@@ -14,3 +13,4 @@
 ---| "statistics"
 ---| "cookie"
 ---| "cache"
+---| "signin"

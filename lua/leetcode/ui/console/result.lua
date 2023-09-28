@@ -77,7 +77,6 @@ function result:handle_runtime_error(item) -- status code = 15
 end
 
 function result:handle_internal_error(item) -- status code = 16
-    log.inspect(item)
     local header = NuiLine()
     header:append(item.status_msg, "DiagnosticError")
 

@@ -1,3 +1,5 @@
+local log = require("leetcode.logger")
+
 local utils = require("leetcode.api.utils")
 local config = require("leetcode.config")
 local spinner = require("leetcode.logger.spinner")
@@ -21,6 +23,8 @@ local check_state = {
 ---@param body lc.Interpret.body
 ---@param callback function
 function interpreter.interpret_solution(title_slug, body, callback)
+    utils.auth_guard()
+
     local url = string.format(config.domain .. "/problems/%s/interpret_solution/", title_slug)
 
     ---@type boolean, submission

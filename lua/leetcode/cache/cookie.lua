@@ -1,5 +1,6 @@
 local path = require("plenary.path")
 
+local log = require("leetcode.logger")
 local file = path:new(vim.fn.stdpath("data") .. "/leetcode/.cookie")
 
 ---@class lc.Cookie
@@ -17,7 +18,23 @@ function cookie.update(str)
     -- if not file:exists() then file:touch() end
     file:write(str, "w")
 
+    local api = require("leetcode.api")
+    api.setup()
+
+    local auth_api = require("leetcode.api.auth")
+    local auth = auth_api.user()
+
+    if not auth.is_signed_in then
+        cookie.delete()
+        error("Invalid cookie")
+    end
+
     return t
+end
+
+function cookie.delete()
+    file:rm()
+    require("leetcode.api").setup()
 end
 
 ---@return lc.Cookie | nil
@@ -25,13 +42,11 @@ function cookie.get()
     local r_ok, contents = pcall(path.read, file)
     if not r_ok then return end
 
-    local n_ok, c = pcall(cookie.update, contents)
-    if not n_ok then return end
+    local pok, c = pcall(cookie.parse, contents)
+    if not pok then return end
 
     return c
 end
-
-function cookie.delete() file:rm() end
 
 ---@param cookie_str string
 ---

@@ -20,7 +20,7 @@ local update_btn = Button:init(
 local delete_btn = Button:init(
     { icon = "󱛪", src = "Delete / Sign out" },
     "d",
-    function() cmd.cookie_prompt() end
+    function() cmd.delete_cookie() end
 )
 
 local back_btn = Button:init(

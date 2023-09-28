@@ -26,7 +26,7 @@ function description:autocmds()
     vim.api.nvim_create_autocmd("WinResized", {
         group = group_id,
         buffer = self.split.bufnr,
-        callback = function() self:redraw() end,
+        callback = function() self:draw() end,
     })
 end
 
@@ -40,13 +40,17 @@ function description:mount()
     return self
 end
 
-function description:draw() self.layout:draw(self.split) end
-
-function description:redraw()
+function description:draw()
     local c = vim.api.nvim_win_get_cursor(self.split.winid)
-    self.layout:draw()
+    self.layout:draw(self.split)
     vim.api.nvim_win_set_cursor(self.split.winid, c)
 end
+
+-- function description:redraw()
+--     local c = vim.api.nvim_win_get_cursor(self.split.winid)
+--     self.layout:draw()
+--     vim.api.nvim_win_set_cursor(self.split.winid, c)
+-- end
 
 ---@private
 function description:populate()
@@ -92,12 +96,11 @@ function description:populate()
 
     self.layout = Layout:init({
         components = {
+            linkcomp,
             padding:init(1),
             titlecomp,
-            padding:init(1),
             statscomp,
-            linkcomp,
-            padding:init(2),
+            padding:init(3),
             contents,
             padding:init(1),
         },

@@ -1,4 +1,5 @@
 local template = require("leetcode.config.template")
+local path = require("plenary.path")
 
 -- local cache = require("leetcode.cache")
 
@@ -41,7 +42,7 @@ function config.apply(cfg)
     config.domain = "https://leetcode." .. config.user.domain
     config.lang = config.user.lang
 
-    -- config.cache = cache.setup()
+    path:new(config.user.directory):mkdir()
 end
 
 return config

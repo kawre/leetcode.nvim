@@ -17,12 +17,6 @@ local update_btn = Button:init(
     function() cmd.cache_update() end
 )
 
-local delete_btn = Button:init(
-    { icon = "󱛪", src = "Delete / Sign out" },
-    "d",
-    function() cmd.cookie_prompt() end
-)
-
 local back_btn = Button:init(
     { icon = "", src = "Back" },
     "q",
@@ -32,7 +26,6 @@ local back_btn = Button:init(
 local buttons = Buttons:init({
     components = {
         update_btn,
-        delete_btn,
         back_btn,
     },
 })

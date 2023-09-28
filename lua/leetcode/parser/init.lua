@@ -83,6 +83,7 @@ function parser:handle_entity(entity)
         self.line = NuiLine()
         self.text:append(NuiLine())
         self.text:append(NuiLine())
+        self.text:append(NuiLine())
     elseif entity == "&lcend;" then
         self.text:append(self.line)
     end
@@ -123,7 +124,7 @@ end
 ---@param tags lc.Parser.Tag
 ---
 ---@return nil
----TODO: problem 591, <u>...</u> tag, 429
+---TODO: problem 591, <u>...</u> tag, 429, 2467, 961, 997, 1649, 645, 137
 function parser:node_hi(node, tags)
     local text = self:get_text(node)
     local tag = tags[1]
@@ -170,17 +171,23 @@ function parser:parse()
 end
 
 ---@param str string
-local function normalize(str)
+local function normalize_html(str)
     local res = str:gsub("​", "")
-        :gsub("<p><strong[^>]*>(Example%s*%d+:)</strong></p>(\n*)", "<example>󰛨 %1</example>\n")
+        :gsub("\t", "")
+        :gsub("\r\n", "\n")
+        :gsub(
+            "<p><strong[^>]*>(Example%s*%d+:)</strong></p>(\n*)",
+            "<example>󰛨 %1</example>\n\n"
+        )
         :gsub(
             "<p><strong[^>]*>(Constraints:)</strong></p>(\n*)",
             "<constraints> %1</constraints>\n"
         )
+        :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
         :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
         :gsub("\n", "&lcnl;")
-        :gsub("\t", "")
         :gsub("%s", "&nbsp;")
+
     return res .. "&lcend;"
 end
 
@@ -188,7 +195,7 @@ end
 ---@param lang string
 function parser:init(str, lang)
     local ts = vim.treesitter
-    str = normalize(str)
+    str = normalize_html(str)
     local _parser = ts.get_string_parser(str, lang)
 
     local obj = setmetatable({

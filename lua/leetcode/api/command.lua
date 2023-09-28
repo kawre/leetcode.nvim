@@ -13,7 +13,8 @@ function cmd.problems()
     require("leetcode.ui.pickers.question").pick(res)
 end
 
-function cmd.cookie_prompt()
+---@param cb? function
+function cmd.cookie_prompt(cb)
     local cookie = require("leetcode.cache.cookie")
 
     local popup_options = {
@@ -38,11 +39,26 @@ function cmd.cookie_prompt()
     local Input = require("nui.input")
     local input = Input(popup_options, {
         prompt = " 󰆘 ",
-        on_submit = function(value) cookie.update(value) end,
+        on_submit = function(value)
+            if cookie.update(value) then
+                cmd.menu_layout("menu")
+                log.info("Sign-in successful")
+                if cb then cb() end
+            end
+        end,
     })
 
     input:map("n", { "<Esc>", "q" }, function() input:unmount() end)
     input:mount()
+end
+
+---Signout
+function cmd.delete_cookie()
+    log.warn("You're now signed out")
+    local cookie = require("leetcode.cache.cookie")
+    pcall(cookie.delete)
+
+    cmd.menu_layout("signin")
 end
 
 ---Merge configurations into default configurations and set it as user configurations.
@@ -85,7 +101,7 @@ function cmd.start()
 
     require("leetcode.api").setup()
     require("leetcode.api.auth").user()
-    require("leetcode.cache").setup()
+    -- require("leetcode.cache").setup()
     require("leetcode-menu"):init()
 end
 

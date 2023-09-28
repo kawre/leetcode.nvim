@@ -4,26 +4,10 @@ local utils = require("leetcode.api.utils")
 ---@class lc.ProblemsApi
 local M = {}
 
----@return integer
-function M.total_num()
-    local query = [[
-        query problemsetQuestionList {
-          problemsetQuestionList: questionList(
-            categorySlug: ""
-            filters: {}
-          ) {
-            total: totalNum
-            }
-        }
-    ]]
-
-    local total = utils.query(query)["problemsetQuestionList"]["total"]
-
-    return total
-end
-
 ---@return lc.Problem[]
 function M.all()
+    assert(utils.auth_guard(), "User not signed in")
+
     local variables = {
         limit = 9999,
     }
@@ -98,6 +82,8 @@ function M._all(cb)
 end
 
 function M.question_of_today()
+    utils.auth_guard()
+
     local query = [[
         query questionOfToday {
           activeDailyCodingChallengeQuestion {
