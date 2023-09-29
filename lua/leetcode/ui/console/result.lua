@@ -30,6 +30,8 @@ function result:handle_runtime(item) -- status code = 10
     local is_sub_res = item.runtime_percentile ~= vim.NIL and item.memory_percentile ~= vim.NIL
     local group = Group:init({ opts = { spacing = 1 } })
 
+    local function perc_hi(perc) return perc >= 50 and "DiagnosticOk" or "DiagnosticError" end
+
     local header = Text:init()
 
     if not is_sub_res then
@@ -63,7 +65,7 @@ function result:handle_runtime(item) -- status code = 10
         local perc_runtime = NuiLine()
         perc_runtime:append(
             "Beats " .. string.format("%.2f", item.runtime_percentile) .. "% ",
-            "DiagnosticOk"
+            perc_hi(item.runtime_percentile)
         )
         perc_runtime:append("of users with " .. item.pretty_lang)
 
@@ -80,7 +82,7 @@ function result:handle_runtime(item) -- status code = 10
         local perc_mem = NuiLine()
         perc_mem:append(
             "Beats " .. string.format("%.2f", item.memory_percentile) .. "% ",
-            "DiagnosticOk"
+            perc_hi(item.memory_percentile)
         )
         perc_mem:append("of users with " .. item.pretty_lang)
 

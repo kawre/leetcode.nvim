@@ -77,6 +77,8 @@ function parser:handle_entity(entity)
             self.text:append(self.line)
             self.line = NuiLine()
         end
+
+        self.newline_count = self.newline_count + 1
     elseif entity == "&lcpad;" then
         if self.line:content() ~= "" then self.text:append(self.line) end
 
@@ -88,7 +90,6 @@ function parser:handle_entity(entity)
         self.text:append(self.line)
     end
 
-    self.newline_count = (entity == "&lcnl;") and (self.newline_count + 1) or 0
     return utils.entity(entity)
 end
 
@@ -124,14 +125,19 @@ end
 ---@param tags lc.Parser.Tag
 ---
 ---@return nil
----TODO: problem 591, <u>...</u> tag, 429, 2467, 961, 997, 1649, 645, 137
+---TODO: problem 591, <u>...</u> tag, 429, 2467, 961, 997, 1649, 645, 137, 1032
 function parser:node_hi(node, tags)
     local text = self:get_text(node)
     local tag = tags[1]
 
     if vim.tbl_contains(tags, "pre") then self:handle_indent(text) end
     if vim.tbl_contains(tags, "li") then self:handle_list(tags) end
-    if node:type() == "entity" then text = self:handle_entity(text) end
+
+    if node:type() == "entity" then
+        text = self:handle_entity(text)
+    else
+        self.newline_count = 0
+    end
 
     if tag == "sup" then text = "^" .. text end
     if tag == "sub" then text = "_" .. text end
