@@ -6,6 +6,8 @@ local Description = require("leetcode.ui.description")
 local api_question = require("leetcode.api.question")
 local Console = require("leetcode.ui.console")
 local Runner = require("leetcode.runner")
+local spinner = require("leetcode.logger.spinner")
+local async = require("plenary.async")
 
 ---@class lc.Question
 ---@field file Path
@@ -38,13 +40,7 @@ function question:create_file()
 
     if not snippet then return log.error("failed to fetch code snippet") end
 
-    local q = self.q
-    local dir = config.user.directory .. "/"
-    local fn = string.format("%s.%s.%s", q.frontend_id, q.title_slug, snippet.lang)
-    local file = path:new(dir .. fn)
-
-    file:write(snippet.code, "w")
-    self.file = file
+    self.file:write(snippet.code, "w")
 end
 
 function question:mount()
@@ -65,14 +61,15 @@ end
 
 ---@param problem lc.Problem
 function question:init(problem)
+    local noti = spinner:init()
     local q = api_question.by_title_slug(problem.title_slug)
+    noti:stop(nil, true)
 
-    local dir = config.user.directory .. "/"
+    local dir = config.directory
     local fn = string.format("%s.%s.%s", q.frontend_id, q.title_slug, config.lang)
-    local file = path:new(dir .. fn)
 
     local obj = setmetatable({
-        file = file,
+        file = path:new(dir .. fn),
         q = q,
     }, self)
 

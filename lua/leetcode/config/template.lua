@@ -17,7 +17,7 @@ local M = {
     sql = "mysql",
 
     ---@type string
-    directory = vim.fn.stdpath("data") .. "/leetcode",
+    directory = vim.fn.stdpath("data") .. "/leetcode/",
 
     ---@type boolean
     logging = true,

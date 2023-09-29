@@ -37,15 +37,11 @@ function spinner:spin()
     local stype = self.spinner
 
     if stype then
-        self:set_noti(nil, {
+        self:set(nil, nil, {
             icon = stype.frames[self.index + 1],
         })
 
         self.index = (self.index + 1) % #stype.frames
-
-        -- 1 % 3
-        -- 2 % 3
-        -- 3 % 3
 
         local fps = 1000 / #stype.frames
         vim.defer_fn(function() self:spin() end, fps)
@@ -53,13 +49,19 @@ function spinner:spin()
 end
 
 ---@private
-function spinner:set_noti(lvl, opts)
+---
+---@param msg? string
+---@param lvl? integer
+---@param opts? table
+function spinner:set(msg, lvl, opts)
+    if msg then self:update(msg) end
+    lvl = lvl or vim.log.levels.INFO
     opts = vim.tbl_deep_extend("force", {
         hide_from_history = true,
         replace = self.noti,
         title = config.name,
         timeout = false,
-    }, opts)
+    }, opts or {})
 
     self.noti = vim.notify(self.msg, lvl, opts)
 end
@@ -75,21 +77,17 @@ function spinner:start()
     return self
 end
 
-function spinner:stop() self.spinner = nil end
-
 ---@param msg? string
-function spinner:done(msg)
-    if msg then self:update(msg) end
+---@param success? boolean
+---@param opts? table
+function spinner:stop(msg, success, opts)
+    opts = vim.tbl_deep_extend("force", {
+        icon = success and "" or "󰅘",
+        timeout = 2000,
+    }, opts or {})
 
-    self:stop()
-    self:set_noti(nil, { icon = "", timeout = 500 })
-end
-
----@param msg string
-function spinner:failed(msg)
-    self:update(msg)
-    self:set_noti("error", { icon = "󰅘", timeout = 2000 })
-    self:stop()
+    self.spinner = nil
+    self:set(msg, success and vim.log.levels.INFO or vim.log.levels.ERROR, opts)
 end
 
 ---@param msg? string

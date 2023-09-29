@@ -10,7 +10,7 @@ setmetatable(notifications, Text)
 function notifications:init(opts)
     opts = vim.tbl_deep_extend("force", {
         position = "center",
-        hl = "DiagnosticInfo",
+        hl = "LeetCodeInfo",
     }, opts or {})
 
     local text = Text:init({

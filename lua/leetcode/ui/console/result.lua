@@ -19,18 +19,21 @@ local result = {}
 result.__index = result
 setmetatable(result, console_popup)
 
+---@param hi string
+function result:set_popup_border_hi(hi) self.popup.border:set_highlight(hi) end
+
 ---@private
 ---
 ---@param item runtime
 function result:handle_runtime(item) -- status code = 10
-    local hi = item.total_correct == item.total_testcases and "DiagnosticOk" or "DiagnosticError"
-    self.popup.border:set_highlight(hi)
+    local hi = item.total_correct == item.total_testcases and "LeetCodeOk" or "LeetCodeError"
+    self:set_popup_border_hi(hi)
 
     ---submission result
     local is_sub_res = item.runtime_percentile ~= vim.NIL and item.memory_percentile ~= vim.NIL
     local group = Group:init({ opts = { spacing = 1 } })
 
-    local function perc_hi(perc) return perc >= 50 and "DiagnosticOk" or "DiagnosticError" end
+    local function perc_hi(perc) return perc >= 50 and "LeetCodeOk" or "LeetCodeError" end
 
     local header = Text:init()
 
@@ -102,8 +105,10 @@ end
 ---
 ---@param item submission
 function result:handle_submission(item) -- status code = 11
+    self:set_popup_border_hi("LeetCodeError")
+
     local header = NuiLine()
-    header:append(item.status_msg, "DiagnosticError")
+    header:append(item.status_msg, "LeetCodeError")
 
     header:append(" | ")
 
@@ -135,8 +140,10 @@ end
 ---
 ---@param item limit_exceeded_error
 function result:handle_limit_exceeded(item) -- status code = 14
+    self:set_popup_border_hi("LeetCodeError")
+
     local header = NuiLine()
-    header:append(item.status_msg, "DiagnosticError")
+    header:append(item.status_msg, "LeetCodeError")
 
     self.layout:append(Text:init({ lines = { header, NuiLine() } }))
     local stdout = Stdout:init(1, item)
@@ -147,12 +154,14 @@ end
 ---
 ---@param item runtime_error
 function result:handle_runtime_error(item) -- status code = 15
+    self:set_popup_border_hi("LeetCodeError")
+
     local header = NuiLine()
-    header:append("Invalid Testcase", "DiagnosticError")
+    header:append("Invalid Testcase", "LeetCodeError")
 
     local t = {}
     for line in vim.gsplit(item.full_runtime_error, "\n") do
-        table.insert(t, NuiLine():append(line, "DiagnosticError"))
+        table.insert(t, NuiLine():append(line, "LeetCodeError"))
     end
 
     local pre = Pre:init(header, t)
@@ -161,7 +170,7 @@ end
 
 function result:handle_internal_error(item) -- status code = 16
     local header = NuiLine()
-    header:append(item.status_msg, "DiagnosticError")
+    header:append(item.status_msg, "LeetCodeError")
 
     local text = Text:init({ lines = { header } })
     self.layout:append(text)
@@ -171,12 +180,14 @@ end
 ---
 ---@param item compile_error
 function result:handle_compile_error(item) -- status code = 20
+    self:set_popup_border_hi("LeetCodeError")
+
     local header = NuiLine()
-    header:append(item.status_msg, "DiagnosticError")
+    header:append(item.status_msg, "LeetCodeError")
 
     local t = {}
     for line in vim.gsplit(item.full_compile_error, "\n") do
-        table.insert(t, NuiLine():append(line, "DiagnosticError"))
+        table.insert(t, NuiLine():append(line, "LeetCodeError"))
     end
 
     self.layout:append(Pre:init(header, t))

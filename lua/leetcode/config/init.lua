@@ -41,8 +41,9 @@ function config.apply(cfg)
 
     config.domain = "https://leetcode." .. config.user.domain
     config.lang = config.user.lang
+    config.directory = config.user.directory
 
-    path:new(config.user.directory):mkdir()
+    path:new(config.directory):mkdir()
 end
 
 return config

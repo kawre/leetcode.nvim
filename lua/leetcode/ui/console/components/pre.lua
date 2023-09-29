@@ -33,7 +33,7 @@ function pre:init(title, lines)
     -- table.insert(t, NuiLine())
     -- local match = output == expected
     -- local icon = match and "" or ""
-    -- local hi = match and "DiagnosticOk" or "DiagnosticError"
+    -- local hi = match and "LeetCodeOk" or "LeetCodeError"
     -- local index_line = NuiLine():append(icon .. " Case " .. index, hi)
     -- table.insert(t, index_line)
     --

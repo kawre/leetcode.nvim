@@ -15,7 +15,6 @@ function cookie.update(str)
     local ok, t = pcall(cookie.parse, str)
     assert(ok, "Cookie parse failed")
 
-    -- if not file:exists() then file:touch() end
     file:write(str, "w")
 
     local api = require("leetcode.api")

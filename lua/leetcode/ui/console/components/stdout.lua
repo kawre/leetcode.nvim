@@ -10,6 +10,8 @@ local stdout = {}
 ---
 ---@return lc-ui.Text | nil
 function stdout:init(case_idx, item)
+    if not item.std_output_list then item.std_output_list = { [case_idx] = item.std_output } end
+
     if item.std_output_list[case_idx] == "" then return nil end
 
     local output_list = vim.split(item.std_output_list[case_idx], "\n", { trimempty = true })

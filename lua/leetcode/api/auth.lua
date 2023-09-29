@@ -5,7 +5,7 @@ local log = require("leetcode.logger")
 ---@class lc.AuthApi
 local M = {}
 
----@return config_auth
+---@return lc.UserAuth
 function M.user()
     local query = [[
         query globalData {

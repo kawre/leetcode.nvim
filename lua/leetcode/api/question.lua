@@ -67,11 +67,19 @@ function question.random()
       query randomQuestion($categorySlug: String) {
         randomQuestion(categorySlug: $categorySlug, filters: {}) {
           title_slug: titleSlug
+          paid_only: isPaidOnly
         }
       }
     ]]
 
-    return utils.query(query, variables)["randomQuestion"]
+    local config = require("leetcode.config")
+    local res = utils.query(query, variables)["randomQuestion"]
+    if not config.auth.is_premium and res.paid_only then
+        log.warn("Drawn question is for premium users only. Please try again")
+        return
+    end
+
+    return res
 end
 
 return question

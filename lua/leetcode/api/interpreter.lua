@@ -22,7 +22,7 @@ function interpreter.listener(id, callback)
     local function listen()
         interpreter.check(id, function(item)
             if item.status_code then
-                noti:done(item.status_msg)
+                noti:stop(item.status_msg, false)
                 callback(item)
                 return
             end

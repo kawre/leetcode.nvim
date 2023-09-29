@@ -75,9 +75,11 @@ function cmd.random_question()
     local problems = require("leetcode.cache.problems")
     local question = require("leetcode.api.question")
 
-    local title_slug = question.random().title_slug
-    local item = problems.get_by_title_slug(title_slug) or {}
-    require("leetcode.ui.question"):init(item)
+    local q = question.random()
+    if q then
+        local item = problems.get_by_title_slug(q.title_slug) or {}
+        require("leetcode.ui.question"):init(item)
+    end
 end
 
 function cmd.console()

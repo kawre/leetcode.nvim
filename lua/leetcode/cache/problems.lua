@@ -4,7 +4,7 @@ local log = require("leetcode.logger")
 
 local config = require("leetcode.config")
 local path = require("plenary.path")
-local file = path:new(config.user.directory .. "/.problemlist")
+local file = path:new(config.directory .. ".problemlist")
 
 ---@class lc.Problem
 ---@field frontend_id string
@@ -24,7 +24,7 @@ local function populate()
         file:write(vim.json.encode(data), "w")
         -- config.cache.problems = data
 
-        noti:done("Problem List Cache Updated!")
+        noti:set("Problem List Cache Updated!", nil, { timeout = 1000 })
     end
 
     require("leetcode.api.problems")._all(cb)
