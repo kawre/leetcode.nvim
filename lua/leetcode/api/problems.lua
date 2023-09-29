@@ -6,7 +6,7 @@ local M = {}
 
 ---@return lc.Problem[]
 function M.all()
-    assert(utils.auth_guard(), "User not signed in")
+    utils.auth_guard()
 
     local variables = {
         limit = 9999,

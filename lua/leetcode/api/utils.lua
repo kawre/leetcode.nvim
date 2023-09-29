@@ -91,8 +91,7 @@ end
 
 function utils.auth_guard()
     local auth = require("leetcode.config").auth
-
-    assert(auth.is_signed_in, "User not signed in ")
+    assert(auth and auth.is_signed_in, "User not signed in ")
 end
 
 return utils

@@ -10,7 +10,7 @@ local question = {}
 ---
 ---@return question_response
 function question.by_title_slug(title_slug)
-    assert(utils.auth_guard(), "User not signed in")
+    utils.auth_guard()
 
     local variables = {
         titleSlug = title_slug,

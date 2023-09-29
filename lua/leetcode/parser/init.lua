@@ -177,11 +177,11 @@ local function normalize_html(str)
         :gsub("\r\n", "\n")
         :gsub(
             "<p><strong[^>]*>(Example%s*%d+:)</strong></p>(\n*)",
-            "<example>󰛨 %1</example>\n\n"
+            "\n\n<example>󰛨 %1</example>\n\n"
         )
         :gsub(
             "<p><strong[^>]*>(Constraints:)</strong></p>(\n*)",
-            "<constraints> %1</constraints>\n"
+            "\n\n<constraints> %1</constraints>\n\n"
         )
         :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
         :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
