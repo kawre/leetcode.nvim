@@ -31,7 +31,8 @@ function console:run()
 end
 
 function console:submit()
-    -- asdf
+    self.result:clear()
+    Runner:init(self.parent):run(true)
 end
 
 function console:toggle()

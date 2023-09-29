@@ -250,3 +250,37 @@
 ---@field totalAcceptedRaw string
 ---@field totalSubmission string
 ---@field totalSubmissionRaw string
+
+--------------------------------------------
+--- Submission
+--------------------------------------------
+---@class lc.Interpreter.Response.submission
+---@field status_code number
+---@field lang string
+---@field run_success boolean
+---@field status_runtime string
+---@field memory number
+---@field display_runtime string
+---@field question_id string
+---@field elapsed_time number
+---@field compare_result string
+---@field code_output string
+---@field std_output string
+---@field last_testcase string
+---@field expected_output string
+---@field task_finish_time number
+---@field task_name string
+---@field finished boolean
+---@field total_correct number
+---@field total_testcases number
+---@field runtime_percentile number | nil
+---@field status_memory string
+---@field memory_percentile number | nil
+---@field pretty_lang string
+---@field submission_id string
+---@field input_formatted string
+---@field input string
+---@field status_msg string
+---@field state string
+
+---@alias submission lc.Interpreter.Response.submission

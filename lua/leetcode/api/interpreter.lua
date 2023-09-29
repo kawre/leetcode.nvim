@@ -14,6 +14,34 @@ local check_state = {
     ["FAILURE"] = "Failed", -- CODE: 16
 }
 
+---@param id string
+---@param callback function
+function interpreter.listener(id, callback)
+    local noti = spinner:init(check_state["PENDING"], "points")
+
+    local function listen()
+        interpreter.check(id, function(item)
+            if item.status_code then
+                noti:done(item.status_msg)
+                callback(item)
+                return
+            end
+
+            noti:update(check_state[item.state])
+
+            if item.state == "PENDING" then
+                noti:change("points")
+            elseif item.state == "STARTED" then
+                noti:change("dot")
+            end
+
+            vim.defer_fn(listen, 500)
+        end)
+    end
+
+    listen()
+end
+
 ---@class lc.Interpret.body
 ---@field question question_response
 ---@field typed_code string
@@ -31,29 +59,19 @@ function interpreter.interpret_solution(title_slug, body, callback)
     local ok, res = pcall(utils.post, url, body)
     assert(ok)
 
-    local noti = spinner:init(check_state["PENDING"], "points")
+    interpreter.listener(res.interpret_id, callback)
+end
 
-    local function listener()
-        interpreter.check(res.interpret_id, function(item)
-            if item.status_code then
-                noti:done(check_state[item.state])
-                callback(item)
-                return
-            end
+function interpreter.submit(title_slug, body, callback)
+    utils.auth_guard()
 
-            noti:update(check_state[item.state])
+    local url = string.format(config.domain .. "/problems/%s/submit/", title_slug)
 
-            if item.state == "PENDING" then
-                noti:change("points")
-            elseif item.state == "STARTED" then
-                noti:change("dot")
-            end
+    ---@type boolean, submission
+    local ok, res = pcall(utils.post, url, body)
+    assert(ok)
 
-            vim.defer_fn(listener, 500)
-        end)
-    end
-
-    listener()
+    interpreter.listener(res.submission_id, callback)
 end
 
 ---@param id string

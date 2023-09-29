@@ -10,34 +10,35 @@ local interpreter = require("leetcode.api.interpreter")
 local runner = {}
 runner.__index = runner
 
-function runner:run()
+---@param submit? boolean
+function runner:run(submit)
     local question = self.question
-
-    local di_lines = question.console.testcase:content()
-    local data_input = table.concat(di_lines, "\n")
 
     local tc_lines = vim.api.nvim_buf_get_lines(question.bufnr, 0, -1, false)
     local typed_code = utils.to_typed_code(tc_lines)
 
     local body = {
         lang = config.user.lang,
-        data_input = data_input,
         typed_code = typed_code,
         question_id = question.q.id,
     }
 
-    interpreter.interpret_solution(
-        question.q.title_slug,
-        body,
-        function(item) self:callback(item) end
-    )
+    local function callback(item) self:callback(item) end
+
+    if not submit then
+        local di_lines = question.console.testcase:content()
+        local data_input = table.concat(di_lines, "\n")
+        body.data_input = data_input
+
+        interpreter.interpret_solution(question.q.title_slug, body, callback)
+    else
+        interpreter.submit(question.q.title_slug, body, callback)
+    end
 end
 
 ---@private
 ---@param item interpreter_response
 function runner:callback(item) self.question.console.result:handle(item) end
-
-function runner:submit() end
 
 ---@param question lc.Question
 function runner:init(question) return setmetatable({ question = question }, self) end

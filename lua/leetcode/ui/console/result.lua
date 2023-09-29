@@ -10,6 +10,7 @@ local Layout = require("leetcode-ui.layout")
 local Text = require("leetcode-ui.component.text")
 
 local NuiLine = require("nui.line")
+local NuiText = require("nui.text")
 local NuiPopup = require("nui.popup")
 
 ---@class lc.Result: lc.Console.Popup
@@ -22,26 +23,106 @@ setmetatable(result, console_popup)
 ---
 ---@param item runtime
 function result:handle_runtime(item) -- status code = 10
-    local header = NuiLine()
+    local hi = item.total_correct == item.total_testcases and "DiagnosticOk" or "DiagnosticError"
+    self.popup.border:set_highlight(hi)
 
-    if item.correct_answer then
-        header:append("Accepted", "DiagnosticOk")
+    ---submission result
+    local is_sub_res = item.runtime_percentile ~= vim.NIL and item.memory_percentile ~= vim.NIL
+    local group = Group:init({ opts = { spacing = 1 } })
+
+    local header = Text:init()
+
+    if not is_sub_res then
+        local h = NuiLine()
+        h:append(item.status_msg, hi)
+        h:append(" | ")
+        h:append("Runtime: " .. item.status_runtime, "Comment")
+        header:append(h)
+        group:append(header)
+
+        for i, answer in ipairs(item.code_answer) do
+            local text = Case:init(
+                i,
+                self.parent.testcase.testcases[i],
+                answer,
+                item.expected_code_answer[i]
+            )
+            group:append(text)
+
+            local stdout = Stdout:init(i, item)
+            if stdout then group:append(stdout) end
+        end
     else
-        header:append("Wrong Answer", "DiagnosticError")
+        header:append(item.status_msg, hi)
+        group:append(header)
+
+        local status_runtime = NuiLine()
+        status_runtime:append(item.display_runtime)
+        status_runtime:append(" ms", "Comment")
+
+        local perc_runtime = NuiLine()
+        perc_runtime:append(
+            "Beats " .. string.format("%.2f", item.runtime_percentile) .. "% ",
+            "DiagnosticOk"
+        )
+        perc_runtime:append("of users with " .. item.pretty_lang)
+
+        local runtime = Pre:init(NuiText("󰓅 Runtime"), {
+            status_runtime,
+            perc_runtime,
+        })
+
+        local status_memory = NuiLine()
+        local s_mem = vim.split(item.status_memory, " ")
+        status_memory:append(s_mem[1] .. " ")
+        status_memory:append(s_mem[2], "Comment")
+
+        local perc_mem = NuiLine()
+        perc_mem:append(
+            "Beats " .. string.format("%.2f", item.memory_percentile) .. "% ",
+            "DiagnosticOk"
+        )
+        perc_mem:append("of users with " .. item.pretty_lang)
+
+        local memory = Pre:init(NuiText("󰍛 Memory"), {
+            status_memory,
+            perc_mem,
+        })
+
+        group:append(runtime)
+        group:append(memory)
     end
 
+    self.layout:append(group)
+end
+
+---@private
+---
+---@param item submission
+function result:handle_submission(item) -- status code = 11
+    local header = NuiLine()
+    header:append(item.status_msg, "DiagnosticError")
+
     header:append(" | ")
-    header:append("Runtime: " .. item.status_runtime, "Comment")
+
+    local testcases =
+        string.format("%d/%d testcases passed", item.total_correct, item.total_testcases)
+    header:append(testcases, "Comment")
 
     self.layout:append(Text:init({ lines = { header, NuiLine() } }))
 
     local group = Group:init({ opts = { spacing = 1 } })
-    for i, answer in ipairs(item.code_answer) do
-        local text =
-            Case:init(i, self.parent.testcase.testcases[i], answer, item.expected_code_answer[i])
-        group:append(text)
+    local text = Case:init(
+        item.total_correct + 1,
+        item.input_formatted,
+        item.code_output,
+        item.expected_output
+    )
 
-        local stdout = Stdout:init(i, item)
+    group:append(text)
+    item.std_output_list = vim.split(item.std_output, "\n", { trimempty = true })
+    if not vim.tbl_isempty(item.std_output_list) then
+        local stdout = Stdout:init(1, item)
         if stdout then group:append(stdout) end
     end
 
@@ -105,12 +186,14 @@ function result:handle(item)
     local status_code = item.status_code
 
     log.debug(status_code)
-    self.popup.border:set_highlight(item.correct_answer and "DiagnosticOk" or "DiagnosticError")
 
     local handlers = {
         -- runtime
         [10] = function()
             self:handle_runtime(item --[[@as runtime]])
+        end,
+        [11] = function()
+            self:handle_submission(item --[[@as submission]])
         end,
 
         -- time limit

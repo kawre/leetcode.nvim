@@ -67,7 +67,7 @@ end
 function question:init(problem)
     local q = api_question.by_title_slug(problem.title_slug)
 
-    local dir = config.user.directory .. "/solutions/"
+    local dir = config.user.directory .. "/"
     local fn = string.format("%s.%s.%s", q.frontend_id, q.title_slug, config.lang)
     local file = path:new(dir .. fn)
 
