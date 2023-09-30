@@ -17,6 +17,11 @@ local entities = {
     ["&#39;"] = "'",
     ["&rarr;"] = "",
     ["&larr;"] = "",
+    ["&thinsp;"] = " ",
+    ["&hellip;"] = "…",
+    ["&lfloor;"] = "⌊",
+    ["&rfloor;"] = "⌋",
+    ["&amp;"] = "&",
 
     ["&ldquo;"] = "“",
     ["&rdquo;"] = "”",
@@ -29,6 +34,7 @@ local entities = {
 local highlights = {
     [""] = "LeetCodeNormal",
     ["strong"] = "LeetCodeBold",
+    ["b"] = "LeetCodeBold",
     ["em"] = "LeetCodeItalic",
     ["i"] = "LeetCodeItalic",
     ["code"] = "LeetCodeCode",
@@ -42,6 +48,9 @@ local highlights = {
     ["ol"] = "Inherit",
     ["li"] = "Inherit",
     ["font"] = "Inherit",
+    ["sup"] = "Inherit",
+    ["sub"] = "Inherit",
+    ["u"] = "Inherit",
 
     ["a"] = "LeetCodeIndent",
 }

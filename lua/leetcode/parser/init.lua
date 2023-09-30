@@ -106,10 +106,14 @@ function parser:handle_list(tags)
     end
 
     local li_type = get_list_type()
-    local leftpad = string.rep("\t", vim.fn.count(tags, "li"))
+    local li_count = vim.fn.count(tags, "li")
+    local leftpad = string.rep("\t", li_count)
+    local li_icons = { "", "", "" }
 
     if li_type == "ul" then
-        self.line:append(leftpad .. " ", "LeetCodeIndent")
+        local li_icon = li_icons[math.max(1, li_count % (#li_icons + 1))]
+        local text = string.format("%s%s ", leftpad, li_icon)
+        self.line:append(text, "LeetCodeIndent")
     else
         self.ol_count = self.ol_count + 1
         local text = string.format("%s%d. ", leftpad, self.ol_count)
@@ -139,6 +143,7 @@ function parser:node_hi(node, tags)
     if not vim.tbl_contains(tags, "ol") then self.ol_count = 0 end
 
     if node:type() == "entity" then
+        if vim.tbl_contains(tags, "li") and text ~= "&lcnl;" then self:handle_list(tags) end
         text = self:handle_entity(text)
     else
         if vim.tbl_contains(tags, "li") then self:handle_list(tags) end
@@ -198,6 +203,7 @@ local function normalize_html(str)
         :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
         :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
         :gsub("\n", "&lcnl;")
+        :gsub("%s%s+", "")
         :gsub("%s", "&nbsp;")
 
     return res .. "&lcend;"

@@ -22,11 +22,9 @@ local function populate()
     local spinner = require("leetcode.logger.spinner")
 
     local noti = spinner:init("Fetching Problem List", "points")
-    -- async.void(function()
     local data = problems_api.all()
     file:write(vim.json.encode(data), "w")
-    noti:stop("Problem List Cache Updated!")
-    -- end)()
+    noti:stop("Problems Cache Updated!")
 end
 
 ---@return lc.Cache.Question[]
@@ -58,7 +56,7 @@ function Problems.update(force)
 
         problems_api._all(function(data)
             file:write(vim.json.encode(data), "w")
-            noti:stop("Problem List Cache Updated!")
+            noti:stop("Problems Cache Updated!")
         end)
     end
 end

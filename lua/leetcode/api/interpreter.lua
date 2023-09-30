@@ -57,7 +57,7 @@ function interpreter.interpret_solution(title_slug, body, callback)
 
     ---@type boolean, submission
     local ok, res = pcall(utils.post, url, body)
-    assert(ok)
+    if not ok then return end
 
     interpreter.listener(res.interpret_id, callback)
 end
@@ -69,7 +69,7 @@ function interpreter.submit(title_slug, body, callback)
 
     ---@type boolean, submission
     local ok, res = pcall(utils.post, url, body)
-    assert(ok)
+    if not ok then return end
 
     interpreter.listener(res.submission_id, callback)
 end

@@ -137,4 +137,7 @@ function cmd.list_questions()
     end
 end
 
+---@param lang string
+function cmd.change_lang(lang) config.lang = lang end
+
 return cmd

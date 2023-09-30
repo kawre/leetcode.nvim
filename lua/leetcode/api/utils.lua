@@ -1,6 +1,7 @@
 local api = require("leetcode.api")
 local curl = require("plenary.curl")
 local Job = require("plenary.job")
+local log = require("leetcode.logger")
 local config = require("leetcode.config")
 
 local lc = "https://leetcode." .. config.user.domain
@@ -27,6 +28,7 @@ function utils.post(url, body)
     })
 
     local ok, data = pcall(vim.json.decode, response.body)
+    if response.status == 429 then log.warn("You have attempted to run code too soon") end
     assert(ok, "Failed to fetch")
 
     return data

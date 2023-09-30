@@ -12,19 +12,14 @@ local spinner = require("leetcode.logger.spinner")
 ---@field description lc.Description
 ---@field bufnr integer
 ---@field console lc.Console
+---@field lang string
 local question = {}
 question.__index = question
 
 ---@type table<integer, lc.Question>
 QUESTIONS = {}
-
 ---@type integer
 CURR_QUESTION = 0
-
----@type integer, integer
-QUEST_WINID = nil
-DESC_WINID = nil
-TABPAGE = nil
 
 ---@private
 function question:create_file()
@@ -33,7 +28,7 @@ function question:create_file()
     local snippet = {}
 
     for _, snip in pairs(snippets ~= vim.NIL and snippets or {}) do
-        if snip.lang_slug == config.user.lang or snip.lang_slug == config.user.sql then
+        if snip.lang_slug == self.lang or snip.lang_slug == config.user.sql then
             snippet.code = snip.code
             snippet.lang = snip.lang_slug
             break
@@ -41,7 +36,6 @@ function question:create_file()
     end
 
     if not snippet then return log.error("failed to fetch code snippet") end
-
     self.file:write(snippet.code, "w")
 end
 
@@ -102,6 +96,7 @@ function question:init(problem)
     local obj = setmetatable({
         file = path:new(dir .. fn),
         q = q,
+        lang = config.lang,
     }, self)
 
     return obj:mount()
