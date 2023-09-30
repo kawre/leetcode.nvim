@@ -11,14 +11,14 @@ local entry_display = require("telescope.pickers.entry_display")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
----@param question lc.Problem
+---@param question lc.Cache.Question
 ---
 ---@return string
 local function question_formatter(question)
     return string.format("%d. %s", question.frontend_id, question.title)
 end
 
----@param question lc.Problem
+---@param question lc.Cache.Question
 local function display_difficulty(question)
     local hi = {
         ["Easy"] = { "E", "LeetCodeEasy" },
@@ -30,7 +30,7 @@ local function display_difficulty(question)
     -- return hi[quesiton.difficulty]
 end
 
----@param question lc.Problem
+---@param question lc.Cache.Question
 local function display_user_status(question)
     if question.paid_only and not config.auth.is_premium then return { "", "LeetCodeMedium" } end
 
@@ -45,7 +45,7 @@ local function display_user_status(question)
     return user_status[question.status]
 end
 
----@param question lc.Problem
+---@param question lc.Cache.Question
 local function display_question(question)
     -- local title = question_formatter(question)
     local index = { question.frontend_id .. "." }
@@ -65,7 +65,7 @@ local displayer = entry_display.create({
 })
 
 local function make_display(entry)
-    ---@type lc.Problem
+    ---@type lc.Cache.Question
     local q = entry.value
 
     return displayer({
@@ -86,7 +86,7 @@ end
 local opts = require("telescope.themes").get_dropdown()
 
 return {
-    ---@param questions lc.Problem[]
+    ---@param questions lc.Cache.Question[]
     pick = function(questions)
         pickers
             .new(opts, {

@@ -7,10 +7,13 @@ local cmd = {}
 function cmd.cache_update() require("leetcode.cache").update() end
 
 function cmd.problems()
+    local async = require("plenary.async")
     local problems = require("leetcode.cache.problems")
-    local _, res = pcall(problems.get)
 
-    require("leetcode.ui.pickers.question").pick(res)
+    async.run(function()
+        local res = problems.get()
+        return res
+    end, function(res) require("leetcode.ui.pickers.question").pick(res) end)
 end
 
 ---@param cb? function

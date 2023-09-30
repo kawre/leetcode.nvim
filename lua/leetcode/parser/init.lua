@@ -15,6 +15,7 @@ local NuiLine = require("nui.line")
 ---@field ts TreesitterModule
 ---@field text lc-ui.Text
 ---@field newline_count integer
+---@field ol_count integer
 local parser = {}
 parser.__index = parser
 
@@ -110,7 +111,9 @@ function parser:handle_list(tags)
     if li_type == "ul" then
         self.line:append(leftpad .. " ", "LeetCodeIndent")
     else
-        self.line:append(leftpad .. "1. ", "LeetCodeIndent")
+        self.ol_count = self.ol_count + 1
+        local text = string.format("%s%d. ", leftpad, self.ol_count)
+        self.line:append(text, "LeetCodeIndent")
     end
 end
 
@@ -133,11 +136,12 @@ function parser:node_hi(node, tags)
     local tag = tags[1]
 
     if vim.tbl_contains(tags, "pre") then self:handle_indent(text) end
-    if vim.tbl_contains(tags, "li") then self:handle_list(tags) end
+    if not vim.tbl_contains(tags, "ol") then self.ol_count = 0 end
 
     if node:type() == "entity" then
         text = self:handle_entity(text)
     else
+        if vim.tbl_contains(tags, "li") then self:handle_list(tags) end
         self.newline_count = 0
     end
 
@@ -213,6 +217,7 @@ function parser:init(str, lang)
         text = Text:init({}),
         line = NuiLine(),
         newline_count = 0,
+        ol_count = 0,
     }, self)
 
     return obj

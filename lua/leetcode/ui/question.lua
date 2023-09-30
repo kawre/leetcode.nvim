@@ -92,7 +92,7 @@ function question:autocmds()
     })
 end
 
----@param problem lc.Problem
+---@param problem lc.Cache.Question
 function question:init(problem)
     local q = api_question.by_title_slug(problem.title_slug)
 

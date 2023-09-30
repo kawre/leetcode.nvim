@@ -4,7 +4,7 @@ local utils = require("leetcode.api.utils")
 ---@class lc.ProblemsApi
 local M = {}
 
----@return lc.Problem[]
+---@return lc.Cache.Question[]
 function M.all()
     utils.auth_guard()
 
@@ -40,7 +40,7 @@ end
 
 ---@param cb function
 ---
----@return lc.Problem[]
+---@return lc.Cache.Question[]
 function M._all(cb)
     local variables = {
         limit = 3000,

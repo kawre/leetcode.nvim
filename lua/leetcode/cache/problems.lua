@@ -5,8 +5,10 @@ local log = require("leetcode.logger")
 local config = require("leetcode.config")
 local path = require("plenary.path")
 local file = path:new(config.directory .. ".problemlist")
+local async = require("plenary.async")
+local problems_api = require("leetcode.api.problems")
 
----@class lc.Problem
+---@class lc.Cache.Question
 ---@field frontend_id string
 ---@field title string
 ---@field title_slug string
@@ -18,17 +20,16 @@ local Problems = {}
 
 local function populate()
     local spinner = require("leetcode.logger.spinner")
+
     local noti = spinner:init("Fetching Problem List", "points")
-
-    local cb = function(data)
-        file:write(vim.json.encode(data), "w")
-        noti:stop("Problem List Cache Updated!")
-    end
-
-    require("leetcode.api.problems")._all(cb)
+    -- async.void(function()
+    local data = problems_api.all()
+    file:write(vim.json.encode(data), "w")
+    noti:stop("Problem List Cache Updated!")
+    -- end)()
 end
 
----@return lc.Problem[]
+---@return lc.Cache.Question[]
 function Problems.get()
     Problems.update()
 
@@ -45,16 +46,21 @@ end
 
 ---@param force? boolean
 function Problems.update(force)
-    if force then return populate() end
-
     local stats = file:_stat()
-
     if vim.tbl_isempty(stats) then return populate() end
 
     local mod_time = stats.mtime.sec
     local curr_time = os.time()
 
-    if (curr_time - mod_time) > 60 * 60 * 24 * 7 then return populate() end
+    if force or (curr_time - mod_time) > 60 * 60 * 24 * 7 then
+        local spinner = require("leetcode.logger.spinner")
+        local noti = spinner:init("Fetching Problem List", "points")
+
+        problems_api._all(function(data)
+            file:write(vim.json.encode(data), "w")
+            noti:stop("Problem List Cache Updated!")
+        end)
+    end
 end
 
 function Problems.get_by_title_slug(title_slug)
@@ -69,9 +75,9 @@ end
 
 ---@param problems_str string
 ---
----@return lc.Problem[]
+---@return lc.Cache.Question[]
 function Problems.parse(problems_str)
-    ---@type boolean, lc.Problem[]
+    ---@type boolean, lc.Cache.Question[]
     local ok, problems = pcall(vim.json.decode, problems_str)
     assert(ok, "Failed to parse problems")
 
