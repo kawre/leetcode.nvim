@@ -6,12 +6,12 @@ local Ui = {}
 
 ---@param items table
 ---@param prompt? string
----@param fn? fun(table)
+---@param format_fn? fun(table):string
 ---@param callback fun(table)
-function Ui.pick_one(items, prompt, fn, callback)
+function Ui.pick_one(items, prompt, format_fn, callback)
     vim.ui.select(items, {
         prompt = prompt or "",
-        format_item = fn or function(item) return item end,
+        format_item = format_fn or function(item) return item end,
         telescope = require("telescope.themes").get_dropdown(),
     }, callback)
 end

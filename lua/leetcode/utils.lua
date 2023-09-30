@@ -39,7 +39,7 @@ function utils.cmd(fn) return string.format("<cmd>lua require('leetcode.api.comm
 ---@param rhs string
 ---@param opts? {silent: boolean, expr: boolean}
 function utils.map(mode, lhs, rhs, opts)
-    local options = { noremap = true }
+    local options = { noremap = true, silent = true }
     if opts then options = vim.tbl_extend("force", options, opts) end
     vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end

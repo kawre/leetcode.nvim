@@ -108,7 +108,7 @@ function menu:init()
     local winid = vim.api.nvim_get_current_win()
     local tabpage = vim.api.nvim_get_current_tabpage()
     vim.api.nvim_buf_set_name(bufnr, "")
-    vim.api.nvim_set_current_tabpage(1)
+    -- vim.api.nvim_set_current_tabpage(1)
 
     utils.apply_opt_local({
         bufhidden = "wipe",

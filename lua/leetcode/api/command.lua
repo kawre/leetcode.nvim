@@ -83,7 +83,7 @@ function cmd.random_question()
 end
 
 function cmd.console()
-    local q = Questions[Curr_question]
+    local q = QUESTIONS[CURR_QUESTION]
 
     if q then
         q.console:toggle()
@@ -113,5 +113,31 @@ function cmd.menu() vim.api.nvim_set_current_tabpage(config.user.menu_tabpage) e
 function cmd.menu_layout(layout) _LC_MENU:set_layout(layout) end
 
 function cmd.questions() vim.api.nvim_set_current_tabpage(config.user.questions_tabpage) end
+
+function cmd.list_questions()
+    local questions = {}
+
+    for _, tabp in ipairs(vim.api.nvim_list_tabpages()) do
+        local bufs = vim.fn.tabpagebuflist(tabp)
+
+        for _, bufnr in ipairs(bufs) do
+            if QUESTIONS[bufnr] then
+                table.insert(questions, { tabpage = tabp, question = QUESTIONS[bufnr] })
+            end
+        end
+    end
+
+    if not vim.tbl_isempty(questions) then
+        local ui = require("leetcode.ui")
+
+        ui.pick_one(questions, "Select a Question", function(item)
+            ---@type question_response
+            local question = item.question.q
+            return question.frontend_id .. ". " .. question.title
+        end, function(res) pcall(vim.cmd.tabnext, res.tabpage) end)
+    else
+        log.warn("No questions openned")
+    end
+end
 
 return cmd

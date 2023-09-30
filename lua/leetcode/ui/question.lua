@@ -1,13 +1,10 @@
-local Split = require("nui.split")
 local path = require("plenary.path")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 local Description = require("leetcode.ui.description")
 local api_question = require("leetcode.api.question")
 local Console = require("leetcode.ui.console")
-local Runner = require("leetcode.runner")
 local spinner = require("leetcode.logger.spinner")
-local async = require("plenary.async")
 
 ---@class lc.Question
 ---@field file Path
@@ -19,10 +16,15 @@ local question = {}
 question.__index = question
 
 ---@type table<integer, lc.Question>
-Questions = {}
+QUESTIONS = {}
 
 ---@type integer
-Curr_question = 0
+CURR_QUESTION = 0
+
+---@type integer, integer
+QUEST_WINID = nil
+DESC_WINID = nil
+TABPAGE = nil
 
 ---@private
 function question:create_file()
@@ -47,23 +49,41 @@ function question:mount()
     if not self.file:exists() then self:create_file() end
 
     vim.api.nvim_set_current_dir(self.file:parent().filename)
-    vim.cmd.tabe(self.file:absolute())
+    vim.cmd("$tabe " .. self.file:absolute())
+    TABPAGE = vim.api.nvim_get_current_tabpage()
 
     self.bufnr = vim.api.nvim_get_current_buf()
-    Curr_question = self.bufnr
-    Questions[Curr_question] = self
+    CURR_QUESTION = self.bufnr
+    QUESTIONS[CURR_QUESTION] = self
 
     self.description = Description:init(self)
     self.console = Console:init(self)
 
+    self:autocmds()
     return self
+end
+
+function question:autocmds()
+    local group_id = vim.api.nvim_create_augroup("leetcode_question", { clear = true })
+
+    vim.api.nvim_create_autocmd("BufWinEnter", {
+        group = group_id,
+        buffer = self.bufnr,
+        callback = function() self.description.split:show() end,
+    })
+
+    vim.api.nvim_create_autocmd("BufWinLeave", {
+        group = group_id,
+        buffer = self.bufnr,
+        callback = function() self.description.split:hide() end,
+    })
 end
 
 ---@param problem lc.Problem
 function question:init(problem)
-    local noti = spinner:init()
+    -- local noti = spinner:init()
     local q = api_question.by_title_slug(problem.title_slug)
-    noti:stop(nil, true)
+    -- noti:stop(nil, true)
 
     local dir = config.directory
     local fn = string.format("%s.%s.%s", q.frontend_id, q.title_slug, config.lang)

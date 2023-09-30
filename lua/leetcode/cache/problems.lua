@@ -22,9 +22,7 @@ local function populate()
 
     local cb = function(data)
         file:write(vim.json.encode(data), "w")
-        -- config.cache.problems = data
-
-        noti:set("Problem List Cache Updated!", nil, { timeout = 1000 })
+        noti:stop("Problem List Cache Updated!")
     end
 
     require("leetcode.api.problems")._all(cb)

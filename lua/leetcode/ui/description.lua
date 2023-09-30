@@ -20,9 +20,9 @@ local Split = require("nui.split")
 local description = {}
 description.__index = description
 
-function description:autocmds()
-    local group_id = vim.api.nvim_create_augroup("leetcode_description", { clear = true })
+local group_id = vim.api.nvim_create_augroup("leetcode_description", { clear = true })
 
+function description:autocmds()
     vim.api.nvim_create_autocmd("WinResized", {
         group = group_id,
         buffer = self.split.bufnr,
@@ -31,12 +31,11 @@ function description:autocmds()
 end
 
 function description:mount()
-    self:autocmds()
-
     self:populate()
     self.split:mount()
     self:draw()
 
+    self:autocmds()
     return self
 end
 
@@ -139,7 +138,7 @@ function description:init(parent)
         layout = {},
     }, self)
 
-    vim.api.nvim_buf_set_name(obj.split.bufnr, "Description")
+    vim.api.nvim_buf_set_name(obj.split.bufnr, string.format("Description(%s)", parent.q.title))
 
     return obj:mount()
 end

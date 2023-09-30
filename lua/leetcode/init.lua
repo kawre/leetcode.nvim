@@ -53,7 +53,7 @@ function leetcode.setup(cfg)
 
     utils.map("n", "<leader>lc", utils.cmd("console"))
     utils.map("n", "<leader>lm", utils.cmd("menu"))
-    utils.map("n", "<leader>lq", utils.cmd("questions"))
+    utils.map("n", "<leader>lq", utils.cmd("list_questions"))
 
     -- vim.api.nvim_create_user_command("LcMenu", function() vim.api.nvim_set_current_tabpage(1) end, {
     --     bang = true,
