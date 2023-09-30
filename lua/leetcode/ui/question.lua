@@ -64,16 +64,29 @@ function question:mount()
 end
 
 function question:autocmds()
-    local group_id = vim.api.nvim_create_augroup("leetcode_question", { clear = true })
-
-    vim.api.nvim_create_autocmd("BufWinEnter", {
+    local group_id = vim.api.nvim_create_augroup("leetcode_questions", { clear = true })
+    vim.api.nvim_create_autocmd("TabEnter", {
         group = group_id,
+        callback = function()
+            local utils = require("leetcode.utils")
+            local questions = utils.get_current_questions()
+
+            local tabpage = vim.api.nvim_get_current_tabpage()
+            for _, q in ipairs(questions) do
+                if q.tabpage == tabpage then CURR_QUESTION = q.question.bufnr end
+            end
+        end,
+    })
+
+    local q_group_id = vim.api.nvim_create_augroup("leetcode_question", {})
+    vim.api.nvim_create_autocmd("BufWinEnter", {
+        group = q_group_id,
         buffer = self.bufnr,
         callback = function() self.description.split:show() end,
     })
 
     vim.api.nvim_create_autocmd("BufWinLeave", {
-        group = group_id,
+        group = q_group_id,
         buffer = self.bufnr,
         callback = function() self.description.split:hide() end,
     })
@@ -81,9 +94,7 @@ end
 
 ---@param problem lc.Problem
 function question:init(problem)
-    -- local noti = spinner:init()
     local q = api_question.by_title_slug(problem.title_slug)
-    -- noti:stop(nil, true)
 
     local dir = config.directory
     local fn = string.format("%s.%s.%s", q.frontend_id, q.title_slug, config.lang)

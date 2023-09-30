@@ -44,6 +44,22 @@ function utils.map(mode, lhs, rhs, opts)
     vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 
+function utils.get_current_questions()
+    local questions = {}
+
+    for _, tabp in ipairs(vim.api.nvim_list_tabpages()) do
+        local bufs = vim.fn.tabpagebuflist(tabp)
+
+        for _, bufnr in ipairs(bufs) do
+            if QUESTIONS[bufnr] then
+                table.insert(questions, { tabpage = tabp, question = QUESTIONS[bufnr] })
+            end
+        end
+    end
+
+    return questions
+end
+
 -- ---@param module string
 -- function utils.add(module)
 --
