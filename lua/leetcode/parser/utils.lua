@@ -22,9 +22,12 @@ local entities = {
     ["&lfloor;"] = "⌊",
     ["&rfloor;"] = "⌋",
     ["&amp;"] = "&",
+    ["&infin;"] = "∞",
 
-    ["&ldquo;"] = "“",
     ["&rdquo;"] = "”",
+    ["&rsquo;"] = "’",
+    ["&ldquo;"] = "“",
+    ["&lsquo;"] = "‘",
 
     ["&lcpad;"] = "",
     ["&lcnl;"] = "",

@@ -141,7 +141,9 @@ function parser:node_hi(node, tags)
     local text = self:get_text(node)
     local tag = tags[1]
 
-    if vim.tbl_contains(tags, "pre") then self:handle_indent(text) end
+    if vim.tbl_contains(tags, "pre") or vim.tbl_contains(tags, "blockquote") then
+        self:handle_indent(text)
+    end
     if not vim.tbl_contains(tags, "ol") then self.ol_count = {} end
 
     if node:type() == "entity" then
@@ -191,9 +193,10 @@ end
 
 ---@param str string
 local function normalize_html(str)
-    local res = str:gsub("​", "")
-        :gsub("\t", "")
+    local res = str
+        :gsub("​", "")
         :gsub("\r\n", "\n")
+        :gsub("\t", "")
         :gsub(
             "<p><strong[^>]*>(Example%s*%d+:)</strong></p>(\n*)",
             "\n\n<example>󰛨 %1</example>\n\n"
@@ -203,9 +206,10 @@ local function normalize_html(str)
             "\n\n<constraints> %1</constraints>\n\n"
         )
         :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
+        -- :gsub("%s*<(ul|li|ol)[^>]*>%s*", "<%1>")
         :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
         :gsub("\n", "&lcnl;")
-        :gsub("%s%s+", "")
+        -- :gsub("%s%s+", "\t")
         :gsub("%s", "&nbsp;")
 
     return res .. "&lcend;"
@@ -222,7 +226,7 @@ function parser:init(str, lang)
         str = str,
         ts = ts,
         parser = _parser,
-        text = Text:init({}),
+        text = Text:init(),
         line = NuiLine(),
         newline_count = 0,
         ol_count = {},
