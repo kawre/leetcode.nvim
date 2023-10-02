@@ -1,4 +1,8 @@
 ---TODO: <blockquote>
+---TODO: <a> parser
+---TODO: <img> parser
+---TODO: <u> parser
+---TODO: question duplication
 
 local log = require("leetcode.logger")
 
@@ -135,9 +139,6 @@ end
 ---
 ---@param node TSNode
 ---@param tags lc.Parser.Tag
----
----@return nil
----TODO: problem 591, <u>...</u> tag, 429, 2467, 961, 997, 1649, 645, 137, 1032
 function parser:node_hi(node, tags)
     local text = self:get_text(node)
     local tag = tags[1]
@@ -159,6 +160,7 @@ function parser:node_hi(node, tags)
     if tag == "sub" then text = "_" .. text end
 
     local nui_text = NuiText(text, utils.hi(tags))
+
     self.line:append(nui_text)
 end
 

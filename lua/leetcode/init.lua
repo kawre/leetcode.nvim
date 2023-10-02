@@ -10,8 +10,8 @@ local leetcode = {}
 local function should_skip()
     if vim.fn.argc() ~= 1 then return true end
 
-    local invoke, arg = config.user.arg, vim.fn.argv()[1]
-    if arg ~= invoke then return true end
+    local user_arg, arg = config.user.arg, vim.fn.argv()[1]
+    if user_arg ~= arg then return true end
 
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
     if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return true end
@@ -22,7 +22,9 @@ end
 ---@param cfg? lc.UserConfig
 function leetcode.setup(cfg)
     config.apply(cfg or {})
+
     if should_skip() then return end
+    cmd.start()
 
     vim.api.nvim_set_hl(0, "LeetCodeEasy", { fg = "#46c6c2" })
     vim.api.nvim_set_hl(0, "LeetCodeMedium", { fg = "#fac31d" })
@@ -43,14 +45,6 @@ function leetcode.setup(cfg)
     vim.api.nvim_set_hl(0, "LeetCodeConstraints", { link = "LeetCodeInfo" })
     vim.api.nvim_set_hl(0, "LeetCodeIndent", { link = "Comment" })
     vim.api.nvim_set_hl(0, "LeetCodeList", { link = "Tag" })
-
-    local group_id = vim.api.nvim_create_augroup("leetcode_start", { clear = true })
-    vim.api.nvim_create_autocmd("VimEnter", {
-        group = group_id,
-        pattern = "*",
-        nested = true,
-        callback = function(_) cmd.start() end,
-    })
 
     utils.map("n", "<leader>lc", utils.cmd("console"))
     utils.map("n", "<leader>lm", utils.cmd("menu"))

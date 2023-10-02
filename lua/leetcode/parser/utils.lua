@@ -55,8 +55,10 @@ local highlights = {
     ["sup"] = "Inherit",
     ["sub"] = "Inherit",
     ["u"] = "Inherit",
+    ["small"] = "Inherit",
+    ["div"] = "Inherit",
 
-    ["a"] = "LeetCodeIndent",
+    ["a"] = "Function",
 }
 
 ---@param entity string
