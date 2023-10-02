@@ -42,6 +42,7 @@ function leetcode.setup(cfg)
     vim.api.nvim_set_hl(0, "LeetCodeExample", { link = "LeetCodeHint" })
     vim.api.nvim_set_hl(0, "LeetCodeConstraints", { link = "LeetCodeInfo" })
     vim.api.nvim_set_hl(0, "LeetCodeIndent", { link = "Comment" })
+    vim.api.nvim_set_hl(0, "LeetCodeList", { link = "Tag" })
 
     local group_id = vim.api.nvim_create_augroup("leetcode_start", { clear = true })
     vim.api.nvim_create_autocmd("VimEnter", {

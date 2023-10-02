@@ -10,12 +10,13 @@ local case = {}
 ---@param input string
 ---@param output string
 ---@param expected string
+---@param passed? boolean
 ---
 ---@return lc-ui.Text
-function case:init(index, input, output, expected)
+function case:init(index, input, output, expected, passed)
     local t = {}
 
-    local match = output == expected
+    local match = passed or (output == expected)
     local icon = match and "" or ""
     local hi = match and "LeetCodeOk" or "LeetCodeError"
     local title_line = NuiLine():append(icon .. " Case " .. index, hi)

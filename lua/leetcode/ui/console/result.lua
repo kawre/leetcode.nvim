@@ -39,18 +39,22 @@ function result:handle_runtime(item) -- status code = 10
 
     if not is_sub_res then
         local h = NuiLine()
-        h:append(item.status_msg, hi)
+        local status_msg = item.compare_result:match("^[1]+$") and "Accepted" or "Wrong Answer"
+        h:append(status_msg, hi)
         h:append(" | ")
         h:append("Runtime: " .. item.status_runtime, "Comment")
         header:append(h)
         group:append(header)
 
         for i, answer in ipairs(item.code_answer) do
+            local passed = item.compare_result:sub(i, i) == "1"
+
             local text = Case:init(
                 i,
                 self.parent.testcase.testcases[i],
                 answer,
-                item.expected_code_answer[i]
+                item.expected_code_answer[i],
+                passed
             )
             group:append(text)
 

@@ -110,17 +110,18 @@ function parser:handle_list(tags)
     local leftpad = string.rep("\t", li_count)
     local li_icons = { "", "", "" }
 
+    local text
     if li_type == "ul" then
         local li_icon = li_icons[math.max(1, li_count % (#li_icons + 1))]
-        local text = string.format("%s%s ", leftpad, li_icon)
-        self.line:append(text, "LeetCodeIndent")
+        text = string.format("%s%s ", leftpad, li_icon)
     else
         local ol_c = vim.fn.count(tags, "ol")
 
         self.ol_count[ol_c] = (self.ol_count[ol_c] or 0) + 1
-        local text = string.format("%s%d. ", leftpad, self.ol_count[ol_c])
-        self.line:append(text, "LeetCodeIndent")
+        text = string.format("%s%d. ", leftpad, self.ol_count[ol_c])
     end
+
+    self.line:append(text, "LeetCodeList")
 end
 
 ---@param text string
@@ -193,10 +194,11 @@ end
 
 ---@param str string
 local function normalize_html(str)
-    local res = str
-        :gsub("​", "")
+    local res = str:gsub("​", "")
         :gsub("\r\n", "\n")
-        :gsub("\t", "")
+        :gsub("\t*<(/?li)>", "<%1>")
+        :gsub("\t*<(/?ul)>", "<%1>")
+        :gsub("\t*<(/?ol)>", "<%1>")
         :gsub(
             "<p><strong[^>]*>(Example%s*%d+:)</strong></p>(\n*)",
             "\n\n<example>󰛨 %1</example>\n\n"
@@ -206,10 +208,9 @@ local function normalize_html(str)
             "\n\n<constraints> %1</constraints>\n\n"
         )
         :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
-        -- :gsub("%s*<(ul|li|ol)[^>]*>%s*", "<%1>")
         :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
         :gsub("\n", "&lcnl;")
-        -- :gsub("%s%s+", "\t")
+        :gsub("\t", "&lctab;")
         :gsub("%s", "&nbsp;")
 
     return res .. "&lcend;"

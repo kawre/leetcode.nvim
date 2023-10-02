@@ -31,6 +31,7 @@ local entities = {
 
     ["&lcpad;"] = "",
     ["&lcnl;"] = "",
+    ["&lctab;"] = "\t",
     ["&lcend;"] = "",
 }
 
@@ -63,6 +64,7 @@ local highlights = {
 function utils.entity(entity)
     if entities[entity] then
         return entities[entity]
+        -- return entity
     else
         log.error("unknown enitity: " .. entity)
         return entity
