@@ -45,6 +45,7 @@ function leetcode.setup(cfg)
     vim.api.nvim_set_hl(0, "LeetCodeConstraints", { link = "LeetCodeInfo" })
     vim.api.nvim_set_hl(0, "LeetCodeIndent", { link = "Comment" })
     vim.api.nvim_set_hl(0, "LeetCodeList", { link = "Tag" })
+    vim.api.nvim_set_hl(0, "LeetCodeLink", { link = "Function" })
 
     utils.map("n", "<leader>lc", utils.cmd("console"))
     utils.map("n", "<leader>lm", utils.cmd("menu"))

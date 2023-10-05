@@ -5,7 +5,6 @@ local problems = require("leetcode.cache.problems")
 local cache = {}
 
 function cache.update()
-    -- log.info(2)
     problems.update(true)
     -- cookie.update()
 end

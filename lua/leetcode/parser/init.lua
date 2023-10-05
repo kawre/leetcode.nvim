@@ -3,6 +3,7 @@
 ---TODO: <img> parser
 ---TODO: <u> parser
 ---TODO: question duplication
+---TODO: Q2066
 
 local log = require("leetcode.logger")
 
@@ -47,28 +48,41 @@ function parser:get_attr(node)
     return attr
 end
 
+---@class lc.Parser.Tag
+---@field tag string
+---@field attrs lc.Parser.Tag.Attr[]
+
 ---@private
 ---
 ---@param node TSNode
 ---
----@return lc.Parser.Tag
+---@return lc.Parser.Tag | nil
 function parser:get_tag_data(node)
-    ---@class lc.Parser.Tag
-    ---@field name string
-    ---@field attrs lc.Parser.Tag.Attr[]
-    local data = { attrs = {} }
+    if node:type() ~= "element" then return end
 
+    local start_tag
     for child in node:iter_children() do
+        local ctype = child:type()
+        if ctype == "start_tag" or ctype == "self_closing_tag" then
+            start_tag = child
+            break
+        end
+    end
+    if not start_tag then return end
+
+    local tag, attrs = nil, {}
+    for child in start_tag:iter_children() do
         local ntype = child:type()
 
         if ntype == "tag_name" then
-            data.tag = self:get_text(child)
+            tag = self:get_text(child)
         elseif ntype == "attribute" then
-            table.insert(data.attrs, self:get_attr(child))
+            table.insert(attrs, self:get_attr(child))
         end
     end
 
-    return data
+    local res = { tag = tag, attrs = attrs }
+    return tag and res or nil
 end
 
 ---@private
@@ -137,9 +151,53 @@ end
 
 ---@private
 ---
+---@param text string
+---@param tag_data lc.Parser.Tag
+---
+---@return NuiLine
+function parser:handle_link(text, tag_data)
+    local line = NuiLine()
+
+    local href
+    for _, attr in ipairs(tag_data.attrs) do
+        if attr.name == "href" then href = attr.value end
+    end
+    if not href then return line end
+
+    line:append("[", "LeetCodeIndent")
+    line:append(text, "LeetCodeLink")
+    line:append(string.format("](%s)", href), "LeetCodeIndent")
+
+    return line
+end
+
+function parser:handle_img(tag_data)
+    log.debug(tag_data)
+    local tag = tag_data.tag
+    if tag ~= "img" then return end
+    local line = NuiLine()
+
+    local src, alt
+    for _, attr in ipairs(tag_data.attrs) do
+        if attr.name == "src" then src = attr.value end
+        if attr.name == "alt" then alt = attr.value end
+    end
+    if not src then return end
+    alt = alt or ""
+
+    line:append(string.format("[%s](", alt ~= "" and alt or "img"), "LeetCodeIndent")
+    line:append(src, "LeetCodeLink")
+    line:append(")", "LeetCodeIndent")
+
+    self.text:append(line)
+end
+
+---@private
+---
 ---@param node TSNode
 ---@param tags lc.Parser.Tag
-function parser:node_hi(node, tags)
+--@param tag_data lc.Parser.Tag
+function parser:node_hi(node, tags, tag_data)
     local text = self:get_text(node)
     local tag = tags[1]
 
@@ -159,29 +217,29 @@ function parser:node_hi(node, tags)
     if tag == "sup" then text = "^" .. text end
     if tag == "sub" then text = "_" .. text end
 
-    local nui_text = NuiText(text, utils.hi(tags))
+    local nui_text = tag == "a" and self:handle_link(text, tag_data)
+        or NuiText(text, utils.hi(tags))
 
     self.line:append(nui_text)
 end
 
 ---@private
+---
 ---@param node TSNode
 ---@param tags table
 function parser:rec_parse(node, tags)
-    ---@type lc.Parser.Tag
-    local tag_data
+    local tag_data = self:get_tag_data(node)
+    ---handle img
+    if tag_data and tag_data.tag == "img" then return self:handle_img(tag_data) end
 
+    ---handle rest
     for child in node:iter_children() do
         local ntype = child:type()
 
-        if ntype == "start_tag" then
-            tag_data = self:get_tag_data(child)
-        else
-            if tag_data then table.insert(tags, 1, tag_data.tag) end
-            if ntype == "text" or ntype == "entity" then self:node_hi(child, tags) end
-            self:rec_parse(child, tags)
-            if tag_data then table.remove(tags, 1) end
-        end
+        if tag_data then table.insert(tags, 1, tag_data.tag) end
+        if ntype == "text" or ntype == "entity" then self:node_hi(child, tags, tag_data) end
+        self:rec_parse(child, tags)
+        if tag_data then table.remove(tags, 1) end
     end
 end
 
@@ -214,6 +272,7 @@ local function normalize_html(str)
         :gsub("\n", "&lcnl;")
         :gsub("\t", "&lctab;")
         :gsub("%s", "&nbsp;")
+        :gsub("<[^>]*>", function(match) return match:gsub("&nbsp;", " ") end)
 
     return res .. "&lcend;"
 end

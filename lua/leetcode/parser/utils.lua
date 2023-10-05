@@ -78,6 +78,8 @@ end
 function utils.hi(tags)
     local tag = tags[1] or ""
 
+    if tag == "a" then log.error("WTETWET") end
+
     -- if not tag then return highlights["p"] end
     if highlights[tag] and highlights[tag] ~= "Inherit" then return highlights[tag] end
 

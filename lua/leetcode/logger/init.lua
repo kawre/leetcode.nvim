@@ -4,14 +4,17 @@ local levels = vim.log.levels
 ---@class lc.Logger
 local logger = {}
 
----@alias msg string | number
+---@alias msg string | number | boolean | table | nil
 
 ---@param msg msg
 ---@param lvl? integer
 logger.log = function(msg, lvl)
     if not config.user.logging then return end
+    msg = msg or "nil"
 
-    if type(msg) == "number" then msg = tostring(msg) end
+    local mtype = type(msg)
+    if mtype == "number" or mtype == "boolean" then msg = tostring(msg) end
+    if mtype == "table" or mtype == "userdata" then msg = vim.inspect(msg) end
     vim.notify(msg, lvl or levels.INFO, { title = config.name })
 end
 
@@ -20,9 +23,6 @@ logger.info = function(msg) logger.log(msg) end
 
 ---@param msg msg
 logger.warn = function(msg) logger.log(msg, levels.WARN) end
-
----@param msg table
-logger.inspect = function(msg) logger.log(vim.inspect(msg)) end
 
 ---@param msg msg
 logger.error = function(msg) logger.log(msg, levels.ERROR) end
