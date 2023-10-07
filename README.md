@@ -2,25 +2,29 @@
 
 # leetcode.nvim
 
-Solve LeetCode problems within Neovim
+🔥 Solve [LeetCode] problems within [Neovim][neovim] 🔥
 
 </div>
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-535ae6baf3ba
 
 [leetcode.nvim]: https://github.com/kawre/leetcode.nvim
+[LeetCode]: https://leetcode.com
+[neovim]: https://github.com/neovim/neovim
 
 ## ✨ Features
 
-- 🔥 Question description formatting
+- 😍 Description formatting
 
-- 📈 LeetCode statistics withing neovim (Soon)
+- 📈 [LeetCode] statistics withing [Neovim][neovim] (Soon)
 
 - 🔀 Support for daily and random questions
 
 - 💾 Caching
 
 ## 📬 Requirements
+
+- [Neovim][neovim] >= 0.8
 
 - [nvim-treesitter][nvim-treesitter]
 
@@ -35,26 +39,49 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
 
 ## 📦 Installation
 
+- [packer.nvim][packer.nvim]
+
+```lua
+use {
+  "kawre/leetcode.nvim",
+  run = ":TSUpdate html",
+  requires = {
+    "nvim-treesitter/nvim-treesitter",
+    "nvim-telescope/telescope.nvim",
+    "MunifTanjim/nui.nvim",
+
+     - optional dependencies
+    "rcarriga/nvim-notify",
+    "nvim-tree/nvim-web-devicons",
+  },
+  config = function()
+    require('leetcode').setup({
+      -- configuration goes here
+    })
+  end,
+}
+```
+
+
 - [lazy.nvim][lazy.nvim]
 
-  ```lua
-  {
-    "kawre/leetcode.nvim",
-    build = ":TSUpdate html",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "nvim-telescope/telescope.nvim",
-      "MunifTanjim/nui.nvim",
-
-      -- optional dependencies
-      "rcarriga/nvim-notify",
-      "nvim-tree/nvim-web-devicons",
-    },
-    opts = {
-      -- configuration goes here
-    },
-  }
-  ```
+```lua
+{
+  "kawre/leetcode.nvim",
+  build = ":TSUpdate html",
+  dependencies = {
+    "nvim-treesitter/nvim-treesitter",
+    "nvim-telescope/telescope.nvim",
+    "MunifTanjim/nui.nvim",
+     - optional dependencies
+    "rcarriga/nvim-notify",
+    "nvim-tree/nvim-web-devicons",
+  },
+  opts = {
+    -- configuration goes here
+  },
+}
+```
 
 [lazy.nvim]: https://github.com/folke/lazy.nvim
 [packer.nvim]: https://github.com/wbthomason/packer.nvim
@@ -65,16 +92,19 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
 ### arg
 
-Argument to pass to Neovim 
+Argument for [Neovim][neovim] 
+
 
 ```lua
 ---@type string
 arg = "leetcode.nvim"
 ```
 
+<small>See [usage](#🚀-usage) for more info</small>
+
 ### lang
 
-Language to start your [leetcode.nvim][leetcode.nvim] session with
+Language to start your session with
 
 ```lua
 ---@type lc.lang
@@ -86,7 +116,7 @@ sql = "mysql"
 
 ### domain
 
-LeetCode domain.
+[LeetCode] domain.
 
 ```lua
 ---@type lc.domain
@@ -187,8 +217,8 @@ description = {
 
 ## 🚀 Usage
 
-This plugin is meant to be used within a fresh neovim instance.
-Meaning that to lauch [leetcode.nvim][leetcode.nvim] you have to pass [`arg`](#arg) as the neovim argument
+This plugin is meant to be used within a <b>fresh</b> [Neovim][neovim] instance.
+Meaning that to lauch [leetcode.nvim][leetcode.nvim] you <b>have</b> to pass [`arg`](#arg) as the <i>first and <b>only</b></i> [Neovim][neovim] argument
 
 ```
 nvim leetcode.nvim
@@ -196,9 +226,30 @@ nvim leetcode.nvim
 
 ### Sign In
 
-It is required to be signed-in to use [leetcode.nvim][leetcode.nvim]
+It is <b>required</b> to be <b>signed-in</b> to use [leetcode.nvim][leetcode.nvim]
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/13594f1d-fff6-444b-b128-29c8cf83e97f
+
+## 🍴 Recipes
+
+- Full lazy loading with [lazy.nvim]
+
+```lua
+{
+    ...
+    cond = function()
+        local user_arg = "leetcode.nvim"
+
+        if vim.fn.argc() ~= 1 then return false end
+        if user_arg ~= vim.fn.argv()[1] then return false end
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+        if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return false end
+
+        return true
+    end
+    ...
+}
+```
 
 ## 📋 Commands
 
@@ -212,4 +263,5 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/13594f1d-fff6-444b-b128-2
 ## ✅ Todo
 
 - [ ] CN version
-- [ ] full sql support
+- [ ] SQL support
+- [ ] Statistics menu page

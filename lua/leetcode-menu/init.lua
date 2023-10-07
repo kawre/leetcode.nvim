@@ -131,20 +131,26 @@ function menu:init()
         signcolumn = "no",
     })
 
-    local logged_in = config.auth.is_signed_in
-    local layout = logged_in and "menu" or "signin"
-    local ok, l = pcall(require, "leetcode-menu.theme." .. layout)
+    local ok, loading = pcall(require, "leetcode-menu.theme.loading")
     assert(ok)
 
     local obj = setmetatable({
         bufnr = bufnr,
         winid = winid,
         tabpage = tabpage,
-        layout = l,
+        layout = loading,
         cursor = {
             idx = 1,
+            prev = nil,
         },
     }, self)
+
+    ---@param user lc.UserAuth
+    require("leetcode.api.auth")._user(function()
+        local logged_in = config.auth.is_signed_in
+        local layout = logged_in and "menu" or "signin"
+        obj:set_layout(layout)
+    end)
 
     _Lc_Menu = obj
     return obj:mount()

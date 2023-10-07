@@ -1,21 +1,18 @@
 local config = require("leetcode.config")
-local utils = require("leetcode.utils")
-
-local log = require("leetcode.logger")
 
 ---@class lc
 local leetcode = {}
 
-local function should_skip()
-    if vim.fn.argc() ~= 1 then return true end
+local function should_start()
+    if vim.fn.argc() ~= 1 then return false end
 
     local user_arg, arg = config.user.arg, vim.fn.argv()[1]
-    if user_arg ~= arg then return true end
+    if user_arg ~= arg then return false end
 
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-    if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return true end
+    if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return false end
 
-    return false
+    return true
 end
 
 local function setup_highlights()
@@ -50,13 +47,17 @@ local function setup_cmds()
     vim.api.nvim_create_user_command("LcLanguage", function() cmd.prompt_lang() end, {})
 end
 
+local function start()
+    setup_highlights()
+    setup_cmds()
+
+    require("leetcode-menu"):init()
+end
+
 ---@param cfg? lc.UserConfig
 function leetcode.setup(cfg)
     config.apply(cfg or {})
-    if not should_skip() then require("leetcode.api.command").start() end
-
-    setup_highlights()
-    setup_cmds()
+    if should_start() then start() end
 end
 
 return leetcode

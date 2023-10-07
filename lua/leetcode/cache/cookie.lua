@@ -17,9 +17,6 @@ function cookie.update(str)
 
     file:write(str, "w")
 
-    local api = require("leetcode.api")
-    api.setup()
-
     local auth_api = require("leetcode.api.auth")
     local auth = auth_api.user()
 
@@ -31,10 +28,7 @@ function cookie.update(str)
     return t
 end
 
-function cookie.delete()
-    file:rm()
-    require("leetcode.api").setup()
-end
+function cookie.delete() file:rm() end
 
 ---@return lc.Cookie | nil
 function cookie.get()

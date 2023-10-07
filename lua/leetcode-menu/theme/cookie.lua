@@ -47,7 +47,4 @@ return Layout:init({
 
         Footer:init(),
     },
-    opts = {
-        margin = 5,
-    },
 })

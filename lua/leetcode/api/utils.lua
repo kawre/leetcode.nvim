@@ -1,8 +1,8 @@
-local api = require("leetcode.api")
 local curl = require("plenary.curl")
 local Job = require("plenary.job")
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
+local headers = require("leetcode.api.headers")
 
 local lc = "https://leetcode." .. config.user.domain
 local endpoint = lc .. "/graphql"
@@ -12,7 +12,7 @@ local utils = {}
 function utils.to_curl_headers()
     local t = {}
 
-    for key, value in pairs(api.headers) do
+    for key, value in pairs(headers.get()) do
         table.insert(t, "-H")
         table.insert(t, key .. ": " .. value)
     end
@@ -23,7 +23,7 @@ end
 ---@param url string
 function utils.post(url, body)
     local response = curl.post(url, {
-        headers = api.headers,
+        headers = headers.get(),
         body = vim.json.encode(body),
     })
 
@@ -68,7 +68,7 @@ end
 ---@return table
 function utils.query(query, variables)
     local response = curl.post(endpoint, {
-        headers = api.headers,
+        headers = headers.get(),
         body = vim.json.encode({
             query = query,
             variables = variables or {},
@@ -85,7 +85,7 @@ end
 ---@param cb function
 function utils._query(body, cb)
     curl.post(endpoint, {
-        headers = api.headers,
+        headers = headers.get(),
         body = vim.json.encode(body),
         callback = vim.schedule_wrap(cb),
     })

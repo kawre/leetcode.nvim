@@ -4,9 +4,7 @@ local Title = require("leetcode-menu.components.title")
 local cmd = require("leetcode.api.command")
 local Buttons = require("leetcode-menu.components.buttons")
 
-local padding = require("leetcode-ui.component.padding")
 local button = require("leetcode-ui.component.button")
-local group = require("leetcode-ui.component.group")
 
 local problems = button:init(
     { icon = "", src = "Problems" },
@@ -40,10 +38,6 @@ local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", function()
     local ok, err = pcall(vim.cmd.quitall)
     if not ok then log.error(err or "") end
 end)
-
--- section.title:append("Menu", "Comment")
-
--- section.footer:append("Signed in as: " .. "kawre", "Keyword")
 
 local Header = require("leetcode-menu.components.header")
 local Footer = require("leetcode-menu.components.footer")

@@ -14,3 +14,4 @@
 ---| "cookie"
 ---| "cache"
 ---| "signin"
+---| "loading"

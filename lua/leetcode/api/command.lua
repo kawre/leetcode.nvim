@@ -95,21 +95,6 @@ function cmd.console()
     end
 end
 
-function cmd.start()
-    -- if vim.fn.argc() ~= 1 then return end
-    --
-    -- local invoke, arg = config.user.arg, vim.fn.argv()[1]
-    -- if arg ~= invoke then return end
-    --
-    -- local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-    -- if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return true end
-
-    require("leetcode.api").setup()
-    require("leetcode.api.auth").user()
-    -- require("leetcode.cache").setup()
-    require("leetcode-menu"):init()
-end
-
 function cmd.menu() vim.api.nvim_set_current_tabpage(_Lc_MenuTabPage) end
 
 ---@param layout layouts
