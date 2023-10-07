@@ -6,6 +6,8 @@ Solve LeetCode problems within Neovim
 
 </div>
 
+https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-535ae6baf3ba
+
 [leetcode.nvim]: https://github.com/kawre/leetcode.nvim
 
 ## ✨ Features
