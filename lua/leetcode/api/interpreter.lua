@@ -21,6 +21,8 @@ function interpreter.listener(id, callback)
 
     local function listen()
         interpreter.check(id, function(item)
+            log.debug({ title = "interpreter check", body = item })
+
             if item.status_code then
                 noti:stop(item.status_msg, false)
                 callback(item)
@@ -81,12 +83,6 @@ end
 function interpreter.check(id, cb)
     local url = string.format(config.domain .. "/submissions/detail/%s/check/", id)
     utils._get(url, cb)
-
-    -- ---@type boolean, lc.Interpreter.Response
-    -- local ok, res = pcall(utils.get, url)
-    -- assert(ok)
-    --
-    -- return res
 end
 
 return interpreter

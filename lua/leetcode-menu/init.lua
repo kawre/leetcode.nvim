@@ -15,10 +15,9 @@ local Line = require("nui.line")
 local menu = {} ---@diagnostic disable-line
 menu.__index = menu
 
-local idk = 100
-
 ---@type lc-menu
-_LC_MENU = {} ---@diagnostic disable-line
+_Lc_Menu = {} ---@diagnostic disable-line
+_Lc_MenuTabPage = 0
 
 local function tbl_keys(t)
     local keys = vim.tbl_keys(t)
@@ -107,8 +106,8 @@ function menu:init()
     local bufnr = vim.api.nvim_get_current_buf()
     local winid = vim.api.nvim_get_current_win()
     local tabpage = vim.api.nvim_get_current_tabpage()
+    _Lc_MenuTabPage = tabpage
     vim.api.nvim_buf_set_name(bufnr, "")
-    -- vim.api.nvim_set_current_tabpage(1)
 
     utils.apply_opt_local({
         bufhidden = "wipe",
@@ -147,7 +146,7 @@ function menu:init()
         },
     }, self)
 
-    _LC_MENU = obj
+    _Lc_Menu = obj
     return obj:mount()
 end
 

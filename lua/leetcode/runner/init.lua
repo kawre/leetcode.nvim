@@ -18,10 +18,11 @@ function runner:run(submit)
     local typed_code = utils.to_typed_code(tc_lines)
 
     local body = {
-        lang = config.user.lang,
+        lang = question.lang,
         typed_code = typed_code,
         question_id = question.q.id,
     }
+    log.debug({ title = "testcase run", body = body })
 
     local function callback(item) self:callback(item) end
 

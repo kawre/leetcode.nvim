@@ -18,14 +18,7 @@ local function should_skip()
     return false
 end
 
----@param cfg? lc.UserConfig
-function leetcode.setup(cfg)
-    config.apply(cfg or {})
-    if should_skip() then return end
-
-    local cmd = require("leetcode.api.command")
-    cmd.start()
-
+local function setup_highlights()
     vim.api.nvim_set_hl(0, "LeetCodeEasy", { fg = "#46c6c2" })
     vim.api.nvim_set_hl(0, "LeetCodeMedium", { fg = "#fac31d" })
     vim.api.nvim_set_hl(0, "LeetCodeHard", { fg = "#f8615c" })
@@ -46,11 +39,24 @@ function leetcode.setup(cfg)
     vim.api.nvim_set_hl(0, "LeetCodeIndent", { link = "Comment" })
     vim.api.nvim_set_hl(0, "LeetCodeList", { link = "Tag" })
     vim.api.nvim_set_hl(0, "LeetCodeLink", { link = "Function" })
+end
+
+local function setup_cmds()
+    local cmd = require("leetcode.api.command")
 
     vim.api.nvim_create_user_command("LcConsole", function() cmd.console() end, {})
     vim.api.nvim_create_user_command("LcMenu", function() cmd.menu() end, {})
     vim.api.nvim_create_user_command("LcQuestionTabs", function() cmd.list_questions() end, {})
     vim.api.nvim_create_user_command("LcLanguage", function() cmd.prompt_lang() end, {})
+end
+
+---@param cfg? lc.UserConfig
+function leetcode.setup(cfg)
+    config.apply(cfg or {})
+    if not should_skip() then require("leetcode.api.command").start() end
+
+    setup_highlights()
+    setup_cmds()
 end
 
 return leetcode

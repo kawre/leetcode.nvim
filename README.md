@@ -12,21 +12,21 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
 
 ## ✨ Features
 
+- 🔥 Question description formatting
+
 - 📈 LeetCode statistics withing neovim (Soon)
 
 - 🔀 Support for daily and random questions
 
-- 💾 Problem list caching
+- 💾 Caching
 
-## 📬 Dependencies
+## 📬 Requirements
 
-- [nvim-treesitter][nvim-treesitter]: html parser
+- [nvim-treesitter][nvim-treesitter]
 
-- [telescope.nvim][telescope.nvim]: pickers
+- [telescope.nvim][telescope.nvim]
 
-- [nui.nvim][nui.nvim]: ui provider
-
-- [nvim-notify][nvim-notify]: notifications provider
+- [nui.nvim][nui.nvim]
 
 [nvim-treesitter]: https://github.com/nvim-treesitter/nvim-treesitter
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
@@ -59,34 +59,111 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
 [lazy.nvim]: https://github.com/folke/lazy.nvim
 [packer.nvim]: https://github.com/wbthomason/packer.nvim
 
-<h2 id="config">⚙️ Default Configuration</h2>
+## 🛠️ Config
+
+To see full configuration types see [template.lua](./lua/leetcode/config/template.lua)
+
+### arg
+
+Argument to pass to Neovim 
+
+```lua
+---@type string
+arg = "leetcode.nvim"
+```
+
+### lang
+
+Language to start your [leetcode.nvim][leetcode.nvim] session with
+
+```lua
+---@type lc.lang
+lang = "cpp"
+
+---@type lc.sql_lang
+sql = "mysql"
+```
+
+### domain
+
+LeetCode domain.
+
+```lua
+---@type lc.domain
+domain = "com" -- For now "com" is only supported
+```
+
+### directory
+
+Where to store [leetcode.nvim][leetcode.nvim] data
+
+```lua
+---@type string
+directory = vim.fn.stdpath("data") .. "/leetcode/"
+```
+
+### logging
+
+Whether to log [leetcode.nvim][leetcode.nvim] status notifications
+
+```lua
+---@type boolean
+logging = true
+```
+
+### console
+
+Console appearance
+
+```lua
+console = {
+    size = {
+        width = "75%", ---@type string | integer
+        height = "75%", ---@type string | integer
+    },
+    dir = "row", ---@type "col" | "row"
+
+    result = {
+        max_stdout_length = 200, ---@type integer
+    },
+}
+```
+
+### description
+
+Question description appearance
+
+```lua
+description = {
+    width = "40%", ---@type string | integer
+}
+```
+
+
+### default config
+
+<details>
+  <summary>Click to see default config</summary>
 
 ```lua
 {
     ---@type string
-    domain = "com",
-
-    ---@type string
     arg = "leetcode.nvim",
 
-    ---@type string
-    lang = "java",
+    ---@type lc.lang
+    lang = "cpp",
 
-    ---@type
-    ---| "pythondata"
-    ---| "mysql"
-    ---| "mssql"
-    ---| "oraclesql"
+    ---@type lc.sql_lang
     sql = "mysql",
+
+    ---@type lc.domain
+    domain = "com",
 
     ---@type string
     directory = vim.fn.stdpath("data") .. "/leetcode/",
 
     ---@type boolean
     logging = true,
-
-    menu_tabpage = 1,
-    questions_tabpage = 2,
 
     console = {
         size = {
@@ -96,7 +173,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
         dir = "row", ---@type "col" | "row"
 
         result = {
-            max_stdout_length = 200,
+            max_stdout_length = 200, ---@type integer
         },
     },
 
@@ -106,17 +183,16 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
 }
 ```
 
+</details>
+
 ## 🚀 Usage
 
 This plugin is meant to be used within a fresh neovim instance.
-Meaning that to lauch [leetcode.nvim][leetcode.nvim] you have to pass [`arg`](#config) as the neovim argument
+Meaning that to lauch [leetcode.nvim][leetcode.nvim] you have to pass [`arg`](#arg) as the neovim argument
 
 ```
 nvim leetcode.nvim
 ```
-
-<!-- NOTE: [leetcode.nvim][leetcode.nvim] launch argument can be changed by modifying `arg` variable -->
-<!-- inside [config](#config) -->
 
 ### Sign In
 

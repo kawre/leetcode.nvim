@@ -110,12 +110,10 @@ function cmd.start()
     require("leetcode-menu"):init()
 end
 
-function cmd.menu() vim.api.nvim_set_current_tabpage(config.user.menu_tabpage) end
+function cmd.menu() vim.api.nvim_set_current_tabpage(_Lc_MenuTabPage) end
 
 ---@param layout layouts
-function cmd.menu_layout(layout) _LC_MENU:set_layout(layout) end
-
-function cmd.questions() vim.api.nvim_set_current_tabpage(config.user.questions_tabpage) end
+function cmd.menu_layout(layout) _Lc_Menu:set_layout(layout) end
 
 function cmd.list_questions()
     local utils = require("leetcode.utils")

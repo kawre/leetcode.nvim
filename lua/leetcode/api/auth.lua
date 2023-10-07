@@ -26,6 +26,7 @@ function M.user()
     if not ok then return {} end
 
     config.auth = res["userStatus"]
+    log.debug({ title = "user auth", body = config.auth })
     return config.auth
 end
 

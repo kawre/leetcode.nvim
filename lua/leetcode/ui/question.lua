@@ -63,7 +63,7 @@ function question:autocmds()
     vim.api.nvim_create_autocmd("TabEnter", {
         group = group_id,
         callback = function()
-            local utils = require("leetcode.utils")
+            -- local utils = require("leetcode.utils")
             local questions = utils.get_current_questions()
 
             local tabpage = vim.api.nvim_get_current_tabpage()
@@ -90,15 +90,16 @@ end
 ---@param problem lc.Cache.Question
 function question:init(problem)
     local q = api_question.by_title_slug(problem.title_slug)
+    local lang = config.lang
 
     local dir = config.directory
-    local ft = utils.filetype(config.lang)
+    local ft = utils.filetype(lang)
     local fn = string.format("%s.%s.%s", q.frontend_id, q.title_slug, ft)
 
     local obj = setmetatable({
         file = path:new(dir .. fn),
         q = q,
-        lang = config.lang,
+        lang = lang,
     }, self)
 
     return obj:mount()

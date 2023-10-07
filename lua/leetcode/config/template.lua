@@ -1,19 +1,46 @@
+---@alias lc.lang
+---| "cpp"
+---| "java"
+---| "python"
+---| "python3"
+---| "c"
+---| "csharp"
+---| "javascript"
+---| "typescript"
+---| "php"
+---| "swift"
+---| "kotlin"
+---| "dart"
+---| "golang"
+---| "ruby"
+---| "scala"
+---| "rust"
+---| "racket"
+---| "erlang"
+---| "elixir"
+
+---@alias lc.sql_lang
+---| "pythondata"
+---| "mysql"
+---| "mssql"
+---| "oraclesql"
+
+---@alias lc.domain
+---| "com"
+---| "cn"
+
 ---@class lc.UserConfig
 local M = {
-    ---@type string
+    ---@type lc.domain
     domain = "com",
 
     ---@type string
     arg = "leetcode.nvim",
 
-    ---@type string
-    lang = "java",
+    ---@type lc.lang
+    lang = "cpp",
 
-    ---@type
-    ---| "pythondata"
-    ---| "mysql"
-    ---| "mssql"
-    ---| "oraclesql"
+    ---@type lc.sql_lang
     sql = "mysql",
 
     ---@type string
@@ -21,9 +48,6 @@ local M = {
 
     ---@type boolean
     logging = true,
-
-    menu_tabpage = 1,
-    questions_tabpage = 2,
 
     console = {
         size = {
@@ -33,7 +57,7 @@ local M = {
         dir = "row", ---@type "col" | "row"
 
         result = {
-            max_stdout_length = 200,
+            max_stdout_length = 200, ---@type integer
         },
     },
 
