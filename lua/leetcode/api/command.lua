@@ -137,7 +137,38 @@ function cmd.list_questions()
     end
 end
 
----@param lang string
-function cmd.change_lang(lang) config.lang = lang end
+function cmd.prompt_lang()
+    local ui = require("leetcode.ui")
+
+    ui.pick_one(
+        {
+            { lang = "C++", slug = "cpp" },
+            { lang = "Java", slug = "java" },
+            { lang = "Python", slug = "python" },
+            { lang = "Python3", slug = "python3" },
+            { lang = "C", slug = "c" },
+            { lang = "C#", slug = "csharp" },
+            { lang = "JavaScript", slug = "javascript" },
+            { lang = "TypeScript", slug = "typescript" },
+            { lang = "PHP", slug = "php" },
+            { lang = "Swift", slug = "swift" },
+            { lang = "Kotlin", slug = "kotlin" },
+            { lang = "Dart", slug = "dart" },
+            { lang = "Go", slug = "golang" },
+            { lang = "Ruby", slug = "ruby" },
+            { lang = "Scala", slug = "scala" },
+            { lang = "Rust", slug = "rust" },
+            { lang = "Racket", slug = "racket" },
+            { lang = "Erlang", slug = "erlang" },
+            { lang = "Elixir", slug = "elixir" },
+        },
+        "Pick a Langauge",
+        function(t) return t.lang end,
+        function(t)
+            config.lang = t.slug
+            log.info("Langauge set to " .. t.lang)
+        end
+    )
+end
 
 return cmd

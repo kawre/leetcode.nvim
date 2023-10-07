@@ -10,12 +10,7 @@ local logger = {}
 ---@param lvl? integer
 logger.log = function(msg, lvl)
     if not config.user.logging then return end
-    msg = msg or "nil"
-
-    local mtype = type(msg)
-    if mtype == "number" or mtype == "boolean" then msg = tostring(msg) end
-    if mtype == "table" or mtype == "userdata" then msg = vim.inspect(msg) end
-    vim.notify(msg, lvl or levels.INFO, { title = config.name })
+    vim.notify(vim.inspect(msg), lvl or levels.INFO, { title = config.name })
 end
 
 ---@param msg msg

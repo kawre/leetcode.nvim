@@ -5,6 +5,7 @@ local Description = require("leetcode.ui.description")
 local api_question = require("leetcode.api.question")
 local Console = require("leetcode.ui.console")
 local spinner = require("leetcode.logger.spinner")
+local utils = require("leetcode.utils")
 
 ---@class lc.Question
 ---@field file Path
@@ -91,7 +92,8 @@ function question:init(problem)
     local q = api_question.by_title_slug(problem.title_slug)
 
     local dir = config.directory
-    local fn = string.format("%s.%s.%s", q.frontend_id, q.title_slug, config.lang)
+    local ft = utils.filetype(config.lang)
+    local fn = string.format("%s.%s.%s", q.frontend_id, q.title_slug, ft)
 
     local obj = setmetatable({
         file = path:new(dir .. fn),

@@ -1,6 +1,5 @@
 local config = require("leetcode.config")
 local utils = require("leetcode.utils")
-local cmd = require("leetcode.api.command")
 
 local log = require("leetcode.logger")
 
@@ -22,8 +21,9 @@ end
 ---@param cfg? lc.UserConfig
 function leetcode.setup(cfg)
     config.apply(cfg or {})
-
     if should_skip() then return end
+
+    local cmd = require("leetcode.api.command")
     cmd.start()
 
     vim.api.nvim_set_hl(0, "LeetCodeEasy", { fg = "#46c6c2" })
@@ -47,27 +47,10 @@ function leetcode.setup(cfg)
     vim.api.nvim_set_hl(0, "LeetCodeList", { link = "Tag" })
     vim.api.nvim_set_hl(0, "LeetCodeLink", { link = "Function" })
 
-    utils.map("n", "<leader>lc", utils.cmd("console"))
-    utils.map("n", "<leader>lm", utils.cmd("menu"))
-    utils.map("n", "<leader>lq", utils.cmd("list_questions"))
-
-    -- vim.api.nvim_create_user_command("LcMenu", function() vim.api.nvim_set_current_tabpage(1) end, {
-    --     bang = true,
-    --     desc = "Opens LeetCode Menu",
-    --     nargs = 0,
-    --     bar = true,
-    -- })
-    --
-    -- vim.api.nvim_create_user_command(
-    --     "LcQuestion",
-    --     function() vim.api.nvim_set_current_tabpage() end,
-    --     {
-    --         bang = true,
-    --         desc = "Opens last openned LeetCode question",
-    --         nargs = 0,
-    --         bar = true,
-    --     }
-    -- )
+    vim.api.nvim_create_user_command("LcConsole", function() cmd.console() end, {})
+    vim.api.nvim_create_user_command("LcMenu", function() cmd.menu() end, {})
+    vim.api.nvim_create_user_command("LcQuestionTabs", function() cmd.list_questions() end, {})
+    vim.api.nvim_create_user_command("LcLanguage", function() cmd.prompt_lang() end, {})
 end
 
 return leetcode
