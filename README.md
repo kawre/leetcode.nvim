@@ -59,7 +59,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
 [lazy.nvim]: https://github.com/folke/lazy.nvim
 [packer.nvim]: https://github.com/wbthomason/packer.nvim
 
-## 🛠️ Config
+## 🛠️ Configuration
 
 To see full configuration types see [template.lua](./lua/leetcode/config/template.lua)
 
@@ -140,10 +140,10 @@ description = {
 ```
 
 
-### default config
+### ⚙️ default configuration
 
 <details>
-  <summary>Click to see default config</summary>
+  <summary>Click to see</summary>
 
 ```lua
 {
@@ -197,3 +197,19 @@ nvim leetcode.nvim
 ### Sign In
 
 It is required to be signed-in to use [leetcode.nvim][leetcode.nvim]
+
+https://github-production-user-asset-6210df.s3.amazonaws.com/69250723/273407175-6a972621-7782-42eb-b7f7-02c0e6c05a59.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231007%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T201135Z&X-Amz-Expires=300&X-Amz-Signature=c33a2877a4c44f51419a579efa5973161205606ab12874d0225d0fc514fe7897&X-Amz-SignedHeaders=host&actor_id=69250723&key_id=0&repo_id=692404712
+
+## 📋 Commands
+
+| command   | triggers    |
+|--------------- | --------------- |
+| LcMenu | opens menu dashboard |
+| LcConsole | opens console for currently opened question |
+| LcQuestionList | opens a picker with all currently opened questions |
+| LcLanguage | opens a prompt to select a new language for the current session |
+
+## ✅ Todo
+
+- [ ] CN version
+- [ ] full sql support
