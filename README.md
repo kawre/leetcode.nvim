@@ -10,7 +10,7 @@
 
 </div>
 
-https://github.com/kawre/leetcode.nvim/assets/69250723/656a2faa-b559-4447-baff-2d30ca96008f
+https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-ab3f09b43740
 
 [leetcode.nvim]: https://github.com/kawre/leetcode.nvim
 [LeetCode]: https://leetcode.com
@@ -245,7 +245,7 @@ nvim leetcode.nvim
 
 It is <b>required</b> to be <b>signed-in</b> to use [leetcode.nvim][leetcode.nvim]
 
-https://github.com/kawre/leetcode.nvim/assets/69250723/13594f1d-fff6-444b-b128-29c8cf83e97f
+https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4ad3abeda5c3
 
 <!-- ## 🍴 Recipes -->
 <!---->
@@ -269,7 +269,7 @@ When you open a new <b>question</b>, [leetcode.nvim] creates a new [tabpage] <i>
 all of the <b>contents</b> related to it</i>.
 To switch between these tabs, use [LcQuestionTabs](#📋-commands) command
 
-https://github.com/kawre/leetcode.nvim/assets/69250723/b4407308-8c81-4b24-97e6-476f2da3b727
+https://github.com/kawre/leetcode.nvim/assets/69250723/64378b0f-c5ba-4378-b9ff-a95df13fbf36
 
 [tabpage]: https://neovim.io/doc/user/tabpage.html
 
