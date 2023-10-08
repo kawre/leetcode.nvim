@@ -58,7 +58,9 @@ function Component:draw(layout)
         new_line:render(layout.bufnr, -1, line_idx, line_idx)
 
         -- self.on_press()
-        if self.opts.on_press then layout:set_on_press(line_idx, self.opts.on_press) end
+        if self.opts.on_press then
+            layout:set_on_press(line_idx, self.opts.on_press, self.opts.sc)
+        end
     end
 end
 

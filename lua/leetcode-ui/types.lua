@@ -15,6 +15,7 @@
 ---@field position?  position
 ---@field hl? string
 ---@field on_press? function
+---@field sc? string
 ---@field padding? component.padding
 
 ---@class lc-ui.Component.config

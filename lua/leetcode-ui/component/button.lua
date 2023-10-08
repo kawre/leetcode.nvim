@@ -1,6 +1,6 @@
 local component = require("leetcode-ui.component")
 local log = require("leetcode.logger")
-local Line = require("nui.line")
+local NuiLine = require("nui.line")
 
 ---@class lc-ui.Button: lc-ui.Component
 local button = {}
@@ -18,12 +18,12 @@ setmetatable(button, component)
 --- @param keybind string? optional
 --- @param keybind_opts table? optional
 function button:init(text, sc, on_press, expandable, keybind, keybind_opts)
-    -- local sc_ = sc:gsub("%s", ""):gsub(leader, "<leader>")
-
     local opts = {
         position = "center",
         on_press = on_press or function() end,
+        sc = sc,
     }
+    -- log.debug(opts)
 
     local width = 50
     local expand = ""
@@ -32,10 +32,11 @@ function button:init(text, sc, on_press, expandable, keybind, keybind_opts)
     local len = vim.api.nvim_strwidth(txt) + vim.api.nvim_strwidth(sc)
     local padding = string.rep(" ", width - len)
 
-    local line = Line()
+    local line = NuiLine()
     line:append(txt)
     line:append(padding)
-    line:append(sc, "LeetCodeInfo")
+    -- line:append(sc, "LeetCodeInfo")
+    line:append("", "LeetCodeInfo")
 
     local obj = setmetatable({
         opts = opts,

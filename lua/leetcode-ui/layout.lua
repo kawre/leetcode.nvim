@@ -1,12 +1,15 @@
 local log = require("leetcode.logger")
-local Line = require("nui.line")
 local Padding = require("leetcode-ui.component.padding")
+
+---@class lc.on_press
+---@field fn function
+---@field sc string
 
 ---@class lc-ui.Layout
 ---@field components lc-ui.Component[]
 ---@field opts lc-ui.Layout.opts
 ---@field line_idx integer
----@field buttons table<integer, function>
+---@field buttons table<integer, lc.on_press>
 ---@field bufnr integer
 ---@field winid integer
 local Layout = {}
@@ -69,12 +72,13 @@ end
 
 ---@param line integer The line that the click happend
 function Layout:handle_press(line)
-    if self.buttons[line] then self.buttons[line]() end
+    if self.buttons[line] then self.buttons[line].fn() end
 end
 
 ---@param line integer
 ---@param fn function
-function Layout:set_on_press(line, fn) self.buttons[line] = fn end
+---@param sc string shortcut
+function Layout:set_on_press(line, fn, sc) self.buttons[line] = { fn = fn, sc = sc } end
 
 ---@param content lc-ui.Component
 function Layout:append(content)

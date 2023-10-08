@@ -86,9 +86,6 @@ end
 
 ---@private
 function menu:keymaps()
-    -- self.split:map("n", "<cr>", function()
-    -- end)
-
     vim.keymap.set("n", "<cr>", function()
         local row = vim.api.nvim_win_get_cursor(self.winid)[1]
         self.layout:handle_press(row)
@@ -145,7 +142,6 @@ function menu:init()
         },
     }, self)
 
-    ---@param user lc.UserAuth
     require("leetcode.api.auth")._user(function()
         local logged_in = config.auth.is_signed_in
         local layout = logged_in and "menu" or "signin"

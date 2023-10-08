@@ -14,13 +14,15 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
 
 ## ✨ Features
 
-- 😍 Description formatting
+- 📌 an intuitive dashboard for effortless navigation within [leetcode.nvim].
 
-- 📈 [LeetCode] statistics withing [Neovim][neovim] (Soon)
+- 😍 question description formatting for a better readability
 
-- 🔀 Support for daily and random questions
+- 📈 [LeetCode] profile statistics within [Neovim][neovim] (Soon)
 
-- 💾 Caching
+- 🔀 support for daily and random questions
+
+- 💾 caching for optimized performance
 
 ## 📬 Requirements
 
@@ -76,6 +78,9 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
 
         -- optional
         "nvim-tree/nvim-web-devicons",
+
+        -- recommended
+        -- "rcarriga/nvim-notify",
     },
     opts = {
         -- configuration goes here

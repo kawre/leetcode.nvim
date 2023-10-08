@@ -1,5 +1,4 @@
 local Component = require("leetcode-ui.component")
-local utils = require("leetcode-ui.utils")
 local Padding = require("leetcode-ui.component.padding")
 local log = require("leetcode.logger")
 
