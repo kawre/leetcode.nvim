@@ -154,7 +154,7 @@ Argument for [Neovim][neovim]
 arg = "leetcode.nvim"
 ```
 
-<small>See [usage](#🚀-usage) for more info</small>
+<small>See [usage](#-usage) for more info</small>
 
 ### lang
 
@@ -266,7 +266,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b4407308-8c81-4b24-97e6-4
 
 ## 📋 Commands
 
-| command   | triggers    |
+| command | description |
 |--------------- | --------------- |
 | LcMenu | opens menu dashboard |
 | LcConsole | opens console for currently opened question |
@@ -280,3 +280,4 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b4407308-8c81-4b24-97e6-4
 - [ ] SQL support
 - [ ] Statistics menu page
 - [ ] Docs
+- [ ] Hints popup
