@@ -18,7 +18,7 @@ local random_btn = Button:init(
 )
 
 local qot_btn = Button:init(
-    { src = "Question of Today", icon = "󰃭" },
+    { src = "Daily Question", icon = "󰃭" },
     "t",
     function() cmd.qot() end
 )

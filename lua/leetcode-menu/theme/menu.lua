@@ -16,7 +16,7 @@ local problems = button:init(
 local statistics = button:init(
     { icon = "󰄪", src = "Statistics (Soon)" },
     "s",
-    function() end,
+    function() log.info("soon") end,
     true
 )
 

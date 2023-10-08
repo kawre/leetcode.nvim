@@ -67,11 +67,7 @@ function M._all(cb)
     ]]
 
     local callback = function(res)
-        local ok, body = pcall(vim.json.decode, res["body"])
-        if not ok then return log.error("failed to decode problem list response body") end
-        assert(body)
-
-        local data = body["data"]["problemsetQuestionList"]["questions"]
+        local data = res["problemsetQuestionList"]["questions"]
         cb(data)
     end
 
@@ -81,7 +77,7 @@ function M._all(cb)
     }, callback)
 end
 
-function M.question_of_today()
+function M.question_of_today(cb)
     utils.auth_guard()
 
     local query = [[
@@ -90,24 +86,21 @@ function M.question_of_today()
             userStatus
             link
             question {
-              acRate
-              difficulty
-              freqBar
-              index: questionFrontendId
-              isFavor
-              paidOnly: isPaidOnly
-              status
+              frontend_id: questionFrontendId
               title
-              titleSlug
+              title_slug: titleSlug
+              status
+              paid_only: isPaidOnly
+              ac_rate: acRate
+              difficulty
             }
           }
         }
       ]]
 
-    local ok, res = pcall(utils.query, query)
-    assert(ok)
+    local callback = function(res) cb(res["activeDailyCodingChallengeQuestion"]["question"]) end
 
-    return res["activeDailyCodingChallengeQuestion"]
+    utils._query({ query = query }, callback)
 end
 
 return M

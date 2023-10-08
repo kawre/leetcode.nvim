@@ -57,7 +57,7 @@ function utils._get(url, cb)
             local decoded = vim.json.decode(result)
             cb(decoded)
         end),
-        on_stderr = function(error, data, self) end,
+        -- on_stderr = function(error, data, self) end,
     }):start()
 end
 
@@ -89,8 +89,11 @@ function utils._query(body, cb)
         headers = headers.get(),
         body = vim.json.encode(body),
         callback = vim.schedule_wrap(function(item)
-            log.debug(item)
-            cb(item)
+            local ok, res = pcall(vim.json.decode, item["body"])
+            assert(ok and res)
+            local data = res["data"]
+            log.debug(data)
+            cb(data)
         end),
     })
 end

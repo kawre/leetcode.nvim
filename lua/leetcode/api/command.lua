@@ -72,7 +72,12 @@ function cmd.authenticate() require("leetcode.api.auth").user() end
 ---Merge configurations into default configurations and set it as user configurations.
 ---
 --@param theme lc-db.Theme
-function cmd.qot() require("leetcode.ui").open_qot() end
+function cmd.qot()
+    local problems = require("leetcode.api.problems")
+    local Question = require("leetcode.ui.question")
+
+    problems.question_of_today(function(qot) Question:init(qot) end)
+end
 
 function cmd.random_question()
     local problems = require("leetcode.cache.problems")
@@ -125,25 +130,25 @@ function cmd.prompt_lang()
 
     ui.pick_one(
         {
-            { lang = "C++",        slug = "cpp" },
-            { lang = "Java",       slug = "java" },
-            { lang = "Python",     slug = "python" },
-            { lang = "Python3",    slug = "python3" },
-            { lang = "C",          slug = "c" },
-            { lang = "C#",         slug = "csharp" },
+            { lang = "C++", slug = "cpp" },
+            { lang = "Java", slug = "java" },
+            { lang = "Python", slug = "python" },
+            { lang = "Python3", slug = "python3" },
+            { lang = "C", slug = "c" },
+            { lang = "C#", slug = "csharp" },
             { lang = "JavaScript", slug = "javascript" },
             { lang = "TypeScript", slug = "typescript" },
-            { lang = "PHP",        slug = "php" },
-            { lang = "Swift",      slug = "swift" },
-            { lang = "Kotlin",     slug = "kotlin" },
-            { lang = "Dart",       slug = "dart" },
-            { lang = "Go",         slug = "golang" },
-            { lang = "Ruby",       slug = "ruby" },
-            { lang = "Scala",      slug = "scala" },
-            { lang = "Rust",       slug = "rust" },
-            { lang = "Racket",     slug = "racket" },
-            { lang = "Erlang",     slug = "erlang" },
-            { lang = "Elixir",     slug = "elixir" },
+            { lang = "PHP", slug = "php" },
+            { lang = "Swift", slug = "swift" },
+            { lang = "Kotlin", slug = "kotlin" },
+            { lang = "Dart", slug = "dart" },
+            { lang = "Go", slug = "golang" },
+            { lang = "Ruby", slug = "ruby" },
+            { lang = "Scala", slug = "scala" },
+            { lang = "Rust", slug = "rust" },
+            { lang = "Racket", slug = "racket" },
+            { lang = "Erlang", slug = "erlang" },
+            { lang = "Elixir", slug = "elixir" },
         },
         "Pick a Langauge",
         function(t) return t.lang end,

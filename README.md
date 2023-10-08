@@ -1,5 +1,9 @@
 <div align="center">
 
+🚨 <b>leetcode.nvim is currently in the <i>alpha stage</i> of development</b> 🚨
+
+---
+
 # leetcode.nvim
 
 🔥 Solve [LeetCode] problems within [Neovim] 🔥
@@ -14,7 +18,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/656a2faa-b559-4447-baff-2
 
 ## ✨ Features
 
-- 📌 an intuitive dashboard for effortless navigation within [leetcode.nvim].
+- 📌 an intuitive dashboard for effortless navigation within [leetcode.nvim]
 
 - 😍 question description formatting for a better readability
 

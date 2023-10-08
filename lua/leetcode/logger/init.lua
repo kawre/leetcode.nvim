@@ -28,7 +28,7 @@ logger.error = function(msg) logger.log(msg, levels.ERROR) end
 ---@param msg msg
 logger.debug = function(msg)
     if not (config.debug and noti_ok) then return end
-    logger.log(msg, levels.DEBUG)
+    logger.log({ msg = msg, trace = debug.traceback() }, levels.DEBUG)
 end
 
 return logger
