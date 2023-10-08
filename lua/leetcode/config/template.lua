@@ -32,7 +32,7 @@
 ---@class lc.UserConfig
 local M = {
     ---@type lc.domain
-    domain = "com",
+    domain = "com", -- For now "com" is the only one supported
 
     ---@type string
     arg = "leetcode.nvim",

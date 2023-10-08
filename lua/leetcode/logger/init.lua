@@ -10,7 +10,8 @@ local logger = {}
 ---@param lvl? integer
 logger.log = function(msg, lvl)
     if not config.user.logging then return end
-    vim.notify(vim.inspect(msg), lvl or levels.INFO, { title = config.name })
+    msg = type(msg) == "string" and msg or vim.inspect(msg)
+    vim.notify(msg, lvl or levels.INFO, { title = config.name })
 end
 
 ---@param msg msg

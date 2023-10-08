@@ -66,20 +66,29 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
 
 ```lua
 {
-  "kawre/leetcode.nvim",
-  build = ":TSUpdate html",
-  dependencies = {
-    "nvim-treesitter/nvim-treesitter",
-    "nvim-telescope/telescope.nvim",
-    "nvim-lua/plenary.nvim", -- required by telescope
-    "MunifTanjim/nui.nvim",
+    "kawre/leetcode.nvim",
+    build = ":TSUpdate html",
+    dependencies = {
+        "nvim-treesitter/nvim-treesitter",
+        "nvim-telescope/telescope.nvim",
+        "nvim-lua/plenary.nvim", -- required by telescope
+        "MunifTanjim/nui.nvim",
 
-    -- optional dependencies
-    "nvim-tree/nvim-web-devicons",
-  },
-  opts = {
-    -- configuration goes here
-  },
+        -- optional
+        "nvim-tree/nvim-web-devicons",
+    },
+    opts = {
+        -- configuration goes there
+    },
+    config = function(_, opts)
+        vim.keymap.set("n", "<leader>lq", "<cmd>LcQuestionTabs<cr>")
+        vim.keymap.set("n", "<leader>lm", "<cmd>LcMenu<cr>")
+        vim.keymap.set("n", "<leader>lc", "<cmd>LcConsole<cr>")
+        vim.keymap.set("n", "<leader>ll", "<cmd>LcLanguage<cr>")
+        vim.keymap.set("n", "<leader>ld", "<cmd>LcDescriptionToggle<cr>")
+
+        require("leetcode").setup(opts)
+    end,
 }
 ```
 
@@ -97,6 +106,9 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
 ```lua
 {
+    ---@type lc.domain
+    domain = "com", -- For now "com" is the only one supported
+
     ---@type string
     arg = "leetcode.nvim",
 
@@ -105,9 +117,6 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
     ---@type lc.sql_lang
     sql = "mysql",
-
-    ---@type lc.domain
-    domain = "com",
 
     ---@type string
     directory = vim.fn.stdpath("data") .. "/leetcode/",
@@ -131,6 +140,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         width = "40%", ---@type string | integer
     },
 }
+
 ```
 
 </details>
@@ -270,3 +280,4 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b4407308-8c81-4b24-97e6-4
 - [ ] CN version
 - [ ] SQL support
 - [ ] Statistics menu page
+- [ ] Docs

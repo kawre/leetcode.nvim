@@ -9,7 +9,6 @@ local config = {
     name = "leetcode.nvim",
     domain = "https://leetcode.com",
     debug = true,
-    notify = false,
     lang = "cpp",
 }
 
@@ -25,10 +24,6 @@ config.auth = {}
 ---@param cfg lc.UserConfig Configurations to be merged.
 function config.apply(cfg)
     config.user = vim.tbl_deep_extend("force", config.default, cfg)
-
-    local ok, _ = pcall(require, "notify")
-    if ok then config.notify = true end
-
     config.domain = "https://leetcode." .. config.user.domain
     config.lang = config.user.lang
     config.directory = config.user.directory
