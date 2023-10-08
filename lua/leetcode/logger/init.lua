@@ -1,3 +1,5 @@
+local noti_ok, _ = pcall(require, "notify")
+
 local config = require("leetcode.config")
 local levels = vim.log.levels
 
@@ -25,7 +27,7 @@ logger.error = function(msg) logger.log(msg, levels.ERROR) end
 
 ---@param msg msg
 logger.debug = function(msg)
-    if not config.debug then return end
+    if not (config.debug and noti_ok) then return end
     logger.log(msg, levels.DEBUG)
 end
 

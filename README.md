@@ -78,7 +78,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
         "nvim-tree/nvim-web-devicons",
     },
     opts = {
-        -- configuration goes there
+        -- configuration goes here
     },
     config = function(_, opts)
         vim.keymap.set("n", "<leader>lq", "<cmd>LcQuestionTabs<cr>")

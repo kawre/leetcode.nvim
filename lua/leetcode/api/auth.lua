@@ -50,11 +50,12 @@ function M._user(cb)
         }
     ]]
 
+    if not require("leetcode.cache.cookie").get() then return cb() end
     utils._query({ query = query }, function(res)
         local body = res["body"]
         local auth = vim.json.decode(body)["data"]
         update_cfg_auth(auth)
-        cb(auth)
+        cb()
     end)
 end
 

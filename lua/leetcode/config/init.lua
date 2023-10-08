@@ -28,7 +28,8 @@ function config.apply(cfg)
     config.lang = config.user.lang
     config.directory = config.user.directory
 
-    path:new(config.directory):mkdir()
+    config.file = path:new(config.directory)
+    config.file:mkdir()
 end
 
 return config

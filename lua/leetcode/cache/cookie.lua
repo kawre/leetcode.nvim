@@ -1,7 +1,8 @@
 local path = require("plenary.path")
-
 local log = require("leetcode.logger")
-local file = path:new(vim.fn.stdpath("data") .. "/leetcode/.cookie")
+
+local config = require("leetcode.config")
+local file = path:new(config.directory .. ".cookie")
 
 ---@class lc.Cookie
 ---@field csrftoken string
@@ -35,8 +36,8 @@ function cookie.get()
     local r_ok, contents = pcall(path.read, file)
     if not r_ok then return end
 
-    local pok, c = pcall(cookie.parse, contents)
-    if not pok then return end
+    local p_ok, c = pcall(cookie.parse, contents)
+    if not p_ok then return end
 
     return c
 end
