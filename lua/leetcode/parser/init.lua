@@ -104,9 +104,7 @@ function parser:handle_entity(entity)
         if self.line:content() ~= "" then self.text:append(self.line) end
 
         self.line = NuiLine()
-        self.text:append(NuiLine())
-        self.text:append(NuiLine())
-        self.text:append(NuiLine())
+        self.text:append({ NuiLine(), NuiLine(), NuiLine() })
     elseif entity == "&lcend;" then
         self.text:append(self.line)
     end
@@ -229,6 +227,7 @@ end
 ---@param tags table
 function parser:rec_parse(node, tags)
     local tag_data = self:get_tag_data(node)
+    log.debug(self:get_text(node))
     ---handle img
     if tag_data and tag_data.tag == "img" then return self:handle_img(tag_data) end
 
@@ -273,6 +272,7 @@ local function normalize_html(str)
         :gsub("\t", "&lctab;")
         :gsub("%s", "&nbsp;")
         :gsub("<[^>]*>", function(match) return match:gsub("&nbsp;", " ") end)
+        :gsub("<a[^>]*>.-</a>", function(match) return match:gsub("&nbsp;", " ") end)
 
     return res .. "&lcend;"
 end

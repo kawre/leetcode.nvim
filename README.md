@@ -73,8 +73,8 @@ use {
     "nvim-treesitter/nvim-treesitter",
     "nvim-telescope/telescope.nvim",
     "MunifTanjim/nui.nvim",
-     - optional dependencies
-    "rcarriga/nvim-notify",
+
+    -- optional dependencies
     "nvim-tree/nvim-web-devicons",
   },
   opts = {
@@ -89,6 +89,51 @@ use {
 ## 🛠️ Configuration
 
 To see full configuration types see [template.lua](./lua/leetcode/config/template.lua)
+
+### ⚙️ default configuration
+
+<details>
+  <summary>Click to see</summary>
+
+```lua
+{
+    ---@type string
+    arg = "leetcode.nvim",
+
+    ---@type lc.lang
+    lang = "cpp",
+
+    ---@type lc.sql_lang
+    sql = "mysql",
+
+    ---@type lc.domain
+    domain = "com",
+
+    ---@type string
+    directory = vim.fn.stdpath("data") .. "/leetcode/",
+
+    ---@type boolean
+    logging = true,
+
+    console = {
+        size = {
+            width = "75%", ---@type string | integer
+            height = "75%", ---@type string | integer
+        },
+        dir = "row", ---@type "col" | "row"
+
+        result = {
+            max_stdout_length = 200, ---@type integer
+        },
+    },
+
+    description = {
+        width = "40%", ---@type string | integer
+    },
+}
+```
+
+</details>
 
 ### arg
 
@@ -120,7 +165,7 @@ sql = "mysql"
 
 ```lua
 ---@type lc.domain
-domain = "com" -- For now "com" is only supported
+domain = "com" -- For now "com" is the only one supported
 ```
 
 ### directory
@@ -169,52 +214,6 @@ description = {
 }
 ```
 
-
-### ⚙️ default configuration
-
-<details>
-  <summary>Click to see</summary>
-
-```lua
-{
-    ---@type string
-    arg = "leetcode.nvim",
-
-    ---@type lc.lang
-    lang = "cpp",
-
-    ---@type lc.sql_lang
-    sql = "mysql",
-
-    ---@type lc.domain
-    domain = "com",
-
-    ---@type string
-    directory = vim.fn.stdpath("data") .. "/leetcode/",
-
-    ---@type boolean
-    logging = true,
-
-    console = {
-        size = {
-            width = "75%", ---@type string | integer
-            height = "75%", ---@type string | integer
-        },
-        dir = "row", ---@type "col" | "row"
-
-        result = {
-            max_stdout_length = 200, ---@type integer
-        },
-    },
-
-    description = {
-        width = "40%", ---@type string | integer
-    },
-}
-```
-
-</details>
-
 ## 🚀 Usage
 
 This plugin is meant to be used within a <b>fresh</b> [Neovim][neovim] instance.
@@ -235,18 +234,13 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/13594f1d-fff6-444b-b128-2
 - Full lazy loading with [lazy.nvim]
 
 ```lua
+local usr_arg = "leetcode.nvim"
+
 {
+    "kawre/leetcode.nvim",
     ...
-    cond = function()
-        local user_arg = "leetcode.nvim"
-
-        if vim.fn.argc() ~= 1 then return false end
-        if user_arg ~= vim.fn.argv()[1] then return false end
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-        if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return false end
-
-        return true
-    end
+    opts = { ..., arg = usr_arg, ... },
+    cond = function() return usr_arg == vim.fn.argv()[1] end,
     ...
 }
 ```
@@ -258,7 +252,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/13594f1d-fff6-444b-b128-2
 | LcMenu | opens menu dashboard |
 | LcConsole | opens console for currently opened question |
 | LcQuestionList | opens a picker with all currently opened questions |
-| LcLanguage | opens a prompt to select a new language for the current session |
+| LcLanguage | opens a picker to select a language for the current session |
 
 ## ✅ Todo
 

@@ -1,6 +1,4 @@
 local Layout = require("leetcode-ui.layout")
-local Text = require("leetcode-ui.component.text")
-local NuiText = require("nui.text")
 
 local Header = require("leetcode-menu.components.header")
 local Buttons = require("leetcode-menu.components.buttons")
