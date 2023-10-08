@@ -1,11 +1,9 @@
----@mod lc.cache.problems
-
 local log = require("leetcode.logger")
+local path = require("plenary.path")
 
 local config = require("leetcode.config")
-local path = require("plenary.path")
-local file = path:new(config.directory .. ".problemlist")
-local async = require("plenary.async")
+local file = config.home:joinpath(".problemlist")
+
 local problems_api = require("leetcode.api.problems")
 
 ---@class lc.Cache.Question

@@ -3,7 +3,7 @@
     "library": {
       "enabled": true,
       "plugins": [
-        "nvim-notify",
+        "nvim-treesitter/nvim-treesitter",
         "telescope.nvim",
         "plenary.nvim",
         "nui.nvim"

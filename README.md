@@ -149,7 +149,6 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
 Argument for [Neovim][neovim] 
 
-
 ```lua
 ---@type string
 arg = "leetcode.nvim"

@@ -92,12 +92,12 @@ function question:init(problem)
     local q = api_question.by_title_slug(problem.title_slug)
     local lang = config.lang
 
-    local dir = config.directory
     local ft = utils.filetype(lang)
     local fn = string.format("%s.%s.%s", q.frontend_id, q.title_slug, ft)
+    local file = config.home:joinpath(fn)
 
     local obj = setmetatable({
-        file = path:new(dir .. fn),
+        file = file,
         q = q,
         lang = lang,
     }, self)

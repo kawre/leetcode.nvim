@@ -3,8 +3,8 @@ local path = require("plenary.path")
 
 ---@class lc.Settings
 local config = {
-    default = template, ---@type lc.UserConfig Default User configuration
-    user = template, ---@type lc.UserConfig User configuration
+    default = template,
+    user = template,
 
     name = "leetcode.nvim",
     domain = "https://leetcode.com",
@@ -24,12 +24,12 @@ config.auth = {}
 ---@param cfg lc.UserConfig Configurations to be merged.
 function config.apply(cfg)
     config.user = vim.tbl_deep_extend("force", config.default, cfg)
+
     config.domain = "https://leetcode." .. config.user.domain
     config.lang = config.user.lang
-    config.directory = config.user.directory
-
-    config.file = path:new(config.directory)
-    config.file:mkdir()
+    ---@type Path
+    config.home = path:new(config.user.directory)
+    config.home:mkdir()
 end
 
 return config
