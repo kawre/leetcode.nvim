@@ -78,6 +78,7 @@ function utils.query(query, variables)
     local ok, data = pcall(vim.json.decode, response["body"])
     if not ok then log.error(data) end
     assert(ok and data and data["data"], "Failed to query data")
+    log.debug(data.data)
     return data.data
 end
 
@@ -87,7 +88,10 @@ function utils._query(body, cb)
     curl.post(endpoint, {
         headers = headers.get(),
         body = vim.json.encode(body),
-        callback = vim.schedule_wrap(cb),
+        callback = vim.schedule_wrap(function(item)
+            log.debug(item)
+            cb(item)
+        end),
     })
 end
 

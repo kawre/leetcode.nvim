@@ -1,5 +1,4 @@
 local template = require("leetcode.config.template")
-local path = require("plenary.path")
 
 ---@class lc.Settings
 local config = {
@@ -23,6 +22,8 @@ config.auth = {}
 ---
 ---@param cfg lc.UserConfig Configurations to be merged.
 function config.apply(cfg)
+    local path = require("plenary.path")
+
     config.user = vim.tbl_deep_extend("force", config.default, cfg)
 
     config.domain = "https://leetcode." .. config.user.domain

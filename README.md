@@ -2,15 +2,15 @@
 
 # leetcode.nvim
 
-🔥 Solve [LeetCode] problems within [Neovim][neovim] 🔥
+🔥 Solve [LeetCode] problems within [Neovim] 🔥
 
 </div>
 
-https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-535ae6baf3ba
+https://github.com/kawre/leetcode.nvim/assets/69250723/656a2faa-b559-4447-baff-2d30ca96008f
 
 [leetcode.nvim]: https://github.com/kawre/leetcode.nvim
 [LeetCode]: https://leetcode.com
-[neovim]: https://github.com/neovim/neovim
+[Neovim]: https://github.com/neovim/neovim
 
 ## ✨ Features
 
@@ -18,7 +18,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
 
 - 😍 question description formatting for a better readability
 
-- 📈 [LeetCode] profile statistics within [Neovim][neovim] (Soon)
+- 📈 [LeetCode] profile statistics within [Neovim] (Soon)
 
 - 🔀 support for daily and random questions
 
@@ -26,7 +26,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
 
 ## 📬 Requirements
 
-- [Neovim][neovim]
+- [Neovim]
 
 - [nvim-treesitter][nvim-treesitter]
 
@@ -152,7 +152,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
 ### arg
 
-Argument for [Neovim][neovim] 
+Argument for [Neovim]
 
 ```lua
 ---@type string
@@ -230,8 +230,8 @@ description = {
 
 ## 🚀 Usage
 
-This plugin is meant to be used within a <b>fresh</b> [Neovim][neovim] instance.
-Meaning that to lauch [leetcode.nvim][leetcode.nvim] you <b>have</b> to pass [`arg`](#arg) as the <i>first and <b>only</b></i> [Neovim][neovim] argument
+This plugin is meant to be used within a <b>fresh</b> [Neovim] instance.
+Meaning that to lauch [leetcode.nvim][leetcode.nvim] you <b>have</b> to pass [`arg`](#arg) as the <i>first and <b>only</b></i> [Neovim] argument
 
 ```
 nvim leetcode.nvim
