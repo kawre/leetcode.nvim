@@ -7,7 +7,7 @@ local M = {}
 
 local function update_cfg_auth(res)
     config.auth = res["userStatus"]
-    log.debug({ title = "user auth", body = config.auth })
+    log.debug(config.auth)
     return config.auth
 end
 

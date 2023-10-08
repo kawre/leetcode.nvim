@@ -21,7 +21,7 @@ function interpreter.listener(id, callback)
 
     local function listen()
         interpreter.check(id, function(item)
-            log.debug({ title = "interpreter check", body = item })
+            log.debug(item)
 
             if item.status_code then
                 noti:stop(item.status_msg, false)

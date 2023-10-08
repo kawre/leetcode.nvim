@@ -22,7 +22,7 @@ function runner:run(submit)
         typed_code = typed_code,
         question_id = question.q.id,
     }
-    log.debug({ title = "testcase run", body = body })
+    log.debug(body)
 
     local function callback(item) self:callback(item) end
 
