@@ -24,7 +24,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
 
 ## 📬 Requirements
 
-- [Neovim][neovim] >= 0.8
+- [Neovim][neovim]
 
 - [nvim-treesitter][nvim-treesitter]
 
@@ -39,29 +39,28 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/4647761c-609c-4b85-9396-5
 
 ## 📦 Installation
 
-- [packer.nvim][packer.nvim]
-
-```lua
-use {
-  "kawre/leetcode.nvim",
-  run = ":TSUpdate html",
-  requires = {
-    "nvim-treesitter/nvim-treesitter",
-    "nvim-telescope/telescope.nvim",
-    "MunifTanjim/nui.nvim",
-
-     - optional dependencies
-    "rcarriga/nvim-notify",
-    "nvim-tree/nvim-web-devicons",
-  },
-  config = function()
-    require('leetcode').setup({
-      -- configuration goes here
-    })
-  end,
-}
-```
-
+<!-- - [packer.nvim][packer.nvim] -->
+<!---->
+<!-- ```lua -->
+<!-- use { -->
+<!--   "kawre/leetcode.nvim", -->
+<!--   run = ":TSUpdate html", -->
+<!--   requires = { -->
+<!--     "nvim-treesitter/nvim-treesitter", -->
+<!--     "nvim-telescope/telescope.nvim", -->
+<!--     "MunifTanjim/nui.nvim", -->
+<!---->
+<!--      - optional dependencies -->
+<!--     "rcarriga/nvim-notify", -->
+<!--     "nvim-tree/nvim-web-devicons", -->
+<!--   }, -->
+<!--   config = function() -->
+<!--     require('leetcode').setup({ -->
+<!--       -- configuration goes here -->
+<!--     }) -->
+<!--   end, -->
+<!-- } -->
+<!-- ``` -->
 
 - [lazy.nvim][lazy.nvim]
 
@@ -72,6 +71,7 @@ use {
   dependencies = {
     "nvim-treesitter/nvim-treesitter",
     "nvim-telescope/telescope.nvim",
+    "nvim-lua/plenary.nvim", -- required by telescope
     "MunifTanjim/nui.nvim",
 
     -- optional dependencies
@@ -229,21 +229,31 @@ It is <b>required</b> to be <b>signed-in</b> to use [leetcode.nvim][leetcode.nvi
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/13594f1d-fff6-444b-b128-29c8cf83e97f
 
-## 🍴 Recipes
+<!-- ## 🍴 Recipes -->
+<!---->
+<!-- - Full lazy loading with [lazy.nvim] -->
+<!---->
+<!-- ```lua -->
+<!-- local usr_arg = "leetcode.nvim" -->
+<!---->
+<!-- { -->
+<!--     "kawre/leetcode.nvim", -->
+<!--     ... -->
+<!--     opts = { ..., arg = usr_arg, ... }, -->
+<!--     cond = function() return usr_arg == vim.fn.argv()[1] end, -->
+<!--     ... -->
+<!-- } -->
+<!-- ``` -->
 
-- Full lazy loading with [lazy.nvim]
+### Switching between questions
 
-```lua
-local usr_arg = "leetcode.nvim"
+When you open a new <b>question</b>, [leetcode.nvim] creates a new [tabpage] <i>containing
+all of the <b>contents</b> related to it</i>.
+To switch between these tabs, use [LcQuestionTabs](#📋-commands) command
 
-{
-    "kawre/leetcode.nvim",
-    ...
-    opts = { ..., arg = usr_arg, ... },
-    cond = function() return usr_arg == vim.fn.argv()[1] end,
-    ...
-}
-```
+https://github.com/kawre/leetcode.nvim/assets/69250723/b4407308-8c81-4b24-97e6-476f2da3b727
+
+[tabpage]: https://neovim.io/doc/user/tabpage.html
 
 ## 📋 Commands
 
@@ -251,7 +261,7 @@ local usr_arg = "leetcode.nvim"
 |--------------- | --------------- |
 | LcMenu | opens menu dashboard |
 | LcConsole | opens console for currently opened question |
-| LcQuestionList | opens a picker with all currently opened questions |
+| LcQuestionTabs | opens a picker with all currently opened question tabs |
 | LcLanguage | opens a picker to select a language for the current session |
 
 ## ✅ Todo

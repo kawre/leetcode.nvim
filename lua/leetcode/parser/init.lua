@@ -170,7 +170,6 @@ function parser:handle_link(text, tag_data)
 end
 
 function parser:handle_img(tag_data)
-    log.debug(tag_data)
     local tag = tag_data.tag
     if tag ~= "img" then return end
     local line = NuiLine()
@@ -227,7 +226,6 @@ end
 ---@param tags table
 function parser:rec_parse(node, tags)
     local tag_data = self:get_tag_data(node)
-    log.debug(self:get_text(node))
     ---handle img
     if tag_data and tag_data.tag == "img" then return self:handle_img(tag_data) end
 
