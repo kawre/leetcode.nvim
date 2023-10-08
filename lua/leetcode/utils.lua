@@ -51,8 +51,8 @@ function utils.get_current_questions()
         local bufs = vim.fn.tabpagebuflist(tabp)
 
         for _, bufnr in ipairs(bufs) do
-            if QUESTIONS[bufnr] then
-                table.insert(questions, { tabpage = tabp, question = QUESTIONS[bufnr] })
+            if _Lc_questions[bufnr] then
+                table.insert(questions, { tabpage = tabp, question = _Lc_questions[bufnr] })
             end
         end
     end

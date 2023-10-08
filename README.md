@@ -245,7 +245,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/13594f1d-fff6-444b-b128-2
 <!-- } -->
 <!-- ``` -->
 
-### Switching between questions
+### Working with multiple questions
 
 When you open a new <b>question</b>, [leetcode.nvim] creates a new [tabpage] <i>containing
 all of the <b>contents</b> related to it</i>.
@@ -263,6 +263,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b4407308-8c81-4b24-97e6-4
 | LcConsole | opens console for currently opened question |
 | LcQuestionTabs | opens a picker with all currently opened question tabs |
 | LcLanguage | opens a picker to select a language for the current session |
+| LcDescriptionToggle | toggle question description |
 
 ## ✅ Todo
 

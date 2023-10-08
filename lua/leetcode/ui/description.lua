@@ -17,6 +17,7 @@ local Split = require("nui.split")
 ---@field content any
 ---@field title any
 ---@field layout lc-ui.Layout
+---@field visible boolean
 local description = {}
 description.__index = description
 
@@ -31,12 +32,23 @@ function description:autocmds()
 end
 
 function description:mount()
+    self.visible = true
     self:populate()
     self.split:mount()
     self:draw()
 
     self:autocmds()
     return self
+end
+
+function description:toggle()
+    if self.visible then
+        self.split:hide()
+    else
+        self.split:show()
+    end
+
+    self.visible = not self.visible
 end
 
 function description:draw()
@@ -136,6 +148,7 @@ function description:init(parent)
         split = split,
         parent = parent,
         layout = {},
+        visible = false,
     }, self)
 
     vim.api.nvim_buf_set_name(obj.split.bufnr, string.format("Description(%s)", parent.q.title))

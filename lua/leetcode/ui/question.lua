@@ -18,9 +18,9 @@ local question = {}
 question.__index = question
 
 ---@type table<integer, lc.Question>
-QUESTIONS = {}
+_Lc_questions = {}
 ---@type integer
-CURR_QUESTION = 0
+_Lc_curr_question = 0
 
 ---@private
 function question:create_file()
@@ -45,11 +45,11 @@ function question:mount()
 
     vim.api.nvim_set_current_dir(self.file:parent().filename)
     vim.cmd("$tabe " .. self.file:absolute())
-    TABPAGE = vim.api.nvim_get_current_tabpage()
+    _Lc_tabpage = vim.api.nvim_get_current_tabpage()
 
     self.bufnr = vim.api.nvim_get_current_buf()
-    CURR_QUESTION = self.bufnr
-    QUESTIONS[CURR_QUESTION] = self
+    _Lc_curr_question = self.bufnr
+    _Lc_questions[_Lc_curr_question] = self
 
     self.description = Description:init(self)
     self.console = Console:init(self)
@@ -68,7 +68,7 @@ function question:autocmds()
 
             local tabpage = vim.api.nvim_get_current_tabpage()
             for _, q in ipairs(questions) do
-                if q.tabpage == tabpage then CURR_QUESTION = q.question.bufnr end
+                if q.tabpage == tabpage then _Lc_curr_question = q.question.bufnr end
             end
         end,
     })

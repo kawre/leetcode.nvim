@@ -45,6 +45,7 @@ local function setup_cmds()
     vim.api.nvim_create_user_command("LcMenu", function() cmd.menu() end, {})
     vim.api.nvim_create_user_command("LcQuestionTabs", function() cmd.list_questions() end, {})
     vim.api.nvim_create_user_command("LcLanguage", function() cmd.prompt_lang() end, {})
+    vim.api.nvim_create_user_command("LcDescriptionToggle", function() cmd.desc_toggle() end, {})
 end
 
 local function start()
