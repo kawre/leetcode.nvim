@@ -56,9 +56,9 @@ end
 function spinner:set(msg, lvl, opts)
     if msg then self:update(msg) end
     lvl = lvl or vim.log.levels.INFO
-    opts = vim.tbl_deep_extend("force", {
+
+    opts = vim.tbl_deep_extend("force", self.noti and { replace = self.noti } or {}, {
         hide_from_history = true,
-        replace = self.noti,
         title = config.name,
         timeout = false,
     }, opts or {})
@@ -98,7 +98,7 @@ function spinner:init(msg, spinner_type)
         msg = msg or "",
         index = 0,
         spinner = spinners[spinner_type or "dot"],
-        noti = {},
+        noti = nil,
     }, self)
 
     return obj:start()
