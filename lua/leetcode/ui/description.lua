@@ -1,5 +1,3 @@
-local log = require("leetcode.logger")
-
 local config = require("leetcode.config")
 local parser = require("leetcode.parser")
 
@@ -7,7 +5,6 @@ local Layout = require("leetcode-ui.layout")
 local Text = require("leetcode-ui.component.text")
 local padding = require("leetcode-ui.component.padding")
 
-local NuiText = require("nui.text")
 local NuiLine = require("nui.line")
 local Split = require("nui.split")
 

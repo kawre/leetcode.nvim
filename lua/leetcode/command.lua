@@ -1,5 +1,4 @@
 local log = require("leetcode.logger")
-local config = require("leetcode.config")
 
 ---@class lc.Commands
 local cmd = {}
@@ -110,5 +109,17 @@ function cmd.question_tabs() require("leetcode.pickers.question-tabs").pick() en
 function cmd.change_lang() require("leetcode.pickers.language").pick() end
 
 function cmd.desc_toggle() _Lc_questions[_Lc_curr_question].description:toggle() end
+
+function cmd.q_run()
+    local q = _Lc_questions[_Lc_curr_question]
+    if not q then return log.warn("No current question found") end
+    q.console:run()
+end
+
+function cmd.q_submit()
+    local q = _Lc_questions[_Lc_curr_question]
+    if not q then return log.warn("No current question found") end
+    q.console:submit()
+end
 
 return cmd

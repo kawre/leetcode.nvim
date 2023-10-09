@@ -45,29 +45,6 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 
 ## 📦 Installation
 
-<!-- - [packer.nvim][packer.nvim] -->
-<!---->
-<!-- ```lua -->
-<!-- use { -->
-<!--   "kawre/leetcode.nvim", -->
-<!--   run = ":TSUpdate html", -->
-<!--   requires = { -->
-<!--     "nvim-treesitter/nvim-treesitter", -->
-<!--     "nvim-telescope/telescope.nvim", -->
-<!--     "MunifTanjim/nui.nvim", -->
-<!---->
-<!--      - optional dependencies -->
-<!--     "rcarriga/nvim-notify", -->
-<!--     "nvim-tree/nvim-web-devicons", -->
-<!--   }, -->
-<!--   config = function() -->
-<!--     require('leetcode').setup({ -->
-<!--       -- configuration goes here -->
-<!--     }) -->
-<!--   end, -->
-<!-- } -->
-<!-- ``` -->
-
 - [lazy.nvim][lazy.nvim]
 
 ```lua
@@ -89,15 +66,6 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
     opts = {
         -- configuration goes here
     },
-    config = function(_, opts)
-        vim.keymap.set("n", "<leader>lq", "<cmd>LcQuestionTabs<cr>")
-        vim.keymap.set("n", "<leader>lm", "<cmd>LcMenu<cr>")
-        vim.keymap.set("n", "<leader>lc", "<cmd>LcConsole<cr>")
-        vim.keymap.set("n", "<leader>ll", "<cmd>LcLanguage<cr>")
-        vim.keymap.set("n", "<leader>ld", "<cmd>LcDescriptionToggle<cr>")
-
-        require("leetcode").setup(opts)
-    end,
 }
 ```
 
@@ -269,11 +237,14 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/64378b0f-c5ba-4378-b9ff-a
 
 | command             | description                                                 |
 | ------------------- | ----------------------------------------------------------- |
+| LcList              | opens a problem list picker                                 |
 | LcMenu              | opens menu dashboard                                        |
 | LcConsole           | opens console for currently opened question                 |
 | LcQuestionTabs      | opens a picker with all currently opened question tabs      |
 | LcLanguage          | opens a picker to select a language for the current session |
 | LcDescriptionToggle | toggle question description                                 |
+| LcRun               | run currently opened question                               |
+| LcSubmit            | submit currently opened question                            |
 
 ## ✅ Todo
 
