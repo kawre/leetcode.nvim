@@ -22,79 +22,85 @@ setmetatable(result, console_popup)
 ---@param hi string
 function result:set_popup_border_hi(hi) self.popup.border:set_highlight(hi) end
 
+function result:handle_accepted(item)
+    local function perc_hi(perc) return perc >= 50 and "LeetCodeOk" or "LeetCodeError" end
+    local group = Group:init({ opts = { spacing = 2 } })
+
+    local header = Text:init()
+    header:append(item._.title, item._.hl)
+    group:append(header)
+
+    -- runtime
+    local status_runtime = NuiLine()
+    local runtime_ms = item.display_runtime or vim.split(item.status_runtime, " ")[1] or "NIL"
+    status_runtime:append(runtime_ms)
+    status_runtime:append(" ms", "Comment")
+
+    local perc_runtime = NuiLine()
+    perc_runtime:append(
+        "Beats " .. string.format("%.2f", item.runtime_percentile) .. "% ",
+        perc_hi(item.runtime_percentile)
+    )
+    perc_runtime:append("of users with " .. item.pretty_lang)
+
+    local runtime = Pre:init(NuiText("󰓅 Runtime", "LeetCodeNormal"), {
+        status_runtime,
+        perc_runtime,
+    })
+    group:append(runtime)
+
+    -- memory
+    local status_memory = NuiLine()
+    local s_mem = vim.split(item.status_memory, " ")
+    status_memory:append(s_mem[1] .. " ")
+    status_memory:append(s_mem[2], "Comment")
+
+    local perc_mem = NuiLine()
+    perc_mem:append(
+        "Beats " .. string.format("%.2f", item.memory_percentile) .. "% ",
+        perc_hi(item.memory_percentile)
+    )
+    perc_mem:append("of users with " .. item.pretty_lang)
+
+    local memory = Pre:init(NuiText("󰍛 Memory", "LeetCodeNormal"), {
+        status_memory,
+        perc_mem,
+    })
+    group:append(memory)
+
+    self.layout:append(group)
+end
+
 ---@private
 ---
 ---@param item lc.runtime
 function result:handle_runtime(item) -- status code = 10
+    if item._.submission then return self:handle_accepted(item) end
+
     local group = Group:init({ opts = { spacing = 1 } })
     local header = Text:init()
-    local is_submission = item.runtime_percentile ~= vim.NIL and item.memory_percentile ~= vim.NIL
 
-    if not is_submission then
-        local h = NuiLine()
-        h:append(item.lcnvim_title, item.lcnvim_hl)
-        h:append(" | ")
-        h:append("Runtime: " .. item.status_runtime, "Comment")
-        header:append(h)
-        group:append(header)
+    local h = NuiLine()
+    h:append(item._.title, item._.hl)
+    h:append(" | ")
+    h:append("Runtime: " .. item.status_runtime, "Comment")
+    header:append(h)
+    group:append(header)
 
-        for i, answer in ipairs(item.code_answer) do
-            local passed = item.compare_result:sub(i, i) == "1"
+    for i, answer in ipairs(item.code_answer) do
+        local passed = item.compare_result:sub(i, i) == "1"
 
-            local text = Case:init(
-                i,
-                self.parent.testcase.testcases[i],
-                answer,
-                item.expected_code_answer[i],
-                passed
-            )
-            group:append(text)
-
-            local stdout = Stdout:init(item.std_output_list[i])
-            if stdout then group:append(stdout) end
-        end
-    else
-        local function perc_hi(perc) return perc >= 50 and "LeetCodeOk" or "LeetCodeError" end
-
-        header:append(item.lcnvim_title, item.lcnvim_hl)
-        group:append(header)
-
-        local status_runtime = NuiLine()
-        local runtime_ms = item.display_runtime or vim.split(item.status_runtime, " ")[1] or "NIL"
-        status_runtime:append(runtime_ms)
-        status_runtime:append(" ms", "Comment")
-
-        local perc_runtime = NuiLine()
-        perc_runtime:append(
-            "Beats " .. string.format("%.2f", item.runtime_percentile) .. "% ",
-            perc_hi(item.runtime_percentile)
+        local text = Case:init(
+            i,
+            self.parent.testcase.testcases[i],
+            answer,
+            item.expected_code_answer[i],
+            passed
         )
-        perc_runtime:append("of users with " .. item.pretty_lang)
+        group:append(text)
 
-        local runtime = Pre:init(NuiText("󰓅 Runtime"), {
-            status_runtime,
-            perc_runtime,
-        })
-
-        local status_memory = NuiLine()
-        local s_mem = vim.split(item.status_memory, " ")
-        status_memory:append(s_mem[1] .. " ")
-        status_memory:append(s_mem[2], "Comment")
-
-        local perc_mem = NuiLine()
-        perc_mem:append(
-            "Beats " .. string.format("%.2f", item.memory_percentile) .. "% ",
-            perc_hi(item.memory_percentile)
-        )
-        perc_mem:append("of users with " .. item.pretty_lang)
-
-        local memory = Pre:init(NuiText("󰍛 Memory"), {
-            status_memory,
-            perc_mem,
-        })
-
-        group:append(runtime)
-        group:append(memory)
+        local stdout = Stdout:init(item.std_output_list[i])
+        if stdout then group:append(stdout) end
     end
 
     self.layout:append(group)
@@ -104,24 +110,24 @@ end
 ---
 ---@param item lc.submission
 function result:handle_submission(item) -- status code = 11
+    local group = Group:init({ opts = { spacing = 1 } })
+
     local header = NuiLine()
-    header:append(item.lcnvim_title, item.lcnvim_hl)
+    header:append(item._.title, item._.hl)
     header:append(" | ")
     local testcases =
         string.format("%d/%d testcases passed", item.total_correct, item.total_testcases)
     header:append(testcases, "Comment")
+    group:append(Text:init({ lines = { header } }))
 
-    self.layout:append(Text:init({ lines = { header, NuiLine() } }))
-
-    local group = Group:init({ opts = { spacing = 1 } })
     local text = Case:init(
         item.total_correct + 1,
         item.input_formatted,
         item.code_output,
         item.expected_output
     )
-
     group:append(text)
+
     if item.std_output then
         local stdout = Stdout:init(item.std_output)
         if stdout then group:append(stdout) end
@@ -145,7 +151,7 @@ function result:handle_limit_exceeded(item) -- status code = 14
         last_testcase:append(item.last_testcase:gsub("\n", " "), "LeetCodeIndent")
 
         local pre_header = NuiLine()
-        pre_header:append(" Last Executed Input", "")
+        pre_header:append(" Last Executed Input", "LeetCodeNormal")
 
         local last_exec = Pre:init(pre_header, { last_testcase })
         group:append(last_exec)
@@ -179,17 +185,22 @@ function result:handle_runtime_error(item) -- status code = 15
 end
 
 function result:handle_internal_error(item) -- status code = 16
-    local header = NuiLine()
-    header:append(item.lcnvim_title, item.lcnvim_hl)
+    local group = Group:init({ opts = { spacing = 1 } })
 
+    local header = NuiLine()
+    header:append(item._.title, item._.hl)
     local text = Text:init({ lines = { header } })
-    self.layout:append(text)
+    group:append(text)
+
+    self.layout:append(group)
 end
 
 ---@private
 ---
 ---@param item lc.compile_error
 function result:handle_compile_error(item) -- status code = 20
+    local group = Group:init({ opts = { spacing = 1 } })
+
     local header = NuiLine()
     header:append(item._.title, item._.hl)
 
@@ -198,7 +209,8 @@ function result:handle_compile_error(item) -- status code = 20
         table.insert(t, NuiLine():append(line, "LeetCodeError"))
     end
 
-    self.layout:append(Pre:init(header, t))
+    group:append(Pre:init(header, t))
+    self.layout:append(group)
 end
 
 ---@param item lc.interpreter_response
@@ -208,17 +220,18 @@ function result:handle_item(item)
     local success = false
     if item.status_code == 10 then
         success = item.compare_result:match("^[1]+$") and true or false
+        item.status_msg = success and "Accepted" or "Wrong Answer"
     end
+
     local submission = not item.submission_id:find("runcode") and true or false
     local hl = success and "LeetCodeOk" or "LeetCodeError"
 
     item._ = {
-        title = item.status_msg,
+        title = " " .. item.status_msg,
         hl = hl,
         success = success,
         submission = submission,
     }
-    log.info(item)
 
     return item
 end

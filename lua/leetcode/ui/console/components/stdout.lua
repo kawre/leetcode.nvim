@@ -9,7 +9,10 @@ local stdout = {}
 ---
 ---@return lc-ui.Text | nil
 function stdout:init(output)
+    output = output or ""
     local output_list = vim.split(output, "\n", { trimempty = true })
+
+    if vim.tbl_isempty(output_list) then return end
 
     local t = {}
     for i = 1, #output_list, 1 do
