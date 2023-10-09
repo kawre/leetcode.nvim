@@ -151,7 +151,7 @@ function description:init(parent)
         visible = false,
     }, self)
 
-    vim.api.nvim_buf_set_name(obj.split.bufnr, string.format("Description(%s)", parent.q.title))
+    -- vim.api.nvim_buf_set_name(obj.split.bufnr, string.format("Description(%s)", parent.q.title))
 
     return obj:mount()
 end

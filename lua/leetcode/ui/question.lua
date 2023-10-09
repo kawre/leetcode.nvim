@@ -86,6 +86,12 @@ end
 
 ---@param problem lc.Cache.Question
 function question:init(problem)
+    local tabp = utils.detect_duplicate_question(problem.title_slug, config.lang)
+    if tabp then
+        pcall(vim.cmd.tabnext, tabp)
+        return log.info("Question already opened")
+    end
+
     local q = api_question.by_title_slug(problem.title_slug)
     local lang = config.lang
 

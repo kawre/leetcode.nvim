@@ -44,6 +44,16 @@ function utils.map(mode, lhs, rhs, opts)
     vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 
+function utils.detect_duplicate_question(title_slug, lang)
+    local tabs = utils.get_current_question_tabs()
+
+    for _, q in ipairs(tabs) do
+        if title_slug == q.question.q.title_slug and lang == q.question.lang then
+            return q.tabpage
+        end
+    end
+end
+
 function utils.get_current_question_tabs()
     ---@class lc.Question.Tab
     ---@field tabpage integer
