@@ -194,9 +194,10 @@ description = {
 
 ## 📋 Commands
 
+<!-- | LcList              | opens a problem list picker                                 | -->
+
 | command             | description                                                 |
 | ------------------- | ----------------------------------------------------------- |
-| LcList              | opens a problem list picker                                 |
 | LcMenu              | opens menu dashboard                                        |
 | LcConsole           | opens console for currently opened question                 |
 | LcQuestionTabs      | opens a picker with all currently opened question tabs      |

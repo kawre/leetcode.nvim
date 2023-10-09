@@ -41,7 +41,7 @@ end
 local function setup_cmds()
     local cmd = require("leetcode.command")
 
-    vim.api.nvim_create_user_command("LcList", function() cmd.problems() end, {})
+    -- vim.api.nvim_create_user_command("LcList", function() cmd.problems() end, {})
     vim.api.nvim_create_user_command("LcConsole", function() cmd.console() end, {})
     vim.api.nvim_create_user_command("LcMenu", function() cmd.menu() end, {})
     vim.api.nvim_create_user_command("LcQuestionTabs", function() cmd.question_tabs() end, {})
