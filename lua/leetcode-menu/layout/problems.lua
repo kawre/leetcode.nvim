@@ -16,10 +16,12 @@ local random_btn = Button:init(
     function() cmd.random_question() end
 )
 
-local qot_btn = Button:init(
-    { src = "Daily Question", icon = "󰃭" },
-    "t",
-    function() cmd.qot() end
+local qot_btn = Button:init({ src = "Daily", icon = "󰃭" }, "t", function() cmd.qot() end)
+
+local lang_btn = Button:init(
+    { src = "Language", icon = "󰢱" },
+    "l",
+    function() cmd.prompt_lang() end
 )
 
 local back_btn = Button:init(
@@ -42,6 +44,7 @@ return Layout:init({
                 list_btn,
                 random_btn,
                 qot_btn,
+                lang_btn,
                 back_btn,
             },
         }),

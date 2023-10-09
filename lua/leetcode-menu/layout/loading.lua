@@ -5,7 +5,7 @@ local Buttons = require("leetcode-menu.components.buttons")
 local button = require("leetcode-ui.component.button")
 local Title = require("leetcode-menu.components.title")
 
-local problems = button:init({ icon = "", src = "" }, "", function() end)
+local problems = button:init({ icon = "", src = "" }, nil, function() end)
 local title = Title:init("Loading...")
 
 return Layout:init({

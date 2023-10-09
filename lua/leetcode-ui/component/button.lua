@@ -11,7 +11,7 @@ setmetatable(button, component)
 ---@field src string
 
 --- @param text lc-ui.Button.text
---- @param sc string
+--- @param sc string|nil
 --- @param on_press function? optional
 --- @param expandable boolean? optional
 --- @param keybind string? optional
@@ -22,6 +22,7 @@ function button:init(text, sc, on_press, expandable, keybind, keybind_opts)
         on_press = on_press or function() end,
         sc = sc,
     }
+    sc = sc and "" or ""
     -- log.debug(opts)
 
     local width = 50
@@ -34,8 +35,7 @@ function button:init(text, sc, on_press, expandable, keybind, keybind_opts)
     local line = NuiLine()
     line:append(txt)
     line:append(padding)
-    -- line:append(sc, "LeetCodeInfo")
-    line:append("", "LeetCodeInfo")
+    line:append(sc, "LeetCodeInfo")
 
     local obj = setmetatable({
         opts = opts,
