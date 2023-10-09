@@ -57,7 +57,7 @@ function interpreter.interpret_solution(title_slug, body, callback)
 
     local url = string.format(config.domain .. "/problems/%s/interpret_solution/", title_slug)
 
-    ---@type boolean, submission
+    ---@type boolean, lc.submission
     local ok, res = pcall(utils.post, url, body)
     if not ok then return end
 
@@ -69,7 +69,7 @@ function interpreter.submit(title_slug, body, callback)
 
     local url = string.format(config.domain .. "/problems/%s/submit/", title_slug)
 
-    ---@type boolean, submission
+    ---@type boolean, lc.submission
     local ok, res = pcall(utils.post, url, body)
     if not ok then return end
 

@@ -24,23 +24,15 @@ function result:set_popup_border_hi(hi) self.popup.border:set_highlight(hi) end
 
 ---@private
 ---
----@param item runtime
+---@param item lc.runtime
 function result:handle_runtime(item) -- status code = 10
-    local hi = item.total_correct == item.total_testcases and "LeetCodeOk" or "LeetCodeError"
-    self:set_popup_border_hi(hi)
-
-    ---submission result
-    local is_sub_res = item.runtime_percentile ~= vim.NIL and item.memory_percentile ~= vim.NIL
     local group = Group:init({ opts = { spacing = 1 } })
-
-    local function perc_hi(perc) return perc >= 50 and "LeetCodeOk" or "LeetCodeError" end
-
     local header = Text:init()
+    local is_submission = item.runtime_percentile ~= vim.NIL and item.memory_percentile ~= vim.NIL
 
-    if not is_sub_res then
+    if not is_submission then
         local h = NuiLine()
-        local status_msg = item.compare_result:match("^[1]+$") and "Accepted" or "Wrong Answer"
-        h:append(status_msg, hi)
+        h:append(item.lcnvim_title, item.lcnvim_hl)
         h:append(" | ")
         h:append("Runtime: " .. item.status_runtime, "Comment")
         header:append(h)
@@ -58,11 +50,13 @@ function result:handle_runtime(item) -- status code = 10
             )
             group:append(text)
 
-            local stdout = Stdout:init(i, item)
+            local stdout = Stdout:init(item.std_output_list[i])
             if stdout then group:append(stdout) end
         end
     else
-        header:append(item.status_msg, hi)
+        local function perc_hi(perc) return perc >= 50 and "LeetCodeOk" or "LeetCodeError" end
+
+        header:append(item.lcnvim_title, item.lcnvim_hl)
         group:append(header)
 
         local status_runtime = NuiLine()
@@ -108,15 +102,11 @@ end
 
 ---@private
 ---
----@param item submission
+---@param item lc.submission
 function result:handle_submission(item) -- status code = 11
-    self:set_popup_border_hi("LeetCodeError")
-
     local header = NuiLine()
-    header:append(item.status_msg, "LeetCodeError")
-
+    header:append(item.lcnvim_title, item.lcnvim_hl)
     header:append(" | ")
-
     local testcases =
         string.format("%d/%d testcases passed", item.total_correct, item.total_testcases)
     header:append(testcases, "Comment")
@@ -132,9 +122,8 @@ function result:handle_submission(item) -- status code = 11
     )
 
     group:append(text)
-    item.std_output_list = vim.split(item.std_output, "\n", { trimempty = true })
-    if not vim.tbl_isempty(item.std_output_list) then
-        local stdout = Stdout:init(1, item)
+    if item.std_output then
+        local stdout = Stdout:init(item.std_output)
         if stdout then group:append(stdout) end
     end
 
@@ -143,26 +132,42 @@ end
 
 ---@private
 ---
----@param item limit_exceeded_error
+---@param item lc.limit_exceeded_error
 function result:handle_limit_exceeded(item) -- status code = 14
-    self:set_popup_border_hi("LeetCodeError")
+    local group = Group:init({ opts = { spacing = 1 } })
 
     local header = NuiLine()
-    header:append(item.status_msg, "LeetCodeError")
+    header:append(item._.title, item._.hl)
+    group:append(Text:init({ lines = { header } }))
 
-    self.layout:append(Text:init({ lines = { header, NuiLine() } }))
-    local stdout = Stdout:init(1, item)
-    if stdout then self.layout:append(stdout) end
+    if item._.submission then
+        local last_testcase = NuiLine()
+        last_testcase:append(item.last_testcase:gsub("\n", " "), "LeetCodeIndent")
+
+        local pre_header = NuiLine()
+        pre_header:append(" Last Executed Input", "")
+
+        local last_exec = Pre:init(pre_header, { last_testcase })
+        group:append(last_exec)
+
+        if item.std_output ~= "" then
+            local stdout = Stdout:init(item.std_output)
+            if stdout then group:append(stdout) end
+        end
+    elseif item.std_output_list[1] ~= "" then
+        local stdout = Stdout:init(item.std_output_list[1])
+        if stdout then group:append(stdout) end
+    end
+
+    self.layout:append(group)
 end
 
 ---@private
 ---
----@param item runtime_error
+---@param item lc.runtime_error
 function result:handle_runtime_error(item) -- status code = 15
-    self:set_popup_border_hi("LeetCodeError")
-
     local header = NuiLine()
-    header:append("Invalid Testcase", "LeetCodeError")
+    header:append(item._.title, item._.hl)
 
     local t = {}
     for line in vim.gsplit(item.full_runtime_error, "\n") do
@@ -175,7 +180,7 @@ end
 
 function result:handle_internal_error(item) -- status code = 16
     local header = NuiLine()
-    header:append(item.status_msg, "LeetCodeError")
+    header:append(item.lcnvim_title, item.lcnvim_hl)
 
     local text = Text:init({ lines = { header } })
     self.layout:append(text)
@@ -183,12 +188,10 @@ end
 
 ---@private
 ---
----@param item compile_error
+---@param item lc.compile_error
 function result:handle_compile_error(item) -- status code = 20
-    self:set_popup_border_hi("LeetCodeError")
-
     local header = NuiLine()
-    header:append(item.status_msg, "LeetCodeError")
+    header:append(item._.title, item._.hl)
 
     local t = {}
     for line in vim.gsplit(item.full_compile_error, "\n") do
@@ -198,69 +201,82 @@ function result:handle_compile_error(item) -- status code = 20
     self.layout:append(Pre:init(header, t))
 end
 
----@param item interpreter_response
-function result:handle(item)
-    self.layout:clear()
-    local status_code = item.status_code
+---@param item lc.interpreter_response
+---
+---@return lc.interpreter_response
+function result:handle_item(item)
+    local success = false
+    if item.status_code == 10 then
+        success = item.compare_result:match("^[1]+$") and true or false
+    end
+    local submission = not item.submission_id:find("runcode") and true or false
+    local hl = success and "LeetCodeOk" or "LeetCodeError"
 
-    log.debug(status_code)
+    item._ = {
+        title = item.status_msg,
+        hl = hl,
+        success = success,
+        submission = submission,
+    }
+    log.info(item)
+
+    return item
+end
+
+---@param item lc.interpreter_response
+function result:handle(item)
+    log.debug(item)
+
+    self.layout:clear()
+    item = self:handle_item(item)
+    self:set_popup_border_hi(item._.hl)
 
     local handlers = {
         -- runtime
         [10] = function()
-            self:handle_runtime(item --[[@as runtime]])
+            self:handle_runtime(item --[[@as lc.runtime]])
         end,
         [11] = function()
-            self:handle_submission(item --[[@as submission]])
+            self:handle_submission(item --[[@as lc.submission]])
         end,
 
         -- time limit
         [13] = function()
-            self:handle_limit_exceeded(item --[[@as limit_exceeded_error]])
+            self:handle_limit_exceeded(item --[[@as lc.limit_exceeded_error]])
         end,
         [14] = function()
-            self:handle_limit_exceeded(item --[[@as limit_exceeded_error]])
+            self:handle_limit_exceeded(item --[[@as lc.limit_exceeded_error]])
         end,
 
         -- runtime error
         [15] = function()
-            self:handle_runtime_error(item --[[@as runtime_error]])
+            self:handle_runtime_error(item --[[@as lc.runtime_error]])
         end,
 
         -- internal error
         [16] = function()
-            self:handle_internal_error(item --[[@as internal_error]])
+            self:handle_internal_error(item --[[@as lc.internal_error]])
         end,
 
         -- compiler
         [20] = function()
-            self:handle_compile_error(item --[[@as compile_error]])
+            self:handle_compile_error(item --[[@as lc.compile_error]])
         end,
 
         -- unknown
         ["unknown"] = function() log.error("unknown runner status code: " .. item.status_code) end,
-    }
+    };
 
-    if not handlers[status_code] then log.debug(status_code) end
-    (handlers[status_code] or handlers["unknown"])()
-
+    (handlers[item.status_code] or handlers["unknown"])()
     self:draw()
 end
 
 function result:clear()
     self.layout:clear()
     self.popup.border:set_highlight("FloatBorder")
-
-    -- local bufnr = self.popup.bufnr
-    -- local modi = vim.api.nvim_buf_get_option(bufnr, "modifiable")
-    -- if not modi then vim.api.nvim_buf_set_option(bufnr, "modifiable", true) end
-    -- vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
-    -- if not modi then vim.api.nvim_buf_set_option(bufnr, "modifiable", false) end
 end
 
 function result:draw() self.layout:draw(self.popup) end
-
--- function result:redraw() self.layout:draw() end
 
 ---@param parent lc.Console
 ---

@@ -139,10 +139,6 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
             height = "75%", ---@type string | integer
         },
         dir = "row", ---@type "col" | "row"
-
-        result = {
-            max_stdout_length = 200, ---@type integer
-        },
     },
 
     description = {
@@ -215,10 +211,6 @@ console = {
         height = "75%", ---@type string | integer
     },
     dir = "row", ---@type "col" | "row"
-
-    result = {
-        max_stdout_length = 200, ---@type integer
-    },
 }
 ```
 

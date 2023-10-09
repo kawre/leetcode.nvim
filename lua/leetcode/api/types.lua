@@ -2,7 +2,7 @@
 ---@field interpret_id string
 ---@field test_case string
 
----@alias submission lc.Interpreter.Submission
+---@alias lc.submission lc.Interpreter.Submission
 
 ---@alias interpret.state
 ---| "PENDING"
@@ -64,7 +64,7 @@
 ---@field status_msg string
 ---@field state string
 
----@alias runtime_error lc.Interpreter.Response.runtime_error
+---@alias lc.runtime_error lc.Interpreter.Response.runtime_error
 
 --------------------------------------------
 --- Runtime | 10
@@ -104,8 +104,11 @@
 ---@field submission_id string
 ---@field status_msg string
 ---@field state string
+---@field lcnvim_is_submission boolean
+---@field lcnvim_title string
+---@field lcnvim_hl string
 
----@alias runtime lc.Interpreter.Response.runtime
+---@alias lc.runtime lc.Interpreter.Response.runtime
 
 --------------------------------------------
 --- Compile Error | 20
@@ -133,34 +136,63 @@
 ---@field status_msg string
 ---@field state string
 
----@alias compile_error lc.Interpreter.Response.compile_error
+---@alias lc.compile_error lc.Interpreter.Response.compile_error
 
 --------------------------------------------
 --- Time Limit Exceeded | 13, 14
 --------------------------------------------
+-- -@class lc.Interpreter.Response.limit.exceeded
+-- -@field code_answer table
+-- -@field code_output table
+-- -@field elapsed_time integer
+-- -@field lang string
+-- -@field memory number
+-- -@field memory_percentile number | nil
+-- -@field pretty_lang string
+-- -@field run_success boolean
+-- -@field runtime_percentile number | nil
+-- -@field state string
+-- -@field status_code number
+-- -@field status_memory string
+-- -@field status_msg string
+-- -@field status_runtime string
+-- -@field std_output_list table
+-- -@field std_output string
+-- -@field submission_id string
+-- -@field task_finish_time number
+-- -@field task_name string
+-- -@field total_correct number | nil
+-- -@field total_testcases number | nil
+
 ---@class lc.Interpreter.Response.limit.exceeded
+---@field status_code number
+---@field lang string
+---@field run_success boolean
+---@field status_runtime string
+---@field memory number
 ---@field code_answer table
 ---@field code_output table
----@field elapsed_time integer
----@field lang string
----@field memory number
----@field memory_percentile number | nil
----@field pretty_lang string
----@field run_success boolean
----@field runtime_percentile number | nil
----@field state string
----@field status_code number
----@field status_memory string
----@field status_msg string
----@field status_runtime string
 ---@field std_output_list table
----@field submission_id string
+---@field std_output string
 ---@field task_finish_time number
 ---@field task_name string
 ---@field total_correct number | nil
 ---@field total_testcases number | nil
+---@field runtime_percentile number | nil
+---@field status_memory string
+---@field memory_percentile number | nil
+---@field pretty_lang string
+---@field submission_id string
+---@field status_msg string
+---@field state string
+---@field compare_result string | nil
+---@field question_id string | nil
+---@field elapsed_time number | nil
+---@field last_testcase string | nil
+---@field expected_output string | nil
+---@field finished boolean | nil
 
----@alias limit_exceeded_error lc.Interpreter.Response.limit.exceeded
+---@alias lc.limit_exceeded_error lc.Interpreter.Response.limit.exceeded
 
 --------------------------------------------
 --- Time Limit Exceeded | 13, 14
@@ -170,17 +202,17 @@
 ---@field status_msg string
 ---@field state interpret.state
 
----@alias internal_error lc.Interpreter.Response.internal.error
+---@alias lc.internal_error lc.Interpreter.Response.internal.error
 
 --------------------------------------------
 --- Interpreter responses
 --------------------------------------------
----@alias interpreter_response
----| runtime
----| runtime_error
----| compile_error
----| limit_exceeded_error
----| internal_error
+---@alias lc.interpreter_response
+---| lc.runtime
+---| lc.runtime_error
+---| lc.compile_error
+---| lc.limit_exceeded_error
+---| lc.internal_error
 
 --------------------------------------------
 --- Code snipppet
@@ -283,4 +315,4 @@
 ---@field status_msg string
 ---@field state string
 
----@alias submission lc.Interpreter.Response.submission
+---@alias lc.submission lc.Interpreter.Response.submission

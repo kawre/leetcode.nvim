@@ -35,7 +35,7 @@ function runner:run(submit)
 end
 
 ---@private
----@param item interpreter_response
+---@param item lc.interpreter_response
 function runner:callback(item) self.question.console.result:handle(item) end
 
 ---@param question lc.Question

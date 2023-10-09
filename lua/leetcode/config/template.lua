@@ -55,10 +55,6 @@ local M = {
             height = "75%", ---@type string | integer
         },
         dir = "row", ---@type "col" | "row"
-
-        result = {
-            max_stdout_length = 200, ---@type integer
-        },
     },
 
     description = {
