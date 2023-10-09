@@ -1,4 +1,4 @@
-local cmd = require("leetcode.api.command")
+local cmd = require("leetcode.command")
 
 local Title = require("leetcode-menu.components.title")
 local Footer = require("leetcode-menu.components.footer")
@@ -21,7 +21,7 @@ local qot_btn = Button:init({ src = "Daily", icon = "󰃭" }, "t", function() cm
 local lang_btn = Button:init(
     { src = "Language", icon = "󰢱" },
     "l",
-    function() cmd.prompt_lang() end
+    function() cmd.change_lang() end
 )
 
 local back_btn = Button:init(

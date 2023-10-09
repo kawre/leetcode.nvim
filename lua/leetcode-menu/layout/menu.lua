@@ -1,7 +1,7 @@
 local log = require("leetcode.logger")
 local Layout = require("leetcode-ui.layout")
 local Title = require("leetcode-menu.components.title")
-local cmd = require("leetcode.api.command")
+local cmd = require("leetcode.command")
 local Buttons = require("leetcode-menu.components.buttons")
 
 local button = require("leetcode-ui.component.button")

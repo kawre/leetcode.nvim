@@ -31,7 +31,7 @@ function utils.strip_html_tag(str, tag)
 end
 
 ---@param fn string
-function utils.cmd(fn) return string.format("<cmd>lua require('leetcode.api.command').%s()<cr>", fn) end
+function utils.cmd(fn) return string.format("<cmd>lua require('leetcode.command').%s()<cr>", fn) end
 
 ---map a key in mode
 ---@param mode string | "'n'" | "'v'" | "'x'" | "'s'" | "'o'" | "'!'" | "'i'" | "'l'" | "'c'" | "'t'" | "''"

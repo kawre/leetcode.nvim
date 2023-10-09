@@ -37,8 +37,6 @@ local function display_user_status(question)
     local user_status = {
         ac = { "", "LeetCodeEasy" },
         notac = { "󱎖", "LeetCodeMedium" },
-        -- AC = "",
-        -- TRIED = "",
     }
 
     if question.status == vim.NIL then return { "" } end

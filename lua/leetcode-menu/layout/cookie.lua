@@ -5,7 +5,7 @@ local Footer = require("leetcode-menu.components.footer")
 local Buttons = require("leetcode-menu.components.buttons")
 local Layout = require("leetcode-ui.layout")
 
-local cmd = require("leetcode.api.command")
+local cmd = require("leetcode.command")
 
 local update_btn = Button:init(
     { icon = "󱛬", src = "Update" },
