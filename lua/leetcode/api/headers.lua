@@ -1,4 +1,3 @@
-local log = require("leetcode.logger")
 local cookie = require("leetcode.cache.cookie")
 
 local headers = {}

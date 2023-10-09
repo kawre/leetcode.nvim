@@ -1,8 +1,5 @@
 local log = require("leetcode.logger")
-
 local utils = require("leetcode.runner.utils")
-local config = require("leetcode.config")
-
 local interpreter = require("leetcode.api.interpreter")
 
 ---@class lc.Runner

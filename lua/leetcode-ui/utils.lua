@@ -1,5 +1,4 @@
 local Line = require("nui.line")
-local log = require("leetcode.logger")
 
 local utils = {}
 

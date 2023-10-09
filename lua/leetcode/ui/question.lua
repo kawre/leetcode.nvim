@@ -1,10 +1,8 @@
-local path = require("plenary.path")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 local Description = require("leetcode.ui.description")
 local api_question = require("leetcode.api.question")
 local Console = require("leetcode.ui.console")
-local spinner = require("leetcode.logger.spinner")
 local utils = require("leetcode.utils")
 
 ---@class lc.Question
@@ -63,7 +61,6 @@ function question:autocmds()
     vim.api.nvim_create_autocmd("TabEnter", {
         group = group_id,
         callback = function()
-            -- local utils = require("leetcode.utils")
             local questions = utils.get_current_questions()
 
             local tabpage = vim.api.nvim_get_current_tabpage()

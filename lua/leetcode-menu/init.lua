@@ -1,10 +1,5 @@
-local component = require("leetcode-ui.component")
-local log = require("leetcode.logger")
 local utils = require("leetcode-menu.utils")
 local config = require("leetcode.config")
-
-local Text = require("nui.text")
-local Line = require("nui.line")
 
 ---@class lc-menu
 ---@field layout lc-ui.Layout

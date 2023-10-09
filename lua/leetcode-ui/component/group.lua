@@ -1,6 +1,5 @@
 local Component = require("leetcode-ui.component")
 local Padding = require("leetcode-ui.component.padding")
-local log = require("leetcode.logger")
 
 ---@class lc-ui.Group: lc-ui.Component
 ---@field components lc-ui.Component[]

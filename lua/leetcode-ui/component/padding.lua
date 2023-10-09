@@ -1,5 +1,4 @@
 local component = require("leetcode-ui.component")
-local utils = require("leetcode-ui.utils")
 local Line = require("nui.line")
 
 ---@class lc-ui.Padding: lc-ui.Component

@@ -1,4 +1,3 @@
-local log = require("leetcode.logger")
 local path = require("plenary.path")
 
 local config = require("leetcode.config")

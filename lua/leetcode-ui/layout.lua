@@ -1,4 +1,3 @@
-local log = require("leetcode.logger")
 local Padding = require("leetcode-ui.component.padding")
 
 ---@class lc.on_press

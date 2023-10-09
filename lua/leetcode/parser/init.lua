@@ -5,8 +5,6 @@
 ---TODO: question duplication
 ---TODO: Q2066
 
-local log = require("leetcode.logger")
-
 local Text = require("leetcode-ui.component.text")
 local utils = require("leetcode.parser.utils")
 

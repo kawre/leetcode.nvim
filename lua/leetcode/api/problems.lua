@@ -1,4 +1,3 @@
-local log = require("leetcode.logger")
 local utils = require("leetcode.api.utils")
 
 ---@class lc.ProblemsApi

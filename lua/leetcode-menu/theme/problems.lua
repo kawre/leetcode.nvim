@@ -1,4 +1,3 @@
-local log = require("leetcode.logger")
 local cmd = require("leetcode.api.command")
 
 local Title = require("leetcode-menu.components.title")

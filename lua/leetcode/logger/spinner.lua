@@ -1,24 +1,22 @@
-local log = require("leetcode.logger")
-
 local config = require("leetcode.config")
 
 ---@class lc.Logger.Spinner
----@field spinner spinner | nil
+---@field spinner lc.spinner | nil
 ---@field index integer
 ---@field noti any
 ---@field msg string
 local spinner = {}
 spinner.__index = spinner
 
----@class spinner
+---@class lc.spinner
 ---@field frames string[]
 ---@field fps integer
 
----@alias spinner_type
+---@alias lc.spinner_types
 ---| "dot"
 ---| "points"
 
----@type spinner[]
+---@type lc.spinner[]
 local spinners = {
     dot = {
         frames = { "⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷" },
@@ -66,7 +64,7 @@ function spinner:set(msg, lvl, opts)
     self.noti = vim.notify(self.msg, lvl, opts)
 end
 
----@param spinner_type spinner_type
+---@param spinner_type lc.spinner_types
 function spinner:change(spinner_type) self.spinner = spinners[spinner_type] end
 
 ---@param msg msg
@@ -92,7 +90,7 @@ function spinner:stop(msg, success, opts)
 end
 
 ---@param msg? string
----@param spinner_type? spinner_type
+---@param spinner_type? lc.spinner_types
 function spinner:init(msg, spinner_type)
     local obj = setmetatable({
         msg = msg or "",

@@ -1,5 +1,4 @@
 local path = require("plenary.path")
-local log = require("leetcode.logger")
 
 local config = require("leetcode.config")
 local file = config.home:joinpath(".cookie")

@@ -1,5 +1,4 @@
 local component = require("leetcode-ui.component")
-local log = require("leetcode.logger")
 local NuiLine = require("nui.line")
 
 ---@class lc-ui.Button: lc-ui.Component
