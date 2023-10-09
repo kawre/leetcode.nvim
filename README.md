@@ -290,3 +290,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/64378b0f-c5ba-4378-b9ff-a
 - [ ] Statistics menu page
 - [ ] Docs
 - [ ] Hints popup
+
+## 🙌 Credits
+
+- [Leetbuddy.nvim](https://github.com/Dhanus3133/Leetbuddy.nvim)
