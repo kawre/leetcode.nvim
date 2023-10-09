@@ -66,7 +66,8 @@ function result:handle_runtime(item) -- status code = 10
         group:append(header)
 
         local status_runtime = NuiLine()
-        status_runtime:append(item.display_runtime)
+        local runtime_ms = item.display_runtime or vim.split(item.status_runtime, " ")[1] or "NIL"
+        status_runtime:append(runtime_ms)
         status_runtime:append(" ms", "Comment")
 
         local perc_runtime = NuiLine()
