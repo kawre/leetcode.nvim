@@ -289,7 +289,11 @@ function result:clear()
     self.popup.border:set_highlight("FloatBorder")
 end
 
-function result:draw() self.layout:draw(self.popup) end
+function result:draw()
+    local c = vim.api.nvim_win_get_cursor(self.popup.winid)
+    self.layout:draw(self.popup)
+    vim.api.nvim_win_set_cursor(self.popup.winid, c)
+end
 
 ---@param parent lc.Console
 ---

@@ -7,7 +7,7 @@ local config = {
 
     name = "leetcode.nvim",
     domain = "https://leetcode.com",
-    debug = true,
+    debug = false,
     lang = "cpp",
 }
 
