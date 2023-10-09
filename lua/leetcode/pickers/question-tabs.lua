@@ -1,4 +1,5 @@
 local log = require("leetcode.logger")
+local utils = require("leetcode.utils")
 
 local Question = require("leetcode.ui.question")
 
@@ -18,29 +19,37 @@ local function question_formatter(question)
     return string.format("%d. %s", question.frontend_id, question.title)
 end
 
----@param question lc.Cache.Question
-local function display_difficulty(question)
-    local hi = {
-        ["Easy"] = { "E", "LeetCodeEasy" },
-        ["Medium"] = { "M", "LeetCodeMedium" },
-        ["Hard"] = { "H", "LeetCodeHard" },
-    }
+local function display_current(entry)
+    local tabp = vim.api.nvim_get_current_tabpage()
+    if tabp ~= entry.tabpage then return unpack({ "", "" }) end
 
-    return { "󱓻", "LeetCode" .. question.difficulty }
-    -- return hi[quesiton.difficulty]
+    return { "", "" }
 end
 
----@param question lc.Cache.Question
-local function display_user_status(question)
-    if question.paid_only and not config.auth.is_premium then return { "", "LeetCodeMedium" } end
-
-    local user_status = {
-        ac = { "", "LeetCodeEasy" },
-        notac = { "󱎖", "LeetCodeMedium" },
+local function display_difficulty(q)
+    local filetypes = {
+        cpp = "cpp",
+        java = "java",
+        python = "py",
+        python3 = "py",
+        c = "c",
+        csharp = "cs",
+        javascript = "js",
+        typescript = "ts",
+        php = "php",
+        swift = "swift",
+        kotlin = "kt",
+        dart = "dart",
+        golang = "go",
+        ruby = "rb",
+        scala = "scala",
+        rust = "rs",
+        racket = "rkt",
+        erlang = "erl",
+        elixir = "ex",
     }
 
-    if question.status == vim.NIL then return { "" } end
-    return user_status[question.status]
+    return { filetypes[q.lang], "LeetCode" .. q.q.difficulty }
 end
 
 ---@param question lc.Cache.Question
@@ -55,7 +64,7 @@ local displayer = entry_display.create({
     separator = " ",
     items = {
         { width = 1 },
-        { width = 1 },
+        { width = 5 },
         { width = 5 },
         { remaining = true },
     },
@@ -63,11 +72,11 @@ local displayer = entry_display.create({
 
 local function make_display(entry)
     ---@type lc.Cache.Question
-    local q = entry.value
+    local q = entry.value.question.q
 
     return displayer({
-        display_user_status(q),
-        display_difficulty(q),
+        display_current(entry.value),
+        display_difficulty(entry.value.question),
         display_question(q),
     })
 end
@@ -76,20 +85,25 @@ local function entry_maker(entry)
     return {
         value = entry,
         display = make_display,
-        ordinal = question_formatter(entry),
+        ordinal = question_formatter(entry.question.q),
     }
 end
 
 local opts = require("telescope.themes").get_dropdown()
 
 return {
-    ---@param questions lc.Cache.Question[]
-    pick = function(questions)
+    pick = function()
+        local tabs = utils.get_current_question_tabs()
+        if vim.tbl_isempty(tabs) then
+            log.warn("No questions opened")
+            return
+        end
+
         pickers
             .new(opts, {
                 prompt_title = "Select a Question",
                 finder = finders.new_table({
-                    results = questions,
+                    results = tabs,
                     entry_maker = entry_maker,
                 }),
                 sorter = conf.generic_sorter(opts),
@@ -99,7 +113,7 @@ return {
                         local selection = action_state.get_selected_entry()
 
                         if not selection then return end
-                        Question:init(selection.value)
+                        pcall(vim.cmd.tabnext, selection.value.tabpage)
                     end)
                     return true
                 end,

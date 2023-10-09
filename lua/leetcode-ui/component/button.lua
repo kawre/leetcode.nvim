@@ -14,16 +14,13 @@ setmetatable(button, component)
 --- @param sc string|nil
 --- @param on_press function? optional
 --- @param expandable boolean? optional
---- @param keybind string? optional
---- @param keybind_opts table? optional
-function button:init(text, sc, on_press, expandable, keybind, keybind_opts)
+function button:init(text, sc, on_press, expandable)
     local opts = {
         position = "center",
         on_press = on_press or function() end,
         sc = sc,
     }
     sc = sc and "" or ""
-    -- log.debug(opts)
 
     local width = 50
     local expand = ""

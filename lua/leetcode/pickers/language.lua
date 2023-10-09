@@ -98,7 +98,7 @@ return {
                         local selection = action_state.get_selected_entry()
 
                         if not selection then return end
-                        config.lang = selection.slug
+                        config.lang = selection.value.slug
                         log.info("Language set to " .. selection.lang)
                     end)
                     return true

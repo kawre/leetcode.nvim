@@ -44,7 +44,12 @@ function utils.map(mode, lhs, rhs, opts)
     vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 
-function utils.get_current_questions()
+function utils.get_current_question_tabs()
+    ---@class lc.Question.Tab
+    ---@field tabpage integer
+    ---@field question lc.Question
+
+    ---@type lc.Question.Tab[]
     local questions = {}
 
     for _, tabp in ipairs(vim.api.nvim_list_tabpages()) do
@@ -91,7 +96,7 @@ function utils.filetype(lang)
     }
 
     local ft = filetypes[lang]
-    assert(ft)
+    assert(ft, "Unknown language: " .. lang)
     return ft
 end
 

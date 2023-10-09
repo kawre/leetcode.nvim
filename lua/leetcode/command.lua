@@ -105,25 +105,7 @@ function cmd.menu() vim.api.nvim_set_current_tabpage(_Lc_MenuTabPage) end
 ---@param layout layouts
 function cmd.menu_layout(layout) _Lc_Menu:set_layout(layout) end
 
-function cmd.list_questions()
-    local utils = require("leetcode.utils")
-    local questions = utils.get_current_questions()
-
-    if not vim.tbl_isempty(questions) then
-        local ui = require("leetcode.ui")
-        local curr_tabp = vim.api.nvim_get_current_tabpage()
-
-        ui.pick_one(questions, "Select a Question", function(item)
-            ---@type question_response
-            local question = item.question.q
-            local text = question.frontend_id .. ". " .. question.title
-
-            return (curr_tabp == item.tabpage and "(C) " or "    ") .. text
-        end, function(res) pcall(vim.cmd.tabnext, res.tabpage) end)
-    else
-        log.warn("No questions opened")
-    end
-end
+function cmd.question_tabs() require("leetcode.pickers.question-tabs").pick() end
 
 function cmd.change_lang() require("leetcode.pickers.language").pick() end
 
