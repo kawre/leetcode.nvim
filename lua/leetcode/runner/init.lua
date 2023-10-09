@@ -12,7 +12,7 @@ function runner:run(submit)
     local question = self.question
 
     local tc_lines = vim.api.nvim_buf_get_lines(question.bufnr, 0, -1, false)
-    local typed_code = utils.to_typed_code(tc_lines)
+    local typed_code = table.concat(tc_lines, "\n")
 
     local body = {
         lang = question.lang,
