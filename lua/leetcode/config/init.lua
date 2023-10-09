@@ -10,7 +10,7 @@ local config = {
     debug = false,
     lang = "cpp",
     toggle_console_on_run = false,
-    toggle_console_on_submit = false,
+    toggle_console_on_submit = false
 }
 
 ---@class lc.UserAuth
