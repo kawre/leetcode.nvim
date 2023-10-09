@@ -192,6 +192,19 @@ description = {
 }
 ```
 
+## 📋 Commands
+
+| command             | description                                                 |
+| ------------------- | ----------------------------------------------------------- |
+| LcList              | opens a problem list picker                                 |
+| LcMenu              | opens menu dashboard                                        |
+| LcConsole           | opens console for currently opened question                 |
+| LcQuestionTabs      | opens a picker with all currently opened question tabs      |
+| LcLanguage          | opens a picker to select a language for the current session |
+| LcDescriptionToggle | toggle question description                                 |
+| LcRun               | run currently opened question                               |
+| LcSubmit            | submit currently opened question                            |
+
 ## 🚀 Usage
 
 This plugin is meant to be used within a <b>fresh</b> [Neovim] instance.
@@ -233,19 +246,6 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/64378b0f-c5ba-4378-b9ff-a
 
 [tabpage]: https://neovim.io/doc/user/tabpage.html
 
-## 📋 Commands
-
-| command             | description                                                 |
-| ------------------- | ----------------------------------------------------------- |
-| LcList              | opens a problem list picker                                 |
-| LcMenu              | opens menu dashboard                                        |
-| LcConsole           | opens console for currently opened question                 |
-| LcQuestionTabs      | opens a picker with all currently opened question tabs      |
-| LcLanguage          | opens a picker to select a language for the current session |
-| LcDescriptionToggle | toggle question description                                 |
-| LcRun               | run currently opened question                               |
-| LcSubmit            | submit currently opened question                            |
-
 ## ✅ Todo
 
 - [ ] CN version
@@ -257,3 +257,5 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/64378b0f-c5ba-4378-b9ff-a
 ## 🙌 Credits
 
 - [Leetbuddy.nvim](https://github.com/Dhanus3133/Leetbuddy.nvim)
+
+- [alpha-nvim](https://github.com/goolord/alpha-nvim)
