@@ -180,8 +180,7 @@ function result:handle_runtime_error(item) -- status code = 15
         table.insert(t, NuiLine():append(line, "LeetCodeError"))
     end
 
-    local pre = Pre:init(header, t)
-    self.layout:append(pre)
+    self.layout:append(Pre:init(header, t))
 end
 
 function result:handle_internal_error(item) -- status code = 16

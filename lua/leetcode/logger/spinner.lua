@@ -1,6 +1,6 @@
 local config = require("leetcode.config")
 
----@class lc.Logger.Spinner
+---@class lc.Spinner
 ---@field spinner lc.spinner | nil
 ---@field index integer
 ---@field noti any

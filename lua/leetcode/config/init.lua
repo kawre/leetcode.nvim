@@ -26,6 +26,7 @@ function config.apply(cfg)
 
     config.user = vim.tbl_deep_extend("force", config.default, cfg)
 
+    config.debug = config.user.debug or false
     config.domain = "https://leetcode." .. config.user.domain
     config.lang = config.user.lang
     ---@type Path
