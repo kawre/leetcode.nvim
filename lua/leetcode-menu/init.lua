@@ -73,7 +73,7 @@ end
 function menu:set_layout(layout)
     self:cursor_reset()
 
-    local ok, res = pcall(require, "leetcode-menu.theme." .. layout)
+    local ok, res = pcall(require, "leetcode-menu.layout." .. layout)
     if ok then self.layout = res end
 
     self:draw()
@@ -123,7 +123,7 @@ function menu:init()
         signcolumn = "no",
     })
 
-    local ok, loading = pcall(require, "leetcode-menu.theme.loading")
+    local ok, loading = pcall(require, "leetcode-menu.layout.loading")
     assert(ok)
 
     local obj = setmetatable({
