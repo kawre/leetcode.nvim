@@ -69,7 +69,7 @@ function Layout:get_line_idx(val)
     return line_idx
 end
 
----@param line integer The line that the click happend
+---@param line integer The line that the click happened
 function Layout:handle_press(line)
     if self.buttons[line] then self.buttons[line].fn() end
 end
