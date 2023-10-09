@@ -267,13 +267,13 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/64378b0f-c5ba-4378-b9ff-a
 
 ## 📋 Commands
 
-| command | description |
-|--------------- | --------------- |
-| LcMenu | opens menu dashboard |
-| LcConsole | opens console for currently opened question |
-| LcQuestionTabs | opens a picker with all currently opened question tabs |
-| LcLanguage | opens a picker to select a language for the current session |
-| LcDescriptionToggle | toggle question description |
+| command             | description                                                 |
+| ------------------- | ----------------------------------------------------------- |
+| LcMenu              | opens menu dashboard                                        |
+| LcConsole           | opens console for currently opened question                 |
+| LcQuestionTabs      | opens a picker with all currently opened question tabs      |
+| LcLanguage          | opens a picker to select a language for the current session |
+| LcDescriptionToggle | toggle question description                                 |
 
 ## ✅ Todo
 
@@ -281,7 +281,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/64378b0f-c5ba-4378-b9ff-a
 - [ ] SQL support
 - [ ] Statistics menu page
 - [ ] Docs
-- [ ] Hints popup
+- [ ] Hints pop-up
 
 ## 🙌 Credits
 

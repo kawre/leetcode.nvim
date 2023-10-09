@@ -55,7 +55,7 @@ function cmd.cookie_prompt(cb)
     input:mount()
 end
 
----Signout
+---Sign out
 function cmd.delete_cookie()
     log.warn("You're now signed out")
     local cookie = require("leetcode.cache.cookie")
@@ -121,7 +121,7 @@ function cmd.list_questions()
             return (curr_tabp == item.tabpage and "(C) " or "    ") .. text
         end, function(res) pcall(vim.cmd.tabnext, res.tabpage) end)
     else
-        log.warn("No questions openned")
+        log.warn("No questions opened")
     end
 end
 
@@ -150,11 +150,11 @@ function cmd.prompt_lang()
             { lang = "Erlang", slug = "erlang", icon = "" },
             { lang = "Elixir", slug = "elixir", icon = "" },
         },
-        "Pick a Langauge",
+        "Pick a Language",
         function(t) return t.icon .. " " .. t.lang end,
         function(t)
             config.lang = t.slug
-            log.info("Langauge set to " .. t.lang)
+            log.info("Language set to " .. t.lang)
         end
     )
 end
