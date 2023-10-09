@@ -5,8 +5,6 @@ local finders = require("telescope.finders")
 local conf = require("telescope.config").values
 local config = require("leetcode.config")
 
-log.info("sdf")
-
 local entry_display = require("telescope.pickers.entry_display")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
@@ -18,8 +16,9 @@ local function lang_formatter(t) return string.format("%s %s", t.icon, t.slug) e
 
 ---@param t lc.picker.language
 local function dislay_icon(t)
-    --
-    return t.icon
+    local name = "LeetCodeLang_" .. t.slug
+    vim.api.nvim_set_hl(0, name, { fg = t.color })
+    return { t.icon, name }
 end
 
 local function display_lang(t)
@@ -30,7 +29,7 @@ end
 local displayer = entry_display.create({
     separator = " ",
     items = {
-        { width = 1 },
+        { width = 2 },
         { remaining = true },
     },
 })
@@ -59,27 +58,28 @@ local opts = require("telescope.themes").get_dropdown()
 ---@field lang string
 ---@field slug string
 ---@field icon string
+---@field color string
 
 local languages = {
-    { lang = "C++", slug = "cpp", icon = "" },
-    { lang = "Java", slug = "java", icon = "" },
-    { lang = "Python", slug = "python", icon = "" },
-    { lang = "Python3", slug = "python3", icon = "" },
-    { lang = "C", slug = "c", icon = "" },
-    { lang = "C#", slug = "csharp", icon = "󰌛" },
-    { lang = "JavaScript", slug = "javascript", icon = "" },
-    { lang = "TypeScript", slug = "typescript", icon = "" },
-    { lang = "PHP", slug = "php", icon = "" },
-    { lang = "Swift", slug = "swift", icon = "" },
-    { lang = "Kotlin", slug = "kotlin", icon = "" },
-    { lang = "Dart", slug = "dart", icon = "" },
-    { lang = "Go", slug = "golang", icon = "" },
-    { lang = "Ruby", slug = "ruby", icon = "" },
-    { lang = "Scala", slug = "scala", icon = "" },
-    { lang = "Rust", slug = "rust", icon = "" },
-    { lang = "Racket", slug = "racket", icon = "󰰟" },
-    { lang = "Erlang", slug = "erlang", icon = "" },
-    { lang = "Elixir", slug = "elixir", icon = "" },
+    { lang = "C++", slug = "cpp", icon = "", color = "#00599C" },
+    { lang = "Java", slug = "java", icon = "", color = "#E76F00" },
+    { lang = "Python", slug = "python", icon = "", color = "#306998" },
+    { lang = "Python3", slug = "python3", icon = "", color = "#306998" },
+    { lang = "C", slug = "c", icon = "", color = "#555555" },
+    { lang = "C#", slug = "csharp", icon = "󰌛", color = "#68217A" },
+    { lang = "JavaScript", slug = "javascript", icon = "", color = "#F0DB4F" },
+    { lang = "TypeScript", slug = "typescript", icon = "", color = "#3178C6" },
+    { lang = "PHP", slug = "php", icon = "", color = "#777BB4" },
+    { lang = "Swift", slug = "swift", icon = "", color = "#FFAC45" },
+    { lang = "Kotlin", slug = "kotlin", icon = "", color = "#7F52FF" },
+    { lang = "Dart", slug = "dart", icon = "", color = "#1057A7" },
+    { lang = "Go", slug = "golang", icon = "", color = "#00ADD8" },
+    { lang = "Ruby", slug = "ruby", icon = "", color = "#CC342D" },
+    { lang = "Scala", slug = "scala", icon = "", color = "#DC322F" },
+    { lang = "Rust", slug = "rust", icon = "", color = "#DEA584" },
+    { lang = "Racket", slug = "racket", icon = "󰰟", color = "#22228F" },
+    { lang = "Erlang", slug = "erlang", icon = "", color = "#A90533" },
+    { lang = "Elixir", slug = "elixir", icon = "", color = "#6E4A7E" },
 }
 
 return {
