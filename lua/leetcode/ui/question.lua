@@ -61,7 +61,7 @@ function question:autocmds()
     vim.api.nvim_create_autocmd("TabEnter", {
         group = group_id,
         callback = function()
-            local questions = utils.get_current_question_tabs()
+            local questions = utils.curr_question_tabs()
 
             local tabpage = vim.api.nvim_get_current_tabpage()
             for _, q in ipairs(questions) do

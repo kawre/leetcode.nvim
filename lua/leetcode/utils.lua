@@ -45,7 +45,7 @@ function utils.map(mode, lhs, rhs, opts)
 end
 
 function utils.detect_duplicate_question(title_slug, lang)
-    local tabs = utils.get_current_question_tabs()
+    local tabs = utils.curr_question_tabs()
 
     for _, q in ipairs(tabs) do
         if title_slug == q.question.q.title_slug and lang == q.question.lang then
@@ -54,7 +54,7 @@ function utils.detect_duplicate_question(title_slug, lang)
     end
 end
 
-function utils.get_current_question_tabs()
+function utils.curr_question_tabs()
     ---@class lc.Question.Tab
     ---@field tabpage integer
     ---@field question lc.Question
@@ -75,11 +75,7 @@ function utils.get_current_question_tabs()
     return questions
 end
 
--- ---@param module string
--- function utils.add(module)
---
---
--- end
+function utils.curr_question() return _Lc_questions[_Lc_curr_question] end
 
 ---@param lang string
 function utils.filetype(lang)
