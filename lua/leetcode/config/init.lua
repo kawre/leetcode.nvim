@@ -24,6 +24,7 @@ config.auth = {}
 ---@param cfg lc.UserConfig Configurations to be merged.
 function config.apply(cfg)
     config.user = vim.tbl_deep_extend("force", config.default, cfg)
+    config.debug = config.user.debug or false
 
     config.debug = config.user.debug or false ---@diagnostic disable-line
     config.domain = "https://leetcode." .. config.user.domain

@@ -32,6 +32,7 @@ function runner:run(submit)
     else
         interpreter.submit(question.q.title_slug, body, callback)
     end
+    if require("leetcode.config").user.console.open_on_runcode then question.console:show() end
 end
 
 ---@private

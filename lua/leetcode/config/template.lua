@@ -50,6 +50,9 @@ local M = {
     logging = true,
 
     console = {
+        ---@type boolean
+        open_on_runcode = false,
+
         size = {
             width = "75%", ---@type string | integer
             height = "75%", ---@type string | integer
