@@ -114,14 +114,12 @@ function cmd.q_run()
     local q = _Lc_questions[_Lc_curr_question]
     if not q then return log.warn("No current question found") end
     q.console:run()
-    if require("leetcode.config").toggle_console_on_run then q.console:toggle() end
 end
 
 function cmd.q_submit()
     local q = _Lc_questions[_Lc_curr_question]
     if not q then return log.warn("No current question found") end
     q.console:submit()
-    if require("leetcode.config").toggle_console_on_submit then q.console:toggle() end
 end
 
 return cmd

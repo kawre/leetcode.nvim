@@ -9,8 +9,6 @@ local config = {
     domain = "https://leetcode.com",
     debug = false,
     lang = "cpp",
-    toggle_console_on_run = false,
-    toggle_console_on_submit = false,
     home = {}, ---@type Path
 }
 
@@ -26,8 +24,6 @@ config.auth = {}
 ---@param cfg lc.UserConfig Configurations to be merged.
 function config.apply(cfg)
     config.user = vim.tbl_deep_extend("force", config.default, cfg)
-    config.toggle_console_on_run = config.user.toggle_console_on_run or false
-    config.toggle_console_on_submit = config.user.toggle_console_on_submit or false
     config.debug = config.user.debug or false
 
     config.debug = config.user.debug or false ---@diagnostic disable-line
