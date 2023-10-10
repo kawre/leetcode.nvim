@@ -31,8 +31,8 @@ function runner:run(submit)
         interpreter.interpret_solution(question.q.title_slug, body, callback)
     else
         interpreter.submit(question.q.title_slug, body, callback)
-if require("leetcode.config").user.console.open_on_runcode then question.console:show() end
     end
+    if require("leetcode.config").user.console.open_on_runcode then question.console:show() end
 end
 
 ---@private
