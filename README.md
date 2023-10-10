@@ -101,13 +101,11 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     ---@type boolean
     logging = true,
 
-    ---@type boolean
-    toggle_console_on_run = false,
-
-    ---@type boolean
     toggle_console_on_submit = false,
 
     console = {
+        ---@type boolean
+        open_on_runcode = false,
         size = {
             width = "75%", ---@type string | integer
             height = "75%", ---@type string | integer
