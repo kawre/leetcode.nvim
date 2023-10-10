@@ -7,7 +7,7 @@ local utils = require("leetcode.utils")
 
 ---@class lc.Question
 ---@field file Path
----@field q question_response
+---@field q lc.question_res
 ---@field description lc.Description
 ---@field bufnr integer
 ---@field console lc.Console

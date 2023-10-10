@@ -30,7 +30,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 
 ## 📬 Requirements
 
-- [Neovim]
+- [Neovim] >= 0.9.0
 
 - [nvim-treesitter][nvim-treesitter]
 

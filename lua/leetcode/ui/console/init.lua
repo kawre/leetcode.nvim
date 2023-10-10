@@ -1,14 +1,7 @@
-local Popup = require("nui.popup")
-local Layout = require("leetcode-ui.layout")
 local config = require("leetcode.config")
 local Testcase = require("leetcode.ui.console.testcase")
-local Text = require("leetcode-ui.component.text")
 local Result = require("leetcode.ui.console.result")
 local Runner = require("leetcode.runner")
-local log = require("leetcode.logger")
-
-local NuiLine = require("nui.line")
-local NuiText = require("nui.text")
 local NuiLayout = require("nui.layout")
 
 ---@class lc.Console

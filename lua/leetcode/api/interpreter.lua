@@ -45,7 +45,7 @@ function interpreter.listener(id, callback)
 end
 
 ---@class lc.Interpret.body
----@field question question_response
+---@field question lc.question_res
 ---@field typed_code string
 ---@field data_input string
 

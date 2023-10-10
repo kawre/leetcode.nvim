@@ -89,16 +89,6 @@ function cmd.random_question()
     end
 end
 
-function cmd.console()
-    local q = _Lc_questions[_Lc_curr_question]
-
-    if q then
-        q.console:toggle()
-    else
-        log.error("No current question found")
-    end
-end
-
 function cmd.menu() vim.api.nvim_set_current_tabpage(_Lc_MenuTabPage) end
 
 ---@param layout layouts
@@ -110,14 +100,23 @@ function cmd.change_lang() require("leetcode.pickers.language").pick() end
 
 function cmd.desc_toggle() _Lc_questions[_Lc_curr_question].description:toggle() end
 
+function cmd.console()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if not q then return log.error("No current question found") end
+    q.console:toggle()
+end
+
 function cmd.q_run()
-    local q = _Lc_questions[_Lc_curr_question]
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
     if not q then return log.warn("No current question found") end
     q.console:run()
 end
 
 function cmd.q_submit()
-    local q = _Lc_questions[_Lc_curr_question]
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
     if not q then return log.warn("No current question found") end
     q.console:submit()
 end
