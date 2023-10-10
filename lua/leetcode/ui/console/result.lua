@@ -171,15 +171,36 @@ end
 ---
 ---@param item lc.runtime_error
 function result:handle_runtime_error(item) -- status code = 15
+    local group = Group:init({ opts = { spacing = 1 } })
+
     local header = NuiLine()
     header:append(item._.title, item._.hl)
+
+    if item.total_correct ~= vim.NIL and item.total_testcases ~= vim.NIL then
+        header:append(" | ")
+        local testcases =
+            string.format("%d/%d testcases passed", item.total_correct, item.total_testcases)
+        header:append(testcases, "Comment")
+    end
 
     local t = {}
     for line in vim.gsplit(item.full_runtime_error, "\n") do
         table.insert(t, NuiLine():append(line, "LeetCodeError"))
     end
+    group:append(Pre:init(header, t))
 
-    self.layout:append(Pre:init(header, t))
+    if item._.submission then
+        local pre_header = NuiLine()
+        pre_header:append(" Last Executed Input", "LeetCodeNormal")
+
+        local last_testcase = NuiLine()
+        last_testcase:append(item.last_testcase:gsub("\n", " "), "LeetCodeIndent")
+
+        local last_exec = Pre:init(pre_header, { last_testcase })
+        group:append(last_exec)
+    end
+
+    self.layout:append(group)
 end
 
 function result:handle_internal_error(item) -- status code = 16

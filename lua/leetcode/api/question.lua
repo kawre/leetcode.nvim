@@ -8,7 +8,7 @@ local question = {}
 
 ---@param title_slug string
 ---
----@return question_response
+---@return lc.question_res
 function question.by_title_slug(title_slug)
     utils.auth_guard()
 

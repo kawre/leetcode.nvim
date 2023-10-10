@@ -1,9 +1,3 @@
----@class lc.Interpreter.Submission
----@field interpret_id string
----@field test_case string
-
----@alias lc.submission lc.Interpreter.Submission
-
 ---@alias interpret.state
 ---| "PENDING"
 ---| "STARTED"
@@ -44,25 +38,31 @@
 ---@field status_code number
 ---@field lang string
 ---@field run_success boolean
----@field code_answer table
----@field code_output table
 ---@field runtime_error string
 ---@field full_runtime_error string
----@field invalid_testcase boolean
----@field case_idx number
----@field param_idx number
+---@field status_runtime string
+---@field memory number
+---@field code_answer table
+---@field code_output table
+---@field std_output_list table
+---@field elapsed_time number
 ---@field task_finish_time number
 ---@field task_name string
----@field total_correct number | nil
----@field total_testcases number | nil
----@field status_runtime string
----@field runtime_percentile number | nil
+---@field total_correct any
+---@field total_testcases any
+---@field runtime_percentile any
 ---@field status_memory string
----@field memory_percentile number | nil
+---@field memory_percentile any
 ---@field pretty_lang string
 ---@field submission_id string
 ---@field status_msg string
 ---@field state string
+---@field question_id string
+---@field compare_result string
+---@field std_output string
+---@field last_testcase string
+---@field expected_output string
+---@field finished boolean
 
 ---@alias lc.runtime_error lc.Interpreter.Response.runtime_error
 
@@ -141,29 +141,6 @@
 --------------------------------------------
 --- Time Limit Exceeded | 13, 14
 --------------------------------------------
--- -@class lc.Interpreter.Response.limit.exceeded
--- -@field code_answer table
--- -@field code_output table
--- -@field elapsed_time integer
--- -@field lang string
--- -@field memory number
--- -@field memory_percentile number | nil
--- -@field pretty_lang string
--- -@field run_success boolean
--- -@field runtime_percentile number | nil
--- -@field state string
--- -@field status_code number
--- -@field status_memory string
--- -@field status_msg string
--- -@field status_runtime string
--- -@field std_output_list table
--- -@field std_output string
--- -@field submission_id string
--- -@field task_finish_time number
--- -@field task_name string
--- -@field total_correct number | nil
--- -@field total_testcases number | nil
-
 ---@class lc.Interpreter.Response.limit.exceeded
 ---@field status_code number
 ---@field lang string
@@ -251,7 +228,7 @@
 ---@field params metadata_param[]
 ---@field return metadata_return
 
----@alias metadata lc.QuestionResponse.metadata
+---@alias lc.metadata lc.QuestionResponse.metadata
 
 --------------------------------------------
 --- Question Response
@@ -271,10 +248,10 @@
 ---@field data_schemas string[]
 ---@field code_snippets code_snippet[]
 ---@field testcase_list string[]
----@field meta_data metadata
+---@field meta_data lc.metadata
 ---@field stats question_stats
 
----@alias question_response lc.QuestionResponse
+---@alias lc.question_res lc.QuestionResponse
 
 ---@class question_stats
 ---@field acRate string
