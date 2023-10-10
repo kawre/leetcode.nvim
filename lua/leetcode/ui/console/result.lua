@@ -1,5 +1,4 @@
 local log = require("leetcode.logger")
-local config = require("leetcode.config")
 local Stdout = require("leetcode.ui.console.components.stdout")
 local console_popup = require("leetcode.ui.console.popup")
 
@@ -109,7 +108,7 @@ end
 ---@private
 ---
 ---@param item lc.submission
-function result:handle_submission(item) -- status code = 11
+function result:handle_submission_error(item) -- status code = 11
     local group = Group:init({ opts = { spacing = 1 } })
 
     local header = NuiLine()
@@ -249,7 +248,7 @@ function result:handle(item)
             self:handle_runtime(item --[[@as lc.runtime]])
         end,
         [11] = function()
-            self:handle_submission(item --[[@as lc.submission]])
+            self:handle_submission_error(item --[[@as lc.submission]])
         end,
 
         -- time limit
