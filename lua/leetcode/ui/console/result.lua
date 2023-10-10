@@ -26,7 +26,7 @@ function result:handle_accepted(item)
     local group = Group:init({ opts = { spacing = 2 } })
 
     local header = Text:init()
-    header:append(item._.title, item._.hl)
+    header:append(item._.title .. " 🎉", item._.hl)
     group:append(header)
 
     -- runtime
