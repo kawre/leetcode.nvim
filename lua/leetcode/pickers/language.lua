@@ -99,7 +99,7 @@ return {
 
                         if not selection then return end
                         config.lang = selection.value.slug
-                        log.info("Language set to " .. selection.lang)
+                        log.info("Language set to " .. selection.value.lang)
                     end)
                     return true
                 end,

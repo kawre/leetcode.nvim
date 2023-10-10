@@ -1,6 +1,6 @@
 local config = require("leetcode.config")
 
----@class lc
+---@class lc.LeetCode
 local leetcode = {}
 
 local function should_start()
@@ -52,6 +52,10 @@ local function setup_cmds()
 end
 
 local function start()
+    local path = require("plenary.path")
+    config.home = path:new(config.user.directory) ---@diagnostic disable-line
+    config.home:mkdir()
+
     setup_highlights()
     setup_cmds()
 
