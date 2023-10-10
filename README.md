@@ -104,6 +104,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     console = {
         ---@type boolean
         open_on_runcode = false,
+
         size = {
             width = "75%", ---@type string | integer
             height = "75%", ---@type string | integer
@@ -176,7 +177,9 @@ Console appearance
 
 ```lua
 console = {
+    ---@type boolean
     open_on_runcode = false,
+
     size = {
         width = "75%", ---@type string | integer
         height = "75%", ---@type string | integer

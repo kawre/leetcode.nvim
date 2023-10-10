@@ -1,6 +1,6 @@
 local log = require("leetcode.logger")
-local utils = require("leetcode.runner.utils")
 local interpreter = require("leetcode.api.interpreter")
+local config = require("leetcode.config")
 
 ---@class lc.Runner
 ---@field question lc.Question
@@ -10,6 +10,7 @@ runner.__index = runner
 ---@param submit? boolean
 function runner:run(submit)
     local question = self.question
+    if config.user.console.open_on_runcode then question.console:show() end
 
     local tc_lines = vim.api.nvim_buf_get_lines(question.bufnr, 0, -1, false)
     local typed_code = table.concat(tc_lines, "\n")
@@ -32,7 +33,6 @@ function runner:run(submit)
     else
         interpreter.submit(question.q.title_slug, body, callback)
     end
-    if require("leetcode.config").user.console.open_on_runcode then question.console:show() end
 end
 
 ---@private
