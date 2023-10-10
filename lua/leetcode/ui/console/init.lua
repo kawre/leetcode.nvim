@@ -68,8 +68,8 @@ function console:init(parent)
         [{ "q", "<Esc>" }] = function() obj:hide() end,
     }
 
-    obj.testcase = Testcase:init(obj):keymaps(keymap)
-    obj.result = Result:init(obj):keymaps(keymap)
+    obj.testcase = Testcase:init(obj):keymaps(keymap) ---@diagnostic disable-line
+    obj.result = Result:init(obj):keymaps(keymap) ---@diagnostic disable-line
 
     obj.layout = NuiLayout(
         {

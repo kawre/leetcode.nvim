@@ -18,6 +18,13 @@ local result = {}
 result.__index = result
 setmetatable(result, console_popup)
 
+local function passed_testcases(item)
+    local correct = item.total_correct ~= vim.NIL and item.total_correct or "0"
+    local total = item.total_testcases ~= vim.NIL and item.total_testcases or "0"
+
+    return string.format("%d/%d testcases passed", correct, total)
+end
+
 ---@param hi string
 function result:set_popup_border_hi(hi) self.popup.border:set_highlight(hi) end
 
@@ -114,9 +121,7 @@ function result:handle_submission_error(item) -- status code = 11
     local header = NuiLine()
     header:append(item._.title, item._.hl)
     header:append(" | ")
-    local testcases =
-        string.format("%d/%d testcases passed", item.total_correct, item.total_testcases)
-    header:append(testcases, "Comment")
+    header:append(passed_testcases(item), "Comment")
     group:append(Text:init({ lines = { header } }))
 
     local text = Case:init(
@@ -176,11 +181,9 @@ function result:handle_runtime_error(item) -- status code = 15
     local header = NuiLine()
     header:append(item._.title, item._.hl)
 
-    if item.total_correct ~= vim.NIL and item.total_testcases ~= vim.NIL then
+    if item._.submission then
         header:append(" | ")
-        local testcases =
-            string.format("%d/%d testcases passed", item.total_correct, item.total_testcases)
-        header:append(testcases, "Comment")
+        header:append(passed_testcases(item), "Comment")
     end
 
     local t = {}
@@ -222,6 +225,10 @@ function result:handle_compile_error(item) -- status code = 20
 
     local header = NuiLine()
     header:append(item._.title, item._.hl)
+    if item._.submission then
+        header:append(" | ")
+        header:append(passed_testcases(item), "Comment")
+    end
 
     local t = {}
     for line in vim.gsplit(item.full_compile_error, "\n") do
