@@ -4,6 +4,12 @@
 ---| "SUCCESS"
 ---| "FAILURE"
 
+---@class lc.Interpreter.item
+---@field title string
+---@field hl string
+---@field submission boolean
+---@field success boolean
+
 ---@class lc.Interpreter.Response
 ---@field status_code integer
 ---@field lang string
@@ -30,6 +36,7 @@
 ---@field status_msg string
 ---@field state interpret.state
 ---@field case_idx integer
+---@field _ lc.Interpreter.item
 
 --------------------------------------------
 --- Runtime Error | 15
@@ -63,6 +70,7 @@
 ---@field last_testcase string
 ---@field expected_output string
 ---@field finished boolean
+---@field _ lc.Interpreter.item
 
 ---@alias lc.runtime_error lc.Interpreter.Response.runtime_error
 
@@ -107,6 +115,7 @@
 ---@field lcnvim_is_submission boolean
 ---@field lcnvim_title string
 ---@field lcnvim_hl string
+---@field _ lc.Interpreter.item
 
 ---@alias lc.runtime lc.Interpreter.Response.runtime
 
@@ -135,6 +144,7 @@
 ---@field submission_id string
 ---@field status_msg string
 ---@field state string
+---@field _ lc.Interpreter.item
 
 ---@alias lc.compile_error lc.Interpreter.Response.compile_error
 
@@ -168,6 +178,7 @@
 ---@field last_testcase string | nil
 ---@field expected_output string | nil
 ---@field finished boolean | nil
+---@field _ lc.Interpreter.item
 
 ---@alias lc.limit_exceeded_error lc.Interpreter.Response.limit.exceeded
 
@@ -291,5 +302,6 @@
 ---@field input string
 ---@field status_msg string
 ---@field state string
+---@field _ lc.Interpreter.item
 
 ---@alias lc.submission lc.Interpreter.Response.submission
