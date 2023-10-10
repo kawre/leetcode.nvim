@@ -37,6 +37,8 @@ function console:toggle()
 end
 
 function console:show()
+    if self.opened then return end
+
     if not self.layout._.mounted then
         self.layout:mount()
     else
@@ -47,8 +49,10 @@ function console:show()
 end
 
 function console:hide()
-    self.opened = false
+    if not self.opened then return end
+
     self.layout:hide()
+    self.opened = false
 end
 
 ---@param parent lc.Question
