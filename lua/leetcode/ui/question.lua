@@ -13,6 +13,7 @@ local utils = require("leetcode.utils")
 ---@field console lc.Console
 ---@field lang string
 ---@field sql string
+---@field cache lc.Cache.Question
 local question = {}
 question.__index = question
 
@@ -27,7 +28,7 @@ function question:create_file()
     local snippet = {}
 
     for _, snip in pairs(snippets ~= vim.NIL and snippets or {}) do
-        if snip.lang_slug == self.lang or snip.lang_slug == config.user.sql then
+        if snip.lang_slug == self.lang then
             snippet.code = snip.code
             snippet.lang = snip.lang_slug
             break
@@ -51,7 +52,6 @@ function question:mount()
 
     self.description = Description:init(self)
     self.console = Console:init(self)
-
     self:autocmds()
     return self
 end
@@ -84,12 +84,22 @@ function question:autocmds()
     })
 end
 
+---@param q lc.QuestionResponse
+---
+---@return boolean
+local function is_sql(q)
+    for _, value in ipairs(q.topic_tags or {}) do
+        if value.slug == "database" then return true end
+    end
+
+    return false
+end
+
 ---@param problem lc.Cache.Question
 function question:init(problem)
-    local tabp = utils.detect_duplicate_question(problem.title_slug, config.lang)
+    local tabp = utils.detect_duplicate_question(problem.title_slug)
     if tabp then
         pcall(vim.cmd.tabnext, tabp)
-        log.info("Question already opened")
         return
     end
 
@@ -99,18 +109,16 @@ function question:init(problem)
         return
     end
 
-    local lang = config.lang
-    local sql = config.sql
-
-    local ft = utils.filetype(lang)
-    local fn = string.format("%s.%s.%s", q.frontend_id, q.title_slug, ft)
+    local lang = utils.get_lang(is_sql(q) and config.sql or config.lang)
+    local suffix = lang.sql and "-" .. lang.short or ""
+    local fn = string.format("%s.%s%s.%s", q.frontend_id, q.title_slug, suffix, lang.ft)
     local file = config.home:joinpath(fn)
 
     local obj = setmetatable({
         file = file,
         q = q,
-        lang = lang,
-        sql = sql,
+        lang = lang.slug,
+        cache = problem,
     }, self)
 
     return obj:mount()

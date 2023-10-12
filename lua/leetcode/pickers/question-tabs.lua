@@ -27,29 +27,8 @@ local function display_current(entry)
 end
 
 local function display_difficulty(q)
-    local filetypes = {
-        cpp = "cpp",
-        java = "java",
-        python = "py",
-        python3 = "py",
-        c = "c",
-        csharp = "cs",
-        javascript = "js",
-        typescript = "ts",
-        php = "php",
-        swift = "swift",
-        kotlin = "kt",
-        dart = "dart",
-        golang = "go",
-        ruby = "rb",
-        scala = "scala",
-        rust = "rs",
-        racket = "rkt",
-        erlang = "erl",
-        elixir = "ex",
-    }
-
-    return { filetypes[q.lang], "LeetCode" .. q.q.difficulty }
+    local lang = utils.get_lang(q.lang)
+    return { lang.short, "LeetCode" .. q.q.difficulty }
 end
 
 ---@param question lc.Cache.Question

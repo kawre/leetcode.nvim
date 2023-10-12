@@ -97,7 +97,13 @@ function cmd.menu_layout(layout) _Lc_Menu:set_layout(layout) end
 
 function cmd.question_tabs() require("leetcode.pickers.question-tabs").pick() end
 
-function cmd.change_lang() require("leetcode.pickers.language").pick() end
+function cmd.change_lang()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+
+    if not q then return log.warn("No current question found") end
+    require("leetcode.pickers.language").pick(q)
+end
 
 function cmd.desc_toggle() _Lc_questions[_Lc_curr_question].description:toggle() end
 

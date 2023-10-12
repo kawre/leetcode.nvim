@@ -10,6 +10,7 @@ local config = {
     debug = false,
     lang = "cpp",
     home = {}, ---@type Path
+    langs = require("leetcode.config.langs"),
 }
 
 ---@class lc.UserAuth

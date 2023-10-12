@@ -1,3 +1,5 @@
+local config = require("leetcode.config")
+
 ---@class lc.Utils
 local utils = {}
 
@@ -44,11 +46,14 @@ function utils.map(mode, lhs, rhs, opts)
     vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 
-function utils.detect_duplicate_question(title_slug, lang)
+function utils.detect_duplicate_question(title_slug)
     local tabs = utils.curr_question_tabs()
 
     for _, q in ipairs(tabs) do
-        if title_slug == q.question.q.title_slug and lang == q.question.lang then
+        if
+            title_slug == q.question.q.title_slug
+            and (config.sql == q.question.lang or config.lang == q.question.lang)
+        then
             return q.tabpage
         end
     end
@@ -75,35 +80,16 @@ function utils.curr_question_tabs()
     return questions
 end
 
-function utils.curr_question() return _Lc_questions[_Lc_curr_question] end
+function utils.curr_question()
+    local tabp = vim.api.nvim_get_current_tabpage()
+    local tabs = utils.curr_question_tabs()
 
----@param lang string
-function utils.filetype(lang)
-    local filetypes = {
-        cpp = "cpp",
-        java = "java",
-        python = "py",
-        python3 = "py",
-        c = "c",
-        csharp = "cs",
-        javascript = "js",
-        typescript = "ts",
-        php = "php",
-        swift = "swift",
-        kotlin = "kt",
-        dart = "dart",
-        golang = "go",
-        ruby = "rb",
-        scala = "scala",
-        rust = "rs",
-        racket = "rkt",
-        erlang = "erl",
-        elixir = "ex",
-    }
+    return vim.tbl_filter(function(t) return t.tabpage == tabp end, tabs)[1].question or nil
+end
 
-    local ft = filetypes[lang]
-    assert(ft, "Unknown language: " .. lang)
-    return ft
+---@return lc.language
+function utils.get_lang(slug)
+    return vim.tbl_filter(function(l) return l.slug == slug end, config.langs)[1]
 end
 
 return utils

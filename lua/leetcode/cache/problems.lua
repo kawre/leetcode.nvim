@@ -60,12 +60,7 @@ end
 
 function Problems.get_by_title_slug(title_slug)
     local problems = Problems.get()
-
-    for _, p in ipairs(problems or {}) do
-        if p.title_slug == title_slug then return p end
-    end
-
-    return nil
+    return vim.tbl_filter(function(e) return e.title_slug == title_slug end, problems)[1]
 end
 
 ---@param problems_str string

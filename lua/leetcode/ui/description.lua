@@ -34,6 +34,21 @@ function description:mount()
     self.split:mount()
     self:draw()
 
+    local utils = require("leetcode-menu.utils")
+    utils.apply_opt_local({
+        modifiable = true,
+        readonly = false,
+        filetype = "leetcode.nvim",
+        swapfile = false,
+        buftype = "nofile",
+        buflisted = true,
+        foldcolumn = "1",
+        wrap = true,
+        number = false,
+        signcolumn = "no",
+        winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
+    })
+
     self:autocmds()
     return self
 end
@@ -122,21 +137,6 @@ function description:init(parent)
         relative = "editor",
         position = "left",
         size = config.user.description.width,
-        buf_options = {
-            modifiable = true,
-            readonly = false,
-            filetype = "leetcode.nvim",
-            swapfile = false,
-            buftype = "nofile",
-            buflisted = true,
-        },
-        win_options = {
-            foldcolumn = "1",
-            wrap = true,
-            number = false,
-            signcolumn = "no",
-            winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
-        },
         enter = true,
         focusable = true,
     })

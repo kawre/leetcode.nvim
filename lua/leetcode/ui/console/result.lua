@@ -250,7 +250,10 @@ function result:handle_item(item)
         item.status_msg = success and "Accepted" or "Wrong Answer"
     end
 
-    local submission = not item.submission_id:find("runcode") and true or false
+    local submission = false
+    if item.submission_id then
+        submission = not item.submission_id:find("runcode") and true or false
+    end
     local hl = success and "LeetCodeOk" or "LeetCodeError"
 
     item._ = {
