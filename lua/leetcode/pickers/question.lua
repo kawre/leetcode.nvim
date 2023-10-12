@@ -15,7 +15,7 @@ local action_state = require("telescope.actions.state")
 ---
 ---@return string
 local function question_formatter(question)
-    return string.format("%d. %s", question.frontend_id, question.title)
+    return string.format("%d. %s %s", question.frontend_id, question.title, question.title_slug)
 end
 
 ---@param question lc.Cache.Question
@@ -27,7 +27,6 @@ local function display_difficulty(question)
     }
 
     return { "󱓻", "LeetCode" .. question.difficulty }
-    -- return hi[quesiton.difficulty]
 end
 
 ---@param question lc.Cache.Question

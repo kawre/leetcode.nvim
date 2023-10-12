@@ -1,6 +1,5 @@
 local utils = require("leetcode.api.utils")
 local config = require("leetcode.config")
-local log = require("leetcode.logger")
 
 ---@class lc.AuthApi
 local M = {}
@@ -21,8 +20,6 @@ local usr_fields = [[
     is_premium: isPremium
     name: username
     is_verified: isVerified
-
-    activeSessionId
 ]]
 
 ---@return lc.UserAuth

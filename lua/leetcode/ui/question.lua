@@ -14,8 +14,8 @@ local utils = require("leetcode.utils")
 ---@field lang string
 ---@field sql string
 ---@field cache lc.Cache.Question
-local question = {}
-question.__index = question
+local Question = {}
+Question.__index = Question
 
 ---@type table<integer, lc.Question>
 _Lc_questions = {}
@@ -23,7 +23,7 @@ _Lc_questions = {}
 _Lc_curr_question = 0
 
 ---@private
-function question:create_file()
+function Question:create_file()
     local snippets = self.q.code_snippets
     local snippet = {}
 
@@ -39,7 +39,7 @@ function question:create_file()
     self.file:write(snippet.code, "w")
 end
 
-function question:mount()
+function Question:mount()
     if not self.file:exists() then self:create_file() end
 
     vim.api.nvim_set_current_dir(self.file:parent().filename)
@@ -56,7 +56,7 @@ function question:mount()
     return self
 end
 
-function question:autocmds()
+function Question:autocmds()
     local group_id = vim.api.nvim_create_augroup("leetcode_questions", { clear = true })
     vim.api.nvim_create_autocmd("TabEnter", {
         group = group_id,
@@ -96,7 +96,7 @@ local function is_sql(q)
 end
 
 ---@param problem lc.Cache.Question
-function question:init(problem)
+function Question:init(problem)
     local tabp = utils.detect_duplicate_question(problem.title_slug)
     if tabp then
         pcall(vim.cmd.tabnext, tabp)
@@ -124,4 +124,4 @@ function question:init(problem)
     return obj:mount()
 end
 
-return question
+return Question
