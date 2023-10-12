@@ -95,11 +95,18 @@ return {
                 sorter = conf.generic_sorter(opts),
                 attach_mappings = function(prompt_bufnr, map)
                     actions.select_default:replace(function()
-                        actions.close(prompt_bufnr)
                         local selection = action_state.get_selected_entry()
 
                         if not selection then return end
-                        Question:init(selection.value)
+
+                        local q = selection.value
+                        if q.paid_only and not config.auth.is_premium then
+                            log.warn("Question is for premium users only")
+                            return
+                        end
+
+                        actions.close(prompt_bufnr)
+                        Question:init(q)
                     end)
                     return true
                 end,

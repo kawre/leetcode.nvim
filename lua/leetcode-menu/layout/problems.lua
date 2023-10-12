@@ -44,7 +44,7 @@ return Layout:init({
                 list_btn,
                 random_btn,
                 qot_btn,
-                lang_btn,
+                -- lang_btn,
                 back_btn,
             },
         }),

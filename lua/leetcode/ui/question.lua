@@ -12,6 +12,7 @@ local utils = require("leetcode.utils")
 ---@field bufnr integer
 ---@field console lc.Console
 ---@field lang string
+---@field sql string
 local question = {}
 question.__index = question
 
@@ -23,7 +24,6 @@ _Lc_curr_question = 0
 ---@private
 function question:create_file()
     local snippets = self.q.code_snippets
-
     local snippet = {}
 
     for _, snip in pairs(snippets ~= vim.NIL and snippets or {}) do
@@ -89,11 +89,18 @@ function question:init(problem)
     local tabp = utils.detect_duplicate_question(problem.title_slug, config.lang)
     if tabp then
         pcall(vim.cmd.tabnext, tabp)
-        return log.info("Question already opened")
+        log.info("Question already opened")
+        return
     end
 
     local q = api_question.by_title_slug(problem.title_slug)
+    if q.is_paid_only and not config.auth.is_premium then
+        log.warn("Question is for premium users only")
+        return
+    end
+
     local lang = config.lang
+    local sql = config.sql
 
     local ft = utils.filetype(lang)
     local fn = string.format("%s.%s.%s", q.frontend_id, q.title_slug, ft)
@@ -103,6 +110,7 @@ function question:init(problem)
         file = file,
         q = q,
         lang = lang,
+        sql = sql,
     }, self)
 
     return obj:mount()

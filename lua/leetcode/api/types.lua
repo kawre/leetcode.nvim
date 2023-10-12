@@ -249,7 +249,7 @@
 ---@field frontend_id integer
 ---@field title string
 ---@field title_slug string
----@field id_paid_only boolean
+---@field is_paid_only boolean
 ---@field difficulty string
 ---@field likes integer
 ---@field dislikes integer
@@ -261,8 +261,13 @@
 ---@field testcase_list string[]
 ---@field meta_data lc.metadata
 ---@field stats question_stats
+---@field topic_tags lc.topic_tag[]
 
 ---@alias lc.question_res lc.QuestionResponse
+
+---@class lc.topic_tag
+---@field name string
+---@field slug string
 
 ---@class question_stats
 ---@field acRate string

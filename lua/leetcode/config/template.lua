@@ -24,6 +24,7 @@
 ---| "mysql"
 ---| "mssql"
 ---| "oraclesql"
+---| "postgresql"
 
 ---@alias lc.domain
 ---| "com"
