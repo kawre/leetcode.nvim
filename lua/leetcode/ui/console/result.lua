@@ -57,6 +57,7 @@ function result:handle_accepted(item)
 
     -- memory
     local status_memory = NuiLine()
+    if item.status_memory == "0B" then item.status_memory = "0 MB" end
     local s_mem = vim.split(item.status_memory, " ")
     status_memory:append(s_mem[1] .. " ")
     status_memory:append(s_mem[2], "Comment")

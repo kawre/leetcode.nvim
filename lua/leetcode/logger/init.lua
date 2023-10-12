@@ -13,24 +13,33 @@ local function normalize(msg) return type(msg) == "string" and msg or vim.inspec
 
 ---@param msg msg
 ---@param lvl? integer
+---@return any
 logger.log = function(msg, lvl)
     if not config.user.logging then return end
     vim.notify(normalize(msg), lvl or lvls.INFO, { title = config.name })
+
+    return msg
 end
 
 ---@param msg msg
-logger.info = function(msg) logger.log(msg) end
+---@return any
+logger.info = function(msg) return logger.log(msg) end
 
 ---@param msg msg
-logger.warn = function(msg) logger.log(msg, lvls.WARN) end
+---@return any
+logger.warn = function(msg) return logger.log(msg, lvls.WARN) end
 
 ---@param msg msg
-logger.error = function(msg) logger.log(msg, lvls.ERROR) end
+---@return any
+logger.error = function(msg) return logger.log(msg, lvls.ERROR) end
 
 ---@param msg msg
+---@return any
 logger.debug = function(msg)
     if not (config.debug and n_ok) then return end
     logger.log(debug.traceback(normalize(msg)), lvls.DEBUG)
+
+    return msg
 end
 
 return logger
