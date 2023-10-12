@@ -1,12 +1,9 @@
 local log = require("leetcode.logger")
 local utils = require("leetcode.utils")
 
-local Question = require("leetcode.ui.question")
-
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local conf = require("telescope.config").values
-local config = require("leetcode.config")
 
 local entry_display = require("telescope.pickers.entry_display")
 local actions = require("telescope.actions")

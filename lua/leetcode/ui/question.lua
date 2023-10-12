@@ -4,6 +4,7 @@ local Description = require("leetcode.ui.description")
 local api_question = require("leetcode.api.question")
 local Console = require("leetcode.ui.console")
 local utils = require("leetcode.utils")
+local async = require("plenary.async")
 
 ---@class lc.Question
 ---@field file Path
@@ -22,29 +23,37 @@ _Lc_questions = {}
 ---@type integer
 _Lc_curr_question = 0
 
----@private
-function Question:create_file()
-    local snippets = self.q.code_snippets
-    local snippet = {}
-
-    for _, snip in pairs(snippets ~= vim.NIL and snippets or {}) do
-        if snip.lang_slug == self.lang then
-            snippet.code = snip.code
-            snippet.lang = snip.lang_slug
-            break
-        end
+---@param q lc.QuestionResponse
+---
+---@return boolean
+local function is_sql(q)
+    for _, value in ipairs(q.topic_tags or {}) do
+        if value.slug == "database" then return true end
     end
 
-    if not snippet then return log.error("failed to fetch code snippet") end
-    self.file:write(snippet.code, "w")
+    return false
+end
+
+function Question:get_snippet()
+    local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
+    return vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
+end
+
+---@private
+function Question:create_file()
+    local lang = utils.get_lang(is_sql(self.q) and config.sql or config.lang)
+    local suffix = lang.sql and "-" .. lang.short or ""
+    local fn = string.format("%s.%s%s.%s", self.q.frontend_id, self.q.title_slug, suffix, lang.ft)
+
+    self.file = config.home:joinpath(fn)
 end
 
 function Question:mount()
-    if not self.file:exists() then self:create_file() end
+    self:create_file()
+    if not self.file:exists() then self.file:write(self:get_snippet().code, "w") end
 
-    vim.api.nvim_set_current_dir(self.file:parent().filename)
+    vim.api.nvim_set_current_dir(config.home:absolute())
     vim.cmd("$tabe " .. self.file:absolute())
-    _Lc_tabpage = vim.api.nvim_get_current_tabpage()
 
     self.bufnr = vim.api.nvim_get_current_buf()
     _Lc_curr_question = self.bufnr
@@ -52,6 +61,7 @@ function Question:mount()
 
     self.description = Description:init(self)
     self.console = Console:init(self)
+
     self:autocmds()
     return self
 end
@@ -84,44 +94,40 @@ function Question:autocmds()
     })
 end
 
----@param q lc.QuestionResponse
----
----@return boolean
-local function is_sql(q)
-    for _, value in ipairs(q.topic_tags or {}) do
-        if value.slug == "database" then return true end
-    end
+function Question:handle_mount()
+    if self:get_snippet() then
+        self:mount()
+    else
+        local msg =
+            string.format("Snippet for `%s` not found. Select a different language", self.lang)
+        log.warn(msg)
 
-    return false
+        require("leetcode.pickers.language").pick_lang(self, function(snippet)
+            self.lang = snippet.t.slug
+            self:mount()
+        end)
+    end
 end
 
 ---@param problem lc.Cache.Question
 function Question:init(problem)
     local tabp = utils.detect_duplicate_question(problem.title_slug)
-    if tabp then
-        pcall(vim.cmd.tabnext, tabp)
-        return
-    end
+    if tabp then return pcall(vim.cmd.tabnext, tabp) end
 
     local q = api_question.by_title_slug(problem.title_slug)
     if q.is_paid_only and not config.auth.is_premium then
-        log.warn("Question is for premium users only")
-        return
+        return log.warn("Question is for premium users only")
     end
 
     local lang = utils.get_lang(is_sql(q) and config.sql or config.lang)
-    local suffix = lang.sql and "-" .. lang.short or ""
-    local fn = string.format("%s.%s%s.%s", q.frontend_id, q.title_slug, suffix, lang.ft)
-    local file = config.home:joinpath(fn)
 
     local obj = setmetatable({
-        file = file,
         q = q,
         lang = lang.slug,
         cache = problem,
     }, self)
 
-    return obj:mount()
+    return obj:handle_mount()
 end
 
 return Question

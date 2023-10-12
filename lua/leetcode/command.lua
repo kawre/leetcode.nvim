@@ -100,12 +100,18 @@ function cmd.question_tabs() require("leetcode.pickers.question-tabs").pick() en
 function cmd.change_lang()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-
     if not q then return log.warn("No current question found") end
+
     require("leetcode.pickers.language").pick(q)
 end
 
-function cmd.desc_toggle() _Lc_questions[_Lc_curr_question].description:toggle() end
+function cmd.desc_toggle()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if not q then return log.error("No current question found") end
+
+    q.description:toggle()
+end
 
 function cmd.console()
     local utils = require("leetcode.utils")
@@ -126,6 +132,11 @@ function cmd.q_submit()
     local q = utils.curr_question()
     if not q then return log.warn("No current question found") end
     q.console:submit()
+end
+
+function cmd.fix()
+    local config = require("leetcode.config")
+    config.home:rmdir()
 end
 
 return cmd

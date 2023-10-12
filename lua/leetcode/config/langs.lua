@@ -51,7 +51,7 @@ return {
         slug = "swift",
         icon = "",
         color = "#FFAC45",
-        short = "swft",
+        short = "swift",
         ft = "swift",
     },
     {
@@ -70,7 +70,7 @@ return {
         slug = "scala",
         icon = "",
         color = "#DC322F",
-        short = "scla",
+        short = "scala",
         ft = "scala",
     },
     { lang = "Rust", slug = "rust", icon = "", color = "#DEA584", short = "rust", ft = "rs" },

@@ -9,8 +9,11 @@ local config = {
     domain = "https://leetcode.com",
     debug = false,
     lang = "cpp",
+    sql = "mysql",
     home = {}, ---@type Path
+
     langs = require("leetcode.config.langs"),
+    icons = require("leetcode.config.icons"),
 }
 
 ---@class lc.UserAuth

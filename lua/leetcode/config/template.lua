@@ -18,8 +18,13 @@
 ---| "racket"
 ---| "erlang"
 ---| "elixir"
+---| "bash"
+---| "html"
+---| "pythonml"
+---| "react"
+---| "vanillajs"
 
----@alias lc.sql_lang
+---@alias lc.sql
 ---| "pythondata"
 ---| "mysql"
 ---| "mssql"
@@ -41,7 +46,7 @@ local M = {
     ---@type lc.lang
     lang = "cpp",
 
-    ---@type lc.sql_lang
+    ---@type lc.sql
     sql = "mysql",
 
     ---@type string
@@ -51,13 +56,13 @@ local M = {
     logging = true,
 
     console = {
-        ---@type boolean
-        open_on_runcode = false,
+        open_on_runcode = false, ---@type boolean
 
         size = {
             width = "75%", ---@type string | integer
             height = "75%", ---@type string | integer
         },
+
         dir = "row", ---@type "col" | "row"
     },
 

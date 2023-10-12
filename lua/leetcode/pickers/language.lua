@@ -12,6 +12,8 @@ local entry_display = require("telescope.pickers.entry_display")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
+local M = {}
+
 ---@param snippet lc.QuestionCodeSnippet
 ---
 ---@return string
@@ -64,40 +66,66 @@ end
 
 local opts = require("telescope.themes").get_dropdown()
 
-return {
-    ---@param question lc.Question
-    pick = function(question)
-        pickers
-            .new(opts, {
-                prompt_title = "Available Languages",
-                finder = finders.new_table({
-                    results = question.q.code_snippets,
-                    entry_maker = entry_maker,
-                }),
-                sorter = conf.generic_sorter(opts),
-                attach_mappings = function(prompt_bufnr, map)
-                    actions.select_default:replace(function()
-                        local selection = action_state.get_selected_entry()
-                        if not selection then return end
-                        local snippet = selection.value
+---@param question lc.Question
+M.pick_lang = function(question, callback)
+    pickers
+        .new(opts, {
+            prompt_title = "Available Languages",
+            finder = finders.new_table({
+                results = question.q.code_snippets,
+                entry_maker = entry_maker,
+            }),
+            sorter = conf.generic_sorter(opts),
+            attach_mappings = function(prompt_bufnr, map)
+                actions.select_default:replace(function()
+                    local selection = action_state.get_selected_entry()
+                    if not selection then return end
 
-                        if question.lang == snippet.t.slug then
-                            log.warn("Language already set to: " .. snippet.t.lang)
-                            return
-                        end
+                    local snippet = selection.value
+                    if question.lang == snippet.t.slug then
+                        return log.warn("Language already set to: " .. snippet.t.lang)
+                    end
 
-                        if snippet.t.sql then
-                            config.sql = snippet.t.slug
-                        else
-                            config.lang = snippet.t.slug
-                        end
+                    config[snippet.t.sql and "sql" or "lang"] = snippet.t.slug
+                    actions.close(prompt_bufnr)
+                    callback(snippet)
+                end)
 
-                        actions.close(prompt_bufnr)
-                        Question:init(question.cache)
-                    end)
-                    return true
-                end,
-            })
-            :find()
-    end,
-}
+                return true
+            end,
+        })
+        :find()
+end
+
+---@param question lc.Question
+M.pick = function(question)
+    pickers
+        .new(opts, {
+            prompt_title = "Available Languages",
+            finder = finders.new_table({
+                results = question.q.code_snippets,
+                entry_maker = entry_maker,
+            }),
+            sorter = conf.generic_sorter(opts),
+            attach_mappings = function(prompt_bufnr, map)
+                actions.select_default:replace(function()
+                    local selection = action_state.get_selected_entry()
+                    if not selection then return end
+
+                    local snippet = selection.value
+                    if question.lang == snippet.t.slug then
+                        return log.warn("Language already set to: " .. snippet.t.lang)
+                    end
+
+                    config[snippet.t.sql and "sql" or "lang"] = snippet.t.slug
+                    actions.close(prompt_bufnr)
+                    Question:init(question.cache)
+                end)
+
+                return true
+            end,
+        })
+        :find()
+end
+
+return M

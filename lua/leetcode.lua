@@ -59,6 +59,10 @@ local function start()
     setup_highlights()
     setup_cmds()
 
+    local utils = require("leetcode.utils")
+    assert(utils.get_lang(config.lang), "Unknown language: " .. config.lang)
+    assert(utils.get_lang(config.sql), "Unknown sql dialect: " .. config.sql)
+
     require("leetcode-menu"):init()
 end
 
