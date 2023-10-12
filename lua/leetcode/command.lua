@@ -42,11 +42,12 @@ function cmd.cookie_prompt(cb)
     local input = Input(popup_options, {
         prompt = " 󰆘 ",
         on_submit = function(value)
-            if cookie.update(value) then
-                cmd.menu_layout("menu")
-                log.info("Sign-in successful")
-                if cb then cb() end
-            end
+            local c_ok, err = pcall(cookie.update, value)
+            if not c_ok then return log.warn(err) end
+
+            cmd.menu_layout("menu")
+            log.info("Sign-in successful")
+            if cb then cb() end
         end,
     })
 

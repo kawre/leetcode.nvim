@@ -37,9 +37,10 @@ function M.all()
     )
 
     local ok, res = pcall(utils.query, query, variables)
-    assert(ok)
+    assert(ok, res)
 
-    return res["problemsetQuestionList"]["questions"]
+    local data = res.body.data
+    return data["problemsetQuestionList"]["questions"]
 end
 
 ---@param cb function
@@ -66,14 +67,12 @@ function M._all(cb)
     )
 
     local callback = function(res)
-        local data = res["problemsetQuestionList"]["questions"]
-        cb(data)
+        local data = res.body.data
+        local questions = data["problemsetQuestionList"]["questions"]
+        cb(questions)
     end
 
-    utils._query({
-        query = query,
-        variables = variables,
-    }, callback)
+    utils._query(query, variables, callback)
 end
 
 function M.question_of_today(cb)
@@ -92,9 +91,12 @@ function M.question_of_today(cb)
         question_fields
     )
 
-    local callback = function(res) cb(res["activeDailyCodingChallengeQuestion"]["question"]) end
+    local callback = function(res)
+        local question = res.body.data["activeDailyCodingChallengeQuestion"]["question"]
+        cb(question)
+    end
 
-    utils._query({ query = query }, callback)
+    utils._query(query, {}, callback)
 end
 
 return M

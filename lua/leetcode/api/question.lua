@@ -47,15 +47,11 @@ function question.by_title_slug(title_slug)
     local ok, res = pcall(utils.query, query, variables)
     assert(ok)
 
-    local md = res["question"].meta_data
-    local dok, mdecoded = pcall(vim.json.decode, md)
-    if dok then res["question"].meta_data = mdecoded end
+    local q = res.body.data.question
+    q.meta_data = select(2, pcall(utils.decode, q.meta_data))
+    q.stats = select(2, pcall(utils.decode, q.stats))
 
-    local stats = res["question"].stats
-    local sok, sdecoded = pcall(vim.json.decode, stats)
-    if sok then res["question"].stats = sdecoded end
-
-    return res["question"]
+    return q
 end
 
 function question.random()
@@ -73,13 +69,16 @@ function question.random()
     ]]
 
     local config = require("leetcode.config")
-    local res = utils.query(query, variables)["randomQuestion"]
-    if not config.auth.is_premium and res.paid_only then
+    local ok, res = pcall(utils.query, query, variables)
+    assert(ok, res)
+
+    local q = res.body.data.randomQuestion
+    if not config.auth.is_premium and q.paid_only then
         log.warn("Drawn question is for premium users only. Please try again")
         return
     end
 
-    return res
+    return q
 end
 
 return question

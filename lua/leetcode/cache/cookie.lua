@@ -1,4 +1,5 @@
 local path = require("plenary.path")
+local log = require("leetcode.logger")
 
 local config = require("leetcode.config")
 local file = config.home:joinpath(".cookie")
@@ -18,11 +19,11 @@ function cookie.update(str)
     file:write(str, "w")
 
     local auth_api = require("leetcode.api.auth")
-    local auth = auth_api.user()
+    local a_ok, err = pcall(auth_api.user)
 
-    if not auth.is_signed_in then
+    if not a_ok then
         cookie.delete()
-        error("Invalid cookie")
+        error(err)
     end
 
     return t

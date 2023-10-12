@@ -75,27 +75,33 @@ function utils.query(query, variables)
         }),
     })
 
-    local ok, data = pcall(vim.json.decode, response["body"])
-    if not ok then log.error(data) end
-    assert(ok and data and data["data"], "Failed to query data")
-    log.debug(data.data)
-    return data.data
+    response.body = utils.decode(response.body)
+    return response
 end
 
----@param body table
+---@param query string
+---@param variables table optional
 ---@param cb function
-function utils._query(body, cb)
+function utils._query(query, variables, cb)
+    local body = {
+        query = query,
+        variables = variables,
+    }
+
     curl.post(endpoint, {
         headers = headers.get(),
         body = vim.json.encode(body),
-        callback = vim.schedule_wrap(function(item)
-            local ok, res = pcall(vim.json.decode, item["body"])
-            assert(ok and res)
-            local data = res["data"]
-            log.debug(data)
-            cb(data)
+        callback = vim.schedule_wrap(function(response)
+            response.body = utils.decode(response.body)
+            cb(response)
         end),
     })
+end
+
+function utils.decode(str)
+    local ok, res = pcall(vim.json.decode, str)
+    assert(ok, str)
+    return res
 end
 
 function utils.auth_guard()

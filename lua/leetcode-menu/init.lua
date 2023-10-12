@@ -1,5 +1,6 @@
 local utils = require("leetcode-menu.utils")
 local config = require("leetcode.config")
+local log = require("leetcode.logger")
 
 ---@class lc-menu
 ---@field layout lc-ui.Layout
@@ -137,11 +138,23 @@ function menu:init()
         },
     }, self)
 
-    require("leetcode.api.auth")._user(function()
-        local logged_in = config.auth.is_signed_in
-        local layout = logged_in and "menu" or "signin"
-        obj:set_layout(layout)
-    end)
+    local cookie = require("leetcode.cache.cookie")
+    if cookie.get() then
+        local auth_api = require("leetcode.api.auth")
+        auth_api._user(function(auth, err)
+            if err then
+                log.warn(err.msg)
+                obj:set_layout("signin")
+                return
+            end
+
+            local logged_in = auth.is_signed_in
+            local layout = logged_in and "menu" or "signin"
+            obj:set_layout(layout)
+        end)
+    else
+        obj:set_layout("signin")
+    end
 
     _Lc_Menu = obj
     return obj:mount()
