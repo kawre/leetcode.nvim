@@ -173,24 +173,24 @@ logging = true
 
 ### console
 
-Console appearance
+question console
 
 ```lua
 console = {
-    ---@type boolean
-    open_on_runcode = false,
+    open_on_runcode = false, ---@type boolean
 
     size = {
         width = "75%", ---@type string | integer
         height = "75%", ---@type string | integer
     },
+
     dir = "row", ---@type "col" | "row"
 }
 ```
 
 ### description
 
-Question description appearance
+question description
 
 ```lua
 description = {
