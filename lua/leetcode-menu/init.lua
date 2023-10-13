@@ -11,6 +11,12 @@ local log = require("leetcode.logger")
 local menu = {} ---@diagnostic disable-line
 menu.__index = menu
 
+---@type table<integer, lc.Question>
+_Lc_questions = {}
+
+---@type integer
+_Lc_curr_question = 0
+
 ---@type lc-menu
 _Lc_Menu = {} ---@diagnostic disable-line
 _Lc_MenuTabPage = 0

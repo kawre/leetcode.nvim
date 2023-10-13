@@ -18,11 +18,6 @@ local async = require("plenary.async")
 local Question = {}
 Question.__index = Question
 
----@type table<integer, lc.Question>
-_Lc_questions = {}
----@type integer
-_Lc_curr_question = 0
-
 ---@param q lc.QuestionResponse
 ---
 ---@return boolean
