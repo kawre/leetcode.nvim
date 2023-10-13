@@ -106,10 +106,8 @@ function menu:init()
     local winid = vim.api.nvim_get_current_win()
     local tabpage = vim.api.nvim_get_current_tabpage()
     _Lc_MenuTabPage = tabpage
-    -- vim.api.nvim_buf_set_name(bufnr, "")
 
     utils.apply_opt_local({
-        -- bufhidden = "wipe",
         buflisted = false,
         matchpairs = "",
         swapfile = false,
