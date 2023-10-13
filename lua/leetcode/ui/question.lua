@@ -5,6 +5,7 @@ local api_question = require("leetcode.api.question")
 local Console = require("leetcode.ui.console")
 local utils = require("leetcode.utils")
 local async = require("plenary.async")
+local Hints = require("leetcode.ui.hints")
 
 ---@class lc.Question
 ---@field file Path
@@ -56,6 +57,7 @@ function Question:mount()
 
     self.description = Description:init(self)
     self.console = Console:init(self)
+    self.hints = Hints:init(self)
 
     self:autocmds()
     return self

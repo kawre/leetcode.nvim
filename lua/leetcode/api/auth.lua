@@ -1,5 +1,6 @@
 local utils = require("leetcode.api.utils")
 local config = require("leetcode.config")
+local log = require("leetcode.logger")
 
 ---@class lc.AuthApi
 local M = {}
@@ -11,7 +12,7 @@ local function update_auth(data)
     assert(auth.is_verified, "Please verify your email address in order to use your account.")
 
     config.auth = auth
-    return config.auth
+    return log.debug(config.auth)
 end
 
 local usr_fields = [[

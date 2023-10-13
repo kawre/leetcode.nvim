@@ -262,6 +262,7 @@
 ---@field meta_data lc.metadata
 ---@field stats question_stats
 ---@field topic_tags lc.topic_tag[]
+---@field hints table[]
 
 ---@alias lc.question_res lc.QuestionResponse
 

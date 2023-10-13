@@ -40,6 +40,7 @@ function question.by_title_slug(title_slug)
             meta_data: metaData
             ac_rate: acRate
             stats
+            hints
             topic_tags: topicTags {
                 name
                 slug

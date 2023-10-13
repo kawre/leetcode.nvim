@@ -120,6 +120,14 @@ function cmd.console()
     q.console:toggle()
 end
 
+function cmd.hints()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if not q then return log.error("No current question found") end
+    q.hints:show()
+    -- q.console:toggle()
+end
+
 function cmd.q_run()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()

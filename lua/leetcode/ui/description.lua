@@ -36,7 +36,6 @@ function description:mount()
 
     local utils = require("leetcode-menu.utils")
     utils.apply_opt_local({
-        -- bufhidden = "wipe",
         buflisted = false,
         matchpairs = "",
         swapfile = false,
@@ -44,7 +43,7 @@ function description:mount()
         filetype = "leetcode.nvim",
         synmaxcol = 0,
         modifiable = false,
-        wrap = false,
+        wrap = true,
         colorcolumn = "",
         foldlevel = 999,
         foldcolumn = "1",
