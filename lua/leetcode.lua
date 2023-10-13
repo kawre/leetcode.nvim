@@ -44,7 +44,15 @@ local function setup_cmds()
     vim.api.nvim_create_user_command("LcList", function() cmd.problems() end, {})
     vim.api.nvim_create_user_command("LcConsole", function() cmd.console() end, {})
     vim.api.nvim_create_user_command("LcMenu", function() cmd.menu() end, {})
-    vim.api.nvim_create_user_command("LcQuestionTabs", function() cmd.question_tabs() end, {})
+
+    vim.api.nvim_create_user_command("LcQuestionTabs", function()
+        local log = require("leetcode.logger")
+        log.warn("LcQuestionTabs is deprecated, use LcTabs instead.")
+        cmd.question_tabs()
+    end, {})
+
+    vim.api.nvim_create_user_command("LcTabs", function() cmd.question_tabs() end, {})
+
     vim.api.nvim_create_user_command("LcLanguage", function() cmd.change_lang() end, {})
     vim.api.nvim_create_user_command("LcDescriptionToggle", function() cmd.desc_toggle() end, {})
     vim.api.nvim_create_user_command("LcRun", function() cmd.q_run() end, {})
