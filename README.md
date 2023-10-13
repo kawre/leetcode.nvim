@@ -207,6 +207,7 @@ description = {
 | LcMenu              | opens menu dashboard                                          |
 | LcList              | opens a problem list picker                                   |
 | LcConsole           | opens console for currently opened question                   |
+| LcHints             | opens hints for currently opened question                     |
 | LcTabs              | opens a picker with all currently opened question tabs        |
 | LcLanguage          | opens a picker to change the language of the current question |
 | LcDescriptionToggle | toggle question description                                   |
