@@ -7,7 +7,7 @@ function cmd.cache_update() require("leetcode.cache").update() end
 
 function cmd.problems()
     local async = require("plenary.async")
-    local problems = require("leetcode.cache.problems")
+    local problems = require("leetcode.cache.problemlist")
 
     async.run(function()
         local res = problems.get()
@@ -80,7 +80,7 @@ function cmd.qot()
 end
 
 function cmd.random_question()
-    local problems = require("leetcode.cache.problems")
+    local problems = require("leetcode.cache.problemlist")
     local question = require("leetcode.api.question")
 
     local q = question.random()
@@ -144,7 +144,7 @@ end
 function cmd.fix()
     -- local config = require("leetcode.config")
     require("leetcode.cache.cookie").delete()
-    require("leetcode.cache.problems").delete()
+    require("leetcode.cache.problemlist").delete()
     vim.cmd("qa!")
 end
 

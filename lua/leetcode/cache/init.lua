@@ -1,5 +1,5 @@
 local cookie = require("leetcode.cache.cookie")
-local problems = require("leetcode.cache.problems")
+local problems = require("leetcode.cache.problemlist")
 
 ---@class lc.Cache
 local cache = {}

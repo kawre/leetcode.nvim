@@ -94,7 +94,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     ---@type lc.lang
     lang = "cpp",
 
-    ---@type lc.sql_lang
+    ---@type lc.sql
     sql = "mysql",
 
     ---@type string

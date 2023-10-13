@@ -1,7 +1,7 @@
 local log = require("leetcode.logger")
 local Stdout = require("leetcode.ui.console.components.stdout")
 local console_popup = require("leetcode.ui.console.popup")
-local problemlist = require("leetcode.cache.problems")
+local problemlist = require("leetcode.cache.problemlist")
 
 local Case = require("leetcode.ui.console.components.case")
 local Group = require("leetcode-ui.component.group")

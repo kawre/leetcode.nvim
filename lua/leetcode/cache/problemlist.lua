@@ -93,12 +93,10 @@ end
 function problemlist.change_status(title_slug, status)
     local problist = problemlist.get()
 
-    vim.tbl_map(function(p)
+    problemlist.write(vim.tbl_map(function(p)
         if p.title_slug == title_slug then p.status = status end
         return p
-    end, problist)
-
-    problemlist.write(problist)
+    end, problist))
 end
 
 function problemlist.delete() file:rm() end
