@@ -21,7 +21,7 @@ local function lang_formatter(snippet) return string.format("%s %s", snippet.t.l
 
 ---@param snippet lc.QuestionCodeSnippet
 local function dislay_icon(snippet)
-    local hl = "LeetCodeLang_" .. snippet.t.slug
+    local hl = "leetcode_lang_" .. snippet.t.slug
     vim.api.nvim_set_hl(0, hl, { fg = snippet.t.color })
 
     return { snippet.t.icon, hl }

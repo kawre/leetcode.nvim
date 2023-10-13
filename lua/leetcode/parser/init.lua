@@ -135,14 +135,14 @@ function parser:handle_list(tags)
         text = string.format("%s%d. ", leftpad, self.ol_count[ol_c])
     end
 
-    self.line:append(text, "LeetCodeList")
+    self.line:append(text, "leetcode_list")
 end
 
 ---@param text string
 function parser:handle_indent(text)
     if self.line:content() ~= "" then return text end
 
-    self.line:append("\t▎\t", "LeetCodeIndent")
+    self.line:append("\t▎\t", "leetcode_indent")
 end
 
 ---@private
@@ -160,9 +160,9 @@ function parser:handle_link(text, tag_data)
     end
     if not href then return line end
 
-    line:append("[", "LeetCodeIndent")
-    line:append(text, "LeetCodeLink")
-    line:append(string.format("](%s)", href), "LeetCodeIndent")
+    line:append("[", "leetcode_indent")
+    line:append(text, "leetcode_link")
+    line:append(string.format("](%s)", href), "leetcode_indent")
 
     return line
 end
@@ -180,9 +180,9 @@ function parser:handle_img(tag_data)
     if not src then return end
     alt = alt or ""
 
-    line:append(string.format("[%s](", alt ~= "" and alt or "img"), "LeetCodeIndent")
-    line:append(src, "LeetCodeLink")
-    line:append(")", "LeetCodeIndent")
+    line:append(string.format("[%s](", alt ~= "" and alt or "img"), "leetcode_indent")
+    line:append(src, "leetcode_link")
+    line:append(")", "leetcode_indent")
 
     self.text:append(line)
 end

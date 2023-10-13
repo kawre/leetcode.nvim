@@ -21,7 +21,7 @@ function Hints:mount()
     local nodes = {}
     for i, hint in ipairs(self.hints) do
         local node = NuiTree.Node(
-            { text = NuiText("󰛨 Hint " .. i, "LeetCodeHint") },
+            { text = NuiText("󰛨 Hint " .. i, "leetcode_hint") },
             { NuiTree.Node({ text = hint }) }
         )
 
@@ -30,7 +30,7 @@ function Hints:mount()
     if vim.tbl_isempty(nodes) then
         table.insert(
             nodes,
-            NuiTree.Node({ text = NuiText(" No hints available", "LeetCodeError") })
+            NuiTree.Node({ text = NuiText(" No hints available", "leetcode_error") })
         )
     end
 

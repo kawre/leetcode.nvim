@@ -20,22 +20,24 @@ end
 
 ---@param question lc.Cache.Question
 local function display_difficulty(question)
-    local hi = {
-        ["Easy"] = { "E", "LeetCodeEasy" },
-        ["Medium"] = { "M", "LeetCodeMedium" },
-        ["Hard"] = { "H", "LeetCodeHard" },
+    local hl = {
+        ["Easy"] = "leetcode_easy",
+        ["Medium"] = "leetcode_medium",
+        ["Hard"] = "leetcode_hard",
     }
 
-    return { "󱓻", "LeetCode" .. question.difficulty }
+    return { "󱓻", hl[question.difficulty] }
 end
 
 ---@param question lc.Cache.Question
 local function display_user_status(question)
-    if question.paid_only and not config.auth.is_premium then return { "", "LeetCodeMedium" } end
+    if question.paid_only and not config.auth.is_premium then
+        return { "", "leetcode_medium" }
+    end
 
     local user_status = {
-        ac = { "", "LeetCodeEasy" },
-        notac = { "󱎖", "LeetCodeMedium" },
+        ac = { "", "leetcode_easy" },
+        notac = { "󱎖", "leetcode_medium" },
     }
 
     if question.status == vim.NIL then return { "" } end
@@ -44,7 +46,7 @@ end
 
 ---@param question lc.Cache.Question
 local function display_question(question)
-    local index = { question.frontend_id .. ".", "LeetCodeNormal" }
+    local index = { question.frontend_id .. ".", "leetcode_normal" }
     local title = { question.title }
 
     return unpack({ index, title })

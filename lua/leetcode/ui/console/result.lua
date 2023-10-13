@@ -29,7 +29,7 @@ end
 function result:set_popup_border_hi(hi) self.popup.border:set_highlight(hi) end
 
 function result:handle_accepted(item)
-    local function perc_hi(perc) return perc >= 50 and "LeetCodeOk" or "LeetCodeError" end
+    local function perc_hi(perc) return perc >= 50 and "leetcode_ok" or "leetcode_error" end
     local group = Group:init({ opts = { spacing = 2 } })
 
     local header = Text:init()
@@ -40,7 +40,7 @@ function result:handle_accepted(item)
     local status_runtime = NuiLine()
     local runtime_ms = item.display_runtime or vim.split(item.status_runtime, " ")[1] or "NIL"
     status_runtime:append(runtime_ms)
-    status_runtime:append(" ms", "Comment")
+    status_runtime:append(" ms", "leetcode_alt")
 
     local perc_runtime = NuiLine()
     perc_runtime:append(
@@ -49,7 +49,7 @@ function result:handle_accepted(item)
     )
     perc_runtime:append("of users with " .. item.pretty_lang)
 
-    local runtime = Pre:init(NuiText("󰓅 Runtime", "LeetCodeNormal"), {
+    local runtime = Pre:init(NuiText("󰓅 Runtime", "leetcode_normal"), {
         status_runtime,
         perc_runtime,
     })
@@ -60,7 +60,7 @@ function result:handle_accepted(item)
     if item.status_memory == "0B" then item.status_memory = "0 MB" end
     local s_mem = vim.split(item.status_memory, " ")
     status_memory:append(s_mem[1] .. " ")
-    status_memory:append(s_mem[2], "Comment")
+    status_memory:append(s_mem[2], "leetcode_alt")
 
     local perc_mem = NuiLine()
     perc_mem:append(
@@ -69,7 +69,7 @@ function result:handle_accepted(item)
     )
     perc_mem:append("of users with " .. item.pretty_lang)
 
-    local memory = Pre:init(NuiText("󰍛 Memory", "LeetCodeNormal"), {
+    local memory = Pre:init(NuiText("󰍛 Memory", "leetcode_normal"), {
         status_memory,
         perc_mem,
     })
@@ -90,7 +90,7 @@ function result:handle_runtime(item) -- status code = 10
     local h = NuiLine()
     h:append(item._.title, item._.hl)
     h:append(" | ")
-    h:append("Runtime: " .. item.status_runtime, "Comment")
+    h:append("Runtime: " .. item.status_runtime, "leetcode_alt")
     header:append(h)
     group:append(header)
 
@@ -122,7 +122,7 @@ function result:handle_submission_error(item) -- status code = 11
     local header = NuiLine()
     header:append(item._.title, item._.hl)
     header:append(" | ")
-    header:append(passed_testcases(item), "Comment")
+    header:append(passed_testcases(item), "leetcode_alt")
     group:append(Text:init({ lines = { header } }))
 
     local text = Case:init(
@@ -153,10 +153,10 @@ function result:handle_limit_exceeded(item) -- status code = 14
 
     if item._.submission then
         local last_testcase = NuiLine()
-        last_testcase:append(item.last_testcase:gsub("\n", " "), "LeetCodeIndent")
+        last_testcase:append(item.last_testcase:gsub("\n", " "), "leetcode_indent")
 
         local pre_header = NuiLine()
-        pre_header:append(" Last Executed Input", "LeetCodeNormal")
+        pre_header:append(" Last Executed Input", "leetcode_normal")
 
         local last_exec = Pre:init(pre_header, { last_testcase })
         group:append(last_exec)
@@ -184,21 +184,21 @@ function result:handle_runtime_error(item) -- status code = 15
 
     if item._.submission then
         header:append(" | ")
-        header:append(passed_testcases(item), "Comment")
+        header:append(passed_testcases(item), "leetcode_alt")
     end
 
     local t = {}
     for line in vim.gsplit(item.full_runtime_error, "\n") do
-        table.insert(t, NuiLine():append(line, "LeetCodeError"))
+        table.insert(t, NuiLine():append(line, "leetcode_error"))
     end
     group:append(Pre:init(header, t))
 
     if item._.submission then
         local pre_header = NuiLine()
-        pre_header:append(" Last Executed Input", "LeetCodeNormal")
+        pre_header:append(" Last Executed Input", "leetcode_normal")
 
         local last_testcase = NuiLine()
-        last_testcase:append(item.last_testcase:gsub("\n", " "), "LeetCodeIndent")
+        last_testcase:append(item.last_testcase:gsub("\n", " "), "leetcode_indent")
 
         local last_exec = Pre:init(pre_header, { last_testcase })
         group:append(last_exec)
@@ -228,12 +228,12 @@ function result:handle_compile_error(item) -- status code = 20
     header:append(item._.title, item._.hl)
     if item._.submission then
         header:append(" | ")
-        header:append(passed_testcases(item), "Comment")
+        header:append(passed_testcases(item), "leetcode_alt")
     end
 
     local t = {}
     for line in vim.gsplit(item.full_compile_error, "\n") do
-        table.insert(t, NuiLine():append(line, "LeetCodeError"))
+        table.insert(t, NuiLine():append(line, "leetcode_error"))
     end
 
     group:append(Pre:init(header, t))
@@ -254,7 +254,7 @@ function result:handle_item(item)
     if item.submission_id then
         submission = not item.submission_id:find("runcode") and true or false
     end
-    local hl = success and "LeetCodeOk" or "LeetCodeError"
+    local hl = success and "leetcode_ok" or "leetcode_error"
 
     item._ = {
         title = " " .. item.status_msg,

@@ -16,26 +16,15 @@ local function should_start()
 end
 
 local function setup_highlights()
-    vim.api.nvim_set_hl(0, "LeetCodeEasy", { fg = "#46c6c2" })
-    vim.api.nvim_set_hl(0, "LeetCodeMedium", { fg = "#fac31d" })
-    vim.api.nvim_set_hl(0, "LeetCodeHard", { fg = "#f8615c" })
+    local theme = require("leetcode.theme")
 
-    vim.api.nvim_set_hl(0, "LeetCodeInfo", { link = "DiagnosticInfo" })
-    vim.api.nvim_set_hl(0, "LeetCodeHint", { link = "DiagnosticHint" })
-    vim.api.nvim_set_hl(0, "LeetCodeError", { link = "DiagnosticError" })
-    vim.api.nvim_set_hl(0, "LeetCodeOk", { link = "DiagnosticOk" })
+    vim.api.nvim_create_autocmd("ColorScheme", {
+        desc = "Colorscheme Synchronizer",
+        group = vim.api.nvim_create_augroup("lc.colorscheme_sync", {}),
+        callback = function() theme.load() end,
+    })
 
-    local normal = vim.api.nvim_get_hl(0, { name = "FloatTitle" })
-    vim.api.nvim_set_hl(0, "LeetCodeNormal", normal)
-    vim.api.nvim_set_hl(0, "LeetCodeItalic", vim.tbl_extend("force", normal, { italic = true }))
-    vim.api.nvim_set_hl(0, "LeetCodeBold", { bold = true })
-
-    vim.api.nvim_set_hl(0, "LeetCodeCode", { link = "Type" })
-    vim.api.nvim_set_hl(0, "LeetCodeExample", { link = "LeetCodeHint" })
-    vim.api.nvim_set_hl(0, "LeetCodeConstraints", { link = "LeetCodeInfo" })
-    vim.api.nvim_set_hl(0, "LeetCodeIndent", { link = "Comment" })
-    vim.api.nvim_set_hl(0, "LeetCodeList", { link = "Tag" })
-    vim.api.nvim_set_hl(0, "LeetCodeLink", { link = "Function" })
+    theme.load()
 end
 
 local function setup_cmds()

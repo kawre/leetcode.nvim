@@ -18,22 +18,22 @@ function case:init(index, input, output, expected, passed)
 
     local match = passed or (output == expected)
     local icon = match and "" or ""
-    local hi = match and "LeetCodeOk" or "LeetCodeError"
+    local hi = match and "leetcode_ok" or "leetcode_error"
     local title_line = NuiLine():append(icon .. " Case " .. index, hi)
 
     local input_line = NuiLine()
     input_line:append("Input: ")
-    input_line:append(input, "Comment")
+    input_line:append(input, "leetcode_alt")
     table.insert(t, input_line)
 
     local output_line = NuiLine()
     output_line:append("Output: ")
-    output_line:append(output, "Comment")
+    output_line:append(output, "leetcode_alt")
     table.insert(t, output_line)
 
     local expected_line = NuiLine()
     expected_line:append("Expected: ")
-    expected_line:append(expected, "Comment")
+    expected_line:append(expected, "leetcode_alt")
     table.insert(t, expected_line)
 
     return Pre:init(title_line, t)

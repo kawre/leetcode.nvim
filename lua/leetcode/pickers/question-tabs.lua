@@ -24,13 +24,19 @@ local function display_current(entry)
 end
 
 local function display_difficulty(q)
+    local hl = {
+        ["Easy"] = "leetcode_easy",
+        ["Medium"] = "leetcode_medium",
+        ["Hard"] = "leetcode_hard",
+    }
+
     local lang = utils.get_lang(q.lang)
-    return { lang.short, "LeetCode" .. q.q.difficulty }
+    return { lang.short, hl[q.q.difficulty] }
 end
 
 ---@param question lc.Cache.Question
 local function display_question(question)
-    local index = { question.frontend_id .. ".", "LeetCodeNormal" }
+    local index = { question.frontend_id .. ".", "leetcode_normal" }
     local title = { question.title }
 
     return unpack({ index, title })

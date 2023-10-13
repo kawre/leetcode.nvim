@@ -32,7 +32,7 @@ function button:init(text, sc, on_press, expandable)
     local line = NuiLine()
     line:append(txt)
     line:append(padding)
-    line:append(sc, "LeetCodeInfo")
+    line:append(sc, "leetcode_info")
 
     local obj = setmetatable({
         opts = opts,

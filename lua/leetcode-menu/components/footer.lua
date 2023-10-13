@@ -21,7 +21,7 @@ function footer:init(opts)
 
     if config.auth.is_signed_in then
         local line = NuiLine()
-        line:append("Signed in as: ", "Comment")
+        line:append("Signed in as: ", "leetcode_alt")
         line:append(config.auth.name)
         text:append(line)
     end

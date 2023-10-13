@@ -17,7 +17,7 @@ function pre:init(title, lines)
     local text = Text:init({ lines = { title, NuiLine() } })
 
     for _, line in ipairs(lines) do
-        local new_line = NuiLine({ NuiText("\t▎\t", "LeetCodeIndent") })
+        local new_line = NuiLine({ NuiText("\t▎\t", "leetcode_indent") })
         new_line:append(line)
         text:append(new_line)
     end
@@ -33,7 +33,7 @@ function pre:init(title, lines)
     -- table.insert(t, NuiLine())
     -- local match = output == expected
     -- local icon = match and "" or ""
-    -- local hi = match and "LeetCodeOk" or "LeetCodeError"
+    -- local hi = match and "leetcode_ok" or "leetcode_error"
     -- local index_line = NuiLine():append(icon .. " Case " .. index, hi)
     -- table.insert(t, index_line)
     --

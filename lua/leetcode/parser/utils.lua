@@ -36,14 +36,14 @@ local entities = {
 }
 
 local highlights = {
-    [""] = "LeetCodeNormal",
-    ["strong"] = "LeetCodeBold",
-    ["b"] = "LeetCodeBold",
-    ["em"] = "LeetCodeItalic",
-    ["i"] = "LeetCodeItalic",
-    ["code"] = "LeetCodeCode",
-    ["example"] = "LeetCodeExample",
-    ["constraints"] = "LeetCodeConstraints",
+    [""] = "leetcode_normal",
+    ["strong"] = "leetcode_bold",
+    ["b"] = "leetcode_bold",
+    ["em"] = "leetcode_italic",
+    ["i"] = "leetcode_italic",
+    ["code"] = "leetcode_code",
+    ["example"] = "leetcode_example",
+    ["constraints"] = "leetcode_constraints",
 
     ["pre"] = "Inherit",
     ["span"] = "Inherit",

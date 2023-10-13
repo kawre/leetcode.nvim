@@ -88,7 +88,7 @@ function description:populate()
     local q = self.parent.q
 
     local linkline = NuiLine()
-    linkline:append("https://leetcode.com/problems/" .. q.title_slug .. "/", "Comment")
+    linkline:append("https://leetcode.com/problems/" .. q.title_slug .. "/", "leetcode_alt")
 
     local titleline = NuiLine()
     titleline:append(" " .. q.frontend_id .. ". " .. q.title .. " ", "")
@@ -97,18 +97,25 @@ function description:populate()
     statsline:append(
         q.difficulty,
         ({
-            ["Easy"] = "LeetCodeEasy",
-            ["Medium"] = "LeetCodeMedium",
-            ["Hard"] = "LeetCodeHard",
+            ["Easy"] = "leetcode_easy",
+            ["Medium"] = "leetcode_medium",
+            ["Hard"] = "leetcode_hard",
         })[q.difficulty]
     )
     statsline:append(" | ")
 
-    statsline:append(q.likes .. "  ", "Comment")
-    statsline:append(q.dislikes .. " ", "Comment")
+    statsline:append(q.likes .. "  ", "leetcode_alt")
+    statsline:append(q.dislikes .. " ", "leetcode_alt")
     statsline:append(" | ")
 
-    statsline:append(string.format("%s of %s", q.stats.acRate, q.stats.totalSubmission), "Comment")
+    statsline:append(
+        string.format("%s of %s", q.stats.acRate, q.stats.totalSubmission),
+        "leetcode_alt"
+    )
+    if not vim.tbl_isempty(q.hints) then
+        statsline:append(" | ")
+        statsline:append("Hints", "leetcode_alt")
+    end
 
     local titlecomp = Text:init({
         lines = { titleline },

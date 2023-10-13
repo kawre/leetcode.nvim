@@ -19,7 +19,7 @@ function stdout:init(output)
         table.insert(t, NuiLine():append(output_list[i]))
     end
 
-    return Pre:init(NuiLine():append(" Stdout", "Comment"), t)
+    return Pre:init(NuiLine():append(" Stdout", "leetcode_alt"), t)
 end
 
 return stdout
