@@ -28,7 +28,10 @@ function Hints:mount()
         table.insert(nodes, node)
     end
     if vim.tbl_isempty(nodes) then
-        table.insert(nodes, NuiTree.Node({ text = NuiText("No hints available", "LeetCodeError") }))
+        table.insert(
+            nodes,
+            NuiTree.Node({ text = NuiText(" No hints available", "LeetCodeError") })
+        )
     end
 
     local tree = NuiTree({
@@ -40,13 +43,17 @@ function Hints:mount()
             line:append(string.rep("  ", node:get_depth() - 1))
 
             if node:has_children() then
-                line:append(node:is_expanded() and " " or " ", "SpecialChar")
+                line:append(node:is_expanded() and " " or " ", "SpecialChar")
                 line:append(node.text)
             else
-                line:append("  ")
-                local parser = require("leetcode.parser")
-                local txt = parser:init(node.text, "html"):parse()
-                if txt.lines[1] then line:append(txt.lines[1]) end
+                if type(node.text) == "string" then
+                    line:append("  ")
+                    local parser = require("leetcode.parser")
+                    local txt = parser:init(node.text, "html"):parse()
+                    if txt.lines[1] then line:append(txt.lines[1]) end
+                else
+                    line:append(node.text)
+                end
             end
 
             return line
