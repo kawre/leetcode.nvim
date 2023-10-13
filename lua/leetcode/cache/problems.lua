@@ -1,4 +1,5 @@
 local path = require("plenary.path")
+local log = require("leetcode.logger")
 
 local config = require("leetcode.config")
 local file = config.home:joinpath(".problemlist")
@@ -20,8 +21,23 @@ local function populate()
 
     local noti = spinner:init("Fetching Problem List", "points")
     local data = problems_api.all()
-    file:write(vim.json.encode(data), "w")
+    problemlist.write(data)
     noti:stop("Problems Cache Updated!")
+end
+
+---@param data string|table
+function problemlist.write(data)
+    local str
+
+    if type(data) == "table" then
+        local ok, dec = pcall(vim.json.encode, data)
+        assert(ok, dec)
+        str = dec
+    else
+        str = data
+    end
+
+    file:write(str, "w")
 end
 
 ---@return lc.Cache.Question[]
@@ -50,7 +66,7 @@ function problemlist.update(force)
         local noti = spinner:init("Fetching Problem List", "points")
 
         problems_api._all(function(data)
-            file:write(vim.json.encode(data), "w")
+            problemlist.write(data)
             noti:stop("Problems Cache Updated!")
         end)
     end
@@ -70,6 +86,19 @@ function problemlist.parse(problems_str)
     assert(ok, "Failed to parse problems")
 
     return problems
+end
+
+---@param title_slug string
+---@param status "ac" | "notac"
+function problemlist.change_status(title_slug, status)
+    local problist = problemlist.get()
+
+    vim.tbl_map(function(p)
+        if p.title_slug == title_slug then p.status = status end
+        return p
+    end, problist)
+
+    problemlist.write(problist)
 end
 
 function problemlist.delete() file:rm() end
