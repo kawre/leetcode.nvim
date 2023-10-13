@@ -34,6 +34,23 @@ function Hints:mount()
     local tree = NuiTree({
         bufnr = self.popup.bufnr,
         nodes = nodes,
+        prepare_node = function(node)
+            local line = NuiLine()
+
+            line:append(string.rep("  ", node:get_depth() - 1))
+
+            if node:has_children() then
+                line:append(node:is_expanded() and " " or " ", "SpecialChar")
+                line:append(node.text)
+            else
+                line:append("  ")
+                local parser = require("leetcode.parser")
+                local txt = parser:init(node.text, "html"):parse()
+                if txt.lines[1] then line:append(txt.lines[1]) end
+            end
+
+            return line
+        end,
     })
 
     local opts = { noremap = true, nowait = true }
