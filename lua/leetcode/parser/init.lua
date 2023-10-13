@@ -19,15 +19,15 @@ local NuiLine = require("nui.line")
 ---@field text lc-ui.Text
 ---@field newline_count integer
 ---@field ol_count table<integer>
-local parser = {}
-parser.__index = parser
+local Parser = {}
+Parser.__index = Parser
 
 ---@private
 ---
 ---@param node TSNode
 ---
 ---@return lc.Parser.Tag.Attr
-function parser:get_attr(node)
+function Parser:get_attr(node)
     ---@class lc.Parser.Tag.Attr
     ---@field name string
     ---@field value string
@@ -55,7 +55,7 @@ end
 ---@param node TSNode
 ---
 ---@return lc.Parser.Tag | nil
-function parser:get_tag_data(node)
+function Parser:get_tag_data(node)
     if node:type() ~= "element" then return end
 
     local start_tag
@@ -88,9 +88,9 @@ end
 ---@param node TSNode
 ---
 ---@return string
-function parser:get_text(node) return self.ts.get_node_text(node, self.str) end
+function Parser:get_text(node) return self.ts.get_node_text(node, self.str) end
 
-function parser:handle_entity(entity)
+function Parser:handle_entity(entity)
     if entity == "&lcnl;" then
         if self.newline_count <= 1 then
             self.text:append(self.line)
@@ -110,7 +110,7 @@ function parser:handle_entity(entity)
     return utils.entity(entity)
 end
 
-function parser:handle_list(tags)
+function Parser:handle_list(tags)
     if self.line:content() ~= "" then return end
 
     local function get_list_type()
@@ -139,7 +139,7 @@ function parser:handle_list(tags)
 end
 
 ---@param text string
-function parser:handle_indent(text)
+function Parser:handle_indent(text)
     if self.line:content() ~= "" then return text end
 
     self.line:append("\t▎\t", "leetcode_indent")
@@ -151,7 +151,7 @@ end
 ---@param tag_data lc.Parser.Tag
 ---
 ---@return NuiLine
-function parser:handle_link(text, tag_data)
+function Parser:handle_link(text, tag_data)
     local line = NuiLine()
 
     local href
@@ -167,7 +167,7 @@ function parser:handle_link(text, tag_data)
     return line
 end
 
-function parser:handle_img(tag_data)
+function Parser:handle_img(tag_data)
     local tag = tag_data.tag
     if tag ~= "img" then return end
     local line = NuiLine()
@@ -192,7 +192,7 @@ end
 ---@param node TSNode
 ---@param tags lc.Parser.Tag
 --@param tag_data lc.Parser.Tag
-function parser:node_hi(node, tags, tag_data)
+function Parser:node_hi(node, tags, tag_data)
     local text = self:get_text(node)
     local tag = tags[1]
 
@@ -222,7 +222,7 @@ end
 ---
 ---@param node TSNode
 ---@param tags table
-function parser:rec_parse(node, tags)
+function Parser:rec_parse(node, tags)
     local tag_data = self:get_tag_data(node)
     ---handle img
     if tag_data and tag_data.tag == "img" then return self:handle_img(tag_data) end
@@ -236,15 +236,6 @@ function parser:rec_parse(node, tags)
         self:rec_parse(child, tags)
         if tag_data then table.remove(tags, 1) end
     end
-end
-
----@return lc-ui.Text
-function parser:parse()
-    local root = self.parser:parse()[1]:root()
-
-    self:rec_parse(root, {})
-
-    return self.text
 end
 
 ---@param str string
@@ -273,17 +264,40 @@ local function normalize_html(str)
     return res .. "&lcend;"
 end
 
+function Parser:plain_parser()
+    local xd = self.str:gsub("<[^>]+>", "")
+
+    for s in vim.gsplit(xd, "\n") do
+        s = s:gsub("&[%a%d#]+;", function(match) return utils.entity(match) end)
+        local nui_line = NuiLine()
+        nui_line:append(s, "leetcode_alt")
+        self.text:append(nui_line)
+    end
+end
+
+---@return lc-ui.Text
+function Parser:parse()
+    self.ts = vim.treesitter
+
+    local norm = normalize_html(self.str)
+    local ok, parser = pcall(self.ts.get_string_parser, norm, self.lang)
+    if ok then
+        self.str = norm
+        local root = parser:parse()[1]:root()
+        self:rec_parse(root, {})
+    else
+        self:plain_parser()
+    end
+
+    return self.text
+end
+
 ---@param str string
 ---@param lang string
-function parser:init(str, lang)
-    local ts = vim.treesitter
-    str = normalize_html(str)
-    local _parser = ts.get_string_parser(str, lang)
-
+function Parser:init(str, lang)
     local obj = setmetatable({
         str = str,
-        ts = ts,
-        parser = _parser,
+        lang = lang,
         text = Text:init(),
         line = NuiLine(),
         newline_count = 0,
@@ -293,4 +307,4 @@ function parser:init(str, lang)
     return obj
 end
 
-return parser
+return Parser
