@@ -36,9 +36,9 @@ logger.error = function(msg) return logger.log(msg, lvls.ERROR) end
 ---@param msg msg
 ---@return any
 logger.debug = function(msg)
-    if not config.debug then return end
-    logger.log(debug.traceback(normalize(msg)), lvls.DEBUG)
+    if not config.debug then return msg end
 
+    logger.log(debug.traceback(normalize(msg)), lvls.DEBUG)
     return msg
 end
 
