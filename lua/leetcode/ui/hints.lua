@@ -54,7 +54,7 @@ function Hints:mount()
     })
 
     local opts = { noremap = true, nowait = true }
-    self.popup:map("n", { "<Esc>", "q" }, function() self.popup:hide() end, opts)
+    self.popup:map("n", { "<Esc>", "q" }, function() self:hide() end, opts)
 
     self.popup:map("n", "<CR>", function()
         local node = tree:get_node()
@@ -79,13 +79,22 @@ function Hints:show()
     else
         self:mount()
     end
+
+    self.opened = true
 end
 
-function Hints:hide() self.popup:hide() end
+function Hints:hide()
+    self.popup:hide()
+    self.opened = false
+end
 
--- function Hints:toggle()
---
--- end
+function Hints:toggle()
+    if self.opened then
+        self:hide()
+    else
+        self:show()
+    end
+end
 
 ---@param parent lc.Question
 function Hints:init(parent)
@@ -126,6 +135,7 @@ function Hints:init(parent)
         popup = popup,
         hints = parent.q.hints,
         parent = parent,
+        opened = false,
     }, self)
 
     return obj
