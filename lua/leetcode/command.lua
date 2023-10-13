@@ -135,8 +135,10 @@ function cmd.q_submit()
 end
 
 function cmd.fix()
-    local config = require("leetcode.config")
-    config.home:rmdir()
+    -- local config = require("leetcode.config")
+    require("leetcode.cache.cookie").delete()
+    require("leetcode.cache.problems").delete()
+    vim.cmd("qa!")
 end
 
 return cmd

@@ -13,7 +13,7 @@ local problems_api = require("leetcode.api.problems")
 ---@field paid_only boolean
 ---@field ac_rate number
 ---@field difficulty "Easy" | "Medium" | "Hard"
-local Problems = {}
+local problemlist = {}
 
 local function populate()
     local spinner = require("leetcode.logger.spinner")
@@ -25,22 +25,20 @@ local function populate()
 end
 
 ---@return lc.Cache.Question[]
-function Problems.get()
-    Problems.update()
+function problemlist.get()
+    problemlist.update()
 
     local r_ok, contents = pcall(path.read, file)
     assert(r_ok)
-    -- if not r_ok then return end
 
-    local ok, problems = pcall(Problems.parse, contents)
+    local ok, problems = pcall(problemlist.parse, contents)
     assert(ok)
-    -- if not ok then return end
 
     return problems
 end
 
 ---@param force? boolean
-function Problems.update(force)
+function problemlist.update(force)
     local stats = file:_stat()
     if vim.tbl_isempty(stats) then return populate() end
 
@@ -58,15 +56,15 @@ function Problems.update(force)
     end
 end
 
-function Problems.get_by_title_slug(title_slug)
-    local problems = Problems.get()
+function problemlist.get_by_title_slug(title_slug)
+    local problems = problemlist.get()
     return vim.tbl_filter(function(e) return e.title_slug == title_slug end, problems)[1]
 end
 
 ---@param problems_str string
 ---
 ---@return lc.Cache.Question[]
-function Problems.parse(problems_str)
+function problemlist.parse(problems_str)
     ---@type boolean, lc.Cache.Question[]
     local ok, problems = pcall(vim.json.decode, problems_str)
     assert(ok, "Failed to parse problems")
@@ -74,4 +72,6 @@ function Problems.parse(problems_str)
     return problems
 end
 
-return Problems
+function problemlist.delete() file:rm() end
+
+return problemlist

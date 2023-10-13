@@ -38,10 +38,15 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 
 - [nui.nvim][nui.nvim]
 
+- [nvim-notify][nvim-notify] (Optional)
+
+- [Nerd Font][nerd-font] (Optional)
+
 [nvim-treesitter]: https://github.com/nvim-treesitter/nvim-treesitter
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
 [nui.nvim]: https://github.com/MunifTanjim/nui.nvim
 [nvim-notify]: https://github.com/rcarriga/nvim-notify
+[nerd-font]: https://www.nerdfonts.com
 
 ## 📦 Installation
 
@@ -58,10 +63,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
         "MunifTanjim/nui.nvim",
 
         -- optional
-        "nvim-tree/nvim-web-devicons",
-
-        -- recommended
-        -- "rcarriga/nvim-notify",
+        "rcarriga/nvim-notify",
     },
     opts = {
         -- configuration goes here
@@ -243,15 +245,15 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4
 <!-- } -->
 <!-- ``` -->
 
-### Working with multiple questions
-
-When you open a new <b>question</b>, [leetcode.nvim] creates a new [tabpage] <i>containing
-all of the <b>contents</b> related to it</i>.
-To switch between these tabs, use [LcQuestionTabs](#📋-commands) command
-
-https://github.com/kawre/leetcode.nvim/assets/69250723/64378b0f-c5ba-4378-b9ff-a95df13fbf36
-
-[tabpage]: https://neovim.io/doc/user/tabpage.html
+<!-- ### Working with multiple questions -->
+<!---->
+<!-- When you open a new <b>question</b>, [leetcode.nvim] creates a new [tabpage] <i>containing -->
+<!-- all of the <b>contents</b> related to it</i>. -->
+<!-- To switch between these tabs, use [LcQuestionTabs](#📋-commands) command -->
+<!---->
+<!-- https://github.com/kawre/leetcode.nvim/assets/69250723/64378b0f-c5ba-4378-b9ff-a95df13fbf36 -->
+<!---->
+<!-- [tabpage]: https://neovim.io/doc/user/tabpage.html -->
 
 ## ✅ Todo
 

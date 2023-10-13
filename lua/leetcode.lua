@@ -49,6 +49,7 @@ local function setup_cmds()
     vim.api.nvim_create_user_command("LcDescriptionToggle", function() cmd.desc_toggle() end, {})
     vim.api.nvim_create_user_command("LcRun", function() cmd.q_run() end, {})
     vim.api.nvim_create_user_command("LcSubmit", function() cmd.q_submit() end, {})
+    vim.api.nvim_create_user_command("LcFix", function() cmd.fix() end, {})
 end
 
 local function start()
