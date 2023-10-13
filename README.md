@@ -32,15 +32,17 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 
 - [Neovim] >= 0.9.0
 
-- [nvim-treesitter][nvim-treesitter]
-
 - [telescope.nvim][telescope.nvim]
 
 - [nui.nvim][nui.nvim]
 
-- [nvim-notify][nvim-notify] (Optional)
+- [nvim-treesitter][nvim-treesitter] _**(optional, but highly recommended)**_
+  used for formatting the question description.
+  Make sure to install the parser for `html`.
 
-- [Nerd Font][nerd-font] (Optional)
+- [nvim-notify][nvim-notify] _**(optional)**_
+
+- [Nerd Font][nerd-font] _**(optional)**_
 
 [nvim-treesitter]: https://github.com/nvim-treesitter/nvim-treesitter
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
