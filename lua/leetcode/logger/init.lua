@@ -15,7 +15,7 @@ local function normalize(msg) return type(msg) == "string" and msg or vim.inspec
 ---@param lvl? integer
 ---@return any
 logger.log = function(msg, lvl)
-    if not config.user.logging then return end
+    if not config.user.logging then return msg end
     vim.notify(normalize(msg), lvl or lvls.INFO, { title = config.name })
 
     return msg
