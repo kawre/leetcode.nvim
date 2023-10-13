@@ -106,18 +106,18 @@ function menu:init()
     local winid = vim.api.nvim_get_current_win()
     local tabpage = vim.api.nvim_get_current_tabpage()
     _Lc_MenuTabPage = tabpage
-    vim.api.nvim_buf_set_name(bufnr, "")
+    -- vim.api.nvim_buf_set_name(bufnr, "")
 
     utils.apply_opt_local({
-        bufhidden = "wipe",
+        -- bufhidden = "wipe",
         buflisted = false,
         matchpairs = "",
         swapfile = false,
         buftype = "nofile",
         filetype = "leetcode.nvim",
         synmaxcol = 0,
-        wrap = false,
         modifiable = false,
+        wrap = false,
         colorcolumn = "",
         foldlevel = 999,
         foldcolumn = "0",
