@@ -1,4 +1,5 @@
 local config = require("leetcode.config")
+local log = require("leetcode.logger")
 
 ---@class lc.Utils
 local utils = {}
@@ -84,7 +85,8 @@ function utils.curr_question()
     local tabp = vim.api.nvim_get_current_tabpage()
     local tabs = utils.curr_question_tabs()
 
-    return vim.tbl_filter(function(t) return t.tabpage == tabp end, tabs)[1].question or nil
+    local tab = vim.tbl_filter(function(t) return t.tabpage == tabp end, tabs)[1] or {}
+    return tab.question
 end
 
 ---@return lc.language

@@ -351,7 +351,7 @@ function result:init(parent)
         },
         buf_options = {
             modifiable = false,
-            readonly = true,
+            readonly = false,
         },
         win_options = {
             winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder",
