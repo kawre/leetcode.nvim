@@ -3,7 +3,7 @@
 ---@param name string String for looking up highlight group.
 ---@return table
 local function hl(name)
-    local highlight = vim.api.nvim_get_hl(0, { name = name, link = true })
+    local highlight = vim.api.nvim_get_hl(0, { name = name, link = false })
     setmetatable(highlight, {
         __index = function(self, key)
             if key == "bg" then return self.background end
@@ -16,8 +16,8 @@ local function hl(name)
     return highlight
 end
 
----@alias lc.Themes table<string, table>
----@type lc.Themes
+---@alias lc.highlights table<string, table>
+---@type lc.highlights
 return function()
     return {
         easy = { fg = "#46c6c2" },
