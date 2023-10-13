@@ -48,7 +48,7 @@ end
 ---@return lc.Cache.Question[]
 function M._all(cb)
     local variables = {
-        limit = 3000,
+        limit = 9999,
     }
 
     local query = string.format(

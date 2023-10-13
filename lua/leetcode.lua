@@ -6,8 +6,8 @@ local leetcode = {}
 local function should_start()
     if vim.fn.argc() ~= 1 then return false end
 
-    local user_arg, arg = config.user.arg, vim.fn.argv()[1]
-    if user_arg ~= arg then return false end
+    local usr_arg, arg = config.user.arg, vim.fn.argv()[1]
+    if usr_arg ~= arg then return false end
 
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
     if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return false end
