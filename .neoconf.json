@@ -3,10 +3,11 @@
     "library": {
       "enabled": true,
       "plugins": [
-        "nvim-treesitter/nvim-treesitter",
+        "nvim-treesitter",
         "telescope.nvim",
         "plenary.nvim",
-        "nui.nvim"
+        "nui.nvim",
+        "nvim-web-devicons"
       ]
     }
   }

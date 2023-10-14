@@ -42,13 +42,14 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 
 - [nvim-notify][nvim-notify] _**(optional)**_
 
-- [Nerd Font][nerd-font] _**(optional)**_
+- [Nerd Font][nerd-font] & [nvim-web-devicons] _**(optional)**_
 
 [nvim-treesitter]: https://github.com/nvim-treesitter/nvim-treesitter
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
 [nui.nvim]: https://github.com/MunifTanjim/nui.nvim
 [nvim-notify]: https://github.com/rcarriga/nvim-notify
 [nerd-font]: https://www.nerdfonts.com
+[nvim-web-devicons]: https://github.com/nvim-tree/nvim-web-devicons
 
 ## 📦 Installation
 
