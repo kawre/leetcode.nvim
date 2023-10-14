@@ -34,7 +34,7 @@ return function()
 
         normal = { fg = hl("FloatTitle").fg },
         alt = { fg = hl("Comment").fg },
-        code = { fg = hl("Type").fg },
+        code = { fg = hl("Type").fg, bg = hl("Normal").bg },
         example = { fg = hl("DiagnosticHint").fg },
         constraints = { fg = hl("DiagnosticInfo").fg },
         indent = { fg = hl("Comment").fg },

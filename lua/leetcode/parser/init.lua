@@ -1,12 +1,6 @@
----TODO: <blockquote>
----TODO: <a> parser
----TODO: <img> parser
----TODO: <u> parser
----TODO: question duplication
----TODO: Q2066
-
 local Text = require("leetcode-ui.component.text")
 local utils = require("leetcode.parser.utils")
+local log = require("leetcode.logger")
 
 local NuiText = require("nui.text")
 local NuiLine = require("nui.line")
@@ -253,6 +247,7 @@ local function normalize_html(str)
             "<p><strong[^>]*>(Constraints:)</strong></p>(\n*)",
             "\n\n<constraints> %1</constraints>\n\n"
         )
+        :gsub("(<code[^>]*>)(.-)(</code>)", "%1&lccode;%2&lccode;%3")
         :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
         :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
         :gsub("\n", "&lcnl;")
@@ -275,10 +270,20 @@ function Parser:plain_parser()
     end
 end
 
+-- Trim excessive lines
+function Parser:trim()
+    local lines = self.text.lines
+    for i = #lines, 1, -1 do
+        if lines[i]:content() ~= "" then break end
+        table.remove(lines, i)
+    end
+    self.text.lines = lines
+
+    return self.text
+end
+
 ---@return lc-ui.Text
 function Parser:parse()
-    self.ts = vim.treesitter
-
     local norm = normalize_html(self.str)
     local ok, parser = pcall(self.ts.get_string_parser, norm, self.lang)
     if ok then
@@ -289,14 +294,17 @@ function Parser:parse()
         self:plain_parser()
     end
 
-    return self.text
+    return self:trim()
 end
 
 ---@param str string
 ---@param lang string
 function Parser:init(str, lang)
+    log.debug(str)
+
     local obj = setmetatable({
         str = str,
+        ts = vim.treesitter,
         lang = lang,
         text = Text:init(),
         line = NuiLine(),

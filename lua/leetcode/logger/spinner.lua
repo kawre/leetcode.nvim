@@ -67,7 +67,7 @@ end
 ---@param spinner_type lc.spinner_types
 function spinner:change(spinner_type) self.spinner = spinners[spinner_type] end
 
----@param msg msg
+---@param msg any
 function spinner:update(msg) self.msg = tostring(msg) end
 
 function spinner:start()

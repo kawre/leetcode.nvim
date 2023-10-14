@@ -33,6 +33,7 @@ local entities = {
     ["&lcnl;"] = "",
     ["&lctab;"] = "\t",
     ["&lcend;"] = "",
+    ["&lccode;"] = "`",
 }
 
 local highlights = {

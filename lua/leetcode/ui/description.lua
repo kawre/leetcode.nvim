@@ -114,7 +114,7 @@ function description:populate()
     )
     if not vim.tbl_isempty(q.hints) then
         statsline:append(" | ")
-        statsline:append("Hints", "leetcode_alt")
+        statsline:append("󰛨 Hints", "leetcode_alt")
     end
 
     local titlecomp = Text:init({
