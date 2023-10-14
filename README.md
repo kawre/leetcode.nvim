@@ -1,6 +1,6 @@
 <div align="center">
 
-🚨 <b>leetcode.nvim is currently in the <i>alpha stage</i> of development</b> 🚨
+🚨 **leetcode.nvim is currently in the _alpha stage_ of development** 🚨
 
 ---
 
@@ -75,7 +75,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 ```
 
 [lazy.nvim]: https://github.com/folke/lazy.nvim
-[packer.nvim]: https://github.com/wbthomason/packer.nvim
+<!-- [packer.nvim]: https://github.com/wbthomason/packer.nvim -->
 
 ## 🛠️ Configuration
 
@@ -209,8 +209,8 @@ description = {
 | ------------------- | ------------------------------------------------------------- |
 | LcMenu              | opens menu dashboard                                          |
 | LcList              | opens a problem list picker                                   |
-| LcConsole           | opens console for currently opened question                   |
-| LcHints             | opens hints for currently opened question                     |
+| LcConsole           | opens console pop-up for currently opened question            |
+| LcHints             | opens hints pop-up for currently opened question              |
 | LcTabs              | opens a picker with all currently opened question tabs        |
 | LcLanguage          | opens a picker to change the language of the current question |
 | LcDescriptionToggle | toggle question description                                   |
@@ -219,16 +219,15 @@ description = {
 
 ## 🚀 Usage
 
-This plugin is meant to be used within a <b>fresh</b> [Neovim] instance.
-Meaning that to lauch [leetcode.nvim][leetcode.nvim] you <b>have</b> to pass [`arg`](#arg) as the <i>first and <b>only</b></i> [Neovim] argument
+This plugin is meant to be used within a **fresh** [Neovim] instance.
+Meaning that to lauch [leetcode.nvim][leetcode.nvim] you **have** to pass
+[`arg`](#arg) as the _first and **only**_ [Neovim] argument
 
-```
-nvim leetcode.nvim
-```
+`nvim leetcode.nvim`
 
 ### Sign In
 
-It is <b>required</b> to be <b>signed-in</b> to use [leetcode.nvim][leetcode.nvim]
+It is **required** to be **signed-in** to use [leetcode.nvim][leetcode.nvim]
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4ad3abeda5c3
 

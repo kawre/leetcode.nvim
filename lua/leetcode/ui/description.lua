@@ -142,9 +142,7 @@ function description:populate()
             statscomp,
             padding:init(3),
             contents,
-            padding:init(1),
         },
-        opts = { margin = 5 },
     })
 end
 
