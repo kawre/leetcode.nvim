@@ -3,31 +3,19 @@ local config = require("leetcode.config")
 ---@class lc.LeetCode
 local leetcode = {}
 
-local function should_start()
-    if vim.fn.argc() ~= 1 then return false end
+function leetcode.should_skip()
+    if vim.fn.argc() ~= 1 then return true end
 
     local usr_arg, arg = config.user.arg, vim.fn.argv()[1]
-    if usr_arg ~= arg then return false end
+    if usr_arg ~= arg then return true end
 
-    local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-    if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return false end
+    local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
+    if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return true end
 
-    return true
+    return false
 end
 
-local function setup_highlights()
-    local theme = require("leetcode.theme")
-
-    vim.api.nvim_create_autocmd("ColorScheme", {
-        desc = "Colorscheme Synchronizer",
-        group = vim.api.nvim_create_augroup("lc.colorscheme_sync", {}),
-        callback = function() theme.load() end,
-    })
-
-    theme.load()
-end
-
-local function setup_cmds()
+function leetcode.setup_cmds()
     local cmd = require("leetcode.command")
 
     -- vim.api.nvim_create_user_command("LcList", function() cmd.problems() end, {})
@@ -50,17 +38,25 @@ local function setup_cmds()
     vim.api.nvim_create_user_command("LcFix", function() cmd.fix() end, {})
 end
 
-local function start()
+function leetcode.validate()
+    local utils = require("leetcode.utils")
+
+    assert(utils.get_lang(config.lang), "Unknown language: " .. config.lang)
+    assert(utils.get_lang(config.sql), "Unknown SQL dialect: " .. config.sql)
+end
+
+function leetcode.start()
+    if leetcode.should_skip() then return end
+
     local path = require("plenary.path")
     config.home = path:new(config.user.directory) ---@diagnostic disable-line
     config.home:mkdir()
 
-    setup_highlights()
-    setup_cmds()
+    local theme = require("leetcode.theme")
+    theme.setup()
 
-    local utils = require("leetcode.utils")
-    assert(utils.get_lang(config.lang), "Unknown language: " .. config.lang)
-    assert(utils.get_lang(config.sql), "Unknown sql dialect: " .. config.sql)
+    leetcode.setup_cmds()
+    leetcode.validate()
 
     require("leetcode-menu"):init()
 end
@@ -68,7 +64,13 @@ end
 ---@param cfg? lc.UserConfig
 function leetcode.setup(cfg)
     config.apply(cfg or {})
-    if should_start() then start() end
+
+    vim.api.nvim_create_autocmd("VimEnter", {
+        group = vim.api.nvim_create_augroup("leetcode_start", { clear = true }),
+        pattern = "*",
+        nested = true,
+        callback = function() leetcode.start() end,
+    })
 end
 
 return leetcode

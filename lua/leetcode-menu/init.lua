@@ -1,6 +1,6 @@
 local utils = require("leetcode-menu.utils")
-local config = require("leetcode.config")
 local log = require("leetcode.logger")
+local cookie = require("leetcode.cache.cookie")
 
 ---@class lc-menu
 ---@field layout lc-ui.Layout
@@ -19,7 +19,7 @@ local function tbl_keys(t)
 end
 
 function menu:draw()
-    self.layout:draw({ bufnr = self.bufnr, winid = self.winid }) ---@diagnostic disable-line
+    self.layout:draw(self) ---@diagnostic disable-line
 end
 
 ---@private
@@ -84,6 +84,28 @@ function menu:keymaps()
     end, {})
 end
 
+function menu:handle_mount()
+    if cookie.get() then
+        local auth_api = require("leetcode.api.auth")
+
+        auth_api._user(function(auth, err)
+            if err then
+                log.warn(err.msg)
+                self:set_layout("signin")
+                return
+            end
+
+            local logged_in = auth.is_signed_in
+            local layout = logged_in and "menu" or "signin"
+            self:set_layout(layout)
+        end)
+    else
+        self:set_layout("signin")
+    end
+
+    return self:mount()
+end
+
 function menu:mount()
     self:keymaps()
     self:autocmds()
@@ -96,14 +118,14 @@ function menu:init()
     local winid = vim.api.nvim_get_current_win()
 
     utils.apply_opt_local(winid, {
+        buftype = "nofile",
         buflisted = false,
         matchpairs = "",
         swapfile = false,
-        buftype = "nofile",
         filetype = "leetcode.nvim",
         synmaxcol = 0,
-        modifiable = false,
         wrap = false,
+        modifiable = false,
         colorcolumn = "",
         foldlevel = 999,
         foldcolumn = "0",
@@ -117,7 +139,7 @@ function menu:init()
     })
 
     local ok, loading = pcall(require, "leetcode-menu.layout.loading")
-    assert(ok)
+    assert(ok, loading)
 
     local obj = setmetatable({
         bufnr = bufnr,
@@ -125,30 +147,11 @@ function menu:init()
         layout = loading,
         cursor = {
             idx = 1,
-            prev = nil,
         },
     }, self)
 
-    local cookie = require("leetcode.cache.cookie")
-    if cookie.get() then
-        local auth_api = require("leetcode.api.auth")
-        auth_api._user(function(auth, err)
-            if err then
-                log.warn(err.msg)
-                obj:set_layout("signin")
-                return
-            end
-
-            local logged_in = auth.is_signed_in
-            local layout = logged_in and "menu" or "signin"
-            obj:set_layout(layout)
-        end)
-    else
-        obj:set_layout("signin")
-    end
-
     _Lc_Menu = obj
-    return obj:mount()
+    return obj:handle_mount()
 end
 
 return menu

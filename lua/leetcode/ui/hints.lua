@@ -109,8 +109,8 @@ function Hints:init(parent)
     local popup = NuiPopup({
         position = "50%",
         size = {
-            width = 80,
-            height = 40,
+            width = "50%",
+            height = "50%",
         },
         enter = true,
         focusable = true,

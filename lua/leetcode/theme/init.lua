@@ -4,7 +4,7 @@ local config = require("leetcode.config")
 ---@class lc.Theme
 local theme = {}
 
-function theme.load_icons()
+function theme.load_devicons()
     vim.tbl_map(function(l)
         local icon, color = devicons.get_icon_color(l.ft)
 
@@ -22,12 +22,21 @@ function theme.load()
         vim.api.nvim_set_hl(0, key, t)
     end
 
-    if devicons_ok then theme.load_icons() end
-
+    if devicons_ok then theme.load_devicons() end
     for _, lang in ipairs(config.langs) do
         local name = "leetcode_lang_" .. lang.slug
         vim.api.nvim_set_hl(0, name, { fg = lang.color })
     end
+end
+
+function theme.setup()
+    vim.api.nvim_create_autocmd("ColorScheme", {
+        desc = "Colorscheme Synchronizer",
+        group = vim.api.nvim_create_augroup("lc.colorscheme_sync", {}),
+        callback = function() theme.load() end,
+    })
+
+    theme.load()
 end
 
 return theme
