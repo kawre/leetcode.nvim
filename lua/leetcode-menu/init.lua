@@ -118,14 +118,14 @@ function menu:init()
     local winid = vim.api.nvim_get_current_win()
 
     utils.apply_opt_local(winid, {
-        buftype = "nofile",
+        modifiable = false,
         buflisted = false,
         matchpairs = "",
         swapfile = false,
+        buftype = "nofile",
         filetype = "leetcode.nvim",
         synmaxcol = 0,
         wrap = false,
-        modifiable = false,
         colorcolumn = "",
         foldlevel = 999,
         foldcolumn = "0",

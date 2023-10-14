@@ -31,8 +31,8 @@ end
 
 function theme.setup()
     vim.api.nvim_create_autocmd("ColorScheme", {
-        desc = "Colorscheme Synchronizer",
         group = vim.api.nvim_create_augroup("lc.colorscheme_sync", {}),
+        desc = "Colorscheme Synchronizer",
         callback = function() theme.load() end,
     })
 

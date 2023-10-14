@@ -7,7 +7,7 @@ function utils.apply_opt_local(winid, options)
 
     log.debug("applying `opt_local` to winid: " .. winid)
     for key, value in pairs(options) do
-        vim.api.nvim_set_option_value(key, value, { win = winid, scope = "local" })
+        pcall(vim.api.nvim_set_option_value, key, value, { win = winid, scope = "local" })
     end
 end
 

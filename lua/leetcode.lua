@@ -48,6 +48,8 @@ end
 function leetcode.start()
     if leetcode.should_skip() then return end
 
+    leetcode.validate()
+
     local path = require("plenary.path")
     config.home = path:new(config.user.directory) ---@diagnostic disable-line
     config.home:mkdir()
@@ -56,17 +58,18 @@ function leetcode.start()
     theme.setup()
 
     leetcode.setup_cmds()
-    leetcode.validate()
 
-    require("leetcode-menu"):init()
+    local menu = require("leetcode-menu")
+    menu:init()
 end
 
 ---@param cfg? lc.UserConfig
 function leetcode.setup(cfg)
     config.apply(cfg or {})
 
+    local group_id = vim.api.nvim_create_augroup("leetcode_start", { clear = true })
     vim.api.nvim_create_autocmd("VimEnter", {
-        group = vim.api.nvim_create_augroup("leetcode_start", { clear = true }),
+        group = group_id,
         pattern = "*",
         nested = true,
         callback = function() leetcode.start() end,
