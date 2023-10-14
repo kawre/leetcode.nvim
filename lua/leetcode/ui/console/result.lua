@@ -30,8 +30,6 @@ end
 function result:set_popup_border_hi(hi) self.popup.border:set_highlight(hi) end
 
 function result:handle_accepted(item)
-    problemlist.change_status(self.parent.parent.q.title_slug, "ac")
-
     local function perc_hi(perc) return perc >= 50 and "leetcode_ok" or "leetcode_error" end
     local group = Group:init({ opts = { spacing = 2 } })
 
@@ -120,8 +118,6 @@ end
 ---
 ---@param item lc.submission
 function result:handle_submission_error(item) -- status code = 11
-    problemlist.change_status(self.parent.parent.q.title_slug, "notac")
-
     local group = Group:init({ opts = { spacing = 1 } })
 
     local header = NuiLine()
