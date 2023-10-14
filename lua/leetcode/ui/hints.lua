@@ -11,14 +11,14 @@ local Hints = {}
 Hints.__index = Hints
 
 function Hints:mount()
-    log.debug(self)
     self.popup:mount()
+
     local utils = require("leetcode-menu.utils")
-    utils.apply_opt_local({ wrap = true })
+    utils.apply_opt_local(self.popup.winid, { wrap = true })
 
     local NuiTree = require("nui.tree")
-
     local nodes = {}
+
     for i, hint in ipairs(self.hints) do
         local node = NuiTree.Node(
             { text = NuiText("󰛨 Hint " .. i, "leetcode_hint") },
@@ -39,11 +39,10 @@ function Hints:mount()
         nodes = nodes,
         prepare_node = function(node)
             local line = NuiLine()
-
             line:append(string.rep("  ", node:get_depth() - 1))
 
             if node:has_children() then
-                line:append(node:is_expanded() and " " or " ", "SpecialChar")
+                line:append(node:is_expanded() and " " or " ", "leetcode_list")
                 line:append(node.text)
             else
                 if type(node.text) == "string" then

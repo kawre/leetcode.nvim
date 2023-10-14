@@ -311,3 +311,13 @@
 ---@field _ lc.Interpreter.item
 
 ---@alias lc.submission lc.Interpreter.Response.submission
+
+--------------------------------------------
+--- UserStatus
+--------------------------------------------
+---@class lc.UserStatus
+---@field name string
+---@field is_signed_in boolean
+---@field is_premium boolean
+---@field is_verified boolean
+---@field id integer

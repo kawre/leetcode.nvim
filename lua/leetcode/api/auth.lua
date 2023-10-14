@@ -17,13 +17,13 @@ end
 
 local usr_fields = [[
     id: userId
+    name: username
     is_signed_in: isSignedIn
     is_premium: isPremium
-    name: username
     is_verified: isVerified
 ]]
 
----@return lc.UserAuth
+---@return lc.UserStatus
 function M.user()
     local query = string.format(
         [[

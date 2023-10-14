@@ -66,7 +66,7 @@ end
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---
----@return lc.UserAuth | nil
+---@return lc.UserStatus | nil
 function cmd.authenticate() require("leetcode.api.auth").user() end
 
 ---Merge configurations into default configurations and set it as user configurations.
@@ -90,7 +90,10 @@ function cmd.random_question()
     end
 end
 
-function cmd.menu() vim.api.nvim_set_current_tabpage(_Lc_MenuTabPage) end
+function cmd.menu()
+    local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, _Lc_Menu.winid)
+    if ok then vim.api.nvim_set_current_tabpage(tabp) end
+end
 
 ---@param layout layouts
 function cmd.menu_layout(layout) _Lc_Menu:set_layout(layout) end

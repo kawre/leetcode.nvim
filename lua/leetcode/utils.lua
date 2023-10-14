@@ -68,17 +68,19 @@ function utils.curr_question_tabs()
     ---@type lc.Question.Tab[]
     local questions = {}
 
-    for _, tabp in ipairs(vim.api.nvim_list_tabpages()) do
-        local bufs = vim.fn.tabpagebuflist(tabp)
-
-        for _, bufnr in ipairs(bufs) do
-            if _Lc_questions[bufnr] then
-                table.insert(questions, { tabpage = tabp, question = _Lc_questions[bufnr] })
-            end
-        end
+    for _, q in ipairs(_Lc_questions) do
+        local tabp = utils.question_tabp(q)
+        if tabp then table.insert(questions, { tabpage = tabp, question = q }) end
     end
 
     return questions
+end
+
+---@param q lc.Question
+---@return integer|nil
+function utils.question_tabp(q)
+    local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, q.winid)
+    if ok then return tabp end
 end
 
 ---@return lc.Question

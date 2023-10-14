@@ -31,12 +31,18 @@ local function display_difficulty(q)
     }
 
     local lang = utils.get_lang(q.lang)
-    return { lang.short, hl[q.q.difficulty] }
+    return { lang.icon }
 end
 
 ---@param question lc.Cache.Question
 local function display_question(question)
-    local index = { question.frontend_id .. ".", "leetcode_normal" }
+    local hl = {
+        ["Easy"] = "leetcode_easy",
+        ["Medium"] = "leetcode_medium",
+        ["Hard"] = "leetcode_hard",
+    }
+
+    local index = { question.frontend_id .. ".", hl[question.difficulty] }
     local title = { question.title }
 
     return unpack({ index, title })
@@ -46,7 +52,7 @@ local displayer = entry_display.create({
     separator = " ",
     items = {
         { width = 1 },
-        { width = 5 },
+        { width = 1 },
         { width = 5 },
         { remaining = true },
     },

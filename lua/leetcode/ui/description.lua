@@ -32,10 +32,10 @@ function description:mount()
     self.visible = true
     self:populate()
     self.split:mount()
-    self:draw()
 
     local utils = require("leetcode-menu.utils")
-    utils.apply_opt_local({
+    utils.apply_opt_local(self.split.winid, {
+        winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
         buflisted = false,
         matchpairs = "",
         swapfile = false,
@@ -54,9 +54,9 @@ function description:mount()
         list = false,
         spell = false,
         signcolumn = "no",
-        winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
     })
 
+    self:draw()
     self:autocmds()
     return self
 end

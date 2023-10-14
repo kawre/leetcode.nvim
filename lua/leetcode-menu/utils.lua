@@ -2,12 +2,12 @@ local log = require("leetcode.logger")
 
 local utils = {}
 
-function utils.apply_opt_local(options)
-    local bufnr = vim.api.nvim_get_current_buf()
-    log.debug("applying `opt_local` to bufnr: " .. bufnr)
+function utils.apply_opt_local(winid, options)
+    if not winid then return end
 
+    log.debug("applying `opt_local` to winid: " .. winid)
     for key, value in pairs(options) do
-        vim.api.nvim_set_option_value(key, value, { scope = "local" })
+        vim.api.nvim_set_option_value(key, value, { win = winid, scope = "local" })
     end
 end
 

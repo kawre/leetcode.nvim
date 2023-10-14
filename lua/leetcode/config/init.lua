@@ -1,5 +1,11 @@
 local template = require("leetcode.config.template")
 
+---@type lc.Question[]
+_Lc_questions = {}
+
+---@type lc-menu
+_Lc_Menu = {} ---@diagnostic disable-line
+
 ---@class lc.Settings
 local config = {
     default = template,
@@ -14,14 +20,10 @@ local config = {
 
     langs = require("leetcode.config.langs"),
     icons = require("leetcode.config.icons"),
-}
 
----@class lc.UserAuth
----@field name string
----@field is_signed_in boolean
----@field is_premium boolean
----@field id integer
-config.auth = {}
+    ---@diagnostic disable-next-line
+    auth = {}, ---@type lc.UserStatus
+}
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---

@@ -11,16 +11,6 @@ local log = require("leetcode.logger")
 local menu = {} ---@diagnostic disable-line
 menu.__index = menu
 
----@type table<integer, lc.Question>
-_Lc_questions = {}
-
----@type integer
-_Lc_curr_question = 0
-
----@type lc-menu
-_Lc_Menu = {} ---@diagnostic disable-line
-_Lc_MenuTabPage = 0
-
 local function tbl_keys(t)
     local keys = vim.tbl_keys(t)
     if not keys then return end
@@ -104,10 +94,8 @@ end
 function menu:init()
     local bufnr = vim.api.nvim_get_current_buf()
     local winid = vim.api.nvim_get_current_win()
-    local tabpage = vim.api.nvim_get_current_tabpage()
-    _Lc_MenuTabPage = tabpage
 
-    utils.apply_opt_local({
+    utils.apply_opt_local(winid, {
         buflisted = false,
         matchpairs = "",
         swapfile = false,
@@ -134,7 +122,6 @@ function menu:init()
     local obj = setmetatable({
         bufnr = bufnr,
         winid = winid,
-        tabpage = tabpage,
         layout = loading,
         cursor = {
             idx = 1,

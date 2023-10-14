@@ -1,3 +1,5 @@
+local M = {}
+
 ---Get highlight group value by name.
 ---
 ---@param name string String for looking up highlight group.
@@ -17,8 +19,8 @@ local function hl(name)
 end
 
 ---@alias lc.highlights table<string, table>
----@type lc.highlights
-return function()
+---@return lc.highlights
+M.get = function()
     return {
         easy = { fg = "#46c6c2" },
         medium = { fg = "#fac31d" },
@@ -29,11 +31,11 @@ return function()
         hint = { fg = hl("DiagnosticHint").fg },
         error = { fg = hl("DiagnosticError").fg },
 
-        bold = { bold = true },
-        italic = { fg = hl("FloatTitle").fg, italic = true },
-
-        normal = { fg = hl("FloatTitle").fg },
         alt = { fg = hl("Comment").fg },
+        normal = { fg = hl("FloatTitle").fg },
+        italic = { fg = hl("FloatTitle").fg, italic = true },
+        bold = { bold = true },
+
         code = { fg = hl("Type").fg, bg = hl("Normal").bg },
         example = { fg = hl("DiagnosticHint").fg },
         constraints = { fg = hl("DiagnosticInfo").fg },
@@ -42,3 +44,5 @@ return function()
         list = { fg = hl("Tag").fg },
     }
 end
+
+return M

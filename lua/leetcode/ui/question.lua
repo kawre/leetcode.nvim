@@ -52,8 +52,8 @@ function Question:mount()
     vim.cmd("$tabe " .. self.file:absolute())
 
     self.bufnr = vim.api.nvim_get_current_buf()
-    _Lc_curr_question = self.bufnr
-    _Lc_questions[_Lc_curr_question] = self
+    self.winid = vim.api.nvim_get_current_win()
+    table.insert(_Lc_questions, self)
 
     self.description = Description:init(self)
     self.console = Console:init(self)
@@ -64,31 +64,23 @@ function Question:mount()
 end
 
 function Question:autocmds()
-    local group_id = vim.api.nvim_create_augroup("leetcode_questions", { clear = true })
-    vim.api.nvim_create_autocmd("TabEnter", {
-        group = group_id,
-        callback = function()
-            local questions = utils.curr_question_tabs()
+    -- local group_id = vim.api.nvim_create_augroup("leetcode_questions", { clear = true })
 
-            local tabpage = vim.api.nvim_get_current_tabpage()
-            for _, q in ipairs(questions) do
-                if q.tabpage == tabpage then _Lc_curr_question = q.question.bufnr end
-            end
-        end,
-    })
-
-    local q_group_id = vim.api.nvim_create_augroup("leetcode_question", {})
-    vim.api.nvim_create_autocmd("BufWinEnter", {
-        group = q_group_id,
-        buffer = self.bufnr,
-        callback = function() self.description.split:show() end,
-    })
-
-    vim.api.nvim_create_autocmd("BufWinLeave", {
-        group = q_group_id,
-        buffer = self.bufnr,
-        callback = function() self.description.split:hide() end,
-    })
+    -- local q_group_id = vim.api.nvim_create_augroup("leetcode_question", {})
+    -- vim.api.nvim_create_autocmd("BufWinEnter", {
+    --     group = q_group_id,
+    --     buffer = self.bufnr,
+    --     callback = function()
+    --         log.info("wtf")
+    --         self.description.split:show()
+    --     end,
+    -- })
+    --
+    -- vim.api.nvim_create_autocmd("BufWinLeave", {
+    --     group = q_group_id,
+    --     buffer = self.bufnr,
+    --     callback = function() self.description.split:hide() end,
+    -- })
 end
 
 function Question:handle_mount()
