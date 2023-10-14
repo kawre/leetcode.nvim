@@ -34,16 +34,18 @@ function description:mount()
     self.split:mount()
 
     local utils = require("leetcode-menu.utils")
-    utils.apply_opt_local(self.split.winid, {
-        winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
+    utils.set_buf_opts(self.split.bufnr, {
+        modifiable = false,
         buflisted = false,
         matchpairs = "",
         swapfile = false,
         buftype = "nofile",
         filetype = "leetcode.nvim",
         synmaxcol = 0,
-        modifiable = false,
-        wrap = true,
+    })
+    utils.set_win_opts(self.split.winid, {
+        winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
+        wrap = false,
         colorcolumn = "",
         foldlevel = 999,
         foldcolumn = "1",
@@ -162,8 +164,6 @@ function description:init(parent)
         layout = {},
         visible = false,
     }, self)
-
-    -- vim.api.nvim_buf_set_name(obj.split.bufnr, string.format("Description(%s)", parent.q.title))
 
     return obj:mount()
 end

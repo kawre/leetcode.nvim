@@ -14,7 +14,7 @@ function Hints:mount()
     self.popup:mount()
 
     local utils = require("leetcode-menu.utils")
-    utils.apply_opt_local(self.popup.winid, { wrap = true })
+    utils.set_win_opts(self.popup.winid, { wrap = true })
 
     local NuiTree = require("nui.tree")
     local nodes = {}

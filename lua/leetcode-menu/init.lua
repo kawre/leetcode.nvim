@@ -114,10 +114,9 @@ function menu:mount()
 end
 
 function menu:init()
-    local bufnr = vim.api.nvim_get_current_buf()
-    local winid = vim.api.nvim_get_current_win()
+    local bufnr, winid = vim.api.nvim_get_current_buf(), vim.api.nvim_get_current_win()
 
-    utils.apply_opt_local(winid, {
+    utils.set_buf_opts(bufnr, {
         modifiable = false,
         buflisted = false,
         matchpairs = "",
@@ -125,6 +124,8 @@ function menu:init()
         buftype = "nofile",
         filetype = "leetcode.nvim",
         synmaxcol = 0,
+    })
+    utils.set_win_opts(winid, {
         wrap = false,
         colorcolumn = "",
         foldlevel = 999,
