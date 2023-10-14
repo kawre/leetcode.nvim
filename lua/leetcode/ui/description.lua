@@ -45,7 +45,7 @@ function description:mount()
     })
     utils.set_win_opts(self.split.winid, {
         winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
-        wrap = false,
+        wrap = true,
         colorcolumn = "",
         foldlevel = 999,
         foldcolumn = "1",
