@@ -32,15 +32,15 @@ M.get = function()
         error = { fg = hl("DiagnosticError").fg },
 
         alt = { fg = hl("Comment").fg },
-        normal = { fg = hl("FloatTitle").fg },
-        italic = { fg = hl("FloatTitle").fg, italic = true },
+        normal = { fg = hl("Delimiter").fg },
+        italic = { fg = hl("Delimiter").fg, italic = true },
         bold = { bold = true },
 
         code = { fg = hl("Type").fg, bg = hl("Normal").bg },
         example = { fg = hl("DiagnosticHint").fg },
         constraints = { fg = hl("DiagnosticInfo").fg },
         indent = { fg = hl("Comment").fg },
-        link = { fg = hl("Function").fg },
+        link = { fg = hl("Function").fg, underline = true },
         list = { fg = hl("Tag").fg },
     }
 end

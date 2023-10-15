@@ -150,16 +150,31 @@ end
 ---@return NuiLine
 function Parser:handle_link(text, tag_data)
     local line = NuiLine()
+    local tag = tag_data.tag
+    local link
 
-    local href
-    for _, attr in ipairs(tag_data.attrs) do
-        if attr.name == "href" then href = attr.value end
+    if tag == "a" then
+        local href = vim.tbl_filter(function(attr)
+            if attr.name == "href" then return attr end
+        end, tag_data.attrs)[1]
+
+        link = href.value or ""
+    elseif tag == "img" then
+        local alt = vim.tbl_filter(function(attr)
+            if attr.name == "alt" then return attr end
+        end, tag_data.attrs)[1]
+        text = alt.value ~= "" and alt.value or "img"
+
+        local src = vim.tbl_filter(function(attr)
+            if attr.name == "src" then return attr end
+        end, tag_data.attrs)[1]
+        link = src.value or ""
     end
-    if not href then return line end
 
-    line:append("[", "leetcode_indent")
-    line:append(text, "leetcode_link")
-    line:append(string.format("](%s)", href), "leetcode_indent")
+    line:append(text, "leetcode_list")
+    line:append("->(", "leetcode_normal")
+    line:append(link, "leetcode_link")
+    line:append(")", "leetcode_normal")
 
     return line
 end
@@ -189,7 +204,7 @@ end
 ---@param node TSNode
 ---@param tags lc.Parser.Tag
 --@param tag_data lc.Parser.Tag
-function Parser:node_hi(node, tags, tag_data)
+function Parser:node_hl(node, tags, tag_data)
     local text = self:get_text(node)
     local tag = tags[1]
 
@@ -209,8 +224,12 @@ function Parser:node_hi(node, tags, tag_data)
     if tag == "sup" then text = "^" .. text end
     if tag == "sub" then text = "_" .. text end
 
-    local nui_text = tag == "a" and self:handle_link(text, tag_data)
-        or NuiText(text, utils.hi(tags))
+    local nui_text
+    if tag == "a" or tag == "img" then
+        nui_text = self:handle_link(text, tag_data)
+    else
+        nui_text = NuiText(text, utils.hi(tags))
+    end
 
     self.line:append(nui_text)
 end
@@ -221,15 +240,12 @@ end
 ---@param tags table
 function Parser:rec_parse(node, tags)
     local tag_data = self:get_tag_data(node)
-    ---handle img
-    if tag_data and tag_data.tag == "img" then return self:handle_img(tag_data) end
 
-    ---handle rest
     for child in node:iter_children() do
         local ntype = child:type()
 
         if tag_data then table.insert(tags, 1, tag_data.tag) end
-        if ntype == "text" or ntype == "entity" then self:node_hi(child, tags, tag_data) end
+        if ntype == "text" or ntype == "entity" then self:node_hl(child, tags, tag_data) end
         self:rec_parse(child, tags)
         if tag_data then table.remove(tags, 1) end
     end
@@ -250,7 +266,7 @@ local function normalize_html(str)
             "<p><strong[^>]*>(Constraints:)</strong></p>(\n*)",
             "\n\n<constraints> %1</constraints>\n\n"
         )
-        :gsub("(<code[^>]*>)(.-)(</code>)", "%1&lccode;%2&lccode;%3")
+        :gsub("<img([^>]*)/>\n*", "<img%1>img</img>")
         :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
         :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
         :gsub("\n", "&lcnl;")
@@ -297,14 +313,13 @@ function Parser:parse()
         self:plain_parser()
     end
 
+    log.debug(self.str)
     return self:trim()
 end
 
 ---@param str string
 ---@param lang string
 function Parser:init(str, lang)
-    log.debug(str)
-
     local obj = setmetatable({
         str = str,
         ts = vim.treesitter,
