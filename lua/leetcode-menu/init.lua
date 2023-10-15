@@ -78,10 +78,13 @@ end
 
 ---@private
 function menu:keymaps()
-    vim.keymap.set("n", "<cr>", function()
+    local press_fn = function()
         local row = vim.api.nvim_win_get_cursor(self.winid)[1]
         self.layout:handle_press(row)
-    end, {})
+    end
+
+    vim.keymap.set("n", "<cr>", press_fn, {})
+    vim.keymap.set("n", "<Tab>", press_fn, {})
 end
 
 function menu:handle_mount()

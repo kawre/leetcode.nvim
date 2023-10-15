@@ -62,7 +62,7 @@ function Hints:mount()
     local opts = { noremap = true, nowait = true }
     self.popup:map("n", { "<Esc>", "q" }, function() self:hide() end, opts)
 
-    self.popup:map("n", "<CR>", function()
+    self.popup:map("n", { "<Tab>", "<CR>" }, function()
         local node = tree:get_node()
         if not node then return end
 
