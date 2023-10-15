@@ -149,9 +149,8 @@ end
 ---
 ---@return NuiLine
 function Parser:handle_link(text, tag_data)
-    local line = NuiLine()
     local tag = tag_data.tag
-    local link
+    local link = ""
 
     if tag == "a" then
         local href = vim.tbl_filter(function(attr)
@@ -171,6 +170,7 @@ function Parser:handle_link(text, tag_data)
         link = src.value or ""
     end
 
+    local line = NuiLine()
     line:append(text, "leetcode_list")
     line:append("->(", "leetcode_normal")
     line:append(link, "leetcode_link")
