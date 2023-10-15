@@ -90,10 +90,12 @@ function description:populate()
     local q = self.parent.q
 
     local linkline = NuiLine()
-    linkline:append("https://leetcode.com/problems/" .. q.title_slug .. "/", "leetcode_alt")
+    local question_link = string.format("%s/problems/%s/", config.domain, q.title_slug)
+    linkline:append(question_link, "leetcode_alt")
 
     local titleline = NuiLine()
-    titleline:append(" " .. q.frontend_id .. ". " .. q.title .. " ", "")
+    titleline:append(q.frontend_id .. ". ", "leetcode_normal")
+    titleline:append(q.title)
 
     local statsline = NuiLine()
     statsline:append(
@@ -116,7 +118,7 @@ function description:populate()
     )
     if not vim.tbl_isempty(q.hints) then
         statsline:append(" | ")
-        statsline:append("󰛨 Hints", "leetcode_alt")
+        statsline:append("󰛨 Hints", "leetcode_hint")
     end
 
     local titlecomp = Text:init({

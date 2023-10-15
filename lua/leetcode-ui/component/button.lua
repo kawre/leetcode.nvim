@@ -20,23 +20,26 @@ function button:init(text, sc, on_press, expandable)
         on_press = on_press or function() end,
         sc = sc,
     }
-    sc = sc and "" or ""
+    sc = sc or ""
 
     local width = 50
     local expand = ""
 
-    local txt = text.icon .. " " .. text.src .. " " .. (expandable and expand or "")
-    local len = vim.api.nvim_strwidth(txt) + vim.api.nvim_strwidth(sc)
+    local text_line = NuiLine()
+    text_line:append(text.icon, "leetcode_list")
+    text_line:append(" ")
+    text_line:append(text.src)
+    if expandable then text_line:append(" " .. expand, "leetcode_alt") end
+
+    local len = vim.api.nvim_strwidth(text_line:content()) + vim.api.nvim_strwidth(sc)
     local padding = string.rep(" ", width - len)
 
-    local line = NuiLine()
-    line:append(txt)
-    line:append(padding)
-    line:append(sc, "leetcode_info")
+    text_line:append(padding)
+    text_line:append(sc, "leetcode_info")
 
     local obj = setmetatable({
         opts = opts,
-        lines = { line },
+        lines = { text_line },
     }, self)
 
     return obj

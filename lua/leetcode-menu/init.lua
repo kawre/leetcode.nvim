@@ -8,6 +8,7 @@ local cookie = require("leetcode.cache.cookie")
 ---@field winid integer
 ---@field tabpage integer
 ---@field cursor lc-menu.cursor
+---@field maps table
 local menu = {} ---@diagnostic disable-line
 menu.__index = menu
 
@@ -20,6 +21,26 @@ end
 
 function menu:draw()
     self.layout:draw(self) ---@diagnostic disable-line
+end
+
+function menu:clear_keymaps()
+    for _, map in ipairs(self.maps) do
+        vim.keymap.del(map.mode, map.lhs, { buffer = self.bufnr })
+    end
+
+    self.maps = {}
+end
+
+function menu:apply_btn_keymaps()
+    local opts = { noremap = false, silent = true, buffer = self.bufnr }
+
+    for _, btn in pairs(self.layout.buttons) do
+        if not btn.sc then return end
+
+        local mode = { "n" }
+        vim.keymap.set(mode, btn.sc, btn.fn, opts)
+        table.insert(self.maps, { mode = mode, lhs = btn.sc })
+    end
 end
 
 ---@private
@@ -73,7 +94,9 @@ function menu:set_layout(layout)
     local ok, res = pcall(require, "leetcode-menu.layout." .. layout)
     if ok then self.layout = res end
 
+    self:clear_keymaps()
     self:draw()
+    self:apply_btn_keymaps()
 end
 
 ---@private
@@ -141,6 +164,7 @@ function menu:init()
         spell = false,
         signcolumn = "no",
     })
+    pcall(vim.diagnostic.disable, bufnr)
 
     local ok, loading = pcall(require, "leetcode-menu.layout.loading")
     assert(ok, loading)
@@ -152,6 +176,7 @@ function menu:init()
         cursor = {
             idx = 1,
         },
+        maps = {},
     }, self)
 
     _Lc_Menu = obj

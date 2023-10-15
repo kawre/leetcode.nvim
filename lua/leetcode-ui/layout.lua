@@ -24,7 +24,6 @@ function Layout:draw(win)
     end
 
     local padding = self.opts.padding
-    -- local components = vim.deepcopy(self.components)
     local components = self.components
 
     local toppad = padding and padding.top

@@ -22,14 +22,14 @@ local statistics = button:init(
 
 local cookie = button:init(
     { src = "Cookie", icon = "󰆘" },
-    "c",
+    "n",
     function() cmd.menu_layout("cookie") end,
     true
 )
 
 local cache = button:init(
     { src = "Cache", icon = "" },
-    "n",
+    "i",
     function() cmd.menu_layout("cache") end,
     true
 )
