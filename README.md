@@ -75,6 +75,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 ```
 
 [lazy.nvim]: https://github.com/folke/lazy.nvim
+
 <!-- [packer.nvim]: https://github.com/wbthomason/packer.nvim -->
 
 ## 🛠️ Configuration
@@ -220,7 +221,7 @@ description = {
 ## 🚀 Usage
 
 This plugin is meant to be used within a **fresh** [Neovim] instance.
-Meaning that to lauch [leetcode.nvim][leetcode.nvim] you **have** to pass
+Meaning that to launch [leetcode.nvim][leetcode.nvim] you **have** to pass
 [`arg`](#arg) as the _first and **only**_ [Neovim] argument
 
 `nvim leetcode.nvim`
