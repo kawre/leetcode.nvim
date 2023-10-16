@@ -1,5 +1,6 @@
 local log = require("leetcode.logger")
 
+---@class lc.Parser.Utils
 local utils = {}
 
 local entities = {
@@ -37,29 +38,27 @@ local entities = {
 }
 
 local highlights = {
-    [""] = "leetcode_normal",
-    ["strong"] = "leetcode_bold",
-    ["b"] = "leetcode_bold",
-    ["em"] = "leetcode_italic",
-    ["i"] = "leetcode_italic",
-    ["code"] = "leetcode_code",
-    ["example"] = "leetcode_example",
-    ["constraints"] = "leetcode_constraints",
+    strong = "bold",
+    b = "bold",
+    em = "italic",
+    i = "italic",
+    code = "code",
+    example = "example",
+    constraints = "constraints",
+    a = "link",
+    u = "underline",
 
-    ["pre"] = "Inherit",
-    ["span"] = "Inherit",
-    ["p"] = "Inherit",
-    ["ul"] = "Inherit",
-    ["ol"] = "Inherit",
-    ["li"] = "Inherit",
-    ["font"] = "Inherit",
-    ["sup"] = "Inherit",
-    ["sub"] = "Inherit",
-    ["u"] = "Inherit",
-    ["small"] = "Inherit",
-    ["div"] = "Inherit",
-
-    ["a"] = "Function",
+    -- pre = "",
+    -- span = "",
+    -- p = "",
+    -- ul = "",
+    -- ol = "",
+    -- li = "",
+    -- font = "",
+    -- sup = "",
+    -- sub = "",
+    -- small = "",
+    -- div = "",
 }
 
 ---@param entity string
@@ -76,21 +75,26 @@ end
 
 ---@param tags string[]
 ---@return string
-function utils.hi(tags)
-    local tag = tags[1] or ""
+function utils.hl(tags)
+    if vim.tbl_isempty(tags) then return "" end
 
-    if tag == "a" then log.error("WTETWET") end
+    local name = "leetcode_dyn_" .. table.concat(tags, "_")
+    if _Lc_dyn_hl[name] then return name end
 
-    -- if not tag then return highlights["p"] end
-    if highlights[tag] and highlights[tag] ~= "Inherit" then return highlights[tag] end
+    local default = require("leetcode.theme.default").get()
 
-    ---Inherit hi from parent tag
-    for _, t in ipairs(tags) do
-        if highlights[t] and highlights[t] ~= "Inherit" then return highlights[t] end
+    local theme = default["normal"]
+    for _, tag in ipairs(tags) do
+        local hl = highlights[tag]
+        if hl then theme = vim.tbl_deep_extend("force", theme, default[hl]) end
     end
 
-    if not highlights[tag] then log.info("Unknown tag: " .. tag) end
-    return highlights[""]
+    if pcall(vim.api.nvim_set_hl, 0, name, theme) then
+        _Lc_dyn_hl[name] = theme
+        return name
+    else
+        return "leetcode_normal"
+    end
 end
 
 return utils

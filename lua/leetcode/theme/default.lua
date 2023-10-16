@@ -22,6 +22,8 @@ end
 ---@return lc.highlights
 M.get = function()
     return {
+        [""] = { fg = hl("Normal").fg },
+
         easy = { fg = "#46c6c2" },
         medium = { fg = "#fac31d" },
         hard = { fg = "#f8615c" },
@@ -33,15 +35,16 @@ M.get = function()
 
         alt = { fg = hl("Comment").fg },
         normal = { fg = hl("Delimiter").fg },
-        italic = { fg = hl("Delimiter").fg, italic = true },
-        bold = { bold = true },
+        italic = { fg = hl("Normal").fg, italic = true },
+        bold = { fg = hl("Normal").fg, bold = true },
+        underline = { underline = true },
 
         code = { fg = hl("Type").fg, bg = hl("Normal").bg },
         example = { fg = hl("DiagnosticHint").fg },
         constraints = { fg = hl("DiagnosticInfo").fg },
         indent = { fg = hl("Comment").fg },
         link = { fg = hl("Function").fg, underline = true },
-        list = { fg = hl("Statement").fg },
+        list = { fg = hl("SpecialChar").fg },
     }
 end
 
