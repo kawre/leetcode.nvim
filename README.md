@@ -220,22 +220,6 @@ It is **required** to be **signed-in** to use [leetcode.nvim]
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4ad3abeda5c3
 
-## 🍴 Recipes
-
-- proper lazy loading with [lazy.nvim]
-
-```lua
-local leet_arg = "leetcode.nvim"
-
-return {
-    "kawre/leetcode.nvim",
-    lazy = leet_arg ~= vim.fn.argv()[1],
-    opts = {
-        arg = leet_arg,
-    },
-}
-```
-
 ## ✅ Todo
 
 - \[ \] CN version

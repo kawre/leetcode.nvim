@@ -133,7 +133,7 @@ end
 function Html:handle_indent(text)
     if self.line:content() ~= "" then return text end
 
-    self.line:append("\t▎ ", "leetcode_indent")
+    self.line:append("\t▎\t", "leetcode_indent")
 end
 
 ---@private
@@ -150,7 +150,7 @@ function Html:handle_link(text, tag_data)
         local href = vim.tbl_filter(function(attr)
             if attr.name == "href" then return attr end
         end, tag_data.attrs)[1] or {}
-        log.info(tag_data.attrs)
+        log.debug(tag_data.attrs)
 
         link = href.value or ""
     elseif tag == "img" then
@@ -172,6 +172,26 @@ function Html:handle_link(text, tag_data)
     line:append(")", "leetcode_normal")
 
     return line
+end
+
+function Html:handle_img(tag_data)
+    local tag = tag_data.tag
+    if tag ~= "img" then return end
+    local line = NuiLine()
+
+    local src, alt
+    for _, attr in ipairs(tag_data.attrs) do
+        if attr.name == "src" then src = attr.value end
+        if attr.name == "alt" then alt = attr.value end
+    end
+    if not src then return end
+    alt = alt or ""
+
+    line:append(string.format("[%s](", alt ~= "" and alt or "img"), "leetcode_indent")
+    line:append(src, "leetcode_link")
+    line:append(")", "leetcode_indent")
+
+    self.text:append(line)
 end
 
 ---@private
@@ -243,10 +263,6 @@ function Html:normalize()
         -- :gsub("\t*<(ul[^>]*)>(.-)\t*</(ul)>", "<%1>%2</%3>\n")
         -- :gsub("\t*<(ol[^>]*)>(.-)\t*</(ol)>", "<%1>%2</%3>\n")
         :gsub(
-            "\n*<(img[^>]*)/>\n*",
-            "<%1>img</img>"
-        )
-        :gsub(
             "<p><strong[^>]*>(Example%s*%d*:)%s*</strong></p>\n*",
             "\n\n<example>󰛨 %1</example>\n\n"
         )
@@ -254,14 +270,17 @@ function Html:normalize()
             "<p><strong[^>]*>(Constraints:)%s*</strong></p>\n*",
             "\n\n<constraints> %1</constraints>\n\n"
         )
+        :gsub("<(img[^>]*)/>\n*", "<%1>img</img>")
         :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
         :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
         :gsub("\n", "&lcnl;")
         :gsub("\t", "&lctab;")
         :gsub("%s", "&nbsp;")
         :gsub("<[^>]*>", function(match) return match:gsub("&nbsp;", " ") end)
-        :gsub("<a[^>]*>(.-)</a>", function(match) return match:gsub("&#?%w+;", utils.entity) end)
-        .. "&lcend;"
+        :gsub("<a[^>]*>(.-)</a>", function(match)
+            match = match:gsub("&#?%w+;", utils.entity)
+            return match:gsub("&nbsp;", " ")
+        end) .. "&lcend;"
 end
 
 -- Trim excessive lines
