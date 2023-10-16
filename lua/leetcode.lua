@@ -17,32 +17,29 @@ end
 
 function leetcode.setup_cmds()
     local cmd = require("leetcode.command")
+    local utils = require("leetcode.utils")
 
-    -- vim.api.nvim_create_user_command("LcList", function() cmd.problems() end, {})
-    vim.api.nvim_create_user_command("LcConsole", function() cmd.console() end, {})
-    vim.api.nvim_create_user_command("LcHints", function() cmd.hints() end, {})
-    vim.api.nvim_create_user_command("LcMenu", function() cmd.menu() end, {})
+    -- commands
+    utils.create_usr_cmd("LcConsole", cmd.console, {})
+    utils.create_usr_cmd("LcHints", cmd.hints, {})
+    utils.create_usr_cmd("LcMenu", cmd.menu, {})
+    utils.create_usr_cmd("LcTabs", cmd.question_tabs, {})
+    utils.create_usr_cmd("LcLanguage", cmd.change_lang, {})
+    utils.create_usr_cmd("LcDescriptionToggle", cmd.desc_toggle, {})
+    utils.create_usr_cmd("LcRun", cmd.q_run, {})
+    utils.create_usr_cmd("LcSubmit", cmd.q_submit, {})
+    utils.create_usr_cmd("LcFix", cmd.fix, {})
 
-    vim.api.nvim_create_user_command("LcQuestionTabs", function()
-        local log = require("leetcode.logger")
-        log.warn("LcQuestionTabs is deprecated, use LcTabs instead.")
-        cmd.question_tabs()
-    end, {})
-
-    vim.api.nvim_create_user_command("LcTabs", function() cmd.question_tabs() end, {})
-
-    vim.api.nvim_create_user_command("LcLanguage", function() cmd.change_lang() end, {})
-    vim.api.nvim_create_user_command("LcDescriptionToggle", function() cmd.desc_toggle() end, {})
-    vim.api.nvim_create_user_command("LcRun", function() cmd.q_run() end, {})
-    vim.api.nvim_create_user_command("LcSubmit", function() cmd.q_submit() end, {})
-    vim.api.nvim_create_user_command("LcFix", function() cmd.fix() end, {})
+    -- deprecate
+    utils.deprecate_usr_cmd("LcQuestionTabs", "LcTabs")
 end
 
 function leetcode.validate()
     local utils = require("leetcode.utils")
 
-    assert(utils.get_lang(config.lang), "Unknown language: " .. config.lang)
-    assert(utils.get_lang(config.sql), "Unknown SQL dialect: " .. config.sql)
+    assert(vim.fn.has("nvim-0.9.0") == 1, "Neovim >= 0.9.0 required")
+    assert(utils.get_lang(config.lang), "Unsupported Language: " .. config.lang)
+    assert(utils.get_lang(config.sql), "Unsupported SQL dialect: " .. config.sql)
 end
 
 function leetcode.start()
@@ -54,10 +51,10 @@ function leetcode.start()
     config.home = path:new(config.user.directory) ---@diagnostic disable-line
     config.home:mkdir()
 
+    leetcode.setup_cmds()
+
     local theme = require("leetcode.theme")
     theme.setup()
-
-    leetcode.setup_cmds()
 
     local menu = require("leetcode-menu")
     menu:init()
@@ -72,7 +69,7 @@ function leetcode.setup(cfg)
         group = group_id,
         pattern = "*",
         nested = true,
-        callback = function() leetcode.start() end,
+        callback = leetcode.start,
     })
 end
 

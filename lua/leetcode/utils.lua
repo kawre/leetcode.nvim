@@ -1,8 +1,23 @@
 local config = require("leetcode.config")
-local log = require("leetcode.logger")
 
 ---@class lc.Utils
 local utils = {}
+
+---@param name string
+---@param command any
+---@param opts table|nil
+function utils.create_usr_cmd(name, command, opts)
+    vim.api.nvim_create_user_command(name, command, opts or {})
+end
+
+function utils.deprecate_usr_cmd(name, new)
+    vim.api.nvim_create_user_command(name, function()
+        local log = require("leetcode.logger")
+
+        log.warn(string.format("%s is deprecated, use %s instead.", name, new))
+        pcall(vim.cmd, new) ---@diagnostic disable-line
+    end, {})
+end
 
 function utils.remove_cookie()
     require("leetcode.cache.cookie").delete()

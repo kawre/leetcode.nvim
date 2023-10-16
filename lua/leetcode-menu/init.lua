@@ -142,6 +142,8 @@ end
 function menu:init()
     local bufnr, winid = vim.api.nvim_get_current_buf(), vim.api.nvim_get_current_win()
 
+    vim.api.nvim_buf_set_name(bufnr, "")
+    pcall(vim.diagnostic.disable, bufnr)
     utils.set_buf_opts(bufnr, {
         modifiable = false,
         buflisted = false,
@@ -164,7 +166,6 @@ function menu:init()
         spell = false,
         signcolumn = "no",
     })
-    pcall(vim.diagnostic.disable, bufnr)
 
     local ok, loading = pcall(require, "leetcode-menu.layout.loading")
     assert(ok, loading)

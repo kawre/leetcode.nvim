@@ -2,7 +2,7 @@
 
 🚨 **leetcode.nvim is currently in the _alpha stage_ of development** 🚨
 
----
+______________________________________________________________________
 
 # leetcode.nvim
 
@@ -11,10 +11,6 @@
 </div>
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-ab3f09b43740
-
-[leetcode.nvim]: https://github.com/kawre/leetcode.nvim
-[LeetCode]: https://leetcode.com
-[Neovim]: https://github.com/neovim/neovim
 
 ## ✨ Features
 
@@ -32,28 +28,21 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 
 - [Neovim] >= 0.9.0
 
-- [telescope.nvim][telescope.nvim]
+- [telescope.nvim]
 
-- [nui.nvim][nui.nvim]
+- [nui.nvim]
 
-- [nvim-treesitter][nvim-treesitter] _**(optional, but highly recommended)**_
+- [nvim-treesitter] _**(optional, but highly recommended)**_
   used for formatting the question description.
   Make sure to install the parser for `html`.
 
-- [nvim-notify][nvim-notify] _**(optional)**_
+- [nvim-notify] _**(optional)**_
 
 - [Nerd Font][nerd-font] & [nvim-web-devicons] _**(optional)**_
 
-[nvim-treesitter]: https://github.com/nvim-treesitter/nvim-treesitter
-[telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
-[nui.nvim]: https://github.com/MunifTanjim/nui.nvim
-[nvim-notify]: https://github.com/rcarriga/nvim-notify
-[nerd-font]: https://www.nerdfonts.com
-[nvim-web-devicons]: https://github.com/nvim-tree/nvim-web-devicons
-
 ## 📦 Installation
 
-- [lazy.nvim][lazy.nvim]
+- [lazy.nvim]
 
 ```lua
 {
@@ -67,14 +56,13 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 
         -- optional
         "rcarriga/nvim-notify",
+        "nvim-tree/nvim-web-devicons",
     },
     opts = {
         -- configuration goes here
     },
 }
 ```
-
-[lazy.nvim]: https://github.com/folke/lazy.nvim
 
 <!-- [packer.nvim]: https://github.com/wbthomason/packer.nvim -->
 
@@ -161,7 +149,7 @@ domain = "com" -- For now "com" is the only one supported
 
 ### directory
 
-Where to store [leetcode.nvim][leetcode.nvim] data
+Where to store [leetcode.nvim] data
 
 ```lua
 ---@type string
@@ -170,7 +158,7 @@ directory = vim.fn.stdpath("data") .. "/leetcode/"
 
 ### logging
 
-Whether to log [leetcode.nvim][leetcode.nvim] status notifications
+Whether to log [leetcode.nvim] status notifications
 
 ```lua
 ---@type boolean
@@ -221,53 +209,38 @@ description = {
 ## 🚀 Usage
 
 This plugin is meant to be used within a **fresh** [Neovim] instance.
-Meaning that to launch [leetcode.nvim][leetcode.nvim] you **have** to pass
+Meaning that to launch [leetcode.nvim] you **have** to pass
 [`arg`](#arg) as the _first and **only**_ [Neovim] argument
 
 `nvim leetcode.nvim`
 
 ### Sign In
 
-It is **required** to be **signed-in** to use [leetcode.nvim][leetcode.nvim]
+It is **required** to be **signed-in** to use [leetcode.nvim]
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4ad3abeda5c3
 
-<!-- ## 🍴 Recipes -->
-<!---->
-<!-- - Full lazy loading with [lazy.nvim] -->
-<!---->
-<!-- ```lua -->
-<!-- local usr_arg = "leetcode.nvim" -->
-<!---->
-<!-- { -->
-<!--     "kawre/leetcode.nvim", -->
-<!--     ... -->
-<!--     opts = { ..., arg = usr_arg, ... }, -->
-<!--     cond = function() return usr_arg == vim.fn.argv()[1] end, -->
-<!--     ... -->
-<!-- } -->
-<!-- ``` -->
-
-<!-- ### Working with multiple questions -->
-<!---->
-<!-- When you open a new <b>question</b>, [leetcode.nvim] creates a new [tabpage] <i>containing -->
-<!-- all of the <b>contents</b> related to it</i>. -->
-<!-- To switch between these tabs, use [LcQuestionTabs](#📋-commands) command -->
-<!---->
-<!-- https://github.com/kawre/leetcode.nvim/assets/69250723/64378b0f-c5ba-4378-b9ff-a95df13fbf36 -->
-<!---->
-<!-- [tabpage]: https://neovim.io/doc/user/tabpage.html -->
-
 ## ✅ Todo
 
-- [ ] CN version
-- [ ] SQL support
-- [ ] Statistics menu page
-- [ ] Docs
-- [x] Hints pop-up
+- \[ \] CN version
+- \[ \] SQL support
+- \[ \] Statistics menu page
+- \[ \] Docs
+- \[x\] Hints pop-up
 
 ## 🙌 Credits
 
 - [Leetbuddy.nvim](https://github.com/Dhanus3133/Leetbuddy.nvim)
 
 - [alpha-nvim](https://github.com/goolord/alpha-nvim)
+
+[lazy.nvim]: https://github.com/folke/lazy.nvim
+[leetcode]: https://leetcode.com
+[leetcode.nvim]: https://github.com/kawre/leetcode.nvim
+[neovim]: https://github.com/neovim/neovim
+[nerd-font]: https://www.nerdfonts.com
+[nui.nvim]: https://github.com/MunifTanjim/nui.nvim
+[nvim-notify]: https://github.com/rcarriga/nvim-notify
+[nvim-treesitter]: https://github.com/nvim-treesitter/nvim-treesitter
+[nvim-web-devicons]: https://github.com/nvim-tree/nvim-web-devicons
+[telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim

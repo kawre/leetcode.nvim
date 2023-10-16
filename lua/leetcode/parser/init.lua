@@ -1,5 +1,6 @@
 ---TODO: 2659
 ---TODO: https://leetcode.com/problems/make-array-empty/
+---TODO: 190
 
 local Text = require("leetcode-ui.component.text")
 local utils = require("leetcode.parser.utils")
@@ -303,6 +304,8 @@ end
 
 ---@return lc-ui.Text
 function Parser:parse()
+    log.debug(self.str)
+
     local norm = normalize_html(self.str)
     local ok, parser = pcall(self.ts.get_string_parser, norm, self.lang)
     if ok then
@@ -313,7 +316,6 @@ function Parser:parse()
         self:plain_parser()
     end
 
-    log.debug(self.str)
     return self:trim()
 end
 
