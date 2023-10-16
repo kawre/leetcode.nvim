@@ -41,7 +41,7 @@ M.get = function()
         constraints = { fg = hl("DiagnosticInfo").fg },
         indent = { fg = hl("Comment").fg },
         link = { fg = hl("Function").fg, underline = true },
-        list = { fg = hl("Tag").fg },
+        list = { fg = hl("Statement").fg },
     }
 end
 

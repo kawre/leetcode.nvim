@@ -32,21 +32,21 @@ end
 
 function Question:get_snippet()
     local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
-    return vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1] or {}
+    return vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
 end
 
 ---@private
 function Question:create_file()
     local lang = utils.get_lang(is_sql(self.q) and config.sql or config.lang)
-    local suffix = lang.sql and "-" .. lang.short or ""
+    local suffix = lang.sql and string.format("-%s", lang.short) or ""
     local fn = string.format("%s.%s%s.%s", self.q.frontend_id, self.q.title_slug, suffix, lang.ft)
 
     self.file = config.home:joinpath(fn)
+    if not self.file:exists() then self.file:write(self:get_snippet().code, "w") end
 end
 
 function Question:mount()
     self:create_file()
-    if not self.file:exists() then self.file:write(self:get_snippet().code, "w") end
 
     vim.api.nvim_set_current_dir(config.home:absolute())
     vim.cmd("$tabe " .. self.file:absolute())
@@ -59,28 +59,7 @@ function Question:mount()
     self.console = Console:init(self)
     self.hints = Hints:init(self)
 
-    self:autocmds()
     return self
-end
-
-function Question:autocmds()
-    -- local group_id = vim.api.nvim_create_augroup("leetcode_questions", { clear = true })
-
-    -- local q_group_id = vim.api.nvim_create_augroup("leetcode_question", {})
-    -- vim.api.nvim_create_autocmd("BufWinEnter", {
-    --     group = q_group_id,
-    --     buffer = self.bufnr,
-    --     callback = function()
-    --         log.info("wtf")
-    --         self.description.split:show()
-    --     end,
-    -- })
-    --
-    -- vim.api.nvim_create_autocmd("BufWinLeave", {
-    --     group = q_group_id,
-    --     buffer = self.bufnr,
-    --     callback = function() self.description.split:hide() end,
-    -- })
 end
 
 function Question:handle_mount()
@@ -100,6 +79,8 @@ end
 
 ---@param problem lc.Cache.Question
 function Question:init(problem)
+    log.debug("Initializing question: " .. problem.frontend_id .. ". " .. problem.title_slug)
+
     local tabp = utils.detect_duplicate_question(problem.title_slug)
     if tabp then return pcall(vim.cmd.tabnext, tabp) end
 
@@ -110,13 +91,13 @@ function Question:init(problem)
 
     local lang = utils.get_lang(is_sql(q) and config.sql or config.lang)
 
-    local obj = setmetatable({
+    self = setmetatable({
         q = q,
         lang = lang.slug,
         cache = problem,
     }, self)
 
-    return obj:handle_mount()
+    return self:handle_mount()
 end
 
 return Question

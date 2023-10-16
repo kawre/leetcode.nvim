@@ -112,7 +112,8 @@ function Html:handle_list(tags)
     local li_type = get_list_type()
     local li_count = vim.fn.count(tags, "li")
     local leftpad = string.rep("\t", li_count)
-    local li_icons = { "", "", "" }
+    -- local li_icons = { "", "", "" }
+    local li_icons = { "*", "-", "+" }
 
     local text
     if li_type == "ul" then
@@ -152,7 +153,6 @@ function Html:handle_link(text, tag_data)
 
         link = href.value or ""
     elseif tag == "img" then
-        log.info(tag_data.attrs)
         local alt = vim.tbl_filter(function(attr)
             if attr.name == "alt" then return attr end
         end, tag_data.attrs)[1] or {}
@@ -248,28 +248,38 @@ end
 function Html:normalize()
     log.debug(self.str)
 
-    self.str = self.str
+    self.str = self
+        .str
         :gsub("​", "")
         :gsub("\r\n", "\n")
         :gsub("\t*<(/?li)>", "<%1>")
         :gsub("\t*<(/?ul)>", "<%1>")
         :gsub("\t*<(/?ol)>", "<%1>")
+        -- :gsub(
+        --     "\t*<(li[^>]*)>(.-)\t*</(li)>",
+        --     "<%1>%2</%3>\n"
+        -- )
+        -- :gsub("\t*<(ul[^>]*)>(.-)\t*</(ul)>", "<%1>%2</%3>\n")
+        -- :gsub("\t*<(ol[^>]*)>(.-)\t*</(ol)>", "<%1>%2</%3>\n")
         :gsub(
-            "<p><strong[^>]*>(Example%s*%d+:)</strong></p>(\n*)",
+            "<p><strong[^>]*>(Example%s*%d*:)%s*</strong></p>\n*",
             "\n\n<example>󰛨 %1</example>\n\n"
         )
         :gsub(
-            "<p><strong[^>]*>(Constraints:)</strong></p>(\n*)",
+            "<p><strong[^>]*>(Constraints:)%s*</strong></p>\n*",
             "\n\n<constraints> %1</constraints>\n\n"
         )
-        :gsub("<img([^>]*)/>\n*", "<img%1>img</img>")
+        :gsub("<(img[^>]*)/>\n*", "<%1>img</img>")
         :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
         :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
         :gsub("\n", "&lcnl;")
         :gsub("\t", "&lctab;")
         :gsub("%s", "&nbsp;")
         :gsub("<[^>]*>", function(match) return match:gsub("&nbsp;", " ") end)
-        :gsub("<a[^>]*>(.-)</a>", function(match) return match:gsub("&nbsp;", " ") end) .. "&lcend;"
+        :gsub("<a[^>]*>(.-)</a>", function(match)
+            match = match:gsub("&#?%w+;", utils.entity)
+            return match:gsub("&nbsp;", " ")
+        end) .. "&lcend;"
 end
 
 -- Trim excessive lines
@@ -296,7 +306,6 @@ function Html:parse(html)
         newline_count = 0,
         ol_count = {},
     }, self)
-    log.debug("siema")
 
     self:normalize()
     local ok, parser = pcall(self.ts.get_string_parser, self.str, "html")
