@@ -74,7 +74,7 @@ end
 
 function problemlist.get_by_title_slug(title_slug)
     local problems = problemlist.get()
-    return vim.tbl_filter(function(e) return e.title_slug == title_slug end, problems)[1]
+    return vim.tbl_filter(function(e) return e.title_slug == title_slug end, problems)[1] or {}
 end
 
 ---@param problems_str string

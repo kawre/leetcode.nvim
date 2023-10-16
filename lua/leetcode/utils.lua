@@ -109,7 +109,7 @@ end
 
 ---@return lc.language
 function utils.get_lang(slug)
-    return vim.tbl_filter(function(l) return l.slug == slug end, config.langs)[1]
+    return vim.tbl_filter(function(l) return l.slug == slug end, config.langs)[1] or {}
 end
 
 return utils

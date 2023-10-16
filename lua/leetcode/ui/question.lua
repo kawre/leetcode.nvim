@@ -32,7 +32,7 @@ end
 
 function Question:get_snippet()
     local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
-    return vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
+    return vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1] or {}
 end
 
 ---@private

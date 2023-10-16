@@ -48,7 +48,7 @@ function Hints:mount()
                 if type(node.text) == "string" then
                     line:append("  ")
                     local parser = require("leetcode.parser")
-                    local txt = parser:init(node.text, "html"):parse()
+                    local txt = parser:parse(node.text)
                     if txt.lines[1] then line:append(txt.lines[1]) end
                 else
                     line:append(node.text)

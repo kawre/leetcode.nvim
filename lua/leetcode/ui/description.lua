@@ -134,7 +134,7 @@ function description:populate()
         opts = { position = "center" },
     })
 
-    local contents = parser:init(q.content, "html"):parse()
+    local contents = parser:parse(q.content)
 
     self.layout = Layout:init({
         components = {
