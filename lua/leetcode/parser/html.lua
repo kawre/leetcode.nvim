@@ -166,32 +166,12 @@ function Html:handle_link(text, tag_data)
     end
 
     local line = NuiLine()
-    line:append(text, "leetcode_list")
+    line:append(text, "leetcode_ref")
     line:append("->(", "leetcode_normal")
     line:append(link, "leetcode_link")
     line:append(")", "leetcode_normal")
 
     return line
-end
-
-function Html:handle_img(tag_data)
-    local tag = tag_data.tag
-    if tag ~= "img" then return end
-    local line = NuiLine()
-
-    local src, alt
-    for _, attr in ipairs(tag_data.attrs) do
-        if attr.name == "src" then src = attr.value end
-        if attr.name == "alt" then alt = attr.value end
-    end
-    if not src then return end
-    alt = alt or ""
-
-    line:append(string.format("[%s](", alt ~= "" and alt or "img"), "leetcode_indent")
-    line:append(src, "leetcode_link")
-    line:append(")", "leetcode_indent")
-
-    self.text:append(line)
 end
 
 ---@private
@@ -256,6 +236,9 @@ function Html:normalize()
         :gsub("\t*<(/?li)>", "<%1>")
         :gsub("\t*<(/?ul)>", "<%1>")
         :gsub("\t*<(/?ol)>", "<%1>")
+        :gsub("<strong>(Input:?%s*)</strong>", "<input>%1</input>")
+        :gsub("<strong>(Output:?%s*)</strong>", "<output>%1</output>")
+        :gsub("<strong>(Explanation:?%s*)</strong>", "<explanation>%1</explanation>")
         -- :gsub(
         --     "\t*<(li[^>]*)>(.-)\t*</(li)>",
         --     "<%1>%2</%3>\n"
@@ -263,11 +246,11 @@ function Html:normalize()
         -- :gsub("\t*<(ul[^>]*)>(.-)\t*</(ul)>", "<%1>%2</%3>\n")
         -- :gsub("\t*<(ol[^>]*)>(.-)\t*</(ol)>", "<%1>%2</%3>\n")
         :gsub(
-            "<p><strong[^>]*>(Example%s*%d*:)%s*</strong></p>\n*",
+            "<p><strong[^>]*>(Example%s*%d*:?)%s*</strong></p>\n*",
             "\n\n<example>󰛨 %1</example>\n\n"
         )
         :gsub(
-            "<p><strong[^>]*>(Constraints:)%s*</strong></p>\n*",
+            "<p><strong[^>]*>(Constraints:?)%s*</strong></p>\n*",
             "\n\n<constraints> %1</constraints>\n\n"
         )
         :gsub("<(img[^>]*)/>\n*", "<%1>img</img>")
@@ -277,10 +260,8 @@ function Html:normalize()
         :gsub("\t", "&lctab;")
         :gsub("%s", "&nbsp;")
         :gsub("<[^>]*>", function(match) return match:gsub("&nbsp;", " ") end)
-        :gsub("<a[^>]*>(.-)</a>", function(match)
-            match = match:gsub("&#?%w+;", utils.entity)
-            return match:gsub("&nbsp;", " ")
-        end) .. "&lcend;"
+        :gsub("<a[^>]*>(.-)</a>", function(match) return match:gsub("&#?%w+;", utils.entity) end)
+        .. "&lcend;"
 end
 
 -- Trim excessive lines

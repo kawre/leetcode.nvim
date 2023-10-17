@@ -33,8 +33,8 @@ M.get = function()
         hint = { fg = hl("DiagnosticHint").fg },
         error = { fg = hl("DiagnosticError").fg },
 
+        normal = { fg = hl("Conceal").fg },
         alt = { fg = hl("Comment").fg },
-        normal = { fg = hl("Delimiter").fg },
         italic = { fg = hl("Normal").fg, italic = true },
         bold = { fg = hl("Normal").fg, bold = true },
         underline = { underline = true },
@@ -42,9 +42,12 @@ M.get = function()
         code = { fg = hl("Type").fg, bg = hl("Normal").bg },
         example = { fg = hl("DiagnosticHint").fg },
         constraints = { fg = hl("DiagnosticInfo").fg },
+        header = { fg = hl("SpecialChar").fg, bold = true },
+
         indent = { fg = hl("Comment").fg },
         link = { fg = hl("Function").fg, underline = true },
         list = { fg = hl("SpecialChar").fg },
+        ref = { fg = hl("Tag").fg },
     }
 end
 

@@ -37,16 +37,23 @@ local entities = {
     ["&lccode;"] = "`",
 }
 
+local xd = "header"
+
 local highlights = {
     strong = "bold",
     b = "bold",
     em = "italic",
     i = "italic",
     code = "code",
-    example = "example",
-    constraints = "constraints",
     a = "link",
     u = "underline",
+
+    example = "example",
+    constraints = "constraints",
+
+    input = xd,
+    output = xd,
+    explanation = xd,
 
     -- pre = "",
     -- span = "",
