@@ -48,7 +48,8 @@ function result:handle_accepted(item)
         "Beats " .. string.format("%.2f", item.runtime_percentile) .. "% ",
         perc_hi(item.runtime_percentile)
     )
-    perc_runtime:append("of users with " .. item.pretty_lang)
+    perc_runtime:append("of users with ")
+    perc_runtime:append(item.pretty_lang, "Structure")
 
     local runtime = Pre:init(NuiText("󰓅 Runtime", "leetcode_normal"), {
         status_runtime,
@@ -68,7 +69,8 @@ function result:handle_accepted(item)
         "Beats " .. string.format("%.2f", item.memory_percentile) .. "% ",
         perc_hi(item.memory_percentile)
     )
-    perc_mem:append("of users with " .. item.pretty_lang)
+    perc_mem:append("of users with ")
+    perc_mem:append(item.pretty_lang, "Structure")
 
     local memory = Pre:init(NuiText("󰍛 Memory", "leetcode_normal"), {
         status_memory,

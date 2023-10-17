@@ -212,7 +212,9 @@ This plugin is meant to be used within a **fresh** [Neovim] instance.
 Meaning that to launch [leetcode.nvim] you **have** to pass
 [`arg`](#arg) as the _first and **only**_ [Neovim] argument
 
-`nvim leetcode.nvim`
+```
+nvim leetcode.nvim
+```
 
 ### Sign In
 
