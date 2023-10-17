@@ -1,4 +1,5 @@
 ---TODO: 2659
+---TODO: 1404
 ---TODO: https://leetcode.com/problems/make-array-empty/
 ---TODO: 190
 
@@ -139,10 +140,12 @@ end
 ---@private
 ---
 ---@param text string
----@param tag_data lc.Parser.Tag
+---@param tag_data lc.Parser.Tag|nil
 ---
 ---@return NuiLine
 function Html:handle_link(text, tag_data)
+    if not tag_data then return NuiLine() end
+
     local tag = tag_data.tag
     local link = ""
 
@@ -177,8 +180,8 @@ end
 ---@private
 ---
 ---@param node TSNode
----@param tags lc.Parser.Tag
---@param tag_data lc.Parser.Tag
+---@param tags string[]
+---@param tag_data lc.Parser.Tag|nil
 function Html:node_hl(node, tags, tag_data)
     local text = self:get_text(node)
     local tag = tags[1]

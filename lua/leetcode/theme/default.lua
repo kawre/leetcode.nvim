@@ -35,8 +35,9 @@ M.get = function()
 
         normal = { fg = hl("Conceal").fg },
         alt = { fg = hl("Comment").fg },
-        italic = { fg = hl("Normal").fg, italic = true },
-        bold = { fg = hl("Normal").fg, bold = true },
+
+        italic = { italic = true },
+        bold = { bold = true },
         underline = { underline = true },
 
         code = { fg = hl("Type").fg, bg = hl("Normal").bg },

@@ -1,11 +1,30 @@
 local devicons_ok, devicons = pcall(require, "nvim-web-devicons")
+local log = require("leetcode.logger")
 local config = require("leetcode.config")
 
 ---@class lc.Theme
 local theme = {}
 
----@type table<string, table>
-_Lc_dyn_hl = {}
+---@type table<string, string[]>
+local dynamic_hls = {}
+
+local highlights = {
+    strong = "bold",
+    b = "bold",
+
+    em = "italic",
+    i = "italic",
+
+    u = "underline",
+
+    a = "link",
+    example = "example",
+    constraints = "constraints",
+    code = "code",
+    input = "header",
+    output = "header",
+    explanation = "header",
+}
 
 function theme.load_devicons()
     vim.tbl_map(function(l)
@@ -19,10 +38,9 @@ function theme.load_devicons()
 end
 
 function theme.load()
-    _Lc_dyn_hl = {}
+    local defaults = require("leetcode.theme.default").get()
 
-    local default = require("leetcode.theme.default").get()
-    for key, t in pairs(default) do
+    for key, t in pairs(defaults) do
         key = "leetcode_" .. key
         vim.api.nvim_set_hl(0, key, t)
     end
@@ -31,6 +49,49 @@ function theme.load()
     for _, lang in ipairs(config.langs) do
         local name = "leetcode_lang_" .. lang.slug
         vim.api.nvim_set_hl(0, name, { fg = lang.color })
+    end
+
+    theme.load_dynamic(defaults)
+end
+
+function theme.load_dynamic(defaults)
+    log.debug(dynamic_hls)
+    for name, tags in pairs(dynamic_hls) do
+        theme.create_dynamic(name, tags, defaults)
+    end
+end
+
+---@param tags string[]
+function theme.get_dynamic(tags)
+    if vim.tbl_isempty(tags) then return "leetcode_normal" end
+
+    local name = "leetcode_dyn_" .. table.concat(tags, "_")
+    if dynamic_hls[name] then return name end
+
+    return theme.create_dynamic(name, tags)
+end
+
+---@param name string
+---@param tags string[]
+---@param defaults? table
+function theme.create_dynamic(name, tags, defaults)
+    defaults = defaults or require("leetcode.theme.default").get()
+
+    local t = defaults["normal"]
+    for _, tag in ipairs(tags) do
+        local hl = highlights[tag]
+        if hl then t = vim.tbl_extend("force", t, defaults[hl]) end
+    end
+
+    if t.italic or t.bold then
+        if t.fg == defaults["normal"].fg then t.fg = defaults[""].fg end
+    end
+
+    if pcall(vim.api.nvim_set_hl, 0, name, t) then
+        dynamic_hls[name] = tags
+        return name
+    else
+        return "leetcode_normal"
     end
 end
 
