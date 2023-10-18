@@ -96,17 +96,27 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     logging = true,
 
     console = {
-        ---@type boolean
-        open_on_runcode = false,
+        open_on_runcode = false, ---@type boolean
+
+        dir = "row", ---@type "col" | "row"
 
         size = {
-            width = "75%", ---@type string | integer
+            width = "90%", ---@type string | integer
             height = "75%", ---@type string | integer
         },
-        dir = "row", ---@type "col" | "row"
+
+        result = {
+            size = "60%", ---@type string | integer
+        },
+
+        testcase = {
+            size = "40%", ---@type string | integer
+        },
     },
 
     description = {
+        position = "left", ---@type "top" | "right" | "bottom" | "left"
+
         width = "40%", ---@type string | integer
     },
 }

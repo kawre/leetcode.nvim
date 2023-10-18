@@ -75,9 +75,9 @@ local M = {
     },
 
     description = {
-        width = "40%", ---@type string | integer
-
         position = "left", ---@type "top" | "right" | "bottom" | "left"
+
+        width = "40%", ---@type string | integer
     },
 }
 
