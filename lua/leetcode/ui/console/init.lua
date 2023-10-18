@@ -57,35 +57,33 @@ end
 
 ---@param parent lc.Question
 function console:init(parent)
-    local obj = setmetatable({
+    self = setmetatable({
         parent = parent,
         opened = false,
     }, self)
 
     local keymap = {
-        ["R"] = function() obj:run() end,
-        ["S"] = function() obj:submit() end,
-        [{ "q", "<Esc>" }] = function() obj:hide() end,
+        ["R"] = function() self:run() end,
+        ["S"] = function() self:submit() end,
+        [{ "q", "<Esc>" }] = function() self:hide() end,
     }
 
-    obj.testcase = Testcase:init(obj):keymaps(keymap) ---@diagnostic disable-line
-    obj.result = Result:init(obj):keymaps(keymap) ---@diagnostic disable-line
+    self.testcase = Testcase:init(self):keymaps(keymap) ---@diagnostic disable-line
+    self.result = Result:init(self):keymaps(keymap) ---@diagnostic disable-line
 
-    obj.layout = NuiLayout(
+    self.layout = NuiLayout(
         {
             relative = "editor",
             position = "50%",
             size = config.user.console.size,
         },
         NuiLayout.Box({
-            NuiLayout.Box(obj.testcase.popup, { size = "50%" }),
-            NuiLayout.Box(obj.result.popup, { size = "50%" }),
+            NuiLayout.Box(self.testcase.popup, { size = config.user.console.testcase.size }),
+            NuiLayout.Box(self.result.popup, { size = config.user.console.result.size }),
         }, { dir = config.user.console.dir })
     )
 
-    -- obj:keymaps()
-
-    return obj
+    return self
 end
 
 return console

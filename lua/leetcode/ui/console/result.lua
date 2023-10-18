@@ -100,14 +100,14 @@ function result:handle_runtime(item) -- status code = 10
     for i, answer in ipairs(item.code_answer) do
         local passed = item.compare_result:sub(i, i) == "1"
 
-        local text = Case:init(
+        local case = Case:init(
             i,
             self.parent.testcase.testcases[i],
             answer,
             item.expected_code_answer[i],
             passed
         )
-        group:append(text)
+        group:append(case)
 
         local stdout = Stdout:init(item.std_output_list[i])
         if stdout then group:append(stdout) end
@@ -367,7 +367,7 @@ function result:init(parent)
         },
     })
 
-    local obj = setmetatable({
+    self = setmetatable({
         popup = popup,
         layout = Layout:init({
             winid = popup.winid,
@@ -376,7 +376,7 @@ function result:init(parent)
         parent = parent,
     }, self)
 
-    return obj
+    return self
 end
 
 return result

@@ -19,7 +19,8 @@ function case:init(index, input, output, expected, passed)
     local match = passed or (output == expected)
     local icon = match and "" or ""
     local hi = match and "leetcode_ok" or "leetcode_error"
-    local title_line = NuiLine():append(icon .. " Case " .. index, hi)
+    local title_line = NuiLine()
+    title_line:append(icon .. " Case " .. index, hi)
 
     local input_line = NuiLine()
     input_line:append("Input: ")

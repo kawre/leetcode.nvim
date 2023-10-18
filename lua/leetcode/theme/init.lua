@@ -24,6 +24,18 @@ local highlights = {
     input = "header",
     output = "header",
     explanation = "header",
+
+    -- pre = "",
+    -- span = "",
+    -- p = "",
+    -- ul = "",
+    -- ol = "",
+    -- li = "",
+    -- font = "",
+    -- sup = "",
+    -- sub = "",
+    -- small = "",
+    -- div = "",
 }
 
 function theme.load_devicons()

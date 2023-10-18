@@ -152,7 +152,7 @@ end
 function description:init(parent)
     local split = Split({
         relative = "editor",
-        position = "left",
+        position = config.user.description.position,
         size = config.user.description.width,
         enter = true,
         focusable = true,
