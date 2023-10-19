@@ -72,8 +72,9 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
 ### ⚙️ default configuration
 
-<details>
-  <summary>Click to see</summary>
+<!-- <details> -->
+
+<!--   <summary>Click to see</summary> -->
 
 ```lua
 {
@@ -123,7 +124,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
 ```
 
-</details>
+<!-- </details> -->
 
 ### arg
 
@@ -175,33 +176,6 @@ Whether to log [leetcode.nvim] status notifications
 logging = true
 ```
 
-### console
-
-question console
-
-```lua
-console = {
-    open_on_runcode = false, ---@type boolean
-
-    size = {
-        width = "75%", ---@type string | integer
-        height = "75%", ---@type string | integer
-    },
-
-    dir = "row", ---@type "col" | "row"
-}
-```
-
-### description
-
-question description
-
-```lua
-description = {
-    width = "40%", ---@type string | integer
-}
-```
-
 ## 📋 Commands
 
 | command             | description                                                   |
@@ -233,6 +207,8 @@ It is **required** to be **signed-in** to use [leetcode.nvim]
 https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4ad3abeda5c3
 
 ## 🍴 Recipes
+
+### lazy loading
 
 - proper lazy loading with [lazy.nvim]
 

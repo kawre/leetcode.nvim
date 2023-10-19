@@ -51,6 +51,11 @@ function Question:mount()
     vim.api.nvim_set_current_dir(config.home:absolute())
     vim.cmd("$tabe " .. self.file:absolute())
 
+    -- https://github.com/kawre/leetcode.nvim/issues/14
+    if self.lang == "rust" then
+        pcall(function() require("rust-tools.standalone").start_standalone_client() end)
+    end
+
     self.bufnr = vim.api.nvim_get_current_buf()
     self.winid = vim.api.nvim_get_current_win()
     table.insert(_Lc_questions, self)

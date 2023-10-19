@@ -1,6 +1,5 @@
 local log = require("leetcode.logger")
 local Question = require("leetcode.ui.question")
-local problems_cache = require("leetcode.cache.problemlist")
 local utils = require("leetcode.utils")
 
 local pickers = require("telescope.pickers")

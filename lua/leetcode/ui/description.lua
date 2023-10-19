@@ -154,7 +154,7 @@ function description:init(parent)
         relative = "editor",
         position = config.user.description.position,
         size = config.user.description.width,
-        enter = true,
+        enter = false,
         focusable = true,
     })
 
