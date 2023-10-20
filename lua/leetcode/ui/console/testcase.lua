@@ -96,7 +96,7 @@ function testcase:draw_extmarks()
                     }
                 end
             )
-            if not ok or invalid then text = { { " invalid", "leetcode_error" } } end
+            if not ok or invalid then text = { { "  " }, { " invalid", "leetcode_error" } } end
 
             self:add_extmark(i - 1, -1, { virt_text = text })
             j = j + 1
@@ -130,9 +130,9 @@ function testcase:init(parent)
             },
             style = "rounded",
             text = {
-                top = " Console | (q) Hide ",
+                top = " Testcases ",
                 top_align = "center",
-                bottom = " Testcase | (r) Reset ",
+                bottom = " (r) Reset ",
                 bottom_align = "center",
             },
         },
