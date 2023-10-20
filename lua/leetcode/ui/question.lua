@@ -23,11 +23,12 @@ Question.__index = Question
 ---
 ---@return boolean
 local function is_sql(q)
-    for _, value in ipairs(q.topic_tags or {}) do
-        if value.slug == "database" then return true end
-    end
+    -- for _, value in ipairs(q.topic_tags or {}) do
+    --     if value.slug == "database" then return true end
+    -- end
 
-    return false
+    -- return false
+    return q.meta_data.database
 end
 
 function Question:get_snippet()

@@ -56,6 +56,8 @@ function question.by_title_slug(title_slug)
     q.meta_data = select(2, pcall(utils.decode, q.meta_data))
     q.stats = select(2, pcall(utils.decode, q.stats))
 
+    log.debug(q.meta_data)
+
     return q
 end
 

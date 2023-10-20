@@ -65,6 +65,7 @@ function console:init(parent)
     local keymap = {
         ["R"] = function() self:run() end,
         ["S"] = function() self:submit() end,
+        ["r"] = function() self.testcase:reset() end,
         [{ "q", "<Esc>" }] = function() self:hide() end,
     }
 

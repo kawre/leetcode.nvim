@@ -1,12 +1,12 @@
-local Layout = require("leetcode-ui.layout")
-local Text = require("leetcode-ui.component.text")
-local NuiLine = require("nui.line")
 local log = require("leetcode.logger")
+local config = require("leetcode.config")
 local NuiPopup = require("nui.popup")
 local console_popup = require("leetcode.ui.console.popup")
 
 ---@class lc.Testcase: lc.Console.Popup
 ---@field testcases string[]
+---@field init_testcases string[]
+---@field extmarks integer[]
 local testcase = {}
 testcase.__index = testcase
 setmetatable(testcase, console_popup)
@@ -41,7 +41,80 @@ function testcase:draw()
 
     vim.api.nvim_buf_set_lines(self.popup.bufnr, 0, -1, false, t)
 
+    self:draw_extmarks()
     return self
+end
+
+function testcase:clear_extmarks()
+    if not config.user.console.testcase.virt_text then return end
+
+    local ns = vim.api.nvim_create_namespace("leetcode_extmarks")
+    for _, id in ipairs(self.extmarks) do
+        vim.api.nvim_buf_del_extmark(self.popup.bufnr, ns, id)
+    end
+
+    self.extmarks = {}
+end
+
+function testcase:add_extmark(line, col, opts)
+    local ns = vim.api.nvim_create_namespace("leetcode_extmarks")
+
+    local id = vim.api.nvim_buf_set_extmark(self.popup.bufnr, ns, line, col, opts or {})
+    table.insert(self.extmarks, id)
+end
+
+function testcase:draw_extmarks()
+    if not config.user.console.testcase.virt_text then return end
+
+    self:clear_extmarks()
+    local bufnr = self.popup.bufnr
+
+    local md = self.parent.parent.q.meta_data
+    local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+
+    if not md.params then return end
+
+    local j = 1
+    local invalid = false
+
+    for i, line in ipairs(lines) do
+        pcall(function()
+            if lines[i - 1] == "" and lines[i] == "" then invalid = true end
+        end)
+
+        if line == "" then
+            j = 1
+        else
+            local ok, text = pcall(
+                function()
+                    return {
+                        { "  " },
+                        { "", "Operator" },
+                        { " " },
+                        { md.params[j].name, "Comment" },
+                        { " " },
+                        { md.params[j].type, "Type" },
+                    }
+                end
+            )
+            if not ok or invalid then text = { { " invalid", "leetcode_error" } } end
+
+            self:add_extmark(i - 1, -1, { virt_text = text })
+            j = j + 1
+        end
+    end
+end
+
+function testcase:reset()
+    self:draw()
+    log.info("Test cases have been reset")
+end
+
+function testcase:autocmds()
+    self.popup:on(
+        { "TextChanged", "TextChangedI", "TextChangedP", "TextChangedT" },
+        function() self:draw_extmarks() end
+    )
 end
 
 ---@param parent lc.Console
@@ -60,7 +133,7 @@ function testcase:init(parent)
             text = {
                 top = " Console | (q) Hide ",
                 top_align = "center",
-                bottom = " Testcase ",
+                bottom = " Testcase | (r) Reset ",
                 bottom_align = "center",
             },
         },
@@ -73,13 +146,16 @@ function testcase:init(parent)
         },
     })
 
-    local obj = setmetatable({
+    self = setmetatable({
         popup = popup,
         testcases = {},
+        init_testcases = {},
+        extmarks = {},
         parent = parent,
     }, self)
 
-    return obj:draw()
+    self:autocmds()
+    return self:draw()
 end
 
 return testcase

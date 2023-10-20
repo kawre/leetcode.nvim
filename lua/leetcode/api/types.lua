@@ -236,6 +236,7 @@
 ---@class lc.QuestionResponse.metadata
 ---@field manual boolean
 ---@field name string
+---@field database boolean
 ---@field params metadata_param[]
 ---@field return metadata_return
 

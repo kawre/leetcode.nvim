@@ -70,6 +70,8 @@ local M = {
         },
 
         testcase = {
+            virt_text = true, ---@type boolean
+
             size = "40%", ---@type string | integer
         },
     },
