@@ -5,7 +5,6 @@ local console_popup = require("leetcode.ui.console.popup")
 
 ---@class lc.Testcase: lc.Console.Popup
 ---@field testcases string[]
----@field init_testcases string[]
 ---@field extmarks integer[]
 local testcase = {}
 testcase.__index = testcase
@@ -149,7 +148,6 @@ function testcase:init(parent)
     self = setmetatable({
         popup = popup,
         testcases = {},
-        init_testcases = {},
         extmarks = {},
         parent = parent,
     }, self)

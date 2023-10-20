@@ -111,6 +111,8 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         },
 
         testcase = {
+            virt_text = true, ---@type boolean
+
             size = "40%", ---@type string | integer
         },
     },
@@ -121,7 +123,6 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         width = "40%", ---@type string | integer
     },
 }
-
 ```
 
 <!-- </details> -->
