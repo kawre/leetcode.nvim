@@ -179,17 +179,16 @@ logging = true
 
 ## 📋 Commands
 
-| command             | description                                                   |
-| ------------------- | ------------------------------------------------------------- |
-| LcMenu              | opens menu dashboard                                          |
-| LcList              | opens a problem list picker                                   |
-| LcConsole           | opens console pop-up for currently opened question            |
-| LcHints             | opens hints pop-up for currently opened question              |
-| LcTabs              | opens a picker with all currently opened question tabs        |
-| LcLanguage          | opens a picker to change the language of the current question |
-| LcDescriptionToggle | toggle question description                                   |
-| LcRun               | run currently opened question                                 |
-| LcSubmit            | submit currently opened question                              |
+| command                  | description                                                   |
+| ------------------------ | ------------------------------------------------------------- |
+| `Leet menu`              | opens menu dashboard                                          |
+| `Leet console`           | opens console pop-up for currently opened question            |
+| `Leet hints`             | opens hints pop-up for currently opened question              |
+| `Leet tabs`              | opens a picker with all currently opened question tabs        |
+| `Leet lang`              | opens a picker to change the language of the current question |
+| `Leet desc toggle`       | toggle question description                                   |
+| `Leet run`               | run currently opened question                                 |
+| `Leet submit`            | submit currently opened question                              |
 
 ## 🚀 Usage
 

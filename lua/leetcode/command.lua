@@ -151,4 +151,65 @@ function cmd.fix()
     vim.cmd("qa!")
 end
 
+cmd.commands = {
+    console = cmd.console,
+    hints = cmd.hints,
+    menu = cmd.menu,
+    tabs = cmd.question_tabs,
+    lang = cmd.change_lang,
+    run = cmd.q_run,
+    submit = cmd.q_submit,
+    fix = cmd.fix,
+
+    desc = {
+        toggle = cmd.desc_toggle,
+    },
+}
+
+---@return string, string[]
+function cmd.parse(args)
+    local parts = vim.split(vim.trim(args), "%s+")
+    if parts[1]:find("Leet") then table.remove(parts, 1) end
+    if args:sub(-1) == " " then parts[#parts + 1] = "" end
+    return table.remove(parts, 1) or "", parts
+end
+
+function cmd.complete(_, line)
+    local prefix, args = cmd.parse(line)
+    if #args > 0 then return cmd.complete(prefix, args[#args]) end
+
+    local tbl = type(cmd.commands[_]) == "table" and cmd.commands[_] --[[@as table]]
+        or cmd.commands
+
+    return vim.tbl_filter(
+        function(key) return key:find(prefix, 1, true) == 1 end,
+        vim.tbl_keys(tbl)
+    )
+end
+
+function cmd.cmd(args)
+    local arguments = vim.split(args.args, "%s+")
+    local last = arguments[#arguments]
+
+    local tbl = cmd.commands
+    for i = 1, #arguments - 1 do
+        tbl = cmd.commands[arguments[i]] --[[@as table]]
+    end
+
+    tbl[last]()
+end
+
+function cmd.setup()
+    vim.api.nvim_create_user_command("Leet", function(args)
+        local ok, _ = pcall(cmd.cmd, args)
+        if not ok then log.error(("Invalid command: `%s`"):format(args.args)) end
+    end, {
+        bar = true,
+        bang = true,
+        nargs = "?",
+        desc = "Leet",
+        complete = cmd.complete,
+    })
+end
+
 return cmd

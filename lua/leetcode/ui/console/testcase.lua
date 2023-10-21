@@ -46,20 +46,24 @@ end
 
 function testcase:clear_extmarks()
     if not config.user.console.testcase.virt_text then return end
-
     local ns = vim.api.nvim_create_namespace("leetcode_extmarks")
-    for _, id in ipairs(self.extmarks) do
-        vim.api.nvim_buf_del_extmark(self.popup.bufnr, ns, id)
-    end
 
-    self.extmarks = {}
+    self.extmarks = vim.tbl_filter(
+        function(extmark) return not vim.api.nvim_buf_del_extmark(self.popup.bufnr, ns, extmark) end,
+        self.extmarks
+    )
 end
 
+---@param line integer
+---@param col integer
+---@param opts? table<string, table>
 function testcase:add_extmark(line, col, opts)
     local ns = vim.api.nvim_create_namespace("leetcode_extmarks")
 
-    local id = vim.api.nvim_buf_set_extmark(self.popup.bufnr, ns, line, col, opts or {})
-    table.insert(self.extmarks, id)
+    table.insert(
+        self.extmarks,
+        vim.api.nvim_buf_set_extmark(self.popup.bufnr, ns, line, col, opts or {})
+    )
 end
 
 function testcase:draw_extmarks()
@@ -73,6 +77,17 @@ function testcase:draw_extmarks()
 
     if not md.params then return end
 
+    local function get_param(idx)
+        return {
+            { " " },
+            { "", "Operator" },
+            { " " },
+            { md.params[idx].name, "Comment" },
+            { " " },
+            { md.params[idx].type, "Type" },
+        }
+    end
+
     local j = 1
     local invalid = false
 
@@ -81,25 +96,14 @@ function testcase:draw_extmarks()
             if lines[i - 1] == "" and lines[i] == "" then invalid = true end
         end)
 
-        if line == "" then
-            j = 1
-        else
-            local ok, text = pcall(
-                function()
-                    return {
-                        { "  " },
-                        { "", "Operator" },
-                        { " " },
-                        { md.params[j].name, "Comment" },
-                        { " " },
-                        { md.params[j].type, "Type" },
-                    }
-                end
-            )
-            if not ok or invalid then text = { { "  " }, { " invalid", "leetcode_error" } } end
+        if line ~= "" then
+            local ok, text = pcall(get_param, j)
+            if not ok or invalid then text = { { " " }, { " invalid", "leetcode_error" } } end
 
             self:add_extmark(i - 1, -1, { virt_text = text })
             j = j + 1
+        else
+            j = 1
         end
     end
 end

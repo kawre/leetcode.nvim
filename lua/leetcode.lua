@@ -17,21 +17,19 @@ end
 
 function leetcode.setup_cmds()
     local cmd = require("leetcode.command")
-    local utils = require("leetcode.utils")
-
-    -- commands
-    utils.create_usr_cmd("LcConsole", cmd.console, {})
-    utils.create_usr_cmd("LcHints", cmd.hints, {})
-    utils.create_usr_cmd("LcMenu", cmd.menu, {})
-    utils.create_usr_cmd("LcTabs", cmd.question_tabs, {})
-    utils.create_usr_cmd("LcLanguage", cmd.change_lang, {})
-    utils.create_usr_cmd("LcDescriptionToggle", cmd.desc_toggle, {})
-    utils.create_usr_cmd("LcRun", cmd.q_run, {})
-    utils.create_usr_cmd("LcSubmit", cmd.q_submit, {})
-    utils.create_usr_cmd("LcFix", cmd.fix, {})
+    cmd.setup()
 
     -- deprecate
-    utils.deprecate_usr_cmd("LcQuestionTabs", "LcTabs")
+    local utils = require("leetcode.utils")
+    utils.deprecate_usr_cmd("LcConsole", "Leet console")
+    utils.deprecate_usr_cmd("LcHints", "Leet hints")
+    utils.deprecate_usr_cmd("LcMenu", "Leet menu")
+    utils.deprecate_usr_cmd("LcTabs", "Leet tabs")
+    utils.deprecate_usr_cmd("LcLanguage", "Leet lang")
+    utils.deprecate_usr_cmd("LcDescriptionToggle", "Leet desc toggle")
+    utils.deprecate_usr_cmd("LcRun", "Leet run")
+    utils.deprecate_usr_cmd("LcSubmit", "Leet submit")
+    utils.deprecate_usr_cmd("LcFix", "Leet fix")
 end
 
 function leetcode.validate()
