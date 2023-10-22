@@ -181,7 +181,7 @@ logging = true
 
 | command                  | description                                                   |
 | ------------------------ | ------------------------------------------------------------- |
-| `Leet menu`              | opens menu dashboard                                          |
+| `Leet` or `Leet menu`    | opens menu dashboard                                          |
 | `Leet console`           | opens console pop-up for currently opened question            |
 | `Leet hints`             | opens hints pop-up for currently opened question              |
 | `Leet tabs`              | opens a picker with all currently opened question tabs        |

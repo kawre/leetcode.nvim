@@ -160,11 +160,9 @@ cmd.commands = {
     submit = cmd.q_submit,
     fix = cmd.fix,
 
-    -- desc = {
-    --     toggle = cmd.desc_toggle,
-    -- },
-
-    desc = cmd.desc_toggle,
+    desc = {
+        toggle = cmd.desc_toggle,
+    },
 }
 
 ---@return string, string[]
@@ -190,6 +188,7 @@ end
 
 function cmd.cmd(args)
     local arguments = vim.split(args.args, "%s+")
+    if vim.tbl_isempty(args.fargs) then return cmd.menu() end
     local last = arguments[#arguments]
 
     local tbl = cmd.commands
