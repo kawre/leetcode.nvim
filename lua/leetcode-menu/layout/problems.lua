@@ -1,4 +1,5 @@
 local cmd = require("leetcode.command")
+local NuiLine = require("nui.line")
 
 local Title = require("leetcode-menu.components.title")
 local Footer = require("leetcode-menu.components.footer")
@@ -8,15 +9,11 @@ local Button = require("leetcode-ui.component.button")
 local Buttons = require("leetcode-menu.components.buttons")
 local Layout = require("leetcode-ui.layout")
 
-local list_btn = Button:init({ src = "List", icon = "" }, "p", function() cmd.problems() end)
+local list_btn = Button:init({ src = "List", icon = "" }, "p", cmd.problems)
 
-local random_btn = Button:init(
-    { src = "Random", icon = "" },
-    "r",
-    function() cmd.random_question() end
-)
+local random_btn = Button:init({ src = "Random", icon = "" }, "r", cmd.random_question)
 
-local qot_btn = Button:init({ src = "Daily", icon = "󰃭" }, "i", function() cmd.qot() end)
+local qot_btn = Button:init({ src = "Daily", icon = "󰃭" }, "d", cmd.qot)
 
 local back_btn = Button:init(
     { src = "Back", icon = "" },

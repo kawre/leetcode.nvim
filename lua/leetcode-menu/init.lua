@@ -32,7 +32,7 @@ function menu:clear_keymaps()
 end
 
 function menu:apply_btn_keymaps()
-    local opts = { noremap = false, silent = true, buffer = self.bufnr }
+    local opts = { noremap = false, silent = true, buffer = self.bufnr, nowait = true }
 
     for _, btn in pairs(self.layout.buttons) do
         if not btn.sc then return end

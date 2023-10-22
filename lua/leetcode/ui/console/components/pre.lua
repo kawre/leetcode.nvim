@@ -7,7 +7,7 @@ local NuiLine = require("nui.line")
 
 ---@class lc.Result.Pre
 local pre = {}
--- pre.__index = pre
+pre.__index = pre
 
 ---@param title NuiText | NuiLine
 ---@param lines NuiLine[]
@@ -23,32 +23,6 @@ function pre:init(title, lines)
     end
 
     return text
-
-    -- local obj = setmetatable({
-    --
-    -- }, self)
-    -- return group
-
-    -- return obj
-    -- table.insert(t, NuiLine())
-    -- local match = output == expected
-    -- local icon = match and "" or ""
-    -- local hi = match and "leetcode_ok" or "leetcode_error"
-    -- local index_line = NuiLine():append(icon .. " Case " .. index, hi)
-    -- table.insert(t, index_line)
-    --
-    -- local indent = "\t▎\t"
-    --
-    -- table.insert(t, NuiLine())
-    --
-    -- local input_line = NuiLine():append(indent .. "Input: " .. input)
-    -- table.insert(t, input_line)
-    --
-    -- local output_line = NuiLine():append(indent .. "Output: " .. output)
-    -- table.insert(t, output_line)
-    --
-    -- local expected_line = NuiLine():append(indent .. "Expected: " .. expected)
-    -- table.insert(t, expected_line)
 end
 
 return pre

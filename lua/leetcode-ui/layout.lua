@@ -64,7 +64,7 @@ end
 ---@param val? integer Optional value to increment line index by
 function Layout:get_line_idx(val)
     local line_idx = self.line_idx
-    self.line_idx = self.line_idx + (val or 1)
+    self.line_idx = self.line_idx + (val or 0)
     return line_idx
 end
 

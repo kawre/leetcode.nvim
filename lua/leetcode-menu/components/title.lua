@@ -19,8 +19,7 @@ function title:init(str, opts)
         opts = opts,
     })
 
-    local obj = setmetatable(text, self)
-    return obj
+    return setmetatable(text, self)
 end
 
 return title

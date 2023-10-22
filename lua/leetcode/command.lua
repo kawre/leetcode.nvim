@@ -145,7 +145,6 @@ function cmd.q_submit()
 end
 
 function cmd.fix()
-    -- local config = require("leetcode.config")
     require("leetcode.cache.cookie").delete()
     require("leetcode.cache.problemlist").delete()
     vim.cmd("qa!")
@@ -161,9 +160,11 @@ cmd.commands = {
     submit = cmd.q_submit,
     fix = cmd.fix,
 
-    desc = {
-        toggle = cmd.desc_toggle,
-    },
+    -- desc = {
+    --     toggle = cmd.desc_toggle,
+    -- },
+
+    desc = cmd.desc_toggle,
 }
 
 ---@return string, string[]
@@ -201,8 +202,7 @@ end
 
 function cmd.setup()
     vim.api.nvim_create_user_command("Leet", function(args)
-        local ok, _ = pcall(cmd.cmd, args)
-        if not ok then log.error(("Invalid command: `%s`"):format(args.args)) end
+        if not pcall(cmd.cmd, args) then log.error(("Invalid command: `%s`"):format(args.args)) end
     end, {
         bar = true,
         bang = true,
