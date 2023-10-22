@@ -24,7 +24,7 @@ return Layout:init({
     components = {
         Header:init(),
 
-        Title:init("Sign in"),
+        Title:init({}, "Sign in"),
         --
         buttons,
         --

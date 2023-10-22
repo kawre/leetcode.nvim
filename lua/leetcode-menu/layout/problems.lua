@@ -27,7 +27,7 @@ return Layout:init({
         Header:init(),
 
         -- title
-        Title:init("Problems"),
+        Title:init({ "Menu" }, "Problems"),
 
         -- buttons
         Buttons:init({

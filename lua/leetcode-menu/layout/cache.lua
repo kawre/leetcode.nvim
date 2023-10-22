@@ -29,7 +29,7 @@ return Layout:init({
     components = {
         Header:init(),
 
-        Title:init("Cache"),
+        Title:init({ "Menu" }, "Cache"),
 
         buttons,
 

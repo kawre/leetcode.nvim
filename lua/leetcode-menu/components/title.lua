@@ -1,4 +1,5 @@
 local Text = require("leetcode-ui.component.text")
+local NuiLine = require("nui.line")
 
 ---@class lc-menu.Title : lc-ui.Text
 ---@field text lc-ui.Text
@@ -6,16 +7,23 @@ local title = {}
 title.__index = title
 setmetatable(title, Text)
 
+---@param history string[]
 ---@param str string
 ---@param opts? any
-function title:init(str, opts)
+function title:init(history, str, opts)
     opts = vim.tbl_deep_extend("force", {
         position = "center",
-        hl = "Function",
     }, opts or {})
 
+    local nui_line = NuiLine()
+    for _, h in ipairs(history) do
+        nui_line:append(h, "leetcode_alt")
+        nui_line:append("  ", "leetcode_list")
+    end
+    nui_line:append(str, "Function")
+
     local text = Text:init({
-        lines = { str },
+        lines = { nui_line },
         opts = opts,
     })
 

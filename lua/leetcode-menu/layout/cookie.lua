@@ -37,7 +37,7 @@ return Layout:init({
     components = {
         Header:init(),
 
-        Title:init("Cookie"),
+        Title:init({ "Menu" }, "Cookie"),
 
         buttons,
 

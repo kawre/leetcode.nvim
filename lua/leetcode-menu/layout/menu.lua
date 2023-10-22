@@ -46,7 +46,7 @@ return Layout:init({
     components = {
         Header:init(),
 
-        Title:init("Menu"),
+        Title:init({}, "Menu"),
 
         Buttons:init({
             components = {
