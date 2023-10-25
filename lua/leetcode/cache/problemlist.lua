@@ -6,6 +6,10 @@ local file = config.home:joinpath(".problemlist")
 
 local problems_api = require("leetcode.api.problems")
 
+---@class lc.Cache.Question.topicTags
+---@field name string
+---@field slug string
+
 ---@class lc.Cache.Question
 ---@field frontend_id string
 ---@field title string
@@ -14,6 +18,8 @@ local problems_api = require("leetcode.api.problems")
 ---@field paid_only boolean
 ---@field ac_rate number
 ---@field difficulty "Easy" | "Medium" | "Hard"
+---@field topic_tags lc.Cache.Question.topicTags[]
+
 local problemlist = {}
 
 local function populate()
