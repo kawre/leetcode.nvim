@@ -97,24 +97,30 @@ local theme = require("telescope.themes").get_dropdown({
 ---
 ---@return lc.Cache.Question[]
 local function filter_questions(questions, opts)
+    if vim.tbl_isempty(opts) then return questions end
+
     ---@param q lc.Cache.Question
     return vim.tbl_filter(function(q)
-        if not vim.tbl_isempty(opts.topics or {}) then
-            local flag = false
+        if opts.topics then
             for _, topic in ipairs(opts.topics) do
+                local flag = false
+
                 for _, tag in ipairs(q.topic_tags) do
-                    if tag.slug == topic then flag = true end
+                    if tag.slug == topic then
+                        flag = true
+                        break
+                    end
                 end
 
                 if not flag then return false end
             end
         end
 
-        if not vim.tbl_isempty(opts.difficulty or {}) then
+        if opts.difficulty then
             if not vim.tbl_contains(opts.difficulty, q.difficulty) then return false end
         end
 
-        if not vim.tbl_isempty(opts.status or {}) then
+        if opts.status then
             if not vim.tbl_contains(opts.status, q.status) then return false end
         end
 
