@@ -56,6 +56,11 @@ function problemlist.get()
     local ok, problems = pcall(problemlist.parse, contents)
     assert(ok)
 
+    -- return vim.tbl_map(function(problem)
+    --     problem.frontend_id = tonumber(problem.frontend_id)
+    --     return problem
+    -- end, problems)
+
     return problems
 end
 

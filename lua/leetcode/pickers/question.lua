@@ -11,6 +11,8 @@ local entry_display = require("telescope.pickers.entry_display")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
+local picker_height, picker_width = 20, 100
+
 ---@param question lc.Cache.Question
 ---
 ---@return string
@@ -38,18 +40,20 @@ local function display_user_status(question)
     local user_status = {
         ac = { "", "leetcode_easy" },
         notac = { "󱎖", "leetcode_medium" },
+        todo = { "", "leetcode_alt" },
     }
 
     if question.status == vim.NIL then return { "" } end
-    return user_status[question.status]
+    return user_status[question.status] or { "" }
 end
 
 ---@param question lc.Cache.Question
 local function display_question(question)
+    local ac_rate = { ("%.1f%%"):format(question.ac_rate), "leetcode_ref" }
     local index = { question.frontend_id .. ".", "leetcode_normal" }
     local title = { question.title }
 
-    return unpack({ index, title })
+    return unpack({ index, title, ac_rate })
 end
 
 local displayer = entry_display.create({
@@ -58,7 +62,8 @@ local displayer = entry_display.create({
         { width = 1 },
         { width = 1 },
         { width = 5 },
-        { remaining = true },
+        { width = 78 },
+        { width = 5 },
     },
 })
 
@@ -81,7 +86,12 @@ local function entry_maker(entry)
     }
 end
 
-local theme = require("telescope.themes").get_dropdown()
+local theme = require("telescope.themes").get_dropdown({
+    layout_config = {
+        width = 100,
+        height = 25,
+    },
+})
 
 ---@param questions lc.Cache.Question[]
 ---
@@ -89,26 +99,46 @@ local theme = require("telescope.themes").get_dropdown()
 local function filter_questions(questions, opts)
     ---@param q lc.Cache.Question
     return vim.tbl_filter(function(q)
-        for _, topic in ipairs(opts.topics) do
-            if vim.tbl_contains(q.topic_tags, topic) then return true end
+        if not vim.tbl_isempty(opts.topics or {}) then
+            local flag = false
+            for _, topic in ipairs(opts.topics) do
+                for _, tag in ipairs(q.topic_tags) do
+                    if tag.slug == topic then flag = true end
+                end
+
+                if not flag then return false end
+            end
         end
 
-        return q.difficulty == opts.diff or q.status == opts.status
+        if not vim.tbl_isempty(opts.difficulty or {}) then
+            if not vim.tbl_contains(opts.difficulty, q.difficulty) then return false end
+        end
+
+        if not vim.tbl_isempty(opts.status or {}) then
+            if not vim.tbl_contains(opts.status, q.status) then return false end
+        end
+
+        return true
     end, questions)
 end
 
----@param sort_by string
----@param order "desc" | "asc"
-local function sort_questions(questions, sort_by, order)
-    local prod = order == "desc" and 1 or -1
-    table.sort(questions, function(a, b) return (a[sort_by] > b[sort_by]) * prod end)
+---@param opts table<string, string[]>
+local function sort_questions(questions, opts)
+    -- local prod = order == "desc" and 1 or -1
+    for _, by in ipairs(opts.sortBy) do
+        table.sort(questions, function(a, b) return a[by] < b[by] end)
+    end
 end
 
 return {
     ---@param questions lc.Cache.Question[]
     pick = function(questions, opts)
+        opts = vim.tbl_deep_extend("force", {
+            -- sortBy = { "frontend_id" },
+        }, opts or {})
+
         questions = filter_questions(questions, opts)
-        sort_questions(questions, opts.sort_by, opts.order_by)
+        -- sort_questions(questions, opts)
 
         pickers
             .new(theme, {

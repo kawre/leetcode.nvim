@@ -11,7 +11,11 @@ local question_fields = [[
     paid_only: isPaidOnly
     ac_rate: acRate
     difficulty
-    topic_tags: topicTags
+    topic_tags: topicTags {
+        name
+        slug
+        id
+    }
 ]]
 
 ---@return lc.Cache.Question[]

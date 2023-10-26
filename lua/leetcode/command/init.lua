@@ -1,17 +1,19 @@
 local log = require("leetcode.logger")
+local cmd_opts = require("leetcode.command.options")
 
 ---@class lc.Commands
 local cmd = {}
 
 function cmd.cache_update() require("leetcode.cache").update() end
 
-function cmd.problems(opts)
+---@param options table<string, string[]>
+function cmd.problems(options)
     local async = require("plenary.async")
     local problems = require("leetcode.cache.problemlist")
 
     async.run(
         function() return problems.get() end,
-        function(res) require("leetcode.pickers.question").pick(res, opts or {}) end
+        function(res) require("leetcode.pickers.question").pick(res, options) end
     )
 end
 
@@ -150,87 +152,6 @@ function cmd.fix()
     vim.cmd("qa!")
 end
 
-local topics = {
-    "dynamic-programming",
-    "math",
-    "hash-table",
-    "string",
-    "array",
-    "biconnected-component",
-    "eulerian-circuit",
-    "radix-sort",
-    "rejection-sampling",
-    "strongly-connected-component",
-    "reservoir-sampling",
-    "minimum-spanning-tree",
-    "counting-sort",
-    "line-sweep",
-    "shell",
-    "suffix-array",
-    "bucket-sort",
-    "quickselect",
-    "concurrency",
-    "doubly-linked-list",
-    "probability-and-statistics",
-    "iterator",
-    "merge-sort",
-    "monotonic-queue",
-    "randomized",
-    "string-matching",
-    "data-stream",
-    "rolling-hash",
-    "brainteaser",
-    "interactive",
-    "combinatorics",
-    "shortest-path",
-    "hash-function",
-    "topological-sort",
-    "binary-indexed-tree",
-    "game-theory",
-    "geometry",
-    "segment-tree",
-    "memoization",
-    "binary-search-tree",
-    "divide-and-conquer",
-    "number-theory",
-    "bitmask",
-    "queue",
-    "recursion",
-    "trie",
-    "monotonic-stack",
-    "enumeration",
-    "sliding-window",
-    "union-find",
-    "linked-list",
-    "backtracking",
-    "counting",
-    "design",
-    "simulation",
-    "heap-priority-queue",
-    "two-pointers",
-    "database",
-    "sorting",
-    "greedy",
-    "breadth-first-search",
-    "depth-first-search",
-    "bit-manipulation",
-    "binary-tree",
-    "matrix",
-    "tree",
-    "graph",
-    "prefix-sum",
-    "stack",
-    "ordered-set",
-    "binary-search",
-}
-local list_opts = {
-    sortBy = { "status", "title", "acceptance", "difficulty" },
-    orderBy = { "desc", "asc" },
-    difficulty = { "Easy", "Medium", "Hard" },
-    status = { "ac", "notac", "todo" },
-    topics = topics,
-}
-
 cmd.commands = {
     cmd.menu,
 
@@ -243,19 +164,26 @@ cmd.commands = {
     submit = { cmd.q_submit },
     fix = { cmd.fix },
 
-    list = { cmd.problems, opts = list_opts },
+    list = { cmd.problems, opts = cmd_opts.list },
 
     desc = {
         toggle = { cmd.desc_toggle },
     },
 }
 
----@return string, string[]
+---@return string, string[], string[]
 function cmd.parse(args)
     local parts = vim.split(vim.trim(args), "%s+")
     if parts[1]:find("Leet") then table.remove(parts, 1) end
     if args:sub(-1) == " " then parts[#parts + 1] = "" end
-    return table.remove(parts, 1) or "", parts
+
+    local options = {}
+    for _, part in ipairs(parts) do
+        local opt = part:match("(.-)=.-")
+        if opt then table.insert(options, opt) end
+    end
+
+    return table.remove(parts, 1) or "", parts, options
 end
 
 ---@param t table
@@ -263,25 +191,16 @@ local function cmds_keys(t)
     return vim.tbl_filter(function(key) return type(key) == "string" end, vim.tbl_keys(t))
 end
 
-function cmd.complete(_, line, cmds)
+function cmd.complete(prefix, args, options, cmds)
     if not cmds then return {} end
-
-    local prefix, args = cmd.parse(line)
-    log.debug({
-        _ = _,
-        line = line,
-        prefix = prefix,
-        args = args,
-        cmds = cmds,
-    })
-    if #args > 0 then
-        cmds = cmds[prefix]
-        if not cmds.opts then return cmd.complete(prefix, args[#args], cmds) end
+    if #args > 0 and not cmds.opts then
+        return cmd.complete(table.remove(args, 1), args, cmds[prefix])
     end
 
     local txt, keys = prefix, cmds_keys(cmds)
-    if args[#args] then
+    if #args > 0 then
         txt, keys = args[#args], cmds_keys(cmds.opts)
+        keys = vim.tbl_filter(function(key) return not vim.tbl_contains(options, key) end, keys)
         keys = vim.tbl_map(function(key) return ("%s="):format(key) end, keys)
 
         local s = vim.split(txt, "=")
@@ -293,16 +212,22 @@ function cmd.complete(_, line, cmds)
         end
     end
 
-    -- log.debug(cmds)
     return vim.tbl_filter(function(key) return key:find(txt, 1, true) == 1 end, keys or {})
 end
 
 function cmd.cmd(args)
     local t = cmd.commands
+    local options = {}
     for s in vim.gsplit(args.args, "%s+", { trimempty = true }) do
-        t = t[s]
+        local opt = vim.split(s, "=")
+        if opt[2] then
+            options[opt[1]] = vim.split(opt[2], ",%s*", { trimempty = true })
+        else
+            t = t[s]
+        end
     end
-    t[1]()
+
+    t[1](options)
 end
 
 function cmd.setup()
@@ -313,7 +238,10 @@ function cmd.setup()
         bang = true,
         nargs = "?",
         desc = "Leet",
-        complete = function(_, line) return cmd.complete(_, line, cmd.commands) end,
+        complete = function(_, line)
+            local prefix, args, options = cmd.parse(line)
+            return cmd.complete(prefix, args, options, cmd.commands[prefix] or cmd.commands)
+        end,
     })
 end
 
