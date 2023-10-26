@@ -205,14 +205,20 @@ function cmd.complete(prefix, args, options, cmds)
 
         local s = vim.split(txt, "=")
         if s[2] and cmds.opts[s[1]] then
-            return vim.tbl_filter(function(key)
-                local vals = vim.split(key, ",")
-                return key:find(vals[#vals], 1, true) == 1
-            end, cmds.opts[s[1]])
+            local vals = vim.split(s[2], ",")
+            return vim.tbl_filter(
+                function(key)
+                    return not vim.tbl_contains(vals, key) and key:find(vals[#vals], 1, true) == 1
+                end,
+                cmds.opts[s[1]]
+            )
         end
     end
 
-    return vim.tbl_filter(function(key) return key:find(txt, 1, true) == 1 end, keys or {})
+    return vim.tbl_filter(
+        function(key) return not vim.tbl_contains(args, key) and key:find(txt, 1, true) == 1 end,
+        keys or {}
+    )
 end
 
 function cmd.cmd(args)

@@ -11,8 +11,6 @@ local entry_display = require("telescope.pickers.entry_display")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
-local picker_height, picker_width = 20, 100
-
 ---@param question lc.Cache.Question
 ---
 ---@return string
@@ -89,7 +87,7 @@ end
 local theme = require("telescope.themes").get_dropdown({
     layout_config = {
         width = 100,
-        height = 25,
+        height = 20,
     },
 })
 
