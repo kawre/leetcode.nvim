@@ -179,17 +179,17 @@ logging = true
 
 ## 📋 Commands
 
-| command                  | description                                                   |
-| ------------------------ | ------------------------------------------------------------- |
-| `Leet` or `Leet menu`    | opens menu dashboard                                          |
-| `Leet console`           | opens console pop-up for currently opened question            |
-| `Leet hints`             | opens hints pop-up for currently opened question              |
-| `Leet tabs`              | opens a picker with all currently opened question tabs        |
-| `Leet lang`              | opens a picker to change the language of the current question |
-| `Leet desc toggle`       | toggle question description                                   |
-| `Leet run`               | run currently opened question                                 |
-| `Leet submit`            | submit currently opened question                              |
-| `Leet list`              | opens a problemlist picker                                    |
+| command                  | description                                                               |
+| ------------------------ | ------------------------------------------------------------------------- |
+| `Leet` or `Leet menu`    | opens menu dashboard                                                      |
+| `Leet console`           | opens console pop-up for currently opened question                        |
+| `Leet info`              | opens a pop-up containing information about the currently opened question |
+| `Leet tabs`              | opens a picker with all currently opened question tabs                    |
+| `Leet lang`              | opens a picker to change the language of the current question             |
+| `Leet desc toggle`       | toggle question description                                               |
+| `Leet run`               | run currently opened question                                             |
+| `Leet submit`            | submit currently opened question                                          |
+| `Leet list`              | opens a problemlist picker                                                |
 
 ### `Leet list`
 
