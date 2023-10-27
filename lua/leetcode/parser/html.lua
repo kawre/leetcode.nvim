@@ -232,8 +232,7 @@ end
 function Html:normalize()
     log.debug(self.str)
 
-    self.str = self
-        .str
+    self.str = self.str
         :gsub("​", "")
         :gsub("\r\n", "\n")
         :gsub("\t*<(/?li)>", "<%1>")
@@ -242,12 +241,8 @@ function Html:normalize()
         :gsub("<strong>(Input:?%s*)</strong>", "<input>%1</input>")
         :gsub("<strong>(Output:?%s*)</strong>", "<output>%1</output>")
         :gsub("<strong>(Explanation:?%s*)</strong>", "<explanation>%1</explanation>")
-        -- :gsub(
-        --     "\t*<(li[^>]*)>(.-)\t*</(li)>",
-        --     "<%1>%2</%3>\n"
-        -- )
-        -- :gsub("\t*<(ul[^>]*)>(.-)\t*</(ul)>", "<%1>%2</%3>\n")
-        -- :gsub("\t*<(ol[^>]*)>(.-)\t*</(ol)>", "<%1>%2</%3>\n")
+        :gsub("<strong>(Follow-up:%s*)</strong>", "<followup>%1</followup>")
+        :gsub("<strong>(Note:%s*)</strong>", "<followup>%1</followup>")
         :gsub(
             "<p><strong[^>]*>(Example%s*%d*:?)%s*</strong></p>\n*",
             "\n\n<example>󰛨 %1</example>\n\n"
@@ -263,8 +258,7 @@ function Html:normalize()
         :gsub("\t", "&lctab;")
         :gsub("%s", "&nbsp;")
         :gsub("<[^>]*>", function(match) return match:gsub("&nbsp;", " ") end)
-        :gsub("<a[^>]*>(.-)</a>", function(match) return match:gsub("&#?%w+;", utils.entity) end)
-        .. "&lcend;"
+        :gsub("<a[^>]*>(.-)</a>", function(match) return match:gsub("&#?%w+;", utils.entity) end) .. "&lcend;"
 end
 
 -- Trim excessive lines

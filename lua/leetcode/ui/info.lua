@@ -45,7 +45,7 @@ function Info:mount()
     end
 
     if not vim.tbl_isempty(topics) then
-        table.insert(nodes, NuiTree.Node({ text = NuiText("Topics ", "leetcode_list") }, topics))
+        table.insert(nodes, NuiTree.Node({ text = NuiText("Topics ", "Number") }, topics))
     else
         table.insert(
             nodes,
@@ -58,9 +58,6 @@ function Info:mount()
     for _, q in ipairs(self.parent.q.similar) do
         local line = NuiLine()
 
-        local lock = not config.auth.is_premium and q.paid_only and "" or " "
-        line:append(lock .. " ", "leetcode_medium")
-
         local hl = {
             ["Easy"] = "leetcode_easy",
             ["Medium"] = "leetcode_medium",
@@ -69,15 +66,15 @@ function Info:mount()
         line:append("󱓻 ", hl[q.difficulty])
         line:append(q.title)
 
+        local lock = not config.auth.is_premium and q.paid_only and "  Premium" or ""
+        line:append(lock, "leetcode_medium")
+
         table.insert(sim_questions, NuiTree.Node({ text = line, question = q }))
     end
     if not vim.tbl_isempty(sim_questions) then
         table.insert(
             nodes,
-            NuiTree.Node(
-                { text = NuiText("Similar Questions ", "leetcode_list") },
-                sim_questions
-            )
+            NuiTree.Node({ text = NuiText("Similar Questions ", "leetcode_ref") }, sim_questions)
         )
     else
         table.insert(

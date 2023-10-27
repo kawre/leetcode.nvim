@@ -44,6 +44,7 @@ M.get = function()
         example = { fg = hl("DiagnosticHint").fg },
         constraints = { fg = hl("DiagnosticInfo").fg },
         header = { fg = hl("SpecialChar").fg, bold = true },
+        followup = { fg = hl("Number").fg, bold = true },
 
         indent = { fg = hl("Comment").fg },
         link = { fg = hl("Function").fg, underline = true },

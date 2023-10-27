@@ -24,6 +24,7 @@ local highlights = {
     input = "header",
     output = "header",
     explanation = "header",
+    followup = "followup",
 
     -- pre = "",
     -- span = "",
