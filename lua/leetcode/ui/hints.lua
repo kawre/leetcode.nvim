@@ -12,17 +12,6 @@ local Info = {}
 Info.__index = Info
 
 function Info:mount()
-    self.popup:mount()
-
-    local utils = require("leetcode-menu.utils")
-    utils.set_win_opts(self.popup.winid, {
-        winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder",
-        wrap = true,
-    })
-    utils.set_win_opts(self.popup.border.winid, {
-        winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder",
-    })
-
     local NuiTree = require("nui.tree")
     local nodes = {}
 
@@ -36,7 +25,7 @@ function Info:mount()
     end
 
     if not vim.tbl_isempty(hints) then
-        table.insert(nodes, NuiTree.Node({ text = NuiText("󰛨 Hints", "leetcode_hint") }, hints))
+        table.insert(nodes, NuiTree.Node({ text = NuiText("Hints 󰛨", "leetcode_hint") }, hints))
     else
         table.insert(
             nodes,
@@ -47,11 +36,16 @@ function Info:mount()
 
     local topics = {}
     for _, topic in ipairs(self.parent.q.topic_tags) do
-        table.insert(topics, NuiTree.Node({ text = NuiText("- " .. topic.name) }))
+        local line = NuiLine()
+
+        line:append("* ", "leetcode_list")
+        line:append(topic.name)
+
+        table.insert(topics, NuiTree.Node({ text = line }))
     end
 
     if not vim.tbl_isempty(topics) then
-        table.insert(nodes, NuiTree.Node({ text = NuiText(" Topics", "leetcode_list") }, topics))
+        table.insert(nodes, NuiTree.Node({ text = NuiText("Topics ", "leetcode_list") }, topics))
     else
         table.insert(
             nodes,
@@ -81,7 +75,7 @@ function Info:mount()
         table.insert(
             nodes,
             NuiTree.Node(
-                { text = NuiText(" Similar Questions", "leetcode_list") },
+                { text = NuiText("Similar Questions ", "leetcode_list") },
                 sim_questions
             )
         )
@@ -139,7 +133,18 @@ function Info:mount()
         tree:render()
     end, opts)
 
+    self.popup:mount()
+    local utils = require("leetcode-menu.utils")
+    local winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder"
+    utils.set_win_opts(self.popup.winid, {
+        winhighlight = winhighlight,
+        wrap = true,
+    })
+    utils.set_win_opts(self.popup.border.winid, {
+        winhighlight = winhighlight,
+    })
     tree:render()
+
     return self
 end
 

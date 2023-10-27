@@ -4,6 +4,12 @@ local cmd_opts = require("leetcode.command.options")
 ---@class lc.Commands
 local cmd = {}
 
+---@param old_name string
+---@param new_name string
+function cmd.deprecate(old_name, new_name)
+    log.warn(("`%s` is deprecated, use `%s` instead."):format(old_name, new_name))
+end
+
 function cmd.cache_update() require("leetcode.cache").update() end
 
 ---@param options table<string, string[]>
@@ -132,6 +138,11 @@ function cmd.info()
     q.hints:toggle()
 end
 
+function cmd.hints()
+    cmd.deprecate("Leet hints", "Leet info")
+    cmd.info()
+end
+
 function cmd.q_run()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
@@ -151,26 +162,6 @@ function cmd.fix()
     require("leetcode.cache.problemlist").delete()
     vim.cmd("qa!")
 end
-
-cmd.commands = {
-    cmd.menu,
-
-    console = { cmd.console },
-    hints = { cmd.info },
-    info = { cmd.info },
-    menu = { cmd.menu },
-    tabs = { cmd.question_tabs },
-    lang = { cmd.change_lang },
-    run = { cmd.q_run },
-    submit = { cmd.q_submit },
-    fix = { cmd.fix },
-
-    list = { cmd.problems, opts = cmd_opts.list },
-
-    desc = {
-        toggle = { cmd.desc_toggle },
-    },
-}
 
 ---@return string, string[], string[]
 function cmd.parse(args)
@@ -251,5 +242,25 @@ function cmd.setup()
         end,
     })
 end
+
+cmd.commands = {
+    cmd.menu,
+
+    console = { cmd.console },
+    info = { cmd.info },
+    menu = { cmd.menu },
+    tabs = { cmd.question_tabs },
+    lang = { cmd.change_lang },
+    run = { cmd.q_run },
+    submit = { cmd.q_submit },
+    fix = { cmd.fix },
+    list = { cmd.problems, opts = cmd_opts.list },
+    desc = {
+        toggle = { cmd.desc_toggle },
+    },
+
+    --deprecated
+    hints = { cmd.hints },
+}
 
 return cmd
