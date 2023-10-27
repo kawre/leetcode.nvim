@@ -92,6 +92,7 @@ local theme = require("telescope.themes").get_dropdown({
 })
 
 ---@param questions lc.Cache.Question[]
+---@param opts table<string, string[]>
 ---
 ---@return lc.Cache.Question[]
 local function filter_questions(questions, opts)
@@ -126,29 +127,14 @@ local function filter_questions(questions, opts)
     end, questions)
 end
 
----@param opts table<string, string[]>
-local function sort_questions(questions, opts)
-    -- local prod = order == "desc" and 1 or -1
-    for _, by in ipairs(opts.sortBy) do
-        table.sort(questions, function(a, b) return a[by] < b[by] end)
-    end
-end
-
 return {
     ---@param questions lc.Cache.Question[]
     pick = function(questions, opts)
-        opts = vim.tbl_deep_extend("force", {
-            -- sortBy = { "frontend_id" },
-        }, opts or {})
-
-        questions = filter_questions(questions, opts)
-        -- sort_questions(questions, opts)
-
         pickers
             .new(theme, {
                 prompt_title = "Select a Question",
                 finder = finders.new_table({
-                    results = questions,
+                    results = filter_questions(questions, opts),
                     entry_maker = entry_maker,
                 }),
                 sorter = conf.generic_sorter(theme),

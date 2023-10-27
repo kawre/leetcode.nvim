@@ -189,6 +189,13 @@ logging = true
 | `Leet desc toggle`       | toggle question description                                   |
 | `Leet run`               | run currently opened question                                 |
 | `Leet submit`            | submit currently opened question                              |
+| `Leet list`              | opens a problemlist picker                                    |
+
+### `Leet list`
+
+can take optional arguments
+
+`Leet list status=<status> topics=<topic1,topic2,...,topicN> difficulty=<difficulty>`
 
 ## 🚀 Usage
 
