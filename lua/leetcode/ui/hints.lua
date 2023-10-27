@@ -2,35 +2,93 @@ local log = require("leetcode.logger")
 local NuiPopup = require("nui.popup")
 local NuiText = require("nui.text")
 local NuiLine = require("nui.line")
+local config = require("leetcode.config")
 
 ---@class lc.Hints
 ---@field popup NuiPopup
 ---@field parent lc.Question
 ---@field hints table[]
-local Hints = {}
-Hints.__index = Hints
+local Info = {}
+Info.__index = Info
 
-function Hints:mount()
+function Info:mount()
     self.popup:mount()
 
     local utils = require("leetcode-menu.utils")
-    utils.set_win_opts(self.popup.winid, { wrap = true })
+    utils.set_win_opts(self.popup.winid, {
+        winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder",
+        wrap = true,
+    })
+    utils.set_win_opts(self.popup.border.winid, {
+        winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder",
+    })
 
     local NuiTree = require("nui.tree")
     local nodes = {}
 
-    for i, hint in ipairs(self.hints) do
-        local node = NuiTree.Node(
-            { text = NuiText("󰛨 Hint " .. i, "leetcode_hint") },
-            { NuiTree.Node({ text = hint }) }
+    local hints = {}
+    for i, hint_txt in ipairs(self.hints) do
+        local hint = NuiTree.Node(
+            { text = NuiText(("%d/%d"):format(i, #self.hints), "leetcode_hint") },
+            { NuiTree.Node({ text = hint_txt }) }
         )
-
-        table.insert(nodes, node)
+        table.insert(hints, hint)
     end
-    if vim.tbl_isempty(nodes) then
+
+    if not vim.tbl_isempty(hints) then
+        table.insert(nodes, NuiTree.Node({ text = NuiText("󰛨 Hints", "leetcode_hint") }, hints))
+    else
         table.insert(
             nodes,
             NuiTree.Node({ text = NuiText(" No hints available", "leetcode_error") })
+        )
+    end
+    table.insert(nodes, NuiTree.Node({ text = "" }))
+
+    local topics = {}
+    for _, topic in ipairs(self.parent.q.topic_tags) do
+        table.insert(topics, NuiTree.Node({ text = NuiText("- " .. topic.name) }))
+    end
+
+    if not vim.tbl_isempty(topics) then
+        table.insert(nodes, NuiTree.Node({ text = NuiText(" Topics", "leetcode_list") }, topics))
+    else
+        table.insert(
+            nodes,
+            NuiTree.Node({ text = NuiText(" No topics available", "leetcode_error") })
+        )
+    end
+    table.insert(nodes, NuiTree.Node({ text = " " }))
+
+    local sim_questions = {}
+    for _, q in ipairs(self.parent.q.similar) do
+        local line = NuiLine()
+
+        local lock = not config.auth.is_premium and q.paid_only and "" or " "
+        line:append(lock .. " ", "leetcode_medium")
+
+        local hl = {
+            ["Easy"] = "leetcode_easy",
+            ["Medium"] = "leetcode_medium",
+            ["Hard"] = "leetcode_hard",
+        }
+        line:append("󱓻 ", hl[q.difficulty])
+        line:append(q.title)
+
+        table.insert(sim_questions, NuiTree.Node({ text = line, question = q }))
+    end
+    if not vim.tbl_isempty(sim_questions) then
+        table.insert(
+            nodes,
+            NuiTree.Node(
+                { text = NuiText(" Similar Questions", "leetcode_list") },
+                sim_questions
+            )
+        )
+    else
+        table.insert(
+            nodes,
+            NuiTree.Node({ text = NuiText(" No similar questions available", "leetcode_error") })
         )
     end
 
@@ -66,6 +124,12 @@ function Hints:mount()
         local node = tree:get_node()
         if not node then return end
 
+        if node.question then
+            local problemlist = require("leetcode.cache.problemlist")
+            local problem = problemlist.get_by_title_slug(node.question.title_slug)
+            if problem then require("leetcode.ui.question"):init(problem) end
+        end
+
         if not node:is_expanded() then
             node:expand()
         else
@@ -79,7 +143,7 @@ function Hints:mount()
     return self
 end
 
-function Hints:show()
+function Info:show()
     if self.popup._.mounted then
         self.popup:show()
     else
@@ -89,12 +153,12 @@ function Hints:show()
     self.opened = true
 end
 
-function Hints:hide()
+function Info:hide()
     self.popup:hide()
     self.opened = false
 end
 
-function Hints:toggle()
+function Info:toggle()
     if self.opened then
         self:hide()
     else
@@ -103,7 +167,7 @@ function Hints:toggle()
 end
 
 ---@param parent lc.Question
-function Hints:init(parent)
+function Info:init(parent)
     log.debug(parent.q.hints)
 
     local popup = NuiPopup({
@@ -125,15 +189,12 @@ function Hints:init(parent)
             },
             style = "rounded",
             text = {
-                top = " Question Hints ",
+                top = " Question Info ",
             },
         },
         buf_options = {
             modifiable = false,
             readonly = false,
-        },
-        win_options = {
-            winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder",
         },
     })
 
@@ -147,4 +208,4 @@ function Hints:init(parent)
     return obj
 end
 
-return Hints
+return Info

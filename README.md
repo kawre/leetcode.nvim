@@ -195,7 +195,9 @@ logging = true
 
 can take optional arguments
 
-`Leet list status=<status> topics=<topic1,topic2,...,topicN> difficulty=<difficulty>`
+```
+Leet list status=<status> topics=<topic1,topic2,...,topicN> difficulty=<difficulty>
+```
 
 ## 🚀 Usage
 

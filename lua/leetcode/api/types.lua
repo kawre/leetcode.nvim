@@ -245,6 +245,12 @@
 --------------------------------------------
 --- Question Response
 --------------------------------------------
+---@class lc.QuestionResponse.similar
+---@field difficulty "Easy" | "Medium" | "Hard"
+---@field title_slug string
+---@field title string
+---@field paid_only boolean
+
 ---@class lc.QuestionResponse
 ---@field id integer
 ---@field frontend_id integer
@@ -264,6 +270,7 @@
 ---@field stats question_stats
 ---@field topic_tags lc.topic_tag[]
 ---@field hints table[]
+---@field similar lc.QuestionResponse.similar
 
 ---@alias lc.question_res lc.QuestionResponse
 

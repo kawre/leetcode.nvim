@@ -125,7 +125,7 @@ function cmd.console()
     q.console:toggle()
 end
 
-function cmd.hints()
+function cmd.info()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
     if not q then return log.error("No current question found") end
@@ -156,7 +156,8 @@ cmd.commands = {
     cmd.menu,
 
     console = { cmd.console },
-    hints = { cmd.hints },
+    hints = { cmd.info },
+    info = { cmd.info },
     menu = { cmd.menu },
     tabs = { cmd.question_tabs },
     lang = { cmd.change_lang },

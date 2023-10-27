@@ -45,6 +45,12 @@ function question.by_title_slug(title_slug)
                 name
                 slug
             }
+            similar: similarQuestionList {
+              difficulty
+              title_slug: titleSlug
+              title
+              paid_only: isPaidOnly
+            }
           }
         }
     ]]
