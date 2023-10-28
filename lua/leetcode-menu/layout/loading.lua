@@ -7,12 +7,7 @@ local Title = require("leetcode-menu.components.title")
 
 local title = Title:init({}, "Loading...")
 
-local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", function()
-    local log = require("leetcode.logger")
-
-    local ok, err = pcall(vim.cmd, "qa!") ---@diagnostic disable-line
-    if not ok then log.error(err or "") end
-end)
+local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", function() vim.cmd.quitall() end)
 
 return Layout:init({
     components = {

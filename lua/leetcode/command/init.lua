@@ -1,5 +1,5 @@
 local log = require("leetcode.logger")
-local cmd_opts = require("leetcode.command.options")
+local arguments = require("leetcode.command.options")
 
 ---@class lc.Commands
 local cmd = {}
@@ -163,10 +163,9 @@ function cmd.fix()
     vim.cmd("qa!")
 end
 
----@return string, string[], string[]
+---@return string[], string[]
 function cmd.parse(args)
     local parts = vim.split(vim.trim(args), "%s+")
-    if parts[1]:find("Leet") then table.remove(parts, 1) end
     if args:sub(-1) == " " then parts[#parts + 1] = "" end
 
     local options = {}
@@ -175,41 +174,54 @@ function cmd.parse(args)
         if opt then table.insert(options, opt) end
     end
 
-    return table.remove(parts, 1) or "", parts, options
+    return parts, options
 end
 
 ---@param t table
 local function cmds_keys(t)
-    return vim.tbl_filter(function(key) return type(key) == "string" end, vim.tbl_keys(t))
+    return vim.tbl_filter(function(key)
+        if type(key) ~= "string" then return false end
+        if key:sub(1, 1) == "_" then return false end
+
+        return true
+    end, vim.tbl_keys(t))
 end
 
-function cmd.complete(prefix, args, options, cmds)
-    if not cmds then return {} end
-    if #args > 0 and not cmds.opts then
-        return cmd.complete(table.remove(args, 1), args, cmds[prefix])
+---@param args string[]
+---@param options string[]
+---@param cmds table<string,any>
+function cmd.complete(args, options, cmds)
+    if not cmds or vim.tbl_isempty(args) then return {} end
+
+    if not cmds._args and cmds[args[1]] then
+        return cmd.complete(args, options, cmds[table.remove(args, 1)])
     end
 
-    local txt, keys = prefix, cmds_keys(cmds)
-    if #args > 0 then
-        txt, keys = args[#args], cmds_keys(cmds.opts)
-        keys = vim.tbl_filter(function(key) return not vim.tbl_contains(options, key) end, keys)
-        keys = vim.tbl_map(function(key) return ("%s="):format(key) end, keys)
+    local txt, keys = args[#args], cmds_keys(cmds)
+    if cmds._args then
+        local option_keys = cmds_keys(cmds._args)
+        option_keys = vim.tbl_filter(
+            function(key) return not vim.tbl_contains(options, key) end,
+            option_keys
+        )
+        option_keys = vim.tbl_map(function(key) return ("%s="):format(key) end, option_keys)
+        keys = vim.tbl_extend("force", keys, option_keys)
 
         local s = vim.split(txt, "=")
-        if s[2] and cmds.opts[s[1]] then
+        if s[2] and cmds._args[s[1]] then
             local vals = vim.split(s[2], ",")
             return vim.tbl_filter(
                 function(key)
                     return not vim.tbl_contains(vals, key) and key:find(vals[#vals], 1, true) == 1
                 end,
-                cmds.opts[s[1]]
+                cmds._args[s[1]]
             )
         end
     end
 
     return vim.tbl_filter(
         function(key) return not vim.tbl_contains(args, key) and key:find(txt, 1, true) == 1 end,
-        keys or {}
+        keys
     )
 end
 
@@ -236,9 +248,11 @@ function cmd.setup()
         bang = true,
         nargs = "?",
         desc = "Leet",
+        ---@param _ string
+        ---@param line string
         complete = function(_, line)
-            local prefix, args, options = cmd.parse(line)
-            return cmd.complete(prefix, args, options, cmd.commands[prefix] or cmd.commands)
+            local args, options = cmd.parse(line:gsub("Leet%s", ""))
+            return cmd.complete(args, options, cmd.commands)
         end,
     })
 end
@@ -252,11 +266,31 @@ cmd.commands = {
     tabs = { cmd.question_tabs },
     lang = { cmd.change_lang },
     run = { cmd.q_run },
+    test = { cmd.q_run },
     submit = { cmd.q_submit },
     fix = { cmd.fix },
-    list = { cmd.problems, opts = cmd_opts.list },
+    random = { cmd.random_question },
+    daily = { cmd.qot },
+
+    list = {
+        cmd.problems,
+
+        test = function() log.info("siema") end,
+
+        _args = arguments.list,
+    },
+
     desc = {
         toggle = { cmd.desc_toggle },
+    },
+
+    cookie = {
+        update = { cmd.cookie_prompt },
+        delete = { cmd.delete_cookie },
+    },
+
+    cache = {
+        update = { cmd.cache_update },
     },
 
     --deprecated

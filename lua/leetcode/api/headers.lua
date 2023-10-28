@@ -8,14 +8,13 @@ headers.get = function()
     return {
         ["Referer"] = "https://leetcode.com/",
         ["Origin"] = "https://leetcode.com",
-        ["Cookie"] = c and string.format(
-            "LEETCODE_SESSION=%s;csrftoken=%s",
-            c.leetcode_session,
-            c.csrftoken
-        ) or "",
+        ["Host"] = "leetcode.com",
+        ["Cookie"] = c
+                and ("LEETCODE_SESSION=%s;csrftoken=%s"):format(c.leetcode_session, c.csrftoken)
+            or "",
         ["Content-Type"] = "application/json",
         ["Accept"] = "application/json",
-        ["X-Csrftoken"] = c and c.csrftoken or nil,
+        ["x-csrftoken"] = c and c.csrftoken or nil,
     }
 end
 

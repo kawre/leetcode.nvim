@@ -1,4 +1,4 @@
-local options = {}
+local arguments = {}
 
 local topics = {
     "dynamic-programming",
@@ -74,7 +74,7 @@ local topics = {
     "binary-search",
 }
 
-options.list = {
+arguments.list = {
     -- sortBy = { "status", "title", "acceptance", "difficulty" },
     -- orderBy = { "desc", "asc" },
     difficulty = { "Easy", "Medium", "Hard" },
@@ -82,4 +82,4 @@ options.list = {
     topics = topics,
 }
 
-return options
+return arguments

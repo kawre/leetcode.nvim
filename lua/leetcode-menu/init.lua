@@ -97,6 +97,8 @@ function menu:set_layout(layout)
     self:clear_keymaps()
     self:draw()
     self:apply_btn_keymaps()
+
+    return self
 end
 
 ---@private
@@ -167,21 +169,17 @@ function menu:init()
         signcolumn = "no",
     })
 
-    local ok, loading = pcall(require, "leetcode-menu.layout.loading")
-    assert(ok, loading)
-
-    local obj = setmetatable({
+    self = setmetatable({
         bufnr = bufnr,
         winid = winid,
-        layout = loading,
         cursor = {
             idx = 1,
         },
         maps = {},
     }, self)
 
-    _Lc_Menu = obj
-    return obj:handle_mount()
+    _Lc_Menu = self
+    return self:set_layout("loading"):handle_mount()
 end
 
 return menu

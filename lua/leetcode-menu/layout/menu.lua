@@ -34,10 +34,7 @@ local cache = button:init(
     true
 )
 
-local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", function()
-    local ok, err = pcall(vim.cmd.quitall)
-    if not ok then log.error(err or "") end
-end)
+local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
 
 local Header = require("leetcode-menu.components.header")
 local Footer = require("leetcode-menu.components.footer")
