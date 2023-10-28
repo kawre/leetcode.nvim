@@ -13,7 +13,6 @@ end
 function utils.deprecate_usr_cmd(name, new)
     vim.api.nvim_create_user_command(name, function()
         local log = require("leetcode.logger")
-
         log.warn(("`%s` is deprecated, use `%s` instead."):format(name, new))
         pcall(vim.cmd, new) ---@diagnostic disable-line
     end, {})

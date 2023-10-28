@@ -17,10 +17,12 @@ function Info:mount()
 
     local hints = {}
     for i, hint_txt in ipairs(self.hints) do
-        local hint = NuiTree.Node(
-            { text = NuiText(("%d/%d"):format(i, #self.hints), "leetcode_hint") },
-            { NuiTree.Node({ text = hint_txt }) }
-        )
+        local line = NuiLine()
+
+        line:append(tostring(i), "leetcode_list")
+        line:append("/" .. #self.hints, "leetcode_ref")
+
+        local hint = NuiTree.Node({ text = line }, { NuiTree.Node({ text = hint_txt }) })
         table.insert(hints, hint)
     end
 
@@ -45,7 +47,7 @@ function Info:mount()
     end
 
     if not vim.tbl_isempty(topics) then
-        table.insert(nodes, NuiTree.Node({ text = NuiText("Topics ", "Number") }, topics))
+        table.insert(nodes, NuiTree.Node({ text = NuiText("Topics ", "Number") }, topics))
     else
         table.insert(
             nodes,
@@ -74,7 +76,7 @@ function Info:mount()
     if not vim.tbl_isempty(sim_questions) then
         table.insert(
             nodes,
-            NuiTree.Node({ text = NuiText("Similar Questions ", "leetcode_ref") }, sim_questions)
+            NuiTree.Node({ text = NuiText("Similar Questions ", "leetcode_ref") }, sim_questions)
         )
     else
         table.insert(

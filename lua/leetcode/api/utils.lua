@@ -100,6 +100,7 @@ end
 
 function utils.decode(str)
     local ok, res = pcall(vim.json.decode, str)
+    log.debug(str)
     assert(ok, str)
     return res
 end

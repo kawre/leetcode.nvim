@@ -106,8 +106,8 @@ function menu:keymaps()
         self.layout:handle_press(row)
     end
 
-    vim.keymap.set("n", "<cr>", press_fn, {})
-    vim.keymap.set("n", "<Tab>", press_fn, {})
+    vim.keymap.set("n", "<cr>", press_fn, { buffer = self.bufnr })
+    vim.keymap.set("n", "<Tab>", press_fn, { buffer = self.bufnr })
 end
 
 function menu:handle_mount()
