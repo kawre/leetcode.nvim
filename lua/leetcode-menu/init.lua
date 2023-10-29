@@ -20,7 +20,9 @@ local function tbl_keys(t)
 end
 
 function menu:draw()
+    self:clear_keymaps()
     self.layout:draw(self) ---@diagnostic disable-line
+    self:apply_btn_keymaps()
 end
 
 function menu:clear_keymaps()
@@ -94,9 +96,7 @@ function menu:set_layout(layout_name)
     local ok, layout = pcall(require, "leetcode-menu.layout." .. layout_name)
     if ok then
         self.layout = layout
-        self:clear_keymaps()
         self:draw()
-        self:apply_btn_keymaps()
     end
 
     return self
@@ -140,7 +140,6 @@ end
 function menu:mount()
     self:keymaps()
     self:autocmds()
-
     self:draw()
 end
 

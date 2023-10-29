@@ -1,53 +1,44 @@
-local config = require("leetcode.config")
+local cmd = require("leetcode.command")
+local Calendar = require("leetcode-menu.components.calendar")
 
-local template = require("leetcode.ui.dashboard.template")
-local section = template.section
-local auth = config.auth
+local Layout = require("leetcode-ui.layout")
 
-section.title.val = "Statistics"
+local Buttons = require("leetcode-menu.components.buttons")
+local Button = require("leetcode-ui.component.button")
+local Title = require("leetcode-menu.components.title")
 
-section.buttons.val = {
-    template.button(
-        "p",
-        " " .. " Problems ",
-        "<cmd>lua require('leetcode.api').cmd.lc_problems()<CR>"
-    ),
-    template.button(
-        "c",
-        "󰆘 " .. " Cookie ",
-        "<cmd>lua require('leetcode.api').cmd.cookie_prompt()<cr>"
-    ),
-    template.button(
-        "c",
-        " " .. " Cache ",
-        "<cmd>lua require('leetcode.api').cmd.cookie_prompt()<cr>"
-    ),
-    template.button("q", "󰩈 " .. " Exit LeetCode", "<cmd>qa<CR>"),
-}
+local title = Title:init({ "Menu" }, "Statistics")
 
-section.footer.val = "Signed in as: " .. auth.name
+local skills = Button:init(
+    { icon = "", src = "Skills" },
+    "s",
+    function() cmd.menu_layout("menu") end
+)
 
-return {
-    layout = {
-        -- header
-        { type = "padding", val = 2 },
-        section.header,
+local languages = Button:init(
+    { icon = "", src = "Languages" },
+    "l",
+    function() cmd.menu_layout("menu") end
+)
 
-        -- notifications
-        -- { type = "padding", val = 2 },
-        -- section.notifications,
-        { type = "padding", val = 2 },
+local back = Button:init(
+    { icon = "", src = "Back" },
+    "q",
+    function() cmd.menu_layout("menu") end
+)
 
-        -- title
-        section.title,
+local Footer = require("leetcode-menu.components.footer")
 
-        -- buttons
-        section.buttons,
+return Layout:init({
+    Calendar:init(),
 
-        --footer
-        section.footer,
-    },
-    opts = {
-        margin = 5,
-    },
-}
+    title,
+
+    Buttons:init({
+        skills,
+        languages,
+        back,
+    }),
+
+    Footer:init(),
+})

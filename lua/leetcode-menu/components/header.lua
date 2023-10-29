@@ -5,7 +5,7 @@ local header = {}
 header.__index = header
 setmetatable(header, Text)
 
-local header_ascii = {
+header.ascii = {
     [[ /$$                          /$$     /$$$$$$                /$$         ]],
     [[| $$                         | $$    /$$__  $$              | $$         ]],
     [[| $$       /$$$$$$  /$$$$$$ /$$$$$$ | $$  \__/ /$$$$$$  /$$$$$$$ /$$$$$$ ]],
@@ -16,8 +16,8 @@ local header_ascii = {
     [[|________/\_______/\_______/  \___/  \______/ \______/ \_______/\_______/]],
 }
 
----@param lines? any
----@param opts? any
+---@param lines? NuiLine[] | string[]
+---@param opts? lc-ui.Component.opts
 function header:init(lines, opts)
     opts = vim.tbl_deep_extend("force", {
         position = "center",
@@ -28,7 +28,7 @@ function header:init(lines, opts)
         },
     }, opts or {})
 
-    local text = Text:init(lines or header_ascii, opts)
+    local text = Text:init(lines or header.ascii, opts)
     return setmetatable(text, self)
 end
 

@@ -1,4 +1,5 @@
 local Padding = require("leetcode-ui.component.padding")
+local log = require("leetcode.logger")
 
 ---@class lc.on_press
 ---@field fn function
@@ -17,6 +18,7 @@ Layout.__index = Layout
 ---@param win? NuiSplit|NuiPopup|table
 function Layout:draw(win)
     self.line_idx = 1
+    self.buttons = {}
 
     if win then
         self.bufnr = win.bufnr

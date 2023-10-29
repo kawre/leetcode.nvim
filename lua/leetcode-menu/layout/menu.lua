@@ -14,9 +14,9 @@ local problems = button:init(
 )
 
 local statistics = button:init(
-    { icon = "󰄪", src = "Statistics (Soon)" },
+    { icon = "󰄪", src = "Statistics" },
     "s",
-    function() log.info("soon") end,
+    function() cmd.menu_layout("stats") end,
     true
 )
 

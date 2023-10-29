@@ -10,7 +10,7 @@
 ---@alias layouts
 ---| "menu"
 ---| "problems"
----| "statistics"
+---| "stats"
 ---| "cookie"
 ---| "cache"
 ---| "signin"
