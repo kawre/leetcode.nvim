@@ -285,10 +285,13 @@ cmd.commands = {
 
     list = {
         cmd.problems,
+
         _args = arguments.list,
     },
 
     desc = {
+        cmd.desc_toggle,
+
         toggle = { cmd.desc_toggle },
     },
 
