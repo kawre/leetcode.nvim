@@ -28,14 +28,8 @@ function header:init(lines, opts)
         },
     }, opts or {})
 
-    local text = Text:init({
-        lines = lines or header_ascii,
-        opts = opts,
-    })
-
-    local obj = setmetatable(text, self)
-
-    return obj
+    local text = Text:init(lines or header_ascii, opts)
+    return setmetatable(text, self)
 end
 
 return header

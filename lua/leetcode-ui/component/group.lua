@@ -8,18 +8,6 @@ local Group = {}
 Group.__index = Group
 setmetatable(Group, Component)
 
----@param config lc-ui.Group.config
----
----@return lc-ui.Group
-function Group:init(config)
-    local obj = setmetatable({
-        components = config.components or {},
-        opts = config.opts or {},
-    }, self)
-
-    return obj
-end
-
 ---@param cmp lc-ui.Component | lc-ui.Component[]
 ---
 ---@return lc-ui.Group
@@ -50,6 +38,17 @@ function Group:draw(layout)
     end
 
     if botpad then Padding:init(botpad):draw(layout) end
+end
+
+---@param components lc-ui.Component[]
+---@param opts? lc-ui.Group.opts
+---
+---@return lc-ui.Group
+function Group:init(components, opts)
+    return setmetatable({
+        components = components or {},
+        opts = opts or {},
+    }, self)
 end
 
 return Group

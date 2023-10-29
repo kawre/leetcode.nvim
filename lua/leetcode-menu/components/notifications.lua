@@ -13,9 +13,7 @@ function notifications:init(opts)
         hl = "leetcode_info",
     }, opts or {})
 
-    local text = Text:init({
-        opts = opts,
-    })
+    local text = Text:init({}, opts)
 
     local obj = setmetatable(text, self)
     return obj

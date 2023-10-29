@@ -31,9 +31,9 @@ function result:set_popup_border_hi(hi) self.popup.border:set_highlight(hi) end
 
 function result:handle_accepted(item)
     local function perc_hi(perc) return perc >= 50 and "leetcode_ok" or "leetcode_error" end
-    local group = Group:init({ opts = { spacing = 2 } })
+    local group = Group:init({}, { spacing = 2 })
 
-    local header = Text:init()
+    local header = Text:init({})
     header:append(item._.title .. " 🎉", item._.hl)
     group:append(header)
 
@@ -87,8 +87,8 @@ end
 function result:handle_runtime(item) -- status code = 10
     if item._.submission then return self:handle_accepted(item) end
 
-    local group = Group:init({ opts = { spacing = 1 } })
-    local header = Text:init()
+    local group = Group:init({}, { spacing = 1 })
+    local header = Text:init({})
 
     local h = NuiLine()
     h:append(item._.title, item._.hl)
@@ -120,13 +120,13 @@ end
 ---
 ---@param item lc.submission
 function result:handle_submission_error(item) -- status code = 11
-    local group = Group:init({ opts = { spacing = 1 } })
+    local group = Group:init({}, { spacing = 1 })
 
     local header = NuiLine()
     header:append(item._.title, item._.hl)
     header:append(" | ")
     header:append(passed_testcases(item), "leetcode_alt")
-    group:append(Text:init({ lines = { header } }))
+    group:append(Text:init({ header }))
 
     local text = Case:init(
         item.total_correct + 1,
@@ -148,11 +148,11 @@ end
 ---
 ---@param item lc.limit_exceeded_error
 function result:handle_limit_exceeded(item) -- status code = 14
-    local group = Group:init({ opts = { spacing = 1 } })
+    local group = Group:init({}, { spacing = 1 })
 
     local header = NuiLine()
     header:append(item._.title, item._.hl)
-    group:append(Text:init({ lines = { header } }))
+    group:append(Text:init({ header }))
 
     if item._.submission then
         local last_testcase = NuiLine()
@@ -180,7 +180,7 @@ end
 ---
 ---@param item lc.runtime_error
 function result:handle_runtime_error(item) -- status code = 15
-    local group = Group:init({ opts = { spacing = 1 } })
+    local group = Group:init({}, { spacing = 1 })
 
     local header = NuiLine()
     header:append(item._.title, item._.hl)
@@ -211,11 +211,11 @@ function result:handle_runtime_error(item) -- status code = 15
 end
 
 function result:handle_internal_error(item) -- status code = 16
-    local group = Group:init({ opts = { spacing = 1 } })
+    local group = Group:init({}, { spacing = 1 })
 
     local header = NuiLine()
     header:append(item._.title, item._.hl)
-    local text = Text:init({ lines = { header } })
+    local text = Text:init({ header })
     group:append(text)
 
     self.layout:append(group)
@@ -225,7 +225,7 @@ end
 ---
 ---@param item lc.compile_error
 function result:handle_compile_error(item) -- status code = 20
-    local group = Group:init({ opts = { spacing = 1 } })
+    local group = Group:init({}, { spacing = 1 })
 
     local header = NuiLine()
     header:append(item._.title, item._.hl)
@@ -369,7 +369,7 @@ function result:init(parent)
 
     self = setmetatable({
         popup = popup,
-        layout = Layout:init({
+        layout = Layout:init({}, {
             winid = popup.winid,
             bufnr = popup.bufnr,
         }),

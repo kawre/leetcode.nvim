@@ -10,10 +10,10 @@ setmetatable(button, component)
 ---@field icon string
 ---@field src string
 
---- @param text lc-ui.Button.text
---- @param sc string|nil
---- @param on_press function? optional
---- @param expandable boolean? optional
+---@param text lc-ui.Button.text
+---@param sc string|nil
+---@param on_press function? optional
+---@param expandable boolean? optional
 function button:init(text, sc, on_press, expandable)
     local opts = {
         position = "center",
@@ -37,12 +37,12 @@ function button:init(text, sc, on_press, expandable)
     text_line:append(padding)
     text_line:append(sc, "leetcode_info")
 
-    local obj = setmetatable({
+    self = setmetatable({
         opts = opts,
         lines = { text_line },
     }, self)
 
-    return obj
+    return self
 end
 
 return button

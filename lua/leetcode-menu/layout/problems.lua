@@ -22,26 +22,21 @@ local back_btn = Button:init(
 )
 
 return Layout:init({
-    components = {
-        -- header
-        Header:init(),
+    -- header
+    Header:init(),
 
-        -- title
-        Title:init({ "Menu" }, "Problems"),
+    -- title
+    Title:init({ "Menu" }, "Problems"),
 
-        -- buttons
-        Buttons:init({
-            components = {
-                list_btn,
-                random_btn,
-                qot_btn,
-                -- lang_btn,
-                back_btn,
-            },
-        }),
+    -- buttons
+    Buttons:init({
+        list_btn,
+        random_btn,
+        qot_btn,
+        -- lang_btn,
+        back_btn,
+    }),
 
-        --footer
-        Footer:init(),
-    },
-    opts = {},
+    --footer
+    Footer:init(),
 })

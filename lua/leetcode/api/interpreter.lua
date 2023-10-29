@@ -55,7 +55,7 @@ end
 function interpreter.interpret_solution(title_slug, body, callback)
     utils.auth_guard()
 
-    local url = string.format(config.domain .. "/problems/%s/interpret_solution/", title_slug)
+    local url = (config.domain .. "/problems/%s/interpret_solution/"):format(title_slug)
 
     ---@type boolean, lc.submission
     local ok, res = pcall(utils.post, url, body)

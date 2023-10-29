@@ -21,18 +21,17 @@ function utils.win_width(layout)
     return vim.api.nvim_win_get_width(layout.winid)
 end
 
----@param config lc-ui.Component.config
+--@param config lc-ui.Component.config
 ---
 ---@return NuiLine[]
-function utils.parse_lines(config)
-    local lines = config.lines
+function utils.parse_lines(lines, opts)
     local t = {}
 
     if type(lines) == "table" then
         for _, line in pairs(lines) do
             if type(line) == "string" then
                 local nui_line = Line()
-                nui_line:append(line, config.opts and config.opts.hl or nil)
+                nui_line:append(line, opts and opts.hl or nil)
                 table.insert(t, nui_line)
             else
                 table.insert(t, line)

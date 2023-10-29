@@ -121,30 +121,19 @@ function description:populate()
         statsline:append("󰛨 Hints", "leetcode_hint")
     end
 
-    local titlecomp = Text:init({
-        lines = { titleline },
-        opts = { position = "center" },
-    })
-    local statscomp = Text:init({
-        lines = { statsline },
-        opts = { position = "center" },
-    })
-    local linkcomp = Text:init({
-        lines = { linkline },
-        opts = { position = "center" },
-    })
+    local titlecomp = Text:init({ titleline }, { position = "center" })
+    local statscomp = Text:init({ statsline }, { position = "center" })
+    local linkcomp = Text:init({ linkline }, { position = "center" })
 
     local contents = parser:parse(q.content)
 
     self.layout = Layout:init({
-        components = {
-            linkcomp,
-            padding:init(1),
-            titlecomp,
-            statscomp,
-            padding:init(3),
-            contents,
-        },
+        linkcomp,
+        padding:init(1),
+        titlecomp,
+        statscomp,
+        padding:init(3),
+        contents,
     })
 end
 

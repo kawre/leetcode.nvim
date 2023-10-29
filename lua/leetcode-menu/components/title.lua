@@ -22,10 +22,7 @@ function title:init(history, str, opts)
     end
     nui_line:append(str, "Function")
 
-    local text = Text:init({
-        lines = { nui_line },
-        opts = opts,
-    })
+    local text = Text:init({ nui_line }, opts)
 
     return setmetatable(text, self)
 end

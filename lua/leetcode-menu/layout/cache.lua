@@ -19,23 +19,19 @@ local back_btn = Button:init(
 )
 
 local buttons = Buttons:init({
-    components = {
-        update_btn,
-        back_btn,
-    },
+    update_btn,
+    back_btn,
 })
 
 return Layout:init({
-    components = {
-        Header:init(),
+    Header:init(),
 
-        Title:init({ "Menu" }, "Cache"),
+    Title:init({ "Menu" }, "Cache"),
 
-        buttons,
+    buttons,
 
-        Footer:init(),
-    },
-    opts = {
-        margin = 5,
-    },
+    Footer:init(),
+}, {
+    margin = 5,
 })
+

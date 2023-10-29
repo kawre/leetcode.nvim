@@ -18,21 +18,17 @@ local back_btn = Button:init(
 )
 
 local buttons = Buttons:init({
-    components = {
-        update_btn,
-        delete_btn,
-        back_btn,
-    },
+    update_btn,
+    delete_btn,
+    back_btn,
 })
 
 return Layout:init({
-    components = {
-        Header:init(),
+    Header:init(),
 
-        Title:init({ "Menu" }, "Cookie"),
+    Title:init({ "Menu" }, "Cookie"),
 
-        buttons,
+    buttons,
 
-        Footer:init(),
-    },
+    Footer:init(),
 })

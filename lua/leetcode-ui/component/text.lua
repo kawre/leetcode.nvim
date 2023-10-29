@@ -2,29 +2,22 @@ local component = require("leetcode-ui.component")
 local utils = require("leetcode-ui.utils")
 
 ---@class lc-ui.Text: lc-ui.Component
-local text = {}
-text.__index = text
-setmetatable(text, component)
+local Text = {}
+Text.__index = Text
+setmetatable(Text, component)
 
---------------------------------------------------------
---- Methods
---------------------------------------------------------
-
---------------------------------------------------------
---- Constructor
---------------------------------------------------------
-
----@param config? lc-ui.Component.config
+---@param lines NuiLine[] | string[]
+---@param opts? lc-ui.Component.opts
 ---
 ---@return lc-ui.Text
-function text:init(config)
-    config = config or {}
-    local obj = {
-        lines = utils.parse_lines(config),
-        opts = config.opts or {},
-    }
+function Text:init(lines, opts)
+    opts = opts or {}
+    lines = lines or {}
 
-    return setmetatable(obj, self)
+    return setmetatable({
+        lines = utils.parse_lines(lines, opts),
+        opts = opts,
+    }, self)
 end
 
-return text
+return Text

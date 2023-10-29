@@ -11,26 +11,22 @@ local problems =
 local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
 
 local buttons = Buttons:init({
-    components = {
-        problems,
-        exit,
-    },
+    problems,
+    exit,
 })
 
 local Header = require("leetcode-menu.components.header")
 local Footer = require("leetcode-menu.components.footer")
 
 return Layout:init({
-    components = {
-        Header:init(),
+    Header:init(),
 
-        Title:init({}, "Sign in"),
-        --
-        buttons,
-        --
-        Footer:init(),
-    },
-    opts = {
-        margin = 5,
-    },
+    Title:init({}, "Sign in"),
+    --
+    buttons,
+    --
+    Footer:init(),
+}, {
+    margin = 5,
 })
+

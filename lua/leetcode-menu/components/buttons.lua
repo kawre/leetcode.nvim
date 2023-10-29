@@ -5,18 +5,16 @@ local Buttons = {}
 Buttons.__index = Buttons
 setmetatable(Buttons, Group)
 
-function Buttons:init(config)
-    config = vim.tbl_deep_extend("force", {
-        opts = {
-            padding = {
-                top = 1,
-                bot = 2,
-            },
-            spacing = 1,
+function Buttons:init(components, opts)
+    opts = vim.tbl_deep_extend("force", {
+        padding = {
+            top = 1,
+            bot = 2,
         },
-    }, config)
+        spacing = 1,
+    }, opts or {})
 
-    local group = Group:init(config)
+    local group = Group:init(components, opts)
     return setmetatable(group, self)
 end
 

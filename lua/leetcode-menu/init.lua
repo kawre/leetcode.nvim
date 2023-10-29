@@ -87,16 +87,17 @@ function menu:cursor_reset()
     self.cursor.prev = nil
 end
 
----@param layout layouts
-function menu:set_layout(layout)
+---@param layout_name layouts
+function menu:set_layout(layout_name)
     self:cursor_reset()
 
-    local ok, res = pcall(require, "leetcode-menu.layout." .. layout)
-    if ok then self.layout = res end
-
-    self:clear_keymaps()
-    self:draw()
-    self:apply_btn_keymaps()
+    local ok, layout = pcall(require, "leetcode-menu.layout." .. layout_name)
+    if ok then
+        self.layout = layout
+        self:clear_keymaps()
+        self:draw()
+        self:apply_btn_keymaps()
+    end
 
     return self
 end
@@ -132,6 +133,7 @@ function menu:handle_mount()
         self:set_layout("signin")
     end
 
+    log.debug(self)
     return self:mount()
 end
 

@@ -37,11 +37,9 @@ function console:toggle()
 end
 
 function console:show()
-    if self.opened then return end
-
     if not self.layout._.mounted then
         self.layout:mount()
-    else
+    elseif not self.opened then
         self.layout:show()
     end
 

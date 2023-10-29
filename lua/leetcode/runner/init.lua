@@ -12,27 +12,29 @@ function runner:run(submit)
     local question = self.question
     if config.user.console.open_on_runcode then question.console:show() end
 
-    local tc_lines = vim.api.nvim_buf_get_lines(question.bufnr, 0, -1, false)
-    local typed_code = table.concat(tc_lines, "\n")
+    vim.schedule(function()
+        local tc_lines = vim.api.nvim_buf_get_lines(question.bufnr, 0, -1, false)
+        local typed_code = table.concat(tc_lines, "\n")
 
-    local body = {
-        lang = question.lang,
-        typed_code = typed_code,
-        question_id = question.q.id,
-    }
-    log.debug(body)
+        local body = {
+            lang = question.lang,
+            typed_code = typed_code,
+            question_id = question.q.id,
+        }
+        log.debug(body)
 
-    local function callback(item) self:callback(item) end
+        local function callback(item) self:callback(item) end
 
-    if not submit then
-        local di_lines = question.console.testcase:content()
-        local data_input = table.concat(di_lines, "\n")
-        body.data_input = data_input
+        if not submit then
+            local di_lines = question.console.testcase:content()
+            local data_input = table.concat(di_lines, "\n")
+            body.data_input = data_input
 
-        interpreter.interpret_solution(question.q.title_slug, body, callback)
-    else
-        interpreter.submit(question.q.title_slug, body, callback)
-    end
+            interpreter.interpret_solution(question.q.title_slug, body, callback)
+        else
+            interpreter.submit(question.q.title_slug, body, callback)
+        end
+    end)
 end
 
 ---@private

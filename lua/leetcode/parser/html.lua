@@ -280,7 +280,7 @@ function Html:parse(html)
     self = setmetatable({
         str = html,
         ts = vim.treesitter,
-        text = Text:init(),
+        text = Text:init({}),
         line = NuiLine(),
         newline_count = 0,
         ol_count = {},

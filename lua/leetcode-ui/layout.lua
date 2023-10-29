@@ -84,22 +84,22 @@ function Layout:append(content)
     return self
 end
 
----@param config? lc-ui.Layout.config
-function Layout:init(config)
-    config = config or {}
+---@param components lc-ui.Component[]
+---@param opts? lc-ui.Layout.opts
+function Layout:init(components, opts)
+    opts = vim.tbl_deep_extend("force", {
+        bufnr = 0,
+        winid = 0,
+    }, opts or {})
 
-    local obj = setmetatable({
-        components = config.components or {},
-        opts = config.opts or {
-            padding = {},
-        },
+    return setmetatable({
+        components = components or {},
+        opts = opts,
         line_idx = 1,
         buttons = {},
-        bufnr = config.bufnr or 0,
-        winid = config.winid or 0,
+        bufnr = opts.bufnr,
+        winid = opts.winid,
     }, self)
-
-    return obj
 end
 
 return Layout

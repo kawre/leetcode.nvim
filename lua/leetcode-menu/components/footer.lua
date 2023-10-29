@@ -15,9 +15,7 @@ function footer:init(opts)
         hl = "Number",
     }, opts or {})
 
-    local text = Text:init({
-        opts = opts,
-    })
+    local text = Text:init({}, opts)
 
     if config.auth.is_signed_in then
         local line = NuiLine()

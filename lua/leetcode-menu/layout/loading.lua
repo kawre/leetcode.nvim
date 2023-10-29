@@ -2,23 +2,19 @@ local Layout = require("leetcode-ui.layout")
 
 local Header = require("leetcode-menu.components.header")
 local Buttons = require("leetcode-menu.components.buttons")
-local button = require("leetcode-ui.component.button")
+local Button = require("leetcode-ui.component.button")
 local Title = require("leetcode-menu.components.title")
 
 local title = Title:init({}, "Loading...")
 
-local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
+local exit = Button:init({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
 
 return Layout:init({
-    components = {
-        Header:init(),
+    Header:init(),
 
-        title,
+    title,
 
-        Buttons:init({
-            components = {
-                exit,
-            },
-        }),
-    },
+    Buttons:init({
+        exit,
+    }),
 })

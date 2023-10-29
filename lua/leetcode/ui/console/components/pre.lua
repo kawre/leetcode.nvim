@@ -14,7 +14,7 @@ pre.__index = pre
 ---
 ---@return lc-ui.Text
 function pre:init(title, lines)
-    local text = Text:init({ lines = { title, NuiLine() } })
+    local text = Text:init({ title, NuiLine() })
 
     for _, line in ipairs(lines) do
         local new_line = NuiLine({ NuiText("\t▎\t", "leetcode_indent") })
