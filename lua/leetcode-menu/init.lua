@@ -115,8 +115,8 @@ end
 function menu:handle_mount()
     if cookie.get() then
         self:set_layout("loading")
-        local auth_api = require("leetcode.api.auth")
 
+        local auth_api = require("leetcode.api.auth")
         auth_api._user(function(auth, err)
             if err then
                 log.warn(err.msg)
@@ -143,11 +143,18 @@ function menu:mount()
 end
 
 function menu:init()
-    local bufnr, winid = vim.api.nvim_get_current_buf(), vim.api.nvim_get_current_win()
+    self = setmetatable({
+        bufnr = vim.api.nvim_get_current_buf(),
+        winid = vim.api.nvim_get_current_win(),
+        cursor = {
+            idx = 1,
+        },
+        maps = {},
+    }, self)
 
-    vim.api.nvim_buf_set_name(bufnr, "")
-    pcall(vim.diagnostic.disable, bufnr)
-    utils.set_buf_opts(bufnr, {
+    vim.api.nvim_buf_set_name(self.bufnr, "")
+    pcall(vim.diagnostic.disable, self.bufnr)
+    utils.set_buf_opts(self.bufnr, {
         modifiable = false,
         buflisted = false,
         matchpairs = "",
@@ -156,7 +163,7 @@ function menu:init()
         filetype = "leetcode.nvim",
         synmaxcol = 0,
     })
-    utils.set_win_opts(winid, {
+    utils.set_win_opts(self.winid, {
         wrap = false,
         colorcolumn = "",
         foldlevel = 999,
@@ -169,15 +176,6 @@ function menu:init()
         spell = false,
         signcolumn = "no",
     })
-
-    self = setmetatable({
-        bufnr = bufnr,
-        winid = winid,
-        cursor = {
-            idx = 1,
-        },
-        maps = {},
-    }, self)
 
     _Lc_Menu = self
     return self:handle_mount()

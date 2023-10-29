@@ -179,24 +179,74 @@ logging = true
 
 ## 📋 Commands
 
-| command                  | description                                                               |
-| ------------------------ | ------------------------------------------------------------------------- |
-| `Leet` or `Leet menu`    | opens menu dashboard                                                      |
-| `Leet console`           | opens console pop-up for currently opened question                        |
-| `Leet info`              | opens a pop-up containing information about the currently opened question |
-| `Leet tabs`              | opens a picker with all currently opened question tabs                    |
-| `Leet lang`              | opens a picker to change the language of the current question             |
-| `Leet desc toggle`       | toggle question description                                               |
-| `Leet run`               | run currently opened question                                             |
-| `Leet submit`            | submit currently opened question                                          |
-| `Leet list`              | opens a problemlist picker                                                |
+<!---->
 
-### `Leet list`
+<!-- | command                  | description                                                               | -->
 
-can take optional arguments
+<!-- | ------------------------ | ------------------------------------------------------------------------- | -->
+
+<!-- | `Leet` or `Leet menu`    | opens menu dashboard                                                      | -->
+
+<!-- | `Leet console`           | opens console pop-up for currently opened question                        | -->
+
+<!-- | `Leet info`              | opens a pop-up containing information about the currently opened question | -->
+
+<!-- | `Leet tabs`              | opens a picker with all currently opened question tabs                    | -->
+
+<!-- | `Leet lang`              | opens a picker to change the language of the current question             | -->
+
+<!-- | `Leet desc toggle`       | toggle question description                                               | -->
+
+<!-- | `Leet run`               | run currently opened question                                             | -->
+
+<!-- | `Leet submit`            | submit currently opened question                                          | -->
+
+<!-- | `Leet list`              | opens a problemlist picker                                                | -->
+
+### `Leet` opens menu dashboard
+
+- `menu` same as `Leet`
+
+- `console` opens console pop-up for currently opened question
+
+- `info` opens a pop-up containing information about the currently opened question
+
+- `tabs` opens a picker with all currently opened question tabs
+
+- `lang` opens a picker to change the language of the current question
+
+- `run` run currently opened question
+
+- `test` same as `Leet run`
+
+- `submit` submit currently opened question
+
+- `random` opens a random question
+
+- `daily` opens the question of today
+
+- [`list`](#leet-list) opens a problemlist picker
+
+- `desc` toggle question description
+
+  - `toggle` same as `Leet desc`
+
+- `cookie`
+
+  - `update` opens a prompt to enter a new cookie
+
+  - `delete` sign-out
+
+- `cache`
+
+  - `update` updates cache
+
+#### `Leet list`
+
+Can take optional arguments. To stack argument values separate them by a `,`
 
 ```
-Leet list status=<status> topics=<topic1,topic2,...,topicN> difficulty=<difficulty>
+Leet list status=<status> topics=<topic1,...,topicN> difficulty=<difficulty>
 ```
 
 ## 🚀 Usage
