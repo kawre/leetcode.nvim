@@ -114,6 +114,7 @@ end
 
 function menu:handle_mount()
     if cookie.get() then
+        self:set_layout("loading")
         local auth_api = require("leetcode.api.auth")
 
         auth_api._user(function(auth, err)
@@ -179,7 +180,7 @@ function menu:init()
     }, self)
 
     _Lc_Menu = self
-    return self:set_layout("loading"):handle_mount()
+    return self:handle_mount()
 end
 
 return menu

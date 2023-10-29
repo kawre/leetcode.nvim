@@ -1,5 +1,5 @@
 local log = require("leetcode.logger")
-local arguments = require("leetcode.command.options")
+local arguments = require("leetcode.command.arguments")
 
 ---@class lc.Commands
 local cmd = {}
@@ -187,14 +187,25 @@ local function cmds_keys(t)
     end, vim.tbl_keys(t))
 end
 
+---@param _ string
+---@param line string
+---
+---@return string[]
+function cmd.complete(_, line)
+    local args, options = cmd.parse(line:gsub("Leet%s", ""))
+    return cmd.rec_complete(args, options, cmd.commands)
+end
+
 ---@param args string[]
 ---@param options string[]
 ---@param cmds table<string,any>
-function cmd.complete(args, options, cmds)
+---
+---@return string[]
+function cmd.rec_complete(args, options, cmds)
     if not cmds or vim.tbl_isempty(args) then return {} end
 
     if not cmds._args and cmds[args[1]] then
-        return cmd.complete(args, options, cmds[table.remove(args, 1)])
+        return cmd.rec_complete(args, options, cmds[table.remove(args, 1)])
     end
 
     local txt, keys = args[#args], cmds_keys(cmds)
@@ -225,58 +236,55 @@ function cmd.complete(args, options, cmds)
     )
 end
 
-function cmd.cmd(args)
+function cmd.exec(args)
     local t = cmd.commands
+
     local options = {}
     for s in vim.gsplit(args.args, "%s+", { trimempty = true }) do
         local opt = vim.split(s, "=")
         if opt[2] then
-            options[opt[1]] = vim.split(opt[2], ",%s*", { trimempty = true })
-        else
+            options[opt[1]] = vim.split(opt[2], ",", { trimempty = true })
+        elseif t then
             t = t[s]
+        else
+            break
         end
     end
 
-    t[1](options)
+    if t and type(t[1]) == "function" then
+        t[1](options) ---@diagnostic disable-line
+    else
+        log.error(("Invalid command: `%s %s`"):format(args.name, args.args))
+    end
 end
 
 function cmd.setup()
-    vim.api.nvim_create_user_command("Leet", function(args)
-        if not pcall(cmd.cmd, args) then log.error(("Invalid command: `%s`"):format(args.args)) end
-    end, {
+    vim.api.nvim_create_user_command("Leet", cmd.exec, {
         bar = true,
         bang = true,
         nargs = "?",
         desc = "Leet",
-        ---@param _ string
-        ---@param line string
-        complete = function(_, line)
-            local args, options = cmd.parse(line:gsub("Leet%s", ""))
-            return cmd.complete(args, options, cmd.commands)
-        end,
+        complete = cmd.complete,
     })
 end
 
 cmd.commands = {
     cmd.menu,
 
+    menu = { cmd.menu },
     console = { cmd.console },
     info = { cmd.info },
-    menu = { cmd.menu },
     tabs = { cmd.question_tabs },
     lang = { cmd.change_lang },
     run = { cmd.q_run },
     test = { cmd.q_run },
     submit = { cmd.q_submit },
-    fix = { cmd.fix },
     random = { cmd.random_question },
     daily = { cmd.qot },
+    fix = { cmd.fix },
 
     list = {
         cmd.problems,
-
-        test = function() log.info("siema") end,
-
         _args = arguments.list,
     },
 

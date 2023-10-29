@@ -56,7 +56,7 @@ local M = {
     logging = true,
 
     console = {
-        open_on_runcode = false, ---@type boolean
+        open_on_runcode = true, ---@type boolean
 
         dir = "row", ---@type "col" | "row"
 

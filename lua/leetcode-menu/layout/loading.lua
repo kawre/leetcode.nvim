@@ -7,7 +7,7 @@ local Title = require("leetcode-menu.components.title")
 
 local title = Title:init({}, "Loading...")
 
-local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", function() vim.cmd.quitall() end)
+local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
 
 return Layout:init({
     components = {

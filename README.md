@@ -97,7 +97,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     logging = true,
 
     console = {
-        open_on_runcode = false, ---@type boolean
+        open_on_runcode = true, ---@type boolean
 
         dir = "row", ---@type "col" | "row"
 
