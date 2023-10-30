@@ -98,6 +98,12 @@ function utils._query(query, variables, cb)
     })
 end
 
+---@param fn function
+---@param times integer
+function utils.retry(fn, times)
+    --
+end
+
 function utils.decode(str)
     local ok, res = pcall(vim.json.decode, str)
     log.debug(str)

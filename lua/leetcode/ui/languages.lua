@@ -89,17 +89,11 @@ function Languages.mount()
     stats_api.languages(function(res)
         Languages.populate(res)
         spinner:stop(nil, true)
-        Languages.draw()
+        Languages.layout:draw(Languages._)
     end)
 
     popup:mount()
     Languages.mounted = true
-end
-
-function Languages.draw()
-    local pos = vim.api.nvim_win_get_cursor(Languages._.winid)
-    Languages.layout:draw(Languages._)
-    vim.api.nvim_win_set_cursor(Languages._.winid, pos)
 end
 
 return Languages

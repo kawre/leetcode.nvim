@@ -102,17 +102,11 @@ function Skills.mount()
     stats_api.skills(function(res)
         Skills.populate(res)
         spinner:stop(nil, true)
-        Skills.draw()
+        Skills.layout:draw(Skills._)
     end)
 
     popup:mount()
     Skills.mounted = true
-end
-
-function Skills.draw()
-    local pos = vim.api.nvim_win_get_cursor(Skills._.winid)
-    Skills.layout:draw(Skills._)
-    vim.api.nvim_win_set_cursor(Skills._.winid, pos)
 end
 
 return Skills

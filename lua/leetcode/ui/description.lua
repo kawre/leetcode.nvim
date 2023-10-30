@@ -74,9 +74,9 @@ function description:toggle()
 end
 
 function description:draw()
-    local c = vim.api.nvim_win_get_cursor(self.split.winid)
+    -- local c = vim.api.nvim_win_get_cursor(self.split.winid)
     self.layout:draw(self.split)
-    vim.api.nvim_win_set_cursor(self.split.winid, c)
+    -- vim.api.nvim_win_set_cursor(self.split.winid, c)
 end
 
 -- function description:redraw()

@@ -22,12 +22,12 @@ local function get_days_in_month(month, year)
     return days_in_month[month]
 end
 
+local function is_same_day(date1, date2)
+    return date1.year == date2.year and date1.month == date2.month and date1.day == date2.day
+end
+
 ---@param osdate osdate
 function Calendar:get_submission(osdate)
-    local function is_same_day(date1, date2)
-        return date1.year == date2.year and date1.month == date2.month and date1.day == date2.day
-    end
-
     for i, sub in ipairs(self.submissions) do
         if is_same_day(sub.osdate, osdate) then
             table.remove(self.submissions, i)
@@ -150,10 +150,6 @@ function Calendar:init(res, opts)
     opts = vim.tbl_deep_extend("force", {
         position = "center",
         hl = "Keyword",
-        -- padding = {
-        --     top = 4,
-        --     bot = 2,
-        -- },
     }, opts or {})
 
     self = setmetatable(Text:init({}, opts), self)
