@@ -1,4 +1,5 @@
 local config = require("leetcode.config")
+local log = require("leetcode.logger")
 
 ---@class lc.Spinner
 ---@field spinner lc.spinner | nil
@@ -86,20 +87,21 @@ function spinner:stop(msg, success, opts)
     }, opts or {})
 
     self.spinner = nil
-    self:set(msg, success and vim.log.levels.INFO or vim.log.levels.ERROR, opts)
+    local lvl = vim.log.levels[success and "INFO" or "ERROR"]
+    self:set(msg, lvl, opts)
 end
 
 ---@param msg? string
 ---@param spinner_type? lc.spinner_types
 function spinner:init(msg, spinner_type)
-    local obj = setmetatable({
+    self = setmetatable({
         msg = msg or "",
         index = 0,
         spinner = spinners[spinner_type or "dot"],
         noti = nil,
     }, self)
 
-    return obj:start()
+    return self:start()
 end
 
 return spinner

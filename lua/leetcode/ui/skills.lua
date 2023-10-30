@@ -101,7 +101,7 @@ function Skills.mount()
     local spinner = Spinner:init("fetching user skills", "dot")
     stats_api.skills(function(res)
         Skills.populate(res)
-        spinner:stop(nil, true)
+        spinner:stop(nil, true, { timeout = 200 })
         Skills.layout:draw(Skills._)
     end)
 

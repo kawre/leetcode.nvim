@@ -17,21 +17,21 @@ local Title = require("leetcode-menu.components.title")
 local group = Group:init({ Header:init() })
 
 local function get_stats()
-    local spinner = Spinner:init("fetching user stats", "dot")
+    local spinner = Spinner:init("fetching user stats")
 
     statistics.solved(function(res)
         group:set_opts({
-            spacing = 3,
+            spacing = 2,
             padding = {
-                top = 3,
-                bot = 3,
+                top = 4,
+                bot = 2,
             },
         })
 
         group.components = { Solved:init(res), Calendar:init(res) }
         _Lc_Menu:draw()
 
-        spinner:stop(nil, true)
+        spinner:stop(nil, true, { timeout = 200 })
     end)
 end
 get_stats()
