@@ -9,6 +9,7 @@ local logger = {}
 
 local function normalize(msg) return type(msg) == "string" and msg or vim.inspect(msg) end
 
+---@private
 ---@param msg any
 ---@param lvl? integer
 ---@return any

@@ -1,5 +1,7 @@
 local cmd = require("leetcode.command")
 local Calendar = require("leetcode-menu.components.calendar")
+local statistics = require("leetcode.api.statistics")
+local log = require("leetcode.logger")
 
 local Layout = require("leetcode-ui.layout")
 
@@ -28,6 +30,11 @@ local back = Button:init(
 )
 
 local Footer = require("leetcode-menu.components.footer")
+
+statistics.solved(function(res)
+    --
+    log.info(res)
+end)
 
 return Layout:init({
     Calendar:init(),
