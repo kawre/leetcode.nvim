@@ -17,6 +17,10 @@ Layout.__index = Layout
 
 ---@param win? NuiSplit|NuiPopup|table
 function Layout:draw(win)
+    -- if win then
+    --     local r, c = vim.api.nvim_win_get_cursor(win.winid)
+    -- end
+    --
     self.line_idx = 1
     self.buttons = {}
 

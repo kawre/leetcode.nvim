@@ -5,6 +5,7 @@ local Calendar = require("leetcode-menu.components.calendar")
 local Group = require("leetcode-ui.component.group")
 local Footer = require("leetcode-menu.components.footer")
 local Header = require("leetcode-menu.components.header")
+local Spinner = require("leetcode.logger.spinner")
 local log = require("leetcode.logger")
 
 local Layout = require("leetcode-ui.layout")
@@ -13,13 +14,29 @@ local Buttons = require("leetcode-menu.components.buttons")
 local Button = require("leetcode-ui.component.button")
 local Title = require("leetcode-menu.components.title")
 
-local title = Title:init({ "Menu" }, "Statistics")
+local group = Group:init({ Header:init() })
 
-local skills = Button:init(
-    { icon = "", src = "Skills" },
-    "s",
-    function() cmd.menu_layout("menu") end
-)
+local function get_stats()
+    local spinner = Spinner:init("fetching user stats", "dot")
+
+    statistics.solved(function(res)
+        group:set_opts({
+            spacing = 3,
+            padding = {
+                top = 3,
+                bot = 3,
+            },
+        })
+
+        group.components = { Solved:init(res), Calendar:init(res) }
+        _Lc_Menu:draw()
+
+        spinner:stop(nil, true)
+    end)
+end
+get_stats()
+
+local skills = Button:init({ icon = "", src = "Skills" }, "s", cmd.skills)
 
 local languages = Button:init(
     { icon = "", src = "Languages" },
@@ -27,35 +44,23 @@ local languages = Button:init(
     function() cmd.menu_layout("menu") end
 )
 
+local update = Button:init({ icon = "", src = "Update" }, "u", get_stats)
+
 local back = Button:init(
     { icon = "", src = "Back" },
     "q",
     function() cmd.menu_layout("menu") end
 )
 
-local group = Group:init({ Header:init() })
-
-statistics.solved(function(res)
-    group:set_opts({
-        spacing = 3,
-        padding = {
-            top = 3,
-            bot = 3,
-        },
-    })
-
-    group.components = { Solved:init(res), Calendar:init(res) }
-    _Lc_Menu:draw()
-end)
-
 return Layout:init({
     group,
 
-    title,
+    Title:init({ "Menu" }, "Statistics"),
 
     Buttons:init({
         skills,
         languages,
+        update,
         back,
     }),
 

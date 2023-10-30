@@ -356,3 +356,11 @@
 ---@field questions_count table<lc.Stats.QuestionCount>
 ---@field solved_beats table<lc.Stats.SolvedBeat>
 ---@field submit_stats lc.Stats.SubmissionStat
+
+--------------------------------------------
+--- Skills
+--------------------------------------------
+---@class lc.Skills.Res
+---@field advanced {tag: string, slug: string, problems_solved: number}[]
+---@field intermediate {tag: string, slug: string, problems_solved: number}[]
+---@field fundamental {tag: string, slug: string, problems_solved: number}[]

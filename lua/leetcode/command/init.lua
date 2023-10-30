@@ -157,6 +157,11 @@ function cmd.q_submit()
     q.console:submit()
 end
 
+function cmd.skills()
+    local skills = require("leetcode.ui.skills")
+    skills:show()
+end
+
 function cmd.fix()
     require("leetcode.cache.cookie").delete()
     require("leetcode.cache.problemlist").delete()

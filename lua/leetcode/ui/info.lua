@@ -20,7 +20,7 @@ function Info:mount()
         local line = NuiLine()
 
         line:append(tostring(i), "leetcode_list")
-        line:append("/" .. #self.hints, "leetcode_ref")
+        line:append("/" .. #self.hints, "leetcode_alt")
 
         local hint = NuiTree.Node({ text = line }, { NuiTree.Node({ text = hint_txt }) })
         table.insert(hints, hint)

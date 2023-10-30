@@ -98,4 +98,41 @@ function statistics.solved(cb)
     end)
 end
 
+---@param cb fun(res: lc.Skills.Res)
+function statistics.skills(cb)
+    local variables = {
+        username = config.auth.name,
+    }
+
+    local query = [[
+        query skillStats($username: String!) {
+            matchedUser(username: $username) {
+                tag_problems_counts: tagProblemCounts {
+                    advanced {
+                        tag: tagName
+                        slug: tagSlug
+                        problems_solved: problemsSolved
+                    }
+                    intermediate {
+                        tag: tagName
+                        slug: tagSlug
+                        problems_solved: problemsSolved
+                    }
+                    fundamental {
+                        tag: tagName
+                        slug: tagSlug
+                        problems_solved: problemsSolved
+                    }
+                }
+            }
+        }
+    ]]
+
+    utils._query(query, variables, function(res)
+        local data = res.body.data
+        local tag_problems_counts = data["matchedUser"]["tag_problems_counts"]
+        cb(tag_problems_counts)
+    end)
+end
+
 return statistics
