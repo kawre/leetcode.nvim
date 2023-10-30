@@ -9,7 +9,7 @@ local log = require("leetcode.logger")
 
 ---@class lc-ui.Calendar : lc-ui.Text
 ---@field curr_time integer
----@field calendar table<string, integer>
+---@field calendar lc.Stats.CalendarData
 ---@field calendar_lines NuiLine[]
 ---@field last_year_sub_count integer
 local Calendar = {}
@@ -41,15 +41,27 @@ function Calendar:handle_res(res)
     self.calendar = res.calendar
 
     local time = os.date("*t")
-    self.curr_time = os.time({ year = time.year - 1, month = time.month, day = 1 })
-    self.time = time
+    self.curr_time = os.time({
+        year = time.year - 1,
+        month = time.month,
+        day = 1,
+        hour = 1,
+        isdst = false,
+    })
+    self.threshold = os.time({
+        year = time.year,
+        month = time.month,
+        day = time.day + 1,
+        hour = 1,
+        isdst = false,
+    })
     self.last_year_sub_count = 0
     self.month_lens = {}
     self.max_sub_count = 0
 
     self.submissions = {}
     for ts, count in pairs(self.calendar.submission_calendar) do
-        local osdate = os.date("*t", ts)
+        local osdate = os.date("*t", tonumber(ts))
         self.max_sub_count = math.max(self.max_sub_count, count)
         table.insert(self.submissions, { osdate = osdate, count = count })
         self.last_year_sub_count = self.last_year_sub_count + count
@@ -135,8 +147,10 @@ end
 
 ---@param m integer
 function Calendar:handle_weekdays(m)
-    local curr = os.date("*t", self.curr_time)
+    if self.curr_time >= self.threshold then return end
 
+    local curr = os.date("*t", self.curr_time)
+    log.debug({ curr = curr, threshold = os.date("*t", self.threshold) })
     local count = self:get_submission(curr) or 0
 
     local text = NuiText("󰝤", square_hl(count, self.max_sub_count))

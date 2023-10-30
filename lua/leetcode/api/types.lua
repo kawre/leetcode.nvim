@@ -337,7 +337,7 @@
 ---@field active_years table
 ---@field dcc_badges table
 ---@field streak number
----@field submission_calendar table
+---@field submission_calendar table<string, integer>
 ---@field total_active_days number
 
 ---@class lc.Stats.QuestionCount
