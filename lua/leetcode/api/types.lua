@@ -329,3 +329,30 @@
 ---@field is_premium boolean
 ---@field is_verified boolean
 ---@field id integer
+
+--------------------------------------------
+--- Statistics
+--------------------------------------------
+---@class lc.Stats.CalendarData
+---@field active_years table
+---@field dcc_badges table
+---@field streak number
+---@field submission_calendar table
+---@field total_active_days number
+
+---@class lc.Stats.QuestionCount
+---@field count number
+---@field difficulty string
+
+---@class lc.Stats.SolvedBeat
+---@field difficulty string
+---@field percentage number
+
+---@class lc.Stats.SubmissionStat
+---@field acSubmissionNum table
+
+---@class lc.Stats.Res
+---@field calendar lc.Stats.CalendarData
+---@field questions_count table<lc.Stats.QuestionCount>
+---@field solved_beats table<lc.Stats.SolvedBeat>
+---@field submit_stats lc.Stats.SubmissionStat

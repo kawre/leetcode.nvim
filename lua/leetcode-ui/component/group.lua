@@ -21,6 +21,9 @@ function Group:append(cmp)
     return self
 end
 
+---@param opts lc-ui.Group.opts
+function Group:set_opts(opts) self.opts = vim.tbl_deep_extend("force", self.opts, opts) end
+
 ---@param layout lc-ui.Layout
 function Group:draw(layout)
     local components = vim.deepcopy(self.components)

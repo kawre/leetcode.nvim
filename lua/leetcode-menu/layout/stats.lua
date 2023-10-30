@@ -1,6 +1,10 @@
 local cmd = require("leetcode.command")
-local Calendar = require("leetcode-menu.components.calendar")
 local statistics = require("leetcode.api.statistics")
+local Solved = require("leetcode-menu.components.solved")
+local Calendar = require("leetcode-menu.components.calendar")
+local Group = require("leetcode-ui.component.group")
+local Footer = require("leetcode-menu.components.footer")
+local Header = require("leetcode-menu.components.header")
 local log = require("leetcode.logger")
 
 local Layout = require("leetcode-ui.layout")
@@ -29,15 +33,23 @@ local back = Button:init(
     function() cmd.menu_layout("menu") end
 )
 
-local Footer = require("leetcode-menu.components.footer")
+local group = Group:init({ Header:init() })
 
 statistics.solved(function(res)
-    --
-    log.info(res)
+    group:set_opts({
+        spacing = 3,
+        padding = {
+            top = 3,
+            bot = 3,
+        },
+    })
+
+    group.components = { Solved:init(res), Calendar:init(res) }
+    _Lc_Menu:draw()
 end)
 
 return Layout:init({
-    Calendar:init(),
+    group,
 
     title,
 

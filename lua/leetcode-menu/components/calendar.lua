@@ -36,18 +36,21 @@ function Calendar:get_submission(osdate)
     end
 end
 
+---@param res lc.Stats.Res
 function Calendar:handle_res(res)
-    self.calendar = res
+    self.calendar = res.calendar
 
     local time = os.date("*t")
     self.curr_time = os.time({ year = time.year - 1, month = time.month, day = 1 })
     self.time = time
     self.last_year_sub_count = 0
     self.month_lens = {}
+    self.max_sub_count = 0
 
     self.submissions = {}
     for ts, count in pairs(self.calendar.submission_calendar) do
         local osdate = os.date("*t", ts)
+        self.max_sub_count = math.max(self.max_sub_count, count)
         table.insert(self.submissions, { osdate = osdate, count = count })
         self.last_year_sub_count = self.last_year_sub_count + count
     end
@@ -60,8 +63,6 @@ function Calendar:handle_res(res)
     self:handle_months()
     self:handle_submissions()
     self.lines = self.calendar_lines
-
-    _Lc_Menu:draw()
 end
 
 function Calendar:handle_submissions()
@@ -113,35 +114,37 @@ function Calendar:handle_weeks(m)
     end
 end
 
+local function square_hl(count, max_count)
+    local perc = (count / max_count) * 100
+    local num = math.ceil(perc / 10) * 10
+    return ("leetcode_calendar_%d"):format(num)
+end
+
 ---@param m integer
 function Calendar:handle_weekdays(m)
     local curr = os.date("*t", self.curr_time)
 
-    local count = self:get_submission(curr)
+    local count = self:get_submission(curr) or 0
 
-    local text
-    if count then
-        text = NuiText("󰝤", "leetcode_easy")
-    else
-        text = NuiText("󰝤", "Whitespace")
-    end
+    local text = NuiText("󰝤", square_hl(count, self.max_sub_count))
     self.calendar_lines[curr.wday]:append(text)
 
     self.curr_time = self.curr_time + (60 * 60 * 24)
 end
 
-function Calendar:init(opts)
+---@param res lc.Stats.Res
+function Calendar:init(res, opts)
     opts = vim.tbl_deep_extend("force", {
         position = "center",
         hl = "Keyword",
-        padding = {
-            top = 4,
-            bot = 2,
-        },
+        -- padding = {
+        --     top = 4,
+        --     bot = 2,
+        -- },
     }, opts or {})
 
-    self = setmetatable(Text:init(Header.ascii, opts), self)
-    stats_api.calendar(function(res) self:handle_res(res) end)
+    self = setmetatable(Text:init({}, opts), self)
+    self:handle_res(res)
     return self
 end
 

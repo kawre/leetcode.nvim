@@ -28,6 +28,10 @@ M.get = function()
         medium = { fg = "#fac31d" },
         hard = { fg = "#f8615c" },
 
+        easy_alt = { fg = "#294d35" },
+        medium_alt = { fg = "#5e4e25" },
+        hard_alt = { fg = "#5a302f" },
+
         ok = { fg = hl("DiagnosticOk").fg },
         info = { fg = hl("DiagnosticInfo").fg },
         hint = { fg = hl("DiagnosticHint").fg },
@@ -50,6 +54,22 @@ M.get = function()
         link = { fg = hl("Function").fg, underline = true },
         list = { fg = hl("SpecialChar").fg },
         ref = { fg = hl("Tag").fg },
+
+        -- calendar
+        calendar_0 = { fg = "#45475b" },
+        calendar_10 = { fg = "#004d1b" },
+        calendar_20 = { fg = "#016620" },
+        calendar_30 = { fg = "#078029" },
+        calendar_40 = { fg = "#109932" },
+        calendar_50 = { fg = "#1cb33d" },
+        calendar_60 = { fg = "#28c244" },
+        calendar_70 = { fg = "#51d164" },
+        calendar_80 = { fg = "#7fe18b" },
+        calendar_90 = { fg = "#b3f0b8" },
+        calendar_100 = { fg = "#d8ffda" },
+
+        all = { fg = hl("Normal").fg },
+        all_alt = { fg = "#45475b" },
     }
 end
 
