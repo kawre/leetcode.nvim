@@ -71,18 +71,31 @@ function Calendar:handle_submissions()
         max_len = math.max(vim.api.nvim_strwidth(line:content()), max_len)
     end
 
-    local subs = ("%d submissions"):format(self.last_year_sub_count)
-    local active_days = ("active days:  %d"):format(self.calendar.total_active_days)
-    local streak = ("max streak: 󰈸 %d"):format(self.calendar.streak)
+    local subs_line = NuiLine()
+    subs_line:append("" .. self.last_year_sub_count)
+    subs_line:append(" submissions", "leetcode_alt")
 
-    local padding = (max_len - vim.api.nvim_strwidth(subs .. active_days .. streak)) / 2
+    local ad_line = NuiLine()
+    ad_line:append("active days:", "leetcode_alt")
+    ad_line:append("  ", "leetcode_list")
+    ad_line:append("" .. self.calendar.total_active_days)
+
+    local streak_line = NuiLine()
+    streak_line:append("max streak:", "leetcode_alt")
+    streak_line:append(" 󰈸 ", "leetcode_list")
+    streak_line:append("" .. self.calendar.streak)
+
+    local padding = (
+        max_len
+        - vim.api.nvim_strwidth(subs_line:content() .. ad_line:content() .. streak_line:content())
+    ) / 2
 
     local sub_line = NuiLine()
-    sub_line:append(subs)
+    sub_line:append(subs_line)
     sub_line:append((" "):rep(padding + (padding % 2 == 0 and 1 or 0)))
-    sub_line:append(active_days)
+    sub_line:append(ad_line)
     sub_line:append((" "):rep(padding))
-    sub_line:append(streak)
+    sub_line:append(streak_line)
     table.insert(self.calendar_lines, sub_line)
 end
 

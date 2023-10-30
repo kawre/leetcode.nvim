@@ -53,16 +53,13 @@ function Solved:handle_res(res)
             total_count = total_count,
             solved = stat.count,
             line = solved_line,
-            idx = ({
-                ["All"] = 1,
-                ["Easy"] = 2,
-                ["Medium"] = 3,
-                ["Hard"] = 4,
-            })[stat.difficulty],
         }
     end
 
-    for diff, stat in pairs(subs) do
+    local order = { "All", "Easy", "Medium", "Hard" }
+    for _, diff in ipairs(order) do
+        local stat = subs[diff]
+
         local line = NuiLine()
         line:append(diff, hl[diff])
 
@@ -76,7 +73,7 @@ function Solved:handle_res(res)
 
         line:append(self:progress_bar(50, stat.solved, stat.total_count, diff))
 
-        table.insert(self.solved_lines, stat.idx, line)
+        table.insert(self.solved_lines, line)
     end
 
     self.lines = self.solved_lines
