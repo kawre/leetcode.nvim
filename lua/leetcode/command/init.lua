@@ -157,9 +157,14 @@ function cmd.q_submit()
     q.console:submit()
 end
 
-function cmd.skills()
+function cmd.ui_skills()
     local skills = require("leetcode.ui.skills")
     skills:show()
+end
+
+function cmd.ui_languages()
+    local languages = require("leetcode.ui.languages")
+    languages:show()
 end
 
 function cmd.fix()

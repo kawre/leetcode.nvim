@@ -36,13 +36,9 @@ local function get_stats()
 end
 get_stats()
 
-local skills = Button:init({ icon = "", src = "Skills" }, "s", cmd.skills)
+local skills = Button:init({ icon = "", src = "Skills" }, "s", cmd.ui_skills)
 
-local languages = Button:init(
-    { icon = "", src = "Languages" },
-    "l",
-    function() cmd.menu_layout("menu") end
-)
+local languages = Button:init({ icon = "", src = "Languages" }, "l", cmd.ui_languages)
 
 local update = Button:init({ icon = "", src = "Update" }, "u", get_stats)
 

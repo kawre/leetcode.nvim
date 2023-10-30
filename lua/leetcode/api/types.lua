@@ -360,7 +360,20 @@
 --------------------------------------------
 --- Skills
 --------------------------------------------
+---@class lc.Skills.Skill
+---@field tag string
+---@field slug string
+---@field problems_solved integer
+
 ---@class lc.Skills.Res
+---@field advanced lc.Skills.Skill
+---@field intermediate lc.Skills.Skill
+---@field fundamental lc.Skills.Skill
+
+--------------------------------------------
+--- Languages
+--------------------------------------------
+---@class lc.Languages.Res
 ---@field advanced {tag: string, slug: string, problems_solved: number}[]
 ---@field intermediate {tag: string, slug: string, problems_solved: number}[]
 ---@field fundamental {tag: string, slug: string, problems_solved: number}[]

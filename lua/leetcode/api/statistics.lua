@@ -135,4 +135,28 @@ function statistics.skills(cb)
     end)
 end
 
+---@param cb fun(res: lc.Languages.Res)
+function statistics.languages(cb)
+    local variables = {
+        username = config.auth.name,
+    }
+
+    local query = [[
+        query languageStats($username: String!) {
+            matchedUser(username: $username) {
+                languageProblemCount {
+                    lang: languageName
+                    problems_solved: problemsSolved
+                }
+            }
+        }
+    ]]
+
+    utils._query(query, variables, function(res)
+        local data = res.body.data
+        local lang_prob_count = data["matchedUser"]["languageProblemCount"]
+        cb(lang_prob_count)
+    end)
+end
+
 return statistics
