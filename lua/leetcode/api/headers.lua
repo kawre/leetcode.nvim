@@ -1,4 +1,5 @@
 local cookie = require("leetcode.cache.cookie")
+local config = require("leetcode.config")
 
 local headers = {}
 
@@ -6,9 +7,9 @@ headers.get = function()
     local c = cookie.get()
 
     return {
-        ["Referer"] = "https://leetcode.com/",
-        ["Origin"] = "https://leetcode.com",
-        ["Host"] = "leetcode.com",
+        ["Referer"] = config.domain,
+        ["Origin"] = config.domain,
+        ["Host"] = ("leetcode.%s"):format(config.user.domain),
         ["Cookie"] = c
                 and ("LEETCODE_SESSION=%s;csrftoken=%s"):format(c.leetcode_session, c.csrftoken)
             or "",

@@ -1,6 +1,7 @@
 local utils = require("leetcode.api.utils")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
+local queries = require("leetcode.api.queries")
 
 ---@class lc.AuthApi
 local M = {}
@@ -25,14 +26,7 @@ local usr_fields = [[
 
 ---@return lc.UserStatus
 function M.user()
-    local query = string.format(
-        [[
-            query globalData {
-              userStatus { %s }
-            }
-        ]],
-        usr_fields
-    )
+    local query = queries.auth()
 
     local ok, res = pcall(utils.query, query)
     if not ok then return {} end
@@ -41,14 +35,7 @@ function M.user()
 end
 
 function M._user(cb)
-    local query = string.format(
-        [[
-            query globalData {
-              userStatus { %s }
-            }
-        ]],
-        usr_fields
-    )
+    local query = queries.auth()
 
     utils._query(query, {}, function(res)
         local data = res.body.data

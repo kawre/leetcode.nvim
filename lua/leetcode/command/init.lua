@@ -1,5 +1,6 @@
 local log = require("leetcode.logger")
 local arguments = require("leetcode.command.arguments")
+local t = require("leetcode.translator")
 
 ---@class lc.Commands
 local cmd = {}
@@ -37,7 +38,7 @@ function cmd.cookie_prompt(cb)
         border = {
             style = "rounded",
             text = {
-                top = " Enter cookie ",
+                top = (" %s "):format(t("Enter cookie")),
                 top_align = "left",
             },
         },
@@ -54,7 +55,7 @@ function cmd.cookie_prompt(cb)
             if not c_ok then return log.warn(err) end
 
             cmd.menu_layout("menu")
-            log.info("Sign-in successful")
+            log.info(t("Sign-in successful"))
             if cb then cb() end
         end,
     })

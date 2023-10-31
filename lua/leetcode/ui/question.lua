@@ -84,6 +84,7 @@ end
 
 ---@param problem lc.Cache.Question
 function Question:init(problem)
+    log.debug(problem)
     log.debug("Initializing question: " .. problem.frontend_id .. ". " .. problem.title_slug)
 
     local tabp = utils.detect_duplicate_question(problem.title_slug)

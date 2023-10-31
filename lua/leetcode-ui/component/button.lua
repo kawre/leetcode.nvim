@@ -1,5 +1,6 @@
 local component = require("leetcode-ui.component")
 local NuiLine = require("nui.line")
+local t = require("leetcode.translator")
 
 ---@class lc-ui.Button: lc-ui.Component
 local button = {}
@@ -15,6 +16,8 @@ setmetatable(button, component)
 ---@param on_press function? optional
 ---@param expandable boolean? optional
 function button:init(text, sc, on_press, expandable)
+    text.src = t(text.src)
+
     local opts = {
         position = "center",
         on_press = on_press or function() end,

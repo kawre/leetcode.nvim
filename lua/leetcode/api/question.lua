@@ -1,5 +1,6 @@
 local utils = require("leetcode.api.utils")
 local log = require("leetcode.logger")
+local queries = require("leetcode.api.queries")
 
 local question = {}
 
@@ -16,44 +17,7 @@ function question.by_title_slug(title_slug)
         titleSlug = title_slug,
     }
 
-    local query = [[
-        query ($titleSlug: String!) {
-          question(titleSlug: $titleSlug) {
-            id:  questionId
-            frontend_id: questionFrontendId
-            title
-            title_slug: titleSlug
-            is_paid_only: isPaidOnly
-            difficulty
-            likes
-            dislikes
-            category_title: categoryTitle
-            content
-            mysql_schemas: mysqlSchemas
-            data_schemas: dataSchemas
-            code_snippets: codeSnippets {
-              lang
-              lang_slug: langSlug
-              code
-            }
-            testcase_list: exampleTestcaseList
-            meta_data: metaData
-            ac_rate: acRate
-            stats
-            hints
-            topic_tags: topicTags {
-                name
-                slug
-            }
-            similar: similarQuestionList {
-              difficulty
-              title_slug: titleSlug
-              title
-              paid_only: isPaidOnly
-            }
-          }
-        }
-    ]]
+    local query = queries.question()
 
     local ok, res = pcall(utils.query, query, variables)
     assert(ok)
@@ -61,8 +25,7 @@ function question.by_title_slug(title_slug)
     local q = res.body.data.question
     q.meta_data = select(2, pcall(utils.decode, q.meta_data))
     q.stats = select(2, pcall(utils.decode, q.stats))
-
-    log.debug(q.meta_data)
+    if type(q.similar) == "string" then q.similar = utils.normalize_similar_cn(q.similar) end
 
     return q
 end

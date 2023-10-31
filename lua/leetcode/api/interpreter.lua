@@ -67,7 +67,7 @@ end
 function interpreter.submit(title_slug, body, callback)
     utils.auth_guard()
 
-    local url = string.format(config.domain .. "/problems/%s/submit/", title_slug)
+    local url = (config.domain .. "/problems/%s/submit/"):format(title_slug)
 
     ---@type boolean, lc.submission
     local ok, res = pcall(utils.post, url, body)
@@ -81,7 +81,7 @@ end
 ---
 ---@return lc.Interpreter.Response
 function interpreter.check(id, cb)
-    local url = string.format(config.domain .. "/submissions/detail/%s/check/", id)
+    local url = (config.domain .. "/submissions/detail/%s/check/"):format(id)
     utils._get(url, cb)
 end
 

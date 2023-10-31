@@ -1,5 +1,7 @@
 local Text = require("leetcode-ui.component.text")
 local NuiLine = require("nui.line")
+local t = require("leetcode.translator")
+local log = require("leetcode.logger")
 
 ---@class lc-menu.Title : lc-ui.Text
 ---@field text lc-ui.Text
@@ -11,6 +13,9 @@ setmetatable(title, Text)
 ---@param str string
 ---@param opts? any
 function title:init(history, str, opts)
+    history = t(history)
+    str = t(str)
+
     opts = vim.tbl_deep_extend("force", {
         position = "center",
     }, opts or {})

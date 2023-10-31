@@ -1,5 +1,6 @@
 local config = require("leetcode.config")
 local parser = require("leetcode.parser")
+local t = require("leetcode.translator")
 
 local Layout = require("leetcode-ui.layout")
 local Text = require("leetcode-ui.component.text")
@@ -99,7 +100,7 @@ function description:populate()
 
     local statsline = NuiLine()
     statsline:append(
-        q.difficulty,
+        t(q.difficulty),
         ({
             ["Easy"] = "leetcode_easy",
             ["Medium"] = "leetcode_medium",
@@ -108,17 +109,19 @@ function description:populate()
     )
     statsline:append(" | ")
 
-    statsline:append(q.likes .. "  ", "leetcode_alt")
-    statsline:append(q.dislikes .. " ", "leetcode_alt")
+    statsline:append(q.likes .. " ", "leetcode_alt")
+    if config.user.domain == "com" then
+        statsline:append(" " .. q.dislikes .. " ", "leetcode_alt")
+    end
     statsline:append(" | ")
 
     statsline:append(
-        string.format("%s of %s", q.stats.acRate, q.stats.totalSubmission),
+        ("%s %s %s"):format(q.stats.acRate, t("of"), q.stats.totalSubmission),
         "leetcode_alt"
     )
     if not vim.tbl_isempty(q.hints) then
         statsline:append(" | ")
-        statsline:append("󰛨 Hints", "leetcode_hint")
+        statsline:append("󰛨 " .. t("Hints"), "leetcode_hint")
     end
 
     local titlecomp = Text:init({ titleline }, { position = "center" })

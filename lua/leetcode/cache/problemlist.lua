@@ -2,7 +2,8 @@ local path = require("plenary.path")
 local log = require("leetcode.logger")
 
 local config = require("leetcode.config")
-local file = config.home:joinpath(".problemlist")
+local file =
+    config.home:joinpath((".problemlist%s"):format(config.user.domain == "cn" and "_cn" or ""))
 
 local problems_api = require("leetcode.api.problems")
 
@@ -13,6 +14,7 @@ local problems_api = require("leetcode.api.problems")
 ---@class lc.Cache.Question
 ---@field frontend_id string
 ---@field title string
+---@field title_cn string
 ---@field title_slug string
 ---@field status string
 ---@field paid_only boolean
@@ -56,11 +58,7 @@ function problemlist.get()
     local ok, problems = pcall(problemlist.parse, contents)
     assert(ok)
 
-    -- return vim.tbl_map(function(problem)
-    --     problem.frontend_id = tonumber(problem.frontend_id)
-    --     return problem
-    -- end, problems)
-
+    log.debug(problems)
     return problems
 end
 
