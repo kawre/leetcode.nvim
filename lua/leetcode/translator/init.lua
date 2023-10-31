@@ -33,6 +33,7 @@ local translate = {
     ["No similar questions available"] = "没有类似的问题可用",
     ["No topics available"] = "没有可用的主题",
     ["No hints available"] = "没有提示可用",
+    ["Drawn question is for premium users only. Please try again"] = "抽选的问题仅供高级用户使用。请再试一次。",
 }
 
 local function t(text)

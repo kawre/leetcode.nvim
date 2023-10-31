@@ -227,7 +227,15 @@ function queries.random_question()
         }
     ]]
 
-    return com_or(query, "")
+    local query_cn = [[
+        query problemsetRandomFilteredQuestion(
+            $categorySlug: String!
+        ) {
+            randomQuestion: problemsetRandomFilteredQuestion(categorySlug: $categorySlug, filters: {  })
+        }
+    ]]
+
+    return com_or(query, query_cn)
 end
 
 return queries

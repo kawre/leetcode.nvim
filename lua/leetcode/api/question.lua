@@ -1,6 +1,8 @@
 local utils = require("leetcode.api.utils")
 local log = require("leetcode.logger")
 local queries = require("leetcode.api.queries")
+local problemlist = require("leetcode.cache.problemlist")
+local t = require("leetcode.translator")
 
 local question = {}
 
@@ -35,22 +37,21 @@ function question.random()
         categorySlug = "",
     }
 
-    local query = [[
-      query randomQuestion($categorySlug: String) {
-        randomQuestion(categorySlug: $categorySlug, filters: {}) {
-          title_slug: titleSlug
-          paid_only: isPaidOnly
-        }
-      }
-    ]]
+    local query = queries.random_question()
 
     local config = require("leetcode.config")
     local ok, res = pcall(utils.query, query, variables)
     assert(ok, res)
 
     local q = res.body.data.randomQuestion
+    if config.user.domain == "cn" then
+        q = {
+            title_slug = q,
+            paid_only = problemlist.get_by_title_slug(q).paid_only,
+        }
+    end
     if not config.auth.is_premium and q.paid_only then
-        log.warn("Drawn question is for premium users only. Please try again")
+        log.warn(t("Drawn question is for premium users only. Please try again"))
         return
     end
 
