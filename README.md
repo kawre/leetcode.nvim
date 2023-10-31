@@ -287,7 +287,7 @@ return {
 
 - \[ \] CN version
 - \[ \] SQL support
-- \[ \] Statistics menu page
+- \[x\] Statistics menu page
 - \[ \] Docs
 - \[x\] Hints pop-up
 
