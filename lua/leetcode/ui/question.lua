@@ -38,8 +38,7 @@ end
 ---@private
 function Question:create_file()
     local lang = utils.get_lang(is_sql(self.q) and config.sql or config.lang)
-    local suffix = lang.sql and string.format("-%s", lang.short) or ""
-    local fn = string.format("%s.%s%s.%s", self.q.frontend_id, self.q.title_slug, suffix, lang.ft)
+    local fn = ("%s.%s-%s.%s"):format(self.q.frontend_id, self.q.title_slug, lang.slug, lang.ft)
 
     self.file = config.home:joinpath(fn)
     if not self.file:exists() then self.file:write(self:get_snippet().code, "w") end
@@ -71,8 +70,7 @@ function Question:handle_mount()
     if self:get_snippet() then
         self:mount()
     else
-        local msg =
-            string.format("Snippet for `%s` not found. Select a different language", self.lang)
+        local msg = ("Snippet for `%s` not found. Select a different language"):format(self.lang)
         log.warn(msg)
 
         require("leetcode.pickers.language").pick_lang(self, function(snippet)

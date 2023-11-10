@@ -18,7 +18,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 
 - 😍 question description formatting for a better readability
 
-- 📈 [LeetCode] profile statistics within [Neovim] (Soon)
+- 📈 [LeetCode] profile statistics within [Neovim]
 
 - 🔀 support for daily and random questions
 
