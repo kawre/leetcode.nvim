@@ -21,8 +21,6 @@ function interpreter.listener(id, callback)
 
     local function listen()
         interpreter.check(id, function(item)
-            log.debug(item)
-
             if item.status_code then
                 noti:stop(item.status_msg, false)
                 callback(item)
@@ -53,27 +51,17 @@ end
 ---@param body lc.Interpret.body
 ---@param callback function
 function interpreter.interpret_solution(title_slug, body, callback)
-    utils.auth_guard()
-
     local url = (config.domain .. "/problems/%s/interpret_solution/"):format(title_slug)
+    local res = interpreter.fetch(url, body)
 
-    ---@type boolean, lc.submission
-    local ok, res = pcall(utils.post, url, body)
-    if not ok then return end
-
-    interpreter.listener(res.interpret_id, callback)
+    if res then interpreter.listener(res.interpret_id, callback) end
 end
 
 function interpreter.submit(title_slug, body, callback)
-    utils.auth_guard()
+    local url = (config.domain .. "/problems/%s/submit/"):format(title_slug)
+    local res = interpreter.fetch(url, body)
 
-    local url = string.format(config.domain .. "/problems/%s/submit/", title_slug)
-
-    ---@type boolean, lc.submission
-    local ok, res = pcall(utils.post, url, body)
-    if not ok then return end
-
-    interpreter.listener(res.submission_id, callback)
+    if res then interpreter.listener(res.submission_id, callback) end
 end
 
 ---@param id string
@@ -81,8 +69,19 @@ end
 ---
 ---@return lc.Interpreter.Response
 function interpreter.check(id, cb)
-    local url = string.format(config.domain .. "/submissions/detail/%s/check/", id)
-    utils._get(url, cb)
+    local url = (config.domain .. "/submissions/detail/%s/check/"):format(id)
+    utils.get(url, cb)
+end
+
+function interpreter.fetch(url, body)
+    local res, err = utils.post(url, body)
+
+    if err then
+        if err.status == 429 then log.warn("You have attempted to run code too soon") end
+        return
+    end
+
+    return res
 end
 
 return interpreter

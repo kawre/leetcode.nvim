@@ -74,11 +74,6 @@ end
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---
----@return lc.UserStatus | nil
-function cmd.authenticate() require("leetcode.api.auth").user() end
-
----Merge configurations into default configurations and set it as user configurations.
----
 --@param theme lc-db.Theme
 function cmd.qot()
     local problems = require("leetcode.api.problems")

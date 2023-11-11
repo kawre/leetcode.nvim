@@ -271,8 +271,6 @@ end
 
 ---@param item lc.interpreter_response
 function result:handle(item)
-    log.debug(item)
-
     self.layout:clear()
     item = self:handle_item(item)
     self:set_popup_border_hi(item._.hl)

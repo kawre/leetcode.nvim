@@ -118,9 +118,9 @@ function menu:handle_mount()
         self:set_layout("loading")
 
         local auth_api = require("leetcode.api.auth")
-        auth_api._user(function(auth, err)
+        auth_api.user(function(auth, err)
             if err then
-                log.warn(err.msg)
+                log.error(err)
                 self:set_layout("signin")
                 return
             end
@@ -133,7 +133,6 @@ function menu:handle_mount()
         self:set_layout("signin")
     end
 
-    log.debug(self)
     return self:mount()
 end
 

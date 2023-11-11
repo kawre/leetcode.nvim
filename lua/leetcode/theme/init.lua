@@ -68,7 +68,6 @@ function theme.load()
 end
 
 function theme.load_dynamic(defaults)
-    log.debug(dynamic_hls)
     for name, tags in pairs(dynamic_hls) do
         theme.create_dynamic(name, tags, defaults)
     end

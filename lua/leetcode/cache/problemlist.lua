@@ -76,7 +76,7 @@ function problemlist.update(force)
         local spinner = require("leetcode.logger.spinner")
         local noti = spinner:init("Fetching Problem List", "points")
 
-        problems_api._all(function(data)
+        problems_api.all(function(data)
             problemlist.write(data)
             noti:stop("Problems Cache Updated!")
         end)

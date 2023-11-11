@@ -172,8 +172,6 @@ end
 
 ---@param parent lc.Question
 function Info:init(parent)
-    log.debug(parent.q.hints)
-
     local popup = NuiPopup({
         position = "50%",
         size = {

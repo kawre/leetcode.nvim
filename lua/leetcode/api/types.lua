@@ -377,3 +377,13 @@
 ---@field advanced {tag: string, slug: string, problems_solved: number}[]
 ---@field intermediate {tag: string, slug: string, problems_solved: number}[]
 ---@field fundamental {tag: string, slug: string, problems_solved: number}[]
+
+--------------------------------------------
+--- Error
+--------------------------------------------
+---@class lc.err
+---@field code integer
+---@field err string
+---@field out string
+---@field response table
+---@field status integer

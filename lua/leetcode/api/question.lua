@@ -55,14 +55,11 @@ function question.by_title_slug(title_slug)
         }
     ]]
 
-    local ok, res = pcall(utils.query, query, variables)
-    assert(ok)
+    local res, err = utils.query(query, variables)
 
-    local q = res.body.data.question
+    local q = res.data.question
     q.meta_data = select(2, pcall(utils.decode, q.meta_data))
     q.stats = select(2, pcall(utils.decode, q.stats))
-
-    log.debug(q.meta_data)
 
     return q
 end
@@ -82,10 +79,9 @@ function question.random()
     ]]
 
     local config = require("leetcode.config")
-    local ok, res = pcall(utils.query, query, variables)
-    assert(ok, res)
+    local res, err = utils.query(query, variables)
 
-    local q = res.body.data.randomQuestion
+    local q = res.data.randomQuestion
     if not config.auth.is_premium and q.paid_only then
         log.warn("Drawn question is for premium users only. Please try again")
         return
