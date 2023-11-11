@@ -39,20 +39,40 @@ end
 
 ---@private
 function utils.curl(method, url, params)
+    local params_cpy = vim.deepcopy(params)
     params = vim.tbl_deep_extend("force", {
         headers = headers.get(),
         compressed = false,
+        retry = 5,
     }, params or {})
 
     if type(params.body) == "table" then params.body = vim.json.encode(params.body) end
 
+    local tries = params.retry
     if params.callback then
         local cb = vim.schedule_wrap(params.callback)
-        params.callback = function(out, _) cb(utils.handle_res(out)) end
+        params.callback = function(out, _)
+            local res, err = utils.handle_res(out)
+
+            if err and tries > 0 then
+                params_cpy.retry = tries - 1
+                utils.curl(method, url, params_cpy)
+            else
+                cb(res, err)
+            end
+        end
+
         curl[method](url, params)
     else
-        local out = curl[method](url, params)
-        return utils.handle_res(out)
+        local res, err
+
+        repeat
+            local out = curl[method](url, params)
+            res, err = utils.handle_res(out)
+            tries = tries - 1
+        until not (res and not err) or tries > 0
+
+        return res, err
     end
 end
 
@@ -79,14 +99,8 @@ function utils.handle_res(out)
         res = utils.decode(out.body)
     end
 
-    if err then log.error(err) end
+    -- if err then log.debug(err) end
     return res, err
-end
-
----@param fn function
----@param times integer
-function utils.retry(fn, times)
-    --
 end
 
 function utils.decode(str)

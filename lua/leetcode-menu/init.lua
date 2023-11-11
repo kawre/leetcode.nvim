@@ -121,8 +121,7 @@ function menu:handle_mount()
         auth_api.user(function(auth, err)
             if err then
                 log.error(err)
-                self:set_layout("signin")
-                return
+                return self:set_layout("signin")
             end
 
             local logged_in = auth.is_signed_in

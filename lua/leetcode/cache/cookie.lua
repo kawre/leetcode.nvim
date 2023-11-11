@@ -29,7 +29,7 @@ function cookie.update(str)
     return t
 end
 
-function cookie.delete() file:rm() end
+function cookie.delete() pcall(path.rm, file) end
 
 ---@return lc.Cookie | nil
 function cookie.get()

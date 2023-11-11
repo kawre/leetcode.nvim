@@ -13,7 +13,7 @@ local usr_fields = [[
     is_verified: isVerified
 ]]
 
----@return lc.UserStatus
+---@return lc.UserStatus, lc.err
 function M.user(cb)
     local query = string.format(
         [[
@@ -41,6 +41,7 @@ function M.handle(res, err)
     end
 
     if not vim.tbl_isempty(msgs) then
+        require("leetcode.cache.cookie").delete()
         err = err or {}
         err.msgs = msgs
     end
