@@ -49,6 +49,7 @@ function utils.curl(method, url, params)
     if type(params.body) == "table" then params.body = vim.json.encode(params.body) end
 
     local tries = params.retry
+
     if params.callback then
         local cb = vim.schedule_wrap(params.callback)
         params.callback = function(out, _)
@@ -64,15 +65,15 @@ function utils.curl(method, url, params)
 
         curl[method](url, params)
     else
-        local res, err
+        local out = curl[method](url, params)
+        local res, err = utils.handle_res(out)
 
-        repeat
-            local out = curl[method](url, params)
-            res, err = utils.handle_res(out)
-            tries = tries - 1
-        until not (res and not err) or tries > 0
-
-        return res, err
+        if err and tries > 0 then
+            params_cpy.retry = tries - 1
+            utils.curl(method, url, params_cpy)
+        else
+            return res, err
+        end
     end
 end
 
@@ -99,7 +100,6 @@ function utils.handle_res(out)
         res = utils.decode(out.body)
     end
 
-    -- if err then log.debug(err) end
     return res, err
 end
 

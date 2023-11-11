@@ -50,6 +50,10 @@ function Question:mount()
     vim.api.nvim_set_current_dir(config.home:absolute())
     vim.cmd("$tabe " .. self.file:absolute())
 
+    utils.exec_hooks("LeetQuestionEnter", {
+        lang = self.lang,
+    })
+
     -- https://github.com/kawre/leetcode.nvim/issues/14
     if self.lang == "rust" then
         pcall(function() require("rust-tools.standalone").start_standalone_client() end)
@@ -92,13 +96,15 @@ function Question:init(problem)
         return log.warn("Question is for premium users only")
     end
 
-    local lang = utils.get_lang(is_sql(q) and config.sql or config.lang)
+    -- local lang = utils.get_lang(is_sql(q) and config.sql or config.lang)
 
     self = setmetatable({
         q = q,
-        lang = lang.slug,
         cache = problem,
+        is_sql = q.meta_data.database and true or false,
     }, self)
+
+    self.lang = self.is_sql and config.sql or config.lang
 
     return self:handle_mount()
 end

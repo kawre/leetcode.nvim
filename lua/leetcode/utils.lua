@@ -111,4 +111,18 @@ function utils.get_lang(slug)
     return vim.tbl_filter(function(l) return l.slug == slug end, config.langs)[1] or {}
 end
 
+---@param event lc.hook
+function utils.exec_hooks(event, ...)
+    local log = require("leetcode.logger")
+    local fns = config.user.hooks[event]
+    if not fns then log.error("Unknown hook event: " .. event) end
+
+    for i, fn in ipairs(fns) do
+        local ok, msg = pcall(fn, ...)
+        if not ok then
+            log.error(("Error executing hook index `%d` in `%s` event: %s"):format(i, event, msg))
+        end
+    end
+end
+
 return utils

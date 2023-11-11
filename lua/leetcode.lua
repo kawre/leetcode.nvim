@@ -52,6 +52,9 @@ function leetcode.start()
 
     leetcode.setup_cmds()
 
+    local utils = require("leetcode.utils")
+    utils.exec_hooks("LeetEnter")
+
     local theme = require("leetcode.theme")
     theme.setup()
 
