@@ -150,7 +150,6 @@ function Calendar:handle_weekdays(m)
     if self.curr_time >= self.threshold then return end
 
     local curr = os.date("*t", self.curr_time)
-    log.debug({ curr = curr, threshold = os.date("*t", self.threshold) })
     local count = self:get_submission(curr) or 0
 
     local text = NuiText("󰝤", square_hl(count, self.max_sub_count))

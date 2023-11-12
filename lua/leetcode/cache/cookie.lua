@@ -18,9 +18,9 @@ function cookie.update(str)
     file:write(str, "w")
 
     local auth_api = require("leetcode.api.auth")
-    local a_ok, err = pcall(auth_api.user)
+    local _, err = auth_api.user()
 
-    if not a_ok then
+    if err then
         cookie.delete()
         error(err)
     end
@@ -28,7 +28,7 @@ function cookie.update(str)
     return t
 end
 
-function cookie.delete() file:rm() end
+function cookie.delete() pcall(path.rm, file) end
 
 ---@return lc.Cookie | nil
 function cookie.get()
@@ -46,15 +46,20 @@ end
 function cookie.parse(cookie_str)
     local c = {}
 
-    local csrf_ok, csrf = pcall(string.match, cookie_str, "csrftoken=[^;]+")
-    assert(csrf_ok and csrf, "Bad csrf token format")
-    c.csrftoken = csrf:sub(11)
+    local csrf_ok, csrf = pcall(string.match, cookie_str, "csrftoken=(.-);")
+    assert(csrf_ok and csrf and csrf ~= "", "Bad csrf token format")
+    c.csrftoken = csrf
 
-    local ls_ok, ls = pcall(string.match, cookie_str, "LEETCODE_SESSION=[^;]+")
-    assert(ls_ok and ls, "Bad leetcode session token format")
-    c.leetcode_session = ls:sub(18)
+    local ls_ok, ls = pcall(string.match, cookie_str, "LEETCODE_SESSION=(.-);")
+    assert(ls_ok and ls and ls ~= "", "Bad leetcode session token format")
+    c.leetcode_session = ls
 
     return c
+end
+
+function cookie.to_str()
+    local c = cookie.get()
+    return c and ("LEETCODE_SESSION=%s;csrftoken=%s;"):format(c.leetcode_session, c.csrftoken) or ""
 end
 
 return cookie

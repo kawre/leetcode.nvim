@@ -153,7 +153,6 @@ function Html:handle_link(text, tag_data)
         local href = vim.tbl_filter(function(attr)
             if attr.name == "href" then return attr end
         end, tag_data.attrs)[1] or {}
-        log.debug(tag_data.attrs)
 
         link = href.value or ""
     elseif tag == "img" then

@@ -7,12 +7,10 @@ headers.get = function()
     local c = cookie.get()
 
     return {
-        ["Referer"] = config.domain,
-        ["Origin"] = config.domain,
-        ["Host"] = ("leetcode.%s"):format(config.user.domain),
-        ["Cookie"] = c
-                and ("LEETCODE_SESSION=%s;csrftoken=%s"):format(c.leetcode_session, c.csrftoken)
-            or "",
+        ["Referer"] = "https://leetcode.com/",
+        ["Origin"] = "https://leetcode.com",
+        ["Host"] = "leetcode.com",
+        ["Cookie"] = cookie.to_str(),
         ["Content-Type"] = "application/json",
         ["Accept"] = "application/json",
         ["x-csrftoken"] = c and c.csrftoken or nil,

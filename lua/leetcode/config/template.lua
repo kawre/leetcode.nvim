@@ -35,6 +35,10 @@
 ---| "com"
 ---| "cn"
 
+---@alias lc.hook
+---| "LeetEnter"
+---| "LeetQuestionNew"
+
 ---@class lc.UserConfig
 local M = {
     ---@type lc.domain
@@ -80,6 +84,14 @@ local M = {
         position = "left", ---@type "top" | "right" | "bottom" | "left"
 
         width = "40%", ---@type string | integer
+    },
+
+    hooks = {
+        ---@type fun()[]
+        LeetEnter = {},
+
+        ---@type fun(question: { lang: string })[]
+        LeetQuestionNew = {},
     },
 }
 

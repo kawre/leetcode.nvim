@@ -103,12 +103,44 @@ function utils.curr_question()
     local tabs = utils.curr_question_tabs()
 
     local tab = vim.tbl_filter(function(t) return t.tabpage == tabp end, tabs)[1] or {}
-    return tab.question
+    if tab.question then
+        return tab.question
+    else
+        local log = require("leetcode.logger")
+        log.error("No current question found")
+    end
 end
 
 ---@return lc.language
 function utils.get_lang(slug)
     return vim.tbl_filter(function(l) return l.slug == slug end, config.langs)[1] or {}
+end
+
+---@param event lc.hook
+function utils.exec_hooks(event, ...)
+    local log = require("leetcode.logger")
+    local fns = config.user.hooks[event]
+    if not fns then log.error("Unknown hook event: " .. event) end
+
+    for i, fn in ipairs(fns) do
+        local ok, msg = pcall(fn, ...)
+        if not ok then
+            log.error(("Error executing hook index `%d` in `%s` event: %s"):format(i, event, msg))
+        end
+    end
+end
+
+---@param err lc.err
+function utils.log_err(err)
+    local log = require("leetcode.logger")
+
+    if err.msgs then
+        for _, msg in ipairs(err.msgs) do
+            log.error(msg)
+        end
+    else
+        log.error(err)
+    end
 end
 
 return utils

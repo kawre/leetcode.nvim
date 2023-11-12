@@ -29,8 +29,8 @@ function statistics.calendar(cb)
         }
     ]]
 
-    utils._query(query, variables, function(res)
-        local data = res.body.data
+    utils.query(query, variables, function(res, err)
+        local data = res.data
         local calendar = data["matchedUser"]["userCalendar"]
 
         calendar.submission_calendar = select(2, pcall(utils.decode, calendar.submission_calendar))
@@ -79,8 +79,8 @@ function statistics.solved(cb)
         }
     ]]
 
-    utils._query(query, variables, function(res)
-        local data = res.body.data
+    utils.query(query, variables, function(res, err)
+        local data = res.data
 
         local questions_count = data["allQuestionsCount"]
         local calendar = data["matchedUser"]["calendar"]
@@ -128,8 +128,8 @@ function statistics.skills(cb)
         }
     ]]
 
-    utils._query(query, variables, function(res)
-        local data = res.body.data
+    utils.query(query, variables, function(res, err)
+        local data = res.data
         local tag_problems_counts = data["matchedUser"]["tag_problems_counts"]
         cb(tag_problems_counts)
     end)
@@ -152,8 +152,8 @@ function statistics.languages(cb)
         }
     ]]
 
-    utils._query(query, variables, function(res)
-        local data = res.body.data
+    utils.query(query, variables, function(res, err)
+        local data = res.data
         local lang_prob_count = data["matchedUser"]["languageProblemCount"]
         cb(lang_prob_count)
     end)

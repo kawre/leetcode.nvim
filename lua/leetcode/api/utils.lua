@@ -1,5 +1,4 @@
 local curl = require("plenary.curl")
-local Job = require("plenary.job")
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
 local headers = require("leetcode.api.headers")
@@ -7,110 +6,110 @@ local headers = require("leetcode.api.headers")
 local lc = "https://leetcode." .. config.user.domain
 local endpoint = lc .. "/graphql"
 
+---@class lc.Api.Utils
 local utils = {}
-
-function utils.to_curl_headers()
-    local t = {}
-
-    for key, value in pairs(headers.get()) do
-        table.insert(t, "-H")
-        table.insert(t, key .. ": " .. value)
-    end
-
-    return unpack(t)
-end
 
 ---@param url string
 function utils.post(url, body)
-    local response = curl.post(url, {
-        headers = headers.get(),
-        body = vim.json.encode(body),
+    return utils.curl("post", url, {
+        body = body,
     })
-
-    local ok, data = pcall(vim.json.decode, response.body)
-    if response.status == 429 then log.warn("You have attempted to run code too soon") end
-    assert(ok, "Failed to fetch")
-
-    return data
 end
 
----@return table
-function utils.get(url)
-    local response = curl.get(url)
-
-    local ok, data = pcall(vim.json.decode, response.body)
-    assert(ok, "Failed to fetch")
-
-    return data
-end
-
----@param url string
----@param cb function
-function utils._get(url, cb)
-    local args = { url, utils.to_curl_headers() }
-
-    Job:new({
-        command = "curl",
-        args = args,
-        on_exit = vim.schedule_wrap(function(self, val)
-            local result = table.concat(self:result(), "\n")
-            local decoded = vim.json.decode(result)
-            cb(decoded)
-        end),
-        -- on_stderr = function(error, data, self) end,
-    }):start()
+function utils.get(url, cb)
+    return utils.curl("get", url, {
+        callback = cb,
+    })
 end
 
 ---@param query string
 ---@param variables? table optional
---@param callback? function optional
----
----@return table
-function utils.query(query, variables)
-    local response = curl.post(endpoint, {
-        headers = headers.get(),
-        body = vim.json.encode({
-            query = query,
-            variables = variables or {},
-        }),
-    })
-
-    response.body = utils.decode(response.body)
-    return response
-end
-
----@param query string
----@param variables table optional
----@param cb function
-function utils._query(query, variables, cb)
+---@param cb? function optional
+function utils.query(query, variables, cb)
     local body = {
         query = query,
         variables = variables,
     }
 
-    curl.post(endpoint, {
-        headers = headers.get(),
-        body = vim.json.encode(body),
-        callback = vim.schedule_wrap(function(response)
-            response.body = utils.decode(response.body)
-            cb(response)
-        end),
+    return utils.curl("post", endpoint, {
+        body = body,
+        callback = cb,
     })
 end
 
----@param fn function
----@param times integer
-function utils.retry(fn, times)
-    --
+---@private
+function utils.curl(method, url, params)
+    local params_cpy = vim.deepcopy(params)
+    params = vim.tbl_deep_extend("force", {
+        headers = headers.get(),
+        compressed = false,
+        retry = 5,
+    }, params or {})
+
+    if type(params.body) == "table" then params.body = vim.json.encode(params.body) end
+
+    local tries = params.retry
+
+    if params.callback then
+        local cb = vim.schedule_wrap(params.callback)
+        params.callback = function(out, _)
+            local res, err = utils.handle_res(out)
+
+            if err and tries > 0 then
+                params_cpy.retry = tries - 1
+                utils.curl(method, url, params_cpy)
+            else
+                cb(res, err)
+            end
+        end
+
+        curl[method](url, params)
+    else
+        local out = curl[method](url, params)
+        local res, err = utils.handle_res(out)
+
+        if err and tries > 0 then
+            params_cpy.retry = tries - 1
+            utils.curl(method, url, params_cpy)
+        else
+            return res, err
+        end
+    end
+end
+
+---@private
+---@return table|nil, lc.err|nil
+function utils.handle_res(out)
+    log.debug(out)
+    local res, err
+
+    if out.exit ~= 0 then
+        err = {
+            code = out.exit,
+            err = "curl failed",
+        }
+    elseif out.status >= 300 then
+        res = out.body
+        err = {
+            code = 0,
+            status = out.status,
+            response = out,
+            out = out.body,
+        }
+    else
+        res = utils.decode(out.body)
+    end
+
+    return res, err
 end
 
 function utils.decode(str)
     local ok, res = pcall(vim.json.decode, str)
-    log.debug(str)
     assert(ok, str)
     return res
 end
 
+---@private
 function utils.auth_guard()
     local auth = require("leetcode.config").auth
     assert(auth and auth.is_signed_in, "User not signed in")

@@ -1,4 +1,3 @@
-local utils = require("leetcode-menu.utils")
 local log = require("leetcode.logger")
 local cookie = require("leetcode.cache.cookie")
 
@@ -118,11 +117,12 @@ function menu:handle_mount()
         self:set_layout("loading")
 
         local auth_api = require("leetcode.api.auth")
-        auth_api._user(function(auth, err)
+        auth_api.user(function(auth, err)
             if err then
-                log.warn(err.msg)
-                self:set_layout("signin")
-                return
+                local utils = require("leetcode.utils")
+                utils.log_err(err)
+
+                return self:set_layout("signin")
             end
 
             local logged_in = auth.is_signed_in
@@ -133,7 +133,6 @@ function menu:handle_mount()
         self:set_layout("signin")
     end
 
-    log.debug(self)
     return self:mount()
 end
 
@@ -155,6 +154,7 @@ function menu:init()
 
     vim.api.nvim_buf_set_name(self.bufnr, "")
     pcall(vim.diagnostic.disable, self.bufnr)
+    local utils = require("leetcode-menu.utils")
     utils.set_buf_opts(self.bufnr, {
         modifiable = false,
         buflisted = false,

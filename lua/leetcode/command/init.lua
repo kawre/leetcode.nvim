@@ -75,11 +75,6 @@ end
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---
----@return lc.UserStatus | nil
-function cmd.authenticate() require("leetcode.api.auth").user() end
-
----Merge configurations into default configurations and set it as user configurations.
----
 --@param theme lc-db.Theme
 function cmd.qot()
     local problems = require("leetcode.api.problems")
@@ -112,31 +107,25 @@ function cmd.question_tabs() require("leetcode.pickers.question-tabs").pick() en
 function cmd.change_lang()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-    if not q then return log.warn("No current question found") end
-
-    require("leetcode.pickers.language").pick(q)
+    if q then require("leetcode.pickers.language").pick(q) end
 end
 
 function cmd.desc_toggle()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-    if not q then return log.error("No current question found") end
-
-    q.description:toggle()
+    if q then q.description:toggle() end
 end
 
 function cmd.console()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-    if not q then return log.error("No current question found") end
-    q.console:toggle()
+    if q then q.console:toggle() end
 end
 
 function cmd.info()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-    if not q then return log.error("No current question found") end
-    q.hints:toggle()
+    if q then q.hints:toggle() end
 end
 
 function cmd.hints()
@@ -147,15 +136,13 @@ end
 function cmd.q_run()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-    if not q then return log.warn("No current question found") end
-    q.console:run()
+    if q then q.console:run() end
 end
 
 function cmd.q_submit()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-    if not q then return log.warn("No current question found") end
-    q.console:submit()
+    if q then q.console:submit() end
 end
 
 function cmd.ui_skills()

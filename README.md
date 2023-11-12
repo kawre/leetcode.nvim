@@ -18,7 +18,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 
 - 😍 question description formatting for a better readability
 
-- 📈 [LeetCode] profile statistics within [Neovim] (Soon)
+- 📈 [LeetCode] profile statistics within [Neovim]
 
 - 🔀 support for daily and random questions
 
@@ -122,6 +122,14 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
         width = "40%", ---@type string | integer
     },
+
+    hooks = {
+        ---@type fun()[]
+        LeetEnter = {},
+
+        ---@type fun(question: { lang: string })[]
+        LeetQuestionNew = {},
+    },
 }
 ```
 
@@ -177,31 +185,21 @@ Whether to log [leetcode.nvim] status notifications
 logging = true
 ```
 
+### hooks
+
+List of functions that get executed on specified event
+
+```lua
+hooks = {
+    ---@type fun()[]
+    LeetEnter = {},
+
+    ---@type fun(question: { lang: string })[]
+    LeetQuestionNew = {},
+},
+```
+
 ## 📋 Commands
-
-<!---->
-
-<!-- | command                  | description                                                               | -->
-
-<!-- | ------------------------ | ------------------------------------------------------------------------- | -->
-
-<!-- | `Leet` or `Leet menu`    | opens menu dashboard                                                      | -->
-
-<!-- | `Leet console`           | opens console pop-up for currently opened question                        | -->
-
-<!-- | `Leet info`              | opens a pop-up containing information about the currently opened question | -->
-
-<!-- | `Leet tabs`              | opens a picker with all currently opened question tabs                    | -->
-
-<!-- | `Leet lang`              | opens a picker to change the language of the current question             | -->
-
-<!-- | `Leet desc toggle`       | toggle question description                                               | -->
-
-<!-- | `Leet run`               | run currently opened question                                             | -->
-
-<!-- | `Leet submit`            | submit currently opened question                                          | -->
-
-<!-- | `Leet list`              | opens a problemlist picker                                                | -->
 
 ### `Leet` opens menu dashboard
 
@@ -287,7 +285,7 @@ return {
 
 - \[ \] CN version
 - \[ \] SQL support
-- \[ \] Statistics menu page
+- \[x\] Statistics menu page
 - \[ \] Docs
 - \[x\] Hints pop-up
 
