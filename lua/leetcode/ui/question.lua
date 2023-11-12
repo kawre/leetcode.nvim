@@ -15,20 +15,9 @@ local Info = require("leetcode.ui.info")
 ---@field lang string
 ---@field sql string
 ---@field cache lc.Cache.Question
+---@field is_sql boolean
 local Question = {}
 Question.__index = Question
-
----@param q lc.QuestionResponse
----
----@return boolean
-local function is_sql(q)
-    -- for _, value in ipairs(q.topic_tags or {}) do
-    --     if value.slug == "database" then return true end
-    -- end
-
-    -- return false
-    return q.meta_data.database
-end
 
 function Question:get_snippet()
     local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
@@ -37,7 +26,7 @@ end
 
 ---@private
 function Question:create_file()
-    local lang = utils.get_lang(is_sql(self.q) and config.sql or config.lang)
+    local lang = utils.get_lang(self.lang)
     local fn = ("%s.%s-%s.%s"):format(self.q.frontend_id, self.q.title_slug, lang.slug, lang.ft)
 
     self.file = config.home:joinpath(fn)
@@ -96,15 +85,13 @@ function Question:init(problem)
         return log.warn("Question is for premium users only")
     end
 
-    -- local lang = utils.get_lang(is_sql(q) and config.sql or config.lang)
-
+    local is_sql = q.meta_data.database and true or false
     self = setmetatable({
         q = q,
         cache = problem,
-        is_sql = q.meta_data.database and true or false,
+        is_sql = is_sql,
+        lang = is_sql and config.sql or config.lang,
     }, self)
-
-    self.lang = self.is_sql and config.sql or config.lang
 
     return self:handle_mount()
 end

@@ -76,10 +76,7 @@ local opts = require("telescope.themes").get_dropdown()
 return {
     pick = function()
         local tabs = utils.curr_question_tabs()
-        if vim.tbl_isempty(tabs) then
-            log.warn("No questions opened")
-            return
-        end
+        if vim.tbl_isempty(tabs) then return log.warn("No questions opened") end
 
         pickers
             .new(opts, {

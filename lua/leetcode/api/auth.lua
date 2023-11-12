@@ -32,6 +32,7 @@ function M.user(cb)
 end
 
 function M.handle(res, err)
+    if err then return res, err end
     local auth = res.data.userStatus
 
     local msgs = {}
@@ -41,9 +42,8 @@ function M.handle(res, err)
     end
 
     if not vim.tbl_isempty(msgs) then
+        err = vim.tbl_deep_extend("force", err or {}, { msgs = msgs })
         require("leetcode.cache.cookie").delete()
-        err = err or {}
-        err.msgs = msgs
     end
 
     config.auth = auth

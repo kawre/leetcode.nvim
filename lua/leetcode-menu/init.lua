@@ -1,4 +1,3 @@
-local utils = require("leetcode-menu.utils")
 local log = require("leetcode.logger")
 local cookie = require("leetcode.cache.cookie")
 
@@ -120,7 +119,9 @@ function menu:handle_mount()
         local auth_api = require("leetcode.api.auth")
         auth_api.user(function(auth, err)
             if err then
-                log.error(err)
+                local utils = require("leetcode.utils")
+                utils.log_err(err)
+
                 return self:set_layout("signin")
             end
 
@@ -153,6 +154,7 @@ function menu:init()
 
     vim.api.nvim_buf_set_name(self.bufnr, "")
     pcall(vim.diagnostic.disable, self.bufnr)
+    local utils = require("leetcode-menu.utils")
     utils.set_buf_opts(self.bufnr, {
         modifiable = false,
         buflisted = false,
