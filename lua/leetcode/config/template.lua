@@ -37,7 +37,7 @@
 
 ---@alias lc.hook
 ---| "LeetEnter"
----| "LeetQuestionEnter"
+---| "LeetQuestionNew"
 
 ---@class lc.UserConfig
 local M = {
@@ -86,10 +86,12 @@ local M = {
         width = "40%", ---@type string | integer
     },
 
-    ---@type table<lc.hook, function[]>
     hooks = {
+        ---@type fun()[]
         LeetEnter = {},
-        LeetQuestionEnter = {},
+
+        ---@type fun(question: { lang: string })[]
+        LeetQuestionNew = {},
     },
 }
 

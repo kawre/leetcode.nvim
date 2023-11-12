@@ -9,9 +9,7 @@ headers.get = function()
         ["Referer"] = "https://leetcode.com/",
         ["Origin"] = "https://leetcode.com",
         ["Host"] = "leetcode.com",
-        ["Cookie"] = c
-                and ("LEETCODE_SESSION=%s;csrftoken=%s"):format(c.leetcode_session, c.csrftoken)
-            or "",
+        ["Cookie"] = cookie.to_str(),
         ["Content-Type"] = "application/json",
         ["Accept"] = "application/json",
         ["x-csrftoken"] = c and c.csrftoken or nil,

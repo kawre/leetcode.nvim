@@ -123,10 +123,12 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         width = "40%", ---@type string | integer
     },
 
-    ---@type table<lc.hook, function[]>
     hooks = {
+        ---@type fun()[]
         LeetEnter = {},
-        LeetQuestionEnter = {},
+
+        ---@type fun(question: { lang: string })[]
+        LeetQuestionNew = {},
     },
 }
 ```
@@ -181,6 +183,20 @@ Whether to log [leetcode.nvim] status notifications
 ```lua
 ---@type boolean
 logging = true
+```
+
+### hooks
+
+List of functions that get executed on specified event
+
+```lua
+hooks = {
+    ---@type fun()[]
+    LeetEnter = {},
+
+    ---@type fun(question: { lang: string })[]
+    LeetQuestionNew = {},
+},
 ```
 
 ## 📋 Commands

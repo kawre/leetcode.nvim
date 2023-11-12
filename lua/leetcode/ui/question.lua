@@ -39,7 +39,7 @@ function Question:mount()
     vim.api.nvim_set_current_dir(config.home:absolute())
     vim.cmd("$tabe " .. self.file:absolute())
 
-    utils.exec_hooks("LeetQuestionEnter", {
+    utils.exec_hooks("LeetQuestionNew", {
         lang = self.lang,
     })
 
