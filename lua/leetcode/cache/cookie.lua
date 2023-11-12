@@ -47,11 +47,11 @@ end
 function cookie.parse(cookie_str)
     local c = {}
 
-    local csrf_ok, csrf = pcall(string.match, cookie_str, "csrftoken=(.-);")
+    local csrf_ok, csrf = pcall(string.match, cookie_str, "csrftoken=(.-);?")
     assert(csrf_ok and csrf and csrf ~= "", "Bad csrf token format")
     c.csrftoken = csrf
 
-    local ls_ok, ls = pcall(string.match, cookie_str, "LEETCODE_SESSION=(.-);")
+    local ls_ok, ls = pcall(string.match, cookie_str, "LEETCODE_SESSION=(.-);?")
     assert(ls_ok and ls and ls ~= "", "Bad leetcode session token format")
     c.leetcode_session = ls
 
