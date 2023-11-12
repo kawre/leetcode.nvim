@@ -14,15 +14,15 @@ function M.all(cb)
     local query = queries.problemset()
 
     if cb then
-        utils.query(query, variables, function(res)
+        utils.query(query, variables, function(res, err)
             local data = res.data
             local questions = data["problemsetQuestionList"]["questions"]
-            cb(questions)
+            cb(utils.normalize_cn_problemlist(questions))
         end)
     else
         local res, err = utils.query(query, variables)
-        local data = res.data
-        return data["problemsetQuestionList"]["questions"]
+        local questions = res.data["problemsetQuestionList"]["questions"]
+        return utils.normalize_cn_problemlist(questions)
     end
 end
 

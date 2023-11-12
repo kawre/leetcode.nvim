@@ -7,9 +7,9 @@ headers.get = function()
     local c = cookie.get()
 
     return {
-        ["Referer"] = "https://leetcode.com/",
-        ["Origin"] = "https://leetcode.com",
-        ["Host"] = "leetcode.com",
+        ["Referer"] = config.domain,
+        ["Origin"] = config.domain .. "/",
+        ["Host"] = ("leetcode.%s"):format(config.user.domain),
         ["Cookie"] = cookie.to_str(),
         ["Content-Type"] = "application/json",
         ["Accept"] = "application/json",
