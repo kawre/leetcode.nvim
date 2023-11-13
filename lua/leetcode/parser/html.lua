@@ -165,15 +165,6 @@ function Html:handle_link(text, tag_data)
             if attr.name == "src" then return attr end
         end, tag_data.attrs)[1] or {}
         link = src.value or ""
-
-        -- local bufnr = vim.api.nvim_get_current_buf()
-        -- local image = image_api.from_url(link, {
-        --     -- buffer = bufnr,
-        --     -- with_virtual_padding = true,
-        -- }, function(image)
-        --     --
-        --     image:render()
-        -- end)
     end
 
     local line = NuiLine()
