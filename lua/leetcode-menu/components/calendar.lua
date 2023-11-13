@@ -44,7 +44,7 @@ function Calendar:handle_res(res)
     self.curr_time = os.time({
         year = time.year - 1,
         month = time.month,
-        day = 1,
+        day = time.day,
         hour = 1,
         isdst = false,
     })
@@ -129,7 +129,7 @@ function Calendar:handle_weeks(m)
         self.calendar_lines[i]:append(" ")
     end
 
-    for _ = 1, get_days_in_month(curr.month, curr.year) do
+    for _ = curr.day, get_days_in_month(curr.month, curr.year) do
         self:handle_weekdays(m)
     end
 

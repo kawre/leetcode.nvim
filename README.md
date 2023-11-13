@@ -49,12 +49,12 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
     "kawre/leetcode.nvim",
     build = ":TSUpdate html",
     dependencies = {
-        "nvim-treesitter/nvim-treesitter",
         "nvim-telescope/telescope.nvim",
         "nvim-lua/plenary.nvim", -- required by telescope
         "MunifTanjim/nui.nvim",
 
         -- optional
+        "nvim-treesitter/nvim-treesitter",
         "rcarriga/nvim-notify",
         "nvim-tree/nvim-web-devicons",
     },
@@ -127,6 +127,9 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         ---@type fun(question: { lang: string })[]
         LeetQuestionNew = {},
     },
+
+    ---@type boolean
+    image_support = false, -- setting this to `true` will disable question description wrap
 }
 ```
 
@@ -191,6 +194,15 @@ hooks = {
     ---@type fun(question: { lang: string })[]
     LeetQuestionNew = {},
 },
+```
+
+### image support
+
+Whether to render question description images using [image.nvim]
+
+```lua
+---@type boolean
+image_support = false, -- setting this to `true` will disable question description wrap
 ```
 
 ## 📋 Commands
@@ -268,10 +280,12 @@ local leet_arg = "leetcode.nvim"
 
 return {
     "kawre/leetcode.nvim",
+    ...
     lazy = leet_arg ~= vim.fn.argv()[1],
     opts = {
         arg = leet_arg,
     },
+    ...
 }
 ```
 
@@ -288,6 +302,7 @@ return {
 
 - [alpha-nvim](https://github.com/goolord/alpha-nvim)
 
+[image.nvim]: https://github.com/3rd/image.nvim
 [lazy.nvim]: https://github.com/folke/lazy.nvim
 [leetcode]: https://leetcode.com
 [leetcode.nvim]: https://github.com/kawre/leetcode.nvim

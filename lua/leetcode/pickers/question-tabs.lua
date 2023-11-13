@@ -25,6 +25,7 @@ end
 
 local function display_difficulty(q)
     local lang = utils.get_lang(q.lang)
+    if not lang then return {} end
     return { lang.icon, "leetcode_lang_" .. lang.slug }
 end
 

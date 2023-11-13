@@ -1,4 +1,9 @@
 local config = require("leetcode.config")
+local log = require("leetcode.logger")
+
+local img_ok, image_api = pcall(require, "image")
+local img_sup = img_ok and config.user.image_support
+
 local parser = require("leetcode.parser")
 local t = require("leetcode.translator")
 
@@ -16,6 +21,7 @@ local Split = require("nui.split")
 ---@field title any
 ---@field layout lc-ui.Layout
 ---@field visible boolean
+---@field images table<string, Image>
 local description = {}
 description.__index = description
 
@@ -46,7 +52,7 @@ function description:mount()
     })
     utils.set_win_opts(self.split.winid, {
         winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
-        wrap = true,
+        wrap = not img_sup,
         colorcolumn = "",
         foldlevel = 999,
         foldcolumn = "1",
@@ -58,6 +64,9 @@ function description:mount()
         spell = false,
         signcolumn = "no",
     })
+    if not img_ok and config.user.image_support then
+        log.error("image.nvim not found but `image_support` is enabled")
+    end
 
     self:draw()
     self:autocmds()
@@ -75,16 +84,37 @@ function description:toggle()
 end
 
 function description:draw()
-    -- local c = vim.api.nvim_win_get_cursor(self.split.winid)
     self.layout:draw(self.split)
-    -- vim.api.nvim_win_set_cursor(self.split.winid, c)
+    self:draw_imgs()
 end
 
--- function description:redraw()
---     local c = vim.api.nvim_win_get_cursor(self.split.winid)
---     self.layout:draw()
---     vim.api.nvim_win_set_cursor(self.split.winid, c)
--- end
+function description:draw_imgs()
+    if not img_sup then return end
+
+    local lines = vim.api.nvim_buf_get_lines(self.split.bufnr, 1, -1, false)
+    for i, line in ipairs(lines) do
+        for link in line:gmatch("->%((http[s]?://%S+)%)") do
+            local img = self.images[link]
+
+            if not img then
+                self.images[link] = {}
+
+                image_api.from_url(link, {
+                    buffer = self.split.bufnr,
+                    window = self.split.winid,
+                    with_virtual_padding = true,
+                }, function(image)
+                    if not image then return end
+
+                    self.images[link] = image
+                    image:render({ y = i + 1 })
+                end)
+            elseif not vim.tbl_isempty(img) then
+                img:clear(true)
+            end
+        end
+    end
+end
 
 ---@private
 function description:populate()
@@ -147,14 +177,15 @@ function description:init(parent)
         focusable = true,
     })
 
-    local obj = setmetatable({
+    self = setmetatable({
         split = split,
         parent = parent,
         layout = {},
         visible = false,
+        images = {},
     }, self)
 
-    return obj:mount()
+    return self:mount()
 end
 
 return description
