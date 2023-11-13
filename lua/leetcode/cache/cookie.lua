@@ -2,7 +2,7 @@ local path = require("plenary.path")
 local log = require("leetcode.logger")
 
 local config = require("leetcode.config")
-local file = config.home:joinpath((".cookie%s"):format(config.user.domain == "cn" and "_cn" or ""))
+local file = config.home:joinpath((".cookie%s"):format(config.is_cn and "_cn" or ""))
 
 ---@class lc.Cookie
 ---@field csrftoken string

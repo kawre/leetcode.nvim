@@ -2,8 +2,7 @@ local path = require("plenary.path")
 local log = require("leetcode.logger")
 
 local config = require("leetcode.config")
-local file =
-    config.home:joinpath((".problemlist%s"):format(config.user.domain == "cn" and "_cn" or ""))
+local file = config.home:joinpath((".problemlist%s"):format(config.is_cn and "_cn" or ""))
 
 local problems_api = require("leetcode.api.problems")
 
@@ -12,7 +11,9 @@ local problems_api = require("leetcode.api.problems")
 ---@field slug string
 
 ---@class lc.Cache.Question
+---@field id integer
 ---@field frontend_id string
+---@field link string
 ---@field title string
 ---@field title_cn string
 ---@field title_slug string

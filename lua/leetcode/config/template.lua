@@ -93,6 +93,10 @@ local M = {
         ---@type fun(question: { lang: string })[]
         LeetQuestionNew = {},
     },
+
+    cn = {
+        translate = true, ---@type boolean
+    },
 }
 
 return M

@@ -34,6 +34,8 @@ function config.apply(cfg)
     config.debug = config.user.debug or false ---@diagnostic disable-line
     config.domain = "https://leetcode." .. config.user.domain
 
+    config.is_cn = config.user.domain == "cn"
+
     config.lang = config.user.lang
     config.sql = config.user.sql
 end

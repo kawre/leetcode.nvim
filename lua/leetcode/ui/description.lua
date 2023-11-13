@@ -91,8 +91,7 @@ function description:populate()
     local q = self.parent.q
 
     local linkline = NuiLine()
-    local question_link = string.format("%s/problems/%s/", config.domain, q.title_slug)
-    linkline:append(question_link, "leetcode_alt")
+    linkline:append(self.parent.cache.link, "leetcode_alt")
 
     local titleline = NuiLine()
     titleline:append(q.frontend_id .. ". ", "leetcode_normal")
@@ -110,9 +109,7 @@ function description:populate()
     statsline:append(" | ")
 
     statsline:append(q.likes .. " ", "leetcode_alt")
-    if config.user.domain == "com" then
-        statsline:append(" " .. q.dislikes .. " ", "leetcode_alt")
-    end
+    if not config.is_cn then statsline:append(" " .. q.dislikes .. " ", "leetcode_alt") end
     statsline:append(" | ")
 
     statsline:append(

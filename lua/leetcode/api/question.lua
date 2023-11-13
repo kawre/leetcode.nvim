@@ -40,7 +40,7 @@ function question.random()
     local res, err = utils.query(query, variables)
 
     local q = res.data.randomQuestion
-    if config.user.domain == "cn" then
+    if config.is_cn then
         q = {
             title_slug = q,
             paid_only = problemlist.get_by_title_slug(q).paid_only,

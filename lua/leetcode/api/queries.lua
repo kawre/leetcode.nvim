@@ -3,7 +3,7 @@ local config = require("leetcode.config")
 ---@class lc.Api.Queries
 local queries = {}
 
-local function com_or(query, query_cn) return config.user.domain == "com" and query or query_cn end
+local function com_or(query, query_cn) return not config.is_cn and query or query_cn end
 
 function queries.auth()
     local query = [[
@@ -236,6 +236,19 @@ function queries.random_question()
     ]]
 
     return com_or(query, query_cn)
+end
+
+function queries.translations()
+    local query_cn = [[
+        query getQuestionTranslation($lang: String) {
+            translations: allAppliedQuestionTranslations(lang: $lang) {
+                title
+                questionId
+            }
+        }
+    ]]
+
+    return com_or(nil, query_cn)
 end
 
 return queries

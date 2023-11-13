@@ -42,7 +42,7 @@ local function t(text)
         return "?"
     end
 
-    return config.user.domain == "com" and text or translate[text]
+    return not config.is_cn and text or translate[text]
 end
 
 ---@param text string|string[]
