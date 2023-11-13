@@ -132,10 +132,24 @@ function utils.lvl_to_name(lvl) return ({ "Easy", "Medium", "Hard" })[lvl] end
 function utils.normalize_problems(problems)
     problems = vim.tbl_filter(function(p) return not p.stat.question__hide end, problems)
 
-    table.sort(
-        problems,
-        function(a, b) return a.stat.frontend_question_id < b.stat.frontend_question_id end
-    )
+    local comp = function(a, b)
+        local a_fid = a.stat.frontend_question_id
+        local b_fid = b.stat.frontend_question_id
+
+        local is_num_a = tonumber(a_fid)
+        local is_num_b = tonumber(b_fid)
+
+        if is_num_a and is_num_b then
+            return tonumber(a_fid) < tonumber(b_fid)
+        elseif is_num_a then
+            return true
+        elseif is_num_b then
+            return false
+        else
+            return a_fid < b_fid
+        end
+    end
+    table.sort(problems, comp)
 
     return vim.tbl_map(
         function(p)
@@ -144,6 +158,7 @@ function utils.normalize_problems(problems)
                 id = p.stat.question_id,
                 frontend_id = p.stat.frontend_question_id,
                 title = p.stat.question__title,
+                sec_title = "",
                 title_slug = p.stat.question__title_slug,
                 link = ("%s/problems/%s/"):format(config.domain, p.stat.question__title_slug),
                 paid_only = p.paid_only,
@@ -167,7 +182,10 @@ function utils.translate_titles(problems, titles)
 
     return vim.tbl_map(function(p)
         local title = map[tostring(p.id)]
-        if title then p.title = title end
+        if title then
+            p.sec_title = p.title
+            p.title = title
+        end
         return p
     end, problems)
 end

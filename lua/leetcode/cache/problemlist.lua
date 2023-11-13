@@ -15,6 +15,7 @@ local problems_api = require("leetcode.api.problems")
 ---@field frontend_id string
 ---@field link string
 ---@field title string
+---@field sec_title string
 ---@field title_cn string
 ---@field title_slug string
 ---@field status string

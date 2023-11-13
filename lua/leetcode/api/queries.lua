@@ -92,22 +92,9 @@ end
 function queries.qot()
     local query = [[
         query questionOfToday {
-            activeDailyCodingChallengeQuestion {
-                userStatus
-                link
+            todayRecord: activeDailyCodingChallengeQuestion {
                 question {
-                    frontend_id: questionFrontendId
-                    title
                     title_slug: titleSlug
-                    status
-                    paid_only: isPaidOnly
-                    ac_rate: acRate
-                    difficulty
-                    topic_tags: topicTags {
-                        name
-                        slug
-                        id
-                    }
                 }
             }
         }
@@ -115,23 +102,9 @@ function queries.qot()
 
     local query_cn = [[
         query questionOfToday {
-            activeDailyCodingChallengeQuestion {
-                userStatus
-                link
+            todayRecord {
                 question {
-                    frontend_id: questionFrontendId
-                    title
                     title_slug: titleSlug
-                    title_cn: titleCn
-                    status
-                    paid_only: isPaidOnly
-                    ac_rate: acRate
-                    difficulty
-                    topic_tags: topicTags {
-                        name
-                        slug
-                        id
-                    }
                 }
             }
         }

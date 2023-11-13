@@ -42,12 +42,11 @@ end
 function M.question_of_today(cb)
     local query = queries.qot()
 
-    local callback = function(res)
-        local question = res.data["activeDailyCodingChallengeQuestion"]["question"]
+    utils.query(query, {}, function(res)
+        local tday_record = res.data["todayRecord"]
+        local question = config.is_cn and tday_record[1].question or tday_record.question
         cb(question)
-    end
-
-    utils.query(query, {}, callback)
+    end)
 end
 
 function M.translated_titles(cb)

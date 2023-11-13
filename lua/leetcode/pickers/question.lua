@@ -15,7 +15,12 @@ local action_state = require("telescope.actions.state")
 ---
 ---@return string
 local function question_formatter(question)
-    return ("%s. %s %s"):format(tostring(question.frontend_id), question.title, question.title_slug)
+    return ("%s. %s %s %s"):format(
+        tostring(question.frontend_id),
+        question.title,
+        question.sec_title,
+        question.title_slug
+    )
 end
 
 ---@param question lc.Cache.Question
