@@ -55,7 +55,7 @@ function utils.curl(method, url, params)
         params.callback = function(out, _)
             local res, err = utils.handle_res(out)
 
-            if err and tries > 0 then
+            if err and err.status >= 500 and tries > 0 then
                 params_cpy.retry = tries - 1
                 utils.curl(method, url, params_cpy)
             else
@@ -68,7 +68,7 @@ function utils.curl(method, url, params)
         local out = curl[method](url, params)
         local res, err = utils.handle_res(out)
 
-        if err and tries > 0 then
+        if err and err.status >= 500 and tries > 0 then
             params_cpy.retry = tries - 1
             utils.curl(method, url, params_cpy)
         else

@@ -23,12 +23,10 @@ local translate = {
     ["sign-in successful"] = "登录成功",
     ["hints"] = "提示",
     ["of"] = "的",
-    ["easy"] = "简单",
-    ["medium"] = "中等",
-    ["hard"] = "困难",
     ["run"] = "运行",
     ["submit"] = "提交",
-    ["result"] = "结果",
+    ["result"] = "执行结果",
+    ["testcases"] = "测试用例",
     ["topics"] = "相关标签",
     ["premium"] = "高级",
     ["similar questions"] = "相似题目",
@@ -41,11 +39,8 @@ local translate = {
     ["runtime"] = "时间",
     ["memory"] = "内存",
     ["beats"] = "击败",
-    ["accepted"] = "通过",
-    ["wrong answer"] = "解答错误",
     ["testcases passed"] = "个通过的测试用例",
-    ["last executed input"] = "上次执行的输入",
-    ["testcases"] = "测试用例",
+    ["last executed input"] = "最后执行的输入",
     ["reset"] = "重置",
     ["input"] = "输入",
     ["output"] = "输出",
@@ -62,6 +57,19 @@ local translate = {
     ["finished"] = "完成",
     ["failed"] = "失败",
     ["you have attempted to run code too soon"] = "你的提交过于频繁，请稍候重试。",
+
+    -- difficulty
+    ["easy"] = "简单",
+    ["medium"] = "中等",
+    ["hard"] = "困难",
+
+    -- status_msg
+    ["accepted"] = "通过",
+    ["wrong answer"] = "解答错误",
+    ["compile error"] = "编译出错",
+    ["time limit exceeded"] = "超出时间限制",
+    ["output limit exceeded"] = "output limit exceeded",
+    ["internal error"] = "internal error",
 }
 
 ---@param text string
@@ -71,7 +79,7 @@ local function t(text)
     local txt = text:lower()
     if not vim.tbl_contains(keys, txt) then
         log.error(("Translation for `%s` not found"):format(text))
-        return "?"
+        return text
     end
 
     return not config.is_cn and text or translate[txt]
