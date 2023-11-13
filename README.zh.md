@@ -1,30 +1,30 @@
 <div align="center">
 
-🚨 **leetcode.nvim is currently in the _alpha stage_ of development** 🚨
+🚨 **leetcode.nvim 目前处于 _alpha 阶段_ 开发中** 🚨
 
 ______________________________________________________________________
 
 # leetcode.nvim
 
-🔥 Solve [LeetCode] problems within [Neovim] 🔥
+🔥 在 [Neovim] 中解决 [LeetCode] 问题 🔥
 
 </div>
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-ab3f09b43740
 
-## ✨ Features
+## ✨ 特性
 
-- 📌 an intuitive dashboard for effortless navigation within [leetcode.nvim]
+- 📌 直观的仪表板，轻松导航 [leetcode.nvim] 内
 
-- 😍 question description formatting for a better readability
+- 😍 更好的可读性的问题描述格式
 
-- 📈 [LeetCode] profile statistics within [Neovim]
+- 📈 在 [Neovim] 中显示 [LeetCode] 个人统计信息
 
-- 🔀 support for daily and random questions
+- 🔀 支持每日和随机问题
 
-- 💾 caching for optimized performance
+- 💾 缓存以优化性能
 
-## 📬 Requirements
+## 📬 环境要求
 
 - [Neovim] >= 0.9.0
 
@@ -32,15 +32,15 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 
 - [nui.nvim]
 
-- [nvim-treesitter] _**(optional, but highly recommended)**_
-  used for formatting the question description.
-  Make sure to install the parser for `html`.
+- [nvim-treesitter] _**(可选，但强烈推荐)**_
+  用于格式化问题描述。
+  确保安装 `html` 解析器。
 
-- [nvim-notify] _**(optional)**_
+- [nvim-notify] _**(可选)**_
 
-- [Nerd Font][nerd-font] & [nvim-web-devicons] _**(optional)**_
+- [Nerd Font][nerd-font] & [nvim-web-devicons] _**(可选)**_
 
-## 📦 Installation
+## 📦 安装
 
 - [lazy.nvim]
 
@@ -50,30 +50,34 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
     build = ":TSUpdate html",
     dependencies = {
         "nvim-telescope/telescope.nvim",
-        "nvim-lua/plenary.nvim", -- required by telescope
+        "nvim-lua/plenary.nvim", -- telescope 所需
         "MunifTanjim/nui.nvim",
 
-        -- optional
+        -- 可选
         "nvim-treesitter/nvim-treesitter",
         "rcarriga/nvim-notify",
         "nvim-tree/nvim-web-devicons",
     },
     opts = {
-        -- configuration goes here
+        -- 配置放在这里
     },
 }
 ```
 
-## 🛠️ Configuration
+## 🛠️ 配置
 
-To see full configuration types see [template.lua](./lua/leetcode/config/template.lua)
+要查看完整的配置类型，请参见 [template.lua](./lua/leetcode/config/template.lua)
 
-### ⚙️ default configuration
+### ⚙️  默认配置
+
+<!-- <details> -->
+
+<!--   <summary>Click to see</summary> -->
 
 ```lua
 {
     ---@type lc.domain
-    domain = "com", -- For now "com" is the only one supported
+    domain = "com", -- 目前仅支持 "com"
 
     ---@type string
     arg = "leetcode.nvim",
@@ -123,24 +127,24 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     },
 
     ---@type boolean
-    image_support = false, -- setting this to `true` will disable question description wrap
+    image_support = false, -- 将此设置为 `true` 将禁用问题描述的换行
 }
 ```
 
 ### arg
 
-Argument for [Neovim]
+[Neovim] 的参数
 
 ```lua
 ---@type string
 arg = "leetcode.nvim"
 ```
 
-<small>See [usage](#-usage) for more info</small>
+<small>有关更多信息，请参见 [usage](#-usage)</small>
 
 ### lang
 
-Language to start your session with
+会话开始时使用的语言
 
 ```lua
 ---@type lc.lang
@@ -149,16 +153,16 @@ lang = "cpp"
 
 ### domain
 
-[LeetCode] domain.
+[LeetCode] 领域
 
 ```lua
 ---@type lc.domain
-domain = "com" -- For now "com" is the only one supported
+domain = "com" -- 目前仅支持 "com"
 ```
 
 ### directory
 
-Where to store [leetcode.nvim] data
+存储 [leetcode.nvim] 数据的位置
 
 ```lua
 ---@type string
@@ -167,7 +171,7 @@ directory = vim.fn.stdpath("data") .. "/leetcode/"
 
 ### logging
 
-Whether to log [leetcode.nvim] status notifications
+是否记录 [leetcode.nvim] 状态通知
 
 ```lua
 ---@type boolean
@@ -176,7 +180,7 @@ logging = true
 
 ### hooks
 
-List of functions that get executed on specified event
+在指定事件上执行的函数列表
 
 ```lua
 hooks = {
@@ -190,82 +194,82 @@ hooks = {
 
 ### image support
 
-Whether to render question description images using [image.nvim]
+是否使用 [image.nvim] 渲染问题描述中的图片
 
 ```lua
 ---@type boolean
-image_support = false, -- setting this to `true` will disable question description wrap
+image_support = false, -- 将此设置为 `true` 将禁用问题描述的换行
 ```
 
-## 📋 Commands
+## 📋 命令
 
-### `Leet` opens menu dashboard
+### `Leet` 打开菜单仪表板
 
-- `menu` same as `Leet`
+- `menu` 与 `Leet` 相同
 
-- `console` opens console pop-up for currently opened question
+- `console` 打开当前打开问题的控制台弹出窗口
 
-- `info` opens a pop-up containing information about the currently opened question
+- `info` 打开包含当前打开问题信息的弹出窗口
 
-- `tabs` opens a picker with all currently opened question tabs
+- `tabs` 打开所有当前打开问题选项卡的选择器
 
-- `lang` opens a picker to change the language of the current question
+- `lang` 打开更改当前问题语言的选择器
 
-- `run` run currently opened question
+- `run` 运行当前打开的问题
 
-- `test` same as `Leet run`
+- `test` 与 `Leet run` 相同
 
-- `submit` submit currently opened question
+- `submit` 提交当前打开的问题
 
-- `random` opens a random question
+- `random` 打开一个随机问题
 
-- `daily` opens the question of today
+- `daily` 打开今天的问题
 
-- [`list`](#leet-list) opens a problemlist picker
+- [`list`](#leet-list) 打开问题列表选择器
 
-- `desc` toggle question description
+- `desc` 切换问题描述
 
-  - `toggle` same as `Leet desc`
+  - `toggle` 与 `Leet desc` 相同
 
 - `cookie`
 
-  - `update` opens a prompt to enter a new cookie
+  - `update` 打开提示输入新 cookie
 
-  - `delete` sign-out
+  - `delete` 注销
 
 - `cache`
 
-  - `update` updates cache
+  - `update` 更新缓存
 
 #### `Leet list`
 
-Can take optional arguments. To stack argument values separate them by a `,`
+可以带有可选参数。要堆叠参数值，请使用 , 将它们分隔开
 
 ```
 Leet list status=<status> topics=<topic1,...,topicN> difficulty=<difficulty>
 ```
 
-## 🚀 Usage
+## 🚀 使用方法
 
-This plugin is meant to be used within a **fresh** [Neovim] instance.
-Meaning that to launch [leetcode.nvim] you **have** to pass
-[`arg`](#arg) as the _first and **only**_ [Neovim] argument
+此插件应该在 **全新** 的 [Neovim] 实例中使用。
+这意味着要启动 [leetcode.nvim]，您 **必须** 将
+[`arg`](#arg) 作为 _第一个且 **唯一**_ [Neovim] 参数
 
 ```
 nvim leetcode.nvim
 ```
 
-### Sign In
+### 登录
 
-It is **required** to be **signed-in** to use [leetcode.nvim]
+使用 [leetcode.nvim] 必须 **登录**
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4ad3abeda5c3
 
-## 🍴 Recipes
+## 🍴 示例
 
-### lazy loading
+### 懒加载
 
-- proper lazy loading with [lazy.nvim]
+- 使用 [lazy.nvim] 实现正确的懒加载
 
 ```lua
 local leet_arg = "leetcode.nvim"
@@ -281,14 +285,14 @@ return {
 }
 ```
 
-## ✅ Todo
+## ✅ 待办事项
 
-- \[ \] CN version
-- \[x\] Statistics menu page
-- \[ \] Docs
-- \[x\] Hints pop-up
+- \[ \] 中文版本
+- \[x\] 统计菜单页面
+- \[ \] 文档
+- \[x\] 提示弹出窗口
 
-## 🙌 Credits
+## 🙌 鸣谢
 
 - [Leetbuddy.nvim](https://github.com/Dhanus3133/Leetbuddy.nvim)
 
