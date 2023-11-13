@@ -13,7 +13,6 @@ local Info = require("leetcode.ui.info")
 ---@field bufnr integer
 ---@field console lc.Console
 ---@field lang string
----@field sql string
 ---@field cache lc.Cache.Question
 ---@field is_sql boolean
 local Question = {}
