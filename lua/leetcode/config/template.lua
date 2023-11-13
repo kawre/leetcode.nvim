@@ -93,6 +93,9 @@ local M = {
         ---@type fun(question: { lang: string })[]
         LeetQuestionNew = {},
     },
+
+    ---@type boolean
+    image_support = false, -- setting this to `true` will disable question description wrap
 }
 
 return M
