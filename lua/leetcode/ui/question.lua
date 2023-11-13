@@ -13,9 +13,7 @@ local Info = require("leetcode.ui.info")
 ---@field bufnr integer
 ---@field console lc.Console
 ---@field lang string
----@field sql string
 ---@field cache lc.Cache.Question
----@field is_sql boolean
 local Question = {}
 Question.__index = Question
 
@@ -78,7 +76,7 @@ function Question:init(problem)
     log.debug(problem)
     log.debug("Initializing question: " .. problem.frontend_id .. ". " .. problem.title_slug)
 
-    local tabp = utils.detect_duplicate_question(problem.title_slug)
+    local tabp = utils.detect_duplicate_question(problem.title_slug, config.lang)
     if tabp then return pcall(vim.cmd.tabnext, tabp) end
 
     local q = api_question.by_title_slug(problem.title_slug)
@@ -86,12 +84,10 @@ function Question:init(problem)
         return log.warn("Question is for premium users only")
     end
 
-    local is_sql = q.meta_data.database and true or false
     self = setmetatable({
         q = q,
         cache = problem,
-        is_sql = is_sql,
-        lang = is_sql and config.sql or config.lang,
+        lang = config.lang,
     }, self)
 
     return self:handle_mount()

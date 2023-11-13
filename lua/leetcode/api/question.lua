@@ -31,7 +31,7 @@ end
 
 function question.random()
     local variables = {
-        categorySlug = "",
+        categorySlug = "algorithms",
     }
 
     local query = queries.random_question()

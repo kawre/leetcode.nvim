@@ -24,13 +24,6 @@
 ---| "react"
 ---| "vanillajs"
 
----@alias lc.sql
----| "pythondata"
----| "mysql"
----| "mssql"
----| "oraclesql"
----| "postgresql"
-
 ---@alias lc.domain
 ---| "com"
 ---| "cn"
@@ -49,9 +42,6 @@ local M = {
 
     ---@type lc.lang
     lang = "cpp",
-
-    ---@type lc.sql
-    sql = "mysql",
 
     ---@type string
     directory = vim.fn.stdpath("data") .. "/leetcode/",

@@ -60,7 +60,6 @@ function problemlist.get()
     local ok, problems = pcall(problemlist.parse, contents)
     assert(ok)
 
-    log.debug(problems)
     return problems
 end
 

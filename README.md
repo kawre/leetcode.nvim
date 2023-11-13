@@ -87,9 +87,6 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     ---@type lc.lang
     lang = "cpp",
 
-    ---@type lc.sql
-    sql = "mysql",
-
     ---@type string
     directory = vim.fn.stdpath("data") .. "/leetcode/",
 
@@ -153,9 +150,6 @@ Language to start your session with
 ```lua
 ---@type lc.lang
 lang = "cpp"
-
----@type lc.sql_lang
-sql = "mysql"
 ```
 
 ### domain
@@ -284,7 +278,6 @@ return {
 ## ✅ Todo
 
 - \[ \] CN version
-- \[ \] SQL support
 - \[x\] Statistics menu page
 - \[ \] Docs
 - \[x\] Hints pop-up

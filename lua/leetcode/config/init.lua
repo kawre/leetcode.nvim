@@ -15,7 +15,6 @@ local config = {
     domain = "https://leetcode.com",
     debug = false,
     lang = "cpp",
-    sql = "mysql",
     home = {}, ---@type Path
 
     langs = require("leetcode.config.langs"),
@@ -37,7 +36,6 @@ function config.apply(cfg)
     config.is_cn = config.user.domain == "cn"
 
     config.lang = config.user.lang
-    config.sql = config.user.sql
 end
 
 return config

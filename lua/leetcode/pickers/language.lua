@@ -85,7 +85,7 @@ M.pick_lang = function(question, callback)
                         return log.warn("Language already set to: " .. snippet.t.lang)
                     end
 
-                    config[snippet.t.sql and "sql" or "lang"] = snippet.t.slug
+                    config.lang = snippet.t.slug
                     actions.close(prompt_bufnr)
                     callback(snippet)
                 end)
@@ -116,7 +116,7 @@ M.pick = function(question)
                         return log.warn("Language already set to: " .. snippet.t.lang)
                     end
 
-                    config[snippet.t.sql and "sql" or "lang"] = snippet.t.slug
+                    config.lang = snippet.t.slug
                     actions.close(prompt_bufnr)
                     Question:init(question.cache)
                 end)
