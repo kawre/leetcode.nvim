@@ -2,6 +2,8 @@ local log = require("leetcode.logger")
 local Stdout = require("leetcode.ui.console.components.stdout")
 local console_popup = require("leetcode.ui.console.popup")
 local problemlist = require("leetcode.cache.problemlist")
+local config = require("leetcode.config")
+local t = require("leetcode.translator")
 
 local Case = require("leetcode.ui.console.components.case")
 local Group = require("leetcode-ui.component.group")
@@ -23,7 +25,7 @@ local function passed_testcases(item)
     local correct = item.total_correct ~= vim.NIL and item.total_correct or "0"
     local total = item.total_testcases ~= vim.NIL and item.total_testcases or "0"
 
-    return string.format("%d/%d testcases passed", correct, total)
+    return ("%d/%d %s"):format(correct, total, t("testcases passed"))
 end
 
 ---@param hi string
@@ -45,13 +47,19 @@ function result:handle_accepted(item)
 
     local perc_runtime = NuiLine()
     perc_runtime:append(
-        "Beats " .. string.format("%.2f", item.runtime_percentile) .. "% ",
+        ("%s %.2f%% "):format(t("Beats"), item.runtime_percentile),
         perc_hi(item.runtime_percentile)
     )
-    perc_runtime:append("of users with ")
-    perc_runtime:append(item.pretty_lang, "Structure")
+    if config.is_cn then
+        perc_runtime:append("使用 ")
+        perc_runtime:append(item.pretty_lang, "Structure")
+        perc_runtime:append(" 的用户")
+    else
+        perc_runtime:append("of users with ")
+        perc_runtime:append(item.pretty_lang, "Structure")
+    end
 
-    local runtime = Pre:init(NuiText("󰓅 Runtime", "leetcode_normal"), {
+    local runtime = Pre:init(NuiText(("󰓅 %s"):format(t("Runtime")), "leetcode_normal"), {
         status_runtime,
         perc_runtime,
     })
@@ -66,13 +74,19 @@ function result:handle_accepted(item)
 
     local perc_mem = NuiLine()
     perc_mem:append(
-        "Beats " .. string.format("%.2f", item.memory_percentile) .. "% ",
+        ("%s %.2f%% "):format(t("Beats"), item.memory_percentile),
         perc_hi(item.memory_percentile)
     )
-    perc_mem:append("of users with ")
-    perc_mem:append(item.pretty_lang, "Structure")
+    if config.is_cn then
+        perc_mem:append("使用 ")
+        perc_mem:append(item.pretty_lang, "Structure")
+        perc_mem:append(" 的用户")
+    else
+        perc_mem:append("of users with ")
+        perc_mem:append(item.pretty_lang, "Structure")
+    end
 
-    local memory = Pre:init(NuiText("󰍛 Memory", "leetcode_normal"), {
+    local memory = Pre:init(NuiText(("󰍛 %s"):format(t("Memory")), "leetcode_normal"), {
         status_memory,
         perc_mem,
     })
@@ -93,7 +107,7 @@ function result:handle_runtime(item) -- status code = 10
     local h = NuiLine()
     h:append(item._.title, item._.hl)
     h:append(" | ")
-    h:append("Runtime: " .. item.status_runtime, "leetcode_alt")
+    h:append(("%s: %s"):format(t("Runtime"), item.status_runtime), "leetcode_alt")
     header:append(h)
     group:append(header)
 
@@ -159,7 +173,7 @@ function result:handle_limit_exceeded(item) -- status code = 14
         last_testcase:append(item.last_testcase:gsub("\n", " "), "leetcode_indent")
 
         local pre_header = NuiLine()
-        pre_header:append(" Last Executed Input", "leetcode_normal")
+        pre_header:append((" %s"):format(t("Last Executed Input")), "leetcode_normal")
 
         local last_exec = Pre:init(pre_header, { last_testcase })
         group:append(last_exec)
@@ -198,7 +212,7 @@ function result:handle_runtime_error(item) -- status code = 15
 
     if item._.submission then
         local pre_header = NuiLine()
-        pre_header:append(" Last Executed Input", "leetcode_normal")
+        pre_header:append((" %s"):format(t("Last Executed Input")), "leetcode_normal")
 
         local last_testcase = NuiLine()
         last_testcase:append(item.last_testcase:gsub("\n", " "), "leetcode_indent")
@@ -260,7 +274,7 @@ function result:handle_item(item)
     local hl = success and "leetcode_ok" or "leetcode_error"
 
     item._ = {
-        title = " " .. item.status_msg,
+        title = " " .. t(item.status_msg),
         hl = hl,
         success = success,
         submission = submission,
@@ -332,10 +346,10 @@ function result:draw() self.layout:draw(self.popup) end
 ---
 ---@return lc.Result
 function result:init(parent)
-    local t = {}
+    local tbl = {}
     for _, case in ipairs(parent.parent.q.testcase_list) do
         for s in vim.gsplit(case, "\n", { trimempty = true }) do
-            table.insert(t, s)
+            table.insert(tbl, s)
         end
     end
 
@@ -350,9 +364,9 @@ function result:init(parent)
             },
             style = "rounded",
             text = {
-                top = " Result ",
+                top = (" %s "):format(t("Result")),
                 top_align = "center",
-                bottom = " (R) Run | (S) Submit ",
+                bottom = (" (R) %s | (S) %s "):format(t("Run"), t("Submit")),
                 bottom_align = "center",
             },
         },

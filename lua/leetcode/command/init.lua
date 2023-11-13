@@ -66,7 +66,7 @@ end
 
 ---Sign out
 function cmd.delete_cookie()
-    log.warn("You're now signed out")
+    log.warn(t("You're now signed out"))
     local cookie = require("leetcode.cache.cookie")
     pcall(cookie.delete)
 

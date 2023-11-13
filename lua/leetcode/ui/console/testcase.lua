@@ -2,6 +2,7 @@ local log = require("leetcode.logger")
 local config = require("leetcode.config")
 local NuiPopup = require("nui.popup")
 local console_popup = require("leetcode.ui.console.popup")
+local t = require("leetcode.translator")
 
 ---@class lc.Testcase: lc.Console.Popup
 ---@field testcases string[]
@@ -105,7 +106,9 @@ function testcase:draw_extmarks()
 
         if line ~= "" then
             local ok, text = pcall(get_param, k, j, line:len())
-            if not ok or invalid then text = { { " invalid", "leetcode_error" } } end
+            if not ok or invalid then
+                text = { { (" %s"):format(t("invalid")), "leetcode_error" } }
+            end
 
             self:add_extmark(i - 1, -1, { virt_text = text })
             j = j + 1
@@ -142,9 +145,9 @@ function testcase:init(parent)
             },
             style = "rounded",
             text = {
-                top = " Testcases ",
+                top = (" %s "):format(t("Testcases")),
                 top_align = "center",
-                bottom = " (r) Reset ",
+                bottom = (" (r) %s "):format(t("Reset")),
                 bottom_align = "center",
             },
         },

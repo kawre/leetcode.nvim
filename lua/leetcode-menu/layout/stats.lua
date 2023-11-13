@@ -19,7 +19,9 @@ local group = Group:init({ Header:init() })
 local function get_stats()
     local spinner = Spinner:init("fetching user stats")
 
-    statistics.solved(function(res)
+    statistics.solved(function(res, err)
+        spinner:stop(nil, true, { timeout = 200 })
+
         group:set_opts({
             spacing = 2,
             padding = {
@@ -30,8 +32,6 @@ local function get_stats()
 
         group.components = { Solved:init(res), Calendar:init(res) }
         _Lc_Menu:draw()
-
-        spinner:stop(nil, true, { timeout = 200 })
     end)
 end
 get_stats()

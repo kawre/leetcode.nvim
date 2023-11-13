@@ -1,4 +1,5 @@
 local config = require("leetcode.config")
+local t = require("leetcode.translator")
 local log = require("leetcode.logger")
 local Description = require("leetcode.ui.description")
 local api_question = require("leetcode.api.question")
@@ -81,7 +82,7 @@ function Question:init(problem)
 
     local q = api_question.by_title_slug(problem.title_slug)
     if q.is_paid_only and not config.auth.is_premium then
-        return log.warn("Question is for premium users only")
+        return log.warn(t("Question is for premium users only"))
     end
 
     self = setmetatable({

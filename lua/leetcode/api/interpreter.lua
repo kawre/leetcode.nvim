@@ -1,4 +1,5 @@
 local log = require("leetcode.logger")
+local t = require("leetcode.translator")
 
 local utils = require("leetcode.api.utils")
 local config = require("leetcode.config")
@@ -8,10 +9,10 @@ local spinner = require("leetcode.logger.spinner")
 local interpreter = {}
 
 local check_state = {
-    ["PENDING"] = "Pending…",
-    ["STARTED"] = "Judging…",
-    ["SUCCESS"] = "Finished",
-    ["FAILURE"] = "Failed", -- CODE: 16
+    ["PENDING"] = t("Pending") .. "…",
+    ["STARTED"] = t("Judging") .. "…",
+    ["SUCCESS"] = t("Finished"),
+    ["FAILURE"] = t("Failed"), -- CODE: 16
 }
 
 ---@param id string
@@ -22,7 +23,7 @@ function interpreter.listener(id, callback)
     local function listen()
         interpreter.check(id, function(item)
             if item.status_code then
-                noti:stop(item.status_msg, false)
+                noti:stop(t(item.status_msg), false)
                 callback(item)
                 return
             end
@@ -77,7 +78,7 @@ function interpreter.fetch(url, body)
     local res, err = utils.post(url, body)
 
     if err then
-        if err.status == 429 then log.warn("You have attempted to run code too soon") end
+        if err.status == 429 then log.warn(t("You have attempted to run code too soon")) end
         return
     end
 

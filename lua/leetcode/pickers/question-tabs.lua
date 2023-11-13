@@ -1,5 +1,6 @@
 local log = require("leetcode.logger")
 local utils = require("leetcode.utils")
+local t = require("leetcode.translator")
 
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
@@ -77,11 +78,11 @@ local opts = require("telescope.themes").get_dropdown()
 return {
     pick = function()
         local tabs = utils.curr_question_tabs()
-        if vim.tbl_isempty(tabs) then return log.warn("No questions opened") end
+        if vim.tbl_isempty(tabs) then return log.warn(t("No questions opened")) end
 
         pickers
             .new(opts, {
-                prompt_title = "Select a Question",
+                prompt_title = t("Select a Question"),
                 finder = finders.new_table({
                     results = tabs,
                     entry_maker = entry_maker,

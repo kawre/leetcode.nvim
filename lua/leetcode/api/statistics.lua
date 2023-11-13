@@ -39,7 +39,7 @@ function statistics.calendar(cb)
     end)
 end
 
----@param cb fun(res: lc.Stats.Res)
+---@param cb fun(res: lc.Stats.Res, err: lc.err)
 function statistics.solved(cb)
     local variables = {
         username = config.auth.name,
@@ -80,6 +80,8 @@ function statistics.solved(cb)
     ]]
 
     utils.query(query, variables, function(res, err)
+        if err then return cb(nil, err) end
+
         local data = res.data
 
         local questions_count = data["allQuestionsCount"]
@@ -94,7 +96,7 @@ function statistics.solved(cb)
             questions_count = questions_count,
             submit_stats = submit_stats,
             solved_beats = solved_beats,
-        })
+        }, nil)
     end)
 end
 

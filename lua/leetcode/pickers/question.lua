@@ -1,4 +1,5 @@
 local log = require("leetcode.logger")
+local t = require("leetcode.translator")
 
 local Question = require("leetcode.ui.question")
 
@@ -137,7 +138,7 @@ return {
     pick = function(questions, opts)
         pickers
             .new(theme, {
-                prompt_title = "Select a Question",
+                prompt_title = t("Select a Question"),
                 finder = finders.new_table({
                     results = filter_questions(questions, opts),
                     entry_maker = entry_maker,
@@ -150,7 +151,7 @@ return {
 
                         local q = selection.value
                         if q.paid_only and not config.auth.is_premium then
-                            log.warn("Question is for premium users only")
+                            log.warn(t("Question is for premium users only"))
                             return
                         end
 

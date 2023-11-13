@@ -1,4 +1,5 @@
 local config = require("leetcode.config")
+local t = require("leetcode.translator")
 
 ---@class lc.Utils
 local utils = {}
@@ -106,7 +107,7 @@ function utils.curr_question()
         return tab.question
     else
         local log = require("leetcode.logger")
-        log.error("No current question found")
+        log.error(t("No current question found"))
     end
 end
 

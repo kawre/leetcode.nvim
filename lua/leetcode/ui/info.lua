@@ -203,7 +203,7 @@ function Info:init(parent)
             },
             style = "rounded",
             text = {
-                top = " Question Info ",
+                top = (" %s "):format(t("Question Info")),
             },
         },
         buf_options = {
