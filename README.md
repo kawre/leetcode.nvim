@@ -269,6 +269,12 @@ Meaning that to launch [leetcode.nvim] you **have** to pass
 nvim leetcode.nvim
 ```
 
+### Pop-ups
+
+🚨 _Do **not**_ close [leetcode.nvim] pop-ups with `:q` 🚨
+
+There are **two** shortcuts specifically designed for closing them which are `q` and `Esc`.
+
 ### Sign In
 
 It is **required** to be **signed-in** to use [leetcode.nvim]
