@@ -113,6 +113,11 @@ function testcase:draw_extmarks()
     end
 end
 
+function testcase:focus()
+    if not vim.api.nvim_win_is_valid(self.popup.winid) then return end
+    vim.api.nvim_set_current_win(self.popup.winid)
+end
+
 function testcase:reset()
     self:draw()
     log.info("Test cases have been reset")
@@ -139,7 +144,7 @@ function testcase:init(parent)
             },
             style = "rounded",
             text = {
-                top = " Testcases ",
+                top = " (H) Testcases ",
                 top_align = "center",
                 bottom = " (r) Reset ",
                 bottom_align = "center",

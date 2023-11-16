@@ -210,6 +210,11 @@ function result:handle_runtime_error(item) -- status code = 15
     self.layout:append(group)
 end
 
+function result:focus()
+    if not vim.api.nvim_win_is_valid(self.popup.winid) then return end
+    vim.api.nvim_set_current_win(self.popup.winid)
+end
+
 function result:handle_internal_error(item) -- status code = 16
     local group = Group:init({}, { spacing = 1 })
 
@@ -350,7 +355,7 @@ function result:init(parent)
             },
             style = "rounded",
             text = {
-                top = " Result ",
+                top = " (L) Result ",
                 top_align = "center",
                 bottom = " (R) Run | (S) Submit ",
                 bottom_align = "center",
