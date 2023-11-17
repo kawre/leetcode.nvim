@@ -147,7 +147,7 @@ end
 ---@private
 ---
 ---@param item lc.limit_exceeded_error
-function result:handle_limit_exceeded(item) -- status code = 14
+function result:handle_limit_exceeded(item) -- status code = 12,13,14
     local group = Group:init({}, { spacing = 1 })
 
     local header = NuiLine()
@@ -289,10 +289,15 @@ function result:handle(item)
             self:handle_submission_error(item --[[@as lc.submission]])
         end,
 
+        -- memory limit
+        [12] = function()
+            self:handle_limit_exceeded(item --[[@as lc.limit_exceeded_error]])
+        end,
         -- time limit
         [13] = function()
             self:handle_limit_exceeded(item --[[@as lc.limit_exceeded_error]])
         end,
+        -- output limit
         [14] = function()
             self:handle_limit_exceeded(item --[[@as lc.limit_exceeded_error]])
         end,
