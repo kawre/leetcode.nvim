@@ -161,7 +161,7 @@ end
 ---@private
 ---
 ---@param item lc.limit_exceeded_error
-function result:handle_limit_exceeded(item) -- status code = 14
+function result:handle_limit_exceeded(item) -- status code = 12,13,14
     local group = Group:init({}, { spacing = 1 })
 
     local header = NuiLine()
@@ -222,6 +222,11 @@ function result:handle_runtime_error(item) -- status code = 15
     end
 
     self.layout:append(group)
+end
+
+function result:focus()
+    if not vim.api.nvim_win_is_valid(self.popup.winid) then return end
+    vim.api.nvim_set_current_win(self.popup.winid)
 end
 
 function result:handle_internal_error(item) -- status code = 16
@@ -298,10 +303,15 @@ function result:handle(item)
             self:handle_submission_error(item --[[@as lc.submission]])
         end,
 
+        -- memory limit
+        [12] = function()
+            self:handle_limit_exceeded(item --[[@as lc.limit_exceeded_error]])
+        end,
         -- time limit
         [13] = function()
             self:handle_limit_exceeded(item --[[@as lc.limit_exceeded_error]])
         end,
+        -- output limit
         [14] = function()
             self:handle_limit_exceeded(item --[[@as lc.limit_exceeded_error]])
         end,
@@ -364,7 +374,7 @@ function result:init(parent)
             },
             style = "rounded",
             text = {
-                top = (" %s "):format(t("Result")),
+                top = (" (L) %s "):format(t("Result")),
                 top_align = "center",
                 bottom = (" (R) %s | (S) %s "):format(t("Run"), t("Submit")),
                 bottom_align = "center",

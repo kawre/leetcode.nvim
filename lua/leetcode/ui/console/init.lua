@@ -65,6 +65,8 @@ function console:init(parent)
         ["S"] = function() self:submit() end,
         ["r"] = function() self.testcase:reset() end,
         [{ "q", "<Esc>" }] = function() self:hide() end,
+        ["H"] = function() self.testcase:focus() end,
+        ["L"] = function() self.result:focus() end,
     }
 
     self.testcase = Testcase:init(self):keymaps(keymap) ---@diagnostic disable-line
