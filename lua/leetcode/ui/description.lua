@@ -1,5 +1,6 @@
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
+local utils = require("leetcode.utils")
 
 local img_ok, image_api = pcall(require, "image")
 local img_sup = img_ok and config.user.image_support
@@ -17,8 +18,6 @@ local Split = require("nui.split")
 ---@class lc.Description
 ---@field split NuiSplit
 ---@field parent lc.Question
----@field content any
----@field title any
 ---@field layout lc-ui.Layout
 ---@field visible boolean
 ---@field images table<string, Image>
@@ -125,7 +124,8 @@ function description:populate()
 
     local titleline = NuiLine()
     titleline:append(q.frontend_id .. ". ", "leetcode_normal")
-    titleline:append(q.title)
+
+    titleline:append(utils.translate(q.title, q.translated_title))
 
     local statsline = NuiLine()
     statsline:append(
@@ -155,7 +155,7 @@ function description:populate()
     local statscomp = Text:init({ statsline }, { position = "center" })
     local linkcomp = Text:init({ linkline }, { position = "center" })
 
-    local contents = parser:parse(q.content)
+    local contents = parser:parse(utils.translate(q.content, q.translated_content))
 
     self.layout = Layout:init({
         linkcomp,

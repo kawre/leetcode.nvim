@@ -1,6 +1,7 @@
 local log = require("leetcode.logger")
 local Question = require("leetcode.ui.question")
 local utils = require("leetcode.utils")
+local t = require("leetcode.translator")
 
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
@@ -69,7 +70,7 @@ local opts = require("telescope.themes").get_dropdown()
 M.pick_lang = function(question, callback)
     pickers
         .new(opts, {
-            prompt_title = "Available Languages",
+            prompt_title = t("Available Languages"),
             finder = finders.new_table({
                 results = question.q.code_snippets,
                 entry_maker = entry_maker,

@@ -1,5 +1,6 @@
 local log = require("leetcode.logger")
 local t = require("leetcode.translator")
+local utils = require("leetcode.utils")
 
 local Question = require("leetcode.ui.question")
 
@@ -19,7 +20,7 @@ local function question_formatter(question)
     return ("%s. %s %s %s"):format(
         tostring(question.frontend_id),
         question.title,
-        question.sec_title,
+        question.title_cn,
         question.title_slug
     )
 end
@@ -55,7 +56,8 @@ end
 local function display_question(question)
     local ac_rate = { ("%.1f%%"):format(question.ac_rate), "leetcode_ref" }
     local index = { question.frontend_id .. ".", "leetcode_normal" }
-    local title = { question.title }
+
+    local title = { utils.translate(question.title, question.title_cn) }
 
     return unpack({ index, title, ac_rate })
 end

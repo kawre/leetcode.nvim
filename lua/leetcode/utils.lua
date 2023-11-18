@@ -141,4 +141,18 @@ function utils.log_err(err)
     end
 end
 
+---@param content string
+---@param translated_content string
+function utils.translate(content, translated_content)
+    if config.is_cn then
+        if config.user.plugins.cn.translate_problems then
+            return translated_content or content
+        else
+            return content or translated_content
+        end
+    else
+        return content
+    end
+end
+
 return utils

@@ -36,6 +36,7 @@ local translate = {
     ["no hints available"] = "没有提示可用",
     ["drawn question is for premium users only. please try again"] = "抽选的问题仅供高级用户使用。请再试一次。",
     ["please verify your email address in order to use your account"] = "请验证您的电子邮件地址以便使用您的账户",
+    ["available languages"] = "可用语言",
     ["languages"] = "语言",
     ["skills"] = "技能",
     ["runtime"] = "时间",

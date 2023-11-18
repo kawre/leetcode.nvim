@@ -18,7 +18,7 @@ function M.all(cb)
 
             local problems = utils.normalize_problems(res.stat_status_pairs)
 
-            if config.is_cn and config.user.cn.translate then
+            if config.is_cn then
                 M.translated_titles(function(titles)
                     problems = utils.translate_titles(problems, titles)
                     cb(problems)
@@ -31,7 +31,7 @@ function M.all(cb)
         local res, err = utils.get(endpoint)
         local problems = utils.normalize_problems(res.stat_status_pairs)
 
-        if config.is_cn and config.user.cn.translate then
+        if config.is_cn then
             local titles = M.translated_titles()
             return utils.translate_titles(problems, titles)
         else

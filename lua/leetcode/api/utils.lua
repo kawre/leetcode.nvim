@@ -165,7 +165,7 @@ function utils.normalize_problems(problems)
                 id = p.stat.question_id,
                 frontend_id = p.stat.frontend_question_id,
                 title = p.stat.question__title,
-                sec_title = "",
+                title_cn = "",
                 title_slug = p.stat.question__title_slug,
                 link = ("%s/problems/%s/"):format(config.domain, p.stat.question__title_slug),
                 paid_only = p.paid_only,
@@ -189,10 +189,7 @@ function utils.translate_titles(problems, titles)
 
     return vim.tbl_map(function(p)
         local title = map[tostring(p.id)]
-        if title then
-            p.sec_title = p.title
-            p.title = title
-        end
+        if title then p.title_cn = title end
         return p
     end, problems)
 end

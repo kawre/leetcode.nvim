@@ -13,32 +13,6 @@ queries.auth = [[
         }
     ]]
 
-queries.problemset = [[
-        query problemsetQuestionList($limit: Int) {
-            problemsetQuestionList(
-                categorySlug: ""
-                limit: $limit
-                filters: {  }
-            ) {
-                questions {
-                    frontend_id: frontendQuestionId
-                    title
-                    title_slug: titleSlug
-                    title_cn: titleCn
-                    status
-                    paid_only: paidOnly
-                    ac_rate: acRate
-                    difficulty
-                    topic_tags: topicTags {
-                        name
-                        slug
-                        id
-                    }
-                }
-            }
-        }
-    ]]
-
 queries.qot = [[
         query questionOfToday {
             todayRecord {
@@ -54,14 +28,16 @@ queries.question = [[
             question(titleSlug: $titleSlug) {
                 id: questionId
                 frontend_id: questionFrontendId
-                title: translatedTitle
                 title_slug: titleSlug
                 is_paid_only: isPaidOnly
                 difficulty
                 likes
                 dislikes
                 category_title: categoryTitle
-                content: translatedContent
+                content
+                translated_content: translatedContent
+                title
+                translated_title: translatedTitle
                 mysql_schemas: mysqlSchemas
                 data_schemas: dataSchemas
                 code_snippets: codeSnippets {

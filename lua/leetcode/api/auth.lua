@@ -18,6 +18,7 @@ function Auth.user(cb)
     end
 end
 
+---@private
 ---@return lc.UserStatus|nil, lc.err|nil
 function Auth.handle(res, err)
     if err then return res, err end

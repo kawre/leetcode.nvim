@@ -2,7 +2,10 @@ local path = require("plenary.path")
 local log = require("leetcode.logger")
 
 local config = require("leetcode.config")
+---@type Path
 local file = config.home:joinpath((".problemlist%s"):format(config.is_cn and "_cn" or ""))
+
+local hist = {}
 
 local problems_api = require("leetcode.api.problems")
 
@@ -15,7 +18,6 @@ local problems_api = require("leetcode.api.problems")
 ---@field frontend_id string
 ---@field link string
 ---@field title string
----@field sec_title string
 ---@field title_cn string
 ---@field title_slug string
 ---@field status string
@@ -24,25 +26,25 @@ local problems_api = require("leetcode.api.problems")
 ---@field difficulty "Easy" | "Medium" | "Hard"
 ---@field topic_tags lc.Cache.Question.topicTags[]
 
-local problemlist = {}
+---@class lc.cache.Problemlist
+local Problemlist = {}
 
-local function populate()
+function Problemlist.populate()
     local spinner = require("leetcode.logger.spinner")
 
-    local noti = spinner:init("Fetching Problem List", "points")
+    local noti = spinner:init("fetching problem list", "points")
     local data = problems_api.all()
-    problemlist.write(data)
-    noti:stop("Problems Cache Updated!")
+    noti:stop("problems cache updated")
+    Problemlist.write(data)
+    return data
 end
 
 ---@param data string|table
-function problemlist.write(data)
+function Problemlist.write(data)
     local str
 
     if type(data) == "table" then
-        local ok, dec = pcall(vim.json.encode, data)
-        assert(ok, dec)
-        str = dec
+        str = vim.json.encode(data)
     else
         str = data
     end
@@ -51,65 +53,65 @@ function problemlist.write(data)
 end
 
 ---@return lc.Cache.Question[]
-function problemlist.get()
-    problemlist.update()
+function Problemlist.get()
+    if not file:exists() then return Problemlist.populate() end
 
-    local r_ok, contents = pcall(path.read, file)
-    assert(r_ok)
+    local fstats = file:_stat()
+    local ftime = fstats.mtime.sec
+    local curr_time = os.time()
 
-    local ok, problems = pcall(problemlist.parse, contents)
-    assert(ok)
+    if (curr_time - ftime) > config.user.cache.update_interval then Problemlist.update() end
 
+    local hproblem = hist[ftime]
+    if hproblem then return hproblem end
+
+    local contents = file:read()
+    if not contents or type(contents) ~= "string" then return Problemlist.populate() end
+
+    local problems = Problemlist.parse(contents)
+    if not problems then return Problemlist.populate() end
+
+    hist[ftime] = problems
     return problems
 end
 
----@param force? boolean
-function problemlist.update(force)
-    local stats = file:_stat()
-    if vim.tbl_isempty(stats) then return populate() end
+function Problemlist.update()
+    local spinner = require("leetcode.logger.spinner")
+    local noti = spinner:init("fetching problemlist", "points")
 
-    local mod_time = stats.mtime.sec
-    local curr_time = os.time()
-
-    if force or (curr_time - mod_time) > 60 * 60 * 24 * 7 then
-        local spinner = require("leetcode.logger.spinner")
-        local noti = spinner:init("Fetching Problem List", "points")
-
-        problems_api.all(function(data)
-            problemlist.write(data)
-            noti:stop("Problems Cache Updated!")
-        end)
-    end
+    problems_api.all(function(data)
+        Problemlist.write(data)
+        noti:stop("problems cache updated!")
+    end)
 end
 
 ---@return lc.Cache.Question
-function problemlist.get_by_title_slug(title_slug)
-    local problems = problemlist.get()
+function Problemlist.get_by_title_slug(title_slug)
+    local problems = Problemlist.get()
     return vim.tbl_filter(function(e) return e.title_slug == title_slug end, problems)[1] or {}
 end
 
----@param problems_str string
+---@param str string
 ---
 ---@return lc.Cache.Question[]
-function problemlist.parse(problems_str)
-    ---@type boolean, lc.Cache.Question[]
-    local ok, problems = pcall(vim.json.decode, problems_str)
-    assert(ok, "Failed to parse problems")
-
-    return problems
+function Problemlist.parse(str)
+    return vim.json.decode(str) ---@diagnostic disable-line
 end
 
 ---@param title_slug string
 ---@param status "ac" | "notac"
-function problemlist.change_status(title_slug, status)
-    local problist = problemlist.get()
+function Problemlist.change_status(title_slug, status)
+    local problist = Problemlist.get()
 
-    problemlist.write(vim.tbl_map(function(p)
+    Problemlist.write(vim.tbl_map(function(p)
         if p.title_slug == title_slug then p.status = status end
         return p
     end, problist))
 end
 
-function problemlist.delete() file:rm() end
+function Problemlist.delete()
+    if not file:exists() then return false end
+    return pcall(path.rm, file)
+end
 
-return problemlist
+return Problemlist

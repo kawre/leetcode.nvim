@@ -255,6 +255,7 @@
 ---@field id integer
 ---@field frontend_id integer
 ---@field title string
+---@field translated_title string
 ---@field title_slug string
 ---@field is_paid_only boolean
 ---@field difficulty string
@@ -262,6 +263,7 @@
 ---@field dislikes integer
 ---@field category_title string
 ---@field content string
+---@field translated_content string
 ---@field mysql_schemas string[]
 ---@field data_schemas string[]
 ---@field code_snippets code_snippet[]

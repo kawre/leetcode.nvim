@@ -87,9 +87,20 @@ local M = {
     ---@type boolean
     image_support = false, -- setting this to `true` will disable question description wrap
 
-    cn = {
-        translate = true, ---@type boolean
+    cache = {
+        ---@type integer
+        update_interval = 60 * 60 * 24 * 7, -- 7 days
     },
+
+    plugins = {
+        cn = {
+            enabled = true,
+            translate_problems = true, ---@type boolean
+        },
+    },
+    -- cn = {
+    --     translate = true, ---@type boolean
+    -- },
 }
 
 return M

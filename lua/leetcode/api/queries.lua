@@ -13,31 +13,6 @@ queries.auth = [[
         }
     ]]
 
-queries.problemset = [[
-        query problemsetQuestionList($limit: Int) {
-            problemsetQuestionList: questionList(
-                categorySlug: ""
-                limit: $limit
-                filters: {  }
-            ) {
-                questions: data {
-                    frontend_id: questionFrontendId
-                    title
-                    title_slug: titleSlug
-                    status
-                    paid_only: isPaidOnly
-                    ac_rate: acRate
-                    difficulty
-                    topic_tags: topicTags {
-                        name
-                        slug
-                        id
-                    }
-                }
-            }
-        }
-    ]]
-
 queries.qot = [[
         query questionOfToday {
             todayRecord: activeDailyCodingChallengeQuestion {
