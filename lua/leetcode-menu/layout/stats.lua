@@ -15,10 +15,10 @@ local Buttons = require("leetcode-menu.components.buttons")
 local Button = require("leetcode-ui.component.button")
 local Title = require("leetcode-menu.components.title")
 
-local group = Group:init({
-    Solved:init(),
-    Calendar:init(),
-}, {
+local calendar = Calendar:init()
+local solved = Solved:init()
+
+local group = Group:init({ solved, calendar }, {
     spacing = 2,
     padding = {
         top = 4,
@@ -26,24 +26,13 @@ local group = Group:init({
     },
 })
 
--- local function get_stats()
---     local spinner = Spinner:init("fetching user stats")
---
---     statistics.solved(function(res, err)
---         spinner:stop(nil, true, { timeout = 200 })
---
---         _Lc_Menu:draw()
---     end)
--- end
--- get_stats()
-
 local skills = not config.is_cn
         and Button:init({ icon = "", src = "Skills" }, "s", cmd.ui_skills)
     or nil
 
 local languages = Button:init({ icon = "", src = "Languages" }, "l", cmd.ui_languages)
 
--- local update = Button:init({ icon = "", src = "Update" }, "u", get_stats)
+local update = Button:init({ icon = "", src = "Update" }, "u", function() calendar:update() end)
 
 local back = Button:init(
     { icon = "", src = "Back" },
@@ -59,7 +48,7 @@ return Layout:init({
     Buttons:init({
         skills,
         languages,
-        -- update,
+        update,
         back,
     }),
 

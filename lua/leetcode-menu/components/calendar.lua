@@ -1,4 +1,6 @@
 local Header = require("leetcode-menu.components.header")
+local config = require("leetcode.config")
+local Spinner = require("leetcode.logger.spinner")
 local Text = require("leetcode-ui.component.text")
 local statistics = require("leetcode.api.statistics")
 local t = require("leetcode.translator")
@@ -87,8 +89,14 @@ function Calendar:handle_submissions()
     end
 
     local subs_line = NuiLine()
-    subs_line:append("" .. self.last_year_sub_count)
-    subs_line:append((" %s"):format(t("submissions")), "leetcode_alt")
+    if not config.is_cn then
+        subs_line:append("" .. self.last_year_sub_count)
+        subs_line:append((" %s"):format(t("submissions")), "leetcode_alt")
+    else
+        subs_line:append(t("submissions"), "leetcode_alt")
+        subs_line:append(" " .. self.last_year_sub_count)
+        subs_line:append(" 次", "leetcode_alt")
+    end
 
     local ad_line = NuiLine()
     ad_line:append(("%s:"):format(t("active days")), "leetcode_alt")
@@ -161,6 +169,18 @@ function Calendar:handle_weekdays(m)
     self.curr_time = self.curr_time + (60 * 60 * 24)
 end
 
+function Calendar:fetch()
+    statistics.calendar(function(res, err) self:handle_res(res, err) end)
+end
+
+function Calendar:update()
+    local spinner = Spinner:init("updating...")
+    statistics.calendar(function(res, err)
+        spinner:stop(nil, true, { timeout = 200 })
+        self:handle_res(res, err)
+    end)
+end
+
 function Calendar:init()
     local opts = {
         position = "center",
@@ -168,7 +188,7 @@ function Calendar:init()
     }
 
     self = setmetatable(Text:init({ t("loading...") }, opts), self)
-    statistics.calendar(function(res, err) self:handle_res(res) end)
+    self:fetch()
     return self
 end
 
