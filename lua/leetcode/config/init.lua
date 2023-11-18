@@ -20,8 +20,8 @@ local config = {
     langs = require("leetcode.config.langs"),
     icons = require("leetcode.config.icons"),
 
-    ---@diagnostic disable-next-line
-    auth = {}, ---@type lc.UserStatus
+    ---@type lc.UserStatus
+    auth = {}, ---@diagnostic disable-line
 }
 
 ---Merge configurations into default configurations and set it as user configurations.

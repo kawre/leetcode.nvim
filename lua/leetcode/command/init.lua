@@ -25,8 +25,7 @@ function cmd.problems(options)
     )
 end
 
----@param cb? function
-function cmd.cookie_prompt(cb)
+function cmd.cookie_prompt()
     local cookie = require("leetcode.cache.cookie")
 
     local popup_options = {
@@ -48,16 +47,18 @@ function cmd.cookie_prompt(cb)
         },
     }
 
-    local Input = require("nui.input")
-    local input = Input(popup_options, {
+    local NuiInput = require("nui.input")
+    local input = NuiInput(popup_options, {
         prompt = " 󰆘 ",
         on_submit = function(value)
-            local c_ok, err = pcall(cookie.update, value)
-            if not c_ok then return log.warn(err) end
+            local success = cookie.set(value)
 
-            cmd.menu_layout("menu")
-            log.info(t("Sign-in successful"))
-            if cb then cb() end
+            if success then
+                log.info(t("Sign-in successful"))
+                cmd.menu_layout("menu")
+            else
+                log.error(t("Sign-in failed"))
+            end
         end,
     })
 

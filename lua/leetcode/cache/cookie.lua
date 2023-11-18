@@ -2,65 +2,78 @@ local path = require("plenary.path")
 local log = require("leetcode.logger")
 
 local config = require("leetcode.config")
+---@type Path
 local file = config.home:joinpath((".cookie%s"):format(config.is_cn and "_cn" or ""))
 
----@class lc.Cookie
+local hist = {}
+
+---@class lc.cache.Cookie
 ---@field csrftoken string
 ---@field leetcode_session string
-local cookie = {}
+---@field str string
+
+---@class lc.Cookie
+local Cookie = {}
 
 ---@param str string
 ---
----@return lc.Cookie
-function cookie.update(str)
-    local ok, t = pcall(cookie.parse, str)
-    assert(ok, "Cookie parse failed")
-
-    file:write(str, "w")
-
-    local auth_api = require("leetcode.api.auth")
-    local _, err = auth_api.user()
-
-    if err then
-        cookie.delete()
-        error(err)
+---@return boolean
+function Cookie.set(str)
+    local cookie, cerr = Cookie.parse(str)
+    if not cookie then
+        log.error(cerr)
+        return false
     end
 
-    return t
+    file:write(str, "w")
+    local auth_api = require("leetcode.api.auth")
+    local _, aerr = auth_api.user()
+
+    if aerr then
+        Cookie.delete()
+        return false
+    else
+        return true
+    end
 end
 
-function cookie.delete() pcall(path.rm, file) end
-
----@return lc.Cookie | nil
-function cookie.get()
-    local r_ok, contents = pcall(path.read, file)
-    if not r_ok then return end
-
-    local p_ok, c = pcall(cookie.parse, contents)
-    if not p_ok then return end
-
-    return c
+---@return boolean
+function Cookie.delete()
+    if not file:exists() then return false end
+    return pcall(path.rm, file)
 end
 
----@param cookie_str string
+---@return lc.cache.Cookie | nil
+function Cookie.get()
+    if not file:exists() then return end
+
+    local fstats = file:_stat()
+    local ftime = fstats.mtime.sec
+
+    local hcookie = hist[ftime]
+    if hcookie then return hcookie end
+
+    local contents = file:read()
+    if not contents or type(contents) ~= "string" then return end
+
+    local cookie = Cookie.parse(contents)
+    if not cookie then return end
+
+    hist[ftime] = cookie
+    return cookie
+end
+
+---@param str string
 ---
-function cookie.parse(cookie_str)
-    local c = {}
+---@return lc.cache.Cookie|nil, string|nil
+function Cookie.parse(str)
+    local csrf = str:match("csrftoken=([^;]+)")
+    if not csrf or csrf == "" then return nil, "Bad csrf token format" end
 
-    local csrf_ok, csrf = pcall(string.match, cookie_str, "csrftoken=([^;]+)")
-    assert(csrf_ok and csrf and csrf ~= "", "Bad csrf token format")
-    c.csrftoken = csrf
+    local ls = str:match("LEETCODE_SESSION=([^;]+)")
+    if not ls or ls == "" then return nil, "Bad leetcode session token format" end
 
-    local ls_ok, ls = pcall(string.match, cookie_str, "LEETCODE_SESSION=([^;]+)")
-    assert(ls_ok and ls and ls ~= "", "Bad leetcode session token format")
-    c.leetcode_session = ls
-
-    return c
+    return { csrftoken = csrf, leetcode_session = ls, str = str }
 end
 
-function cookie.to_str()
-    local c = cookie.get()
-    return c and ("LEETCODE_SESSION=%s;csrftoken=%s;"):format(c.leetcode_session, c.csrftoken) or ""
-end
-
-return cookie
+return Cookie
