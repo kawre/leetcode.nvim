@@ -8,10 +8,10 @@ local M = {}
 
 ---@return lc.UserStatus, lc.err
 function M.user(cb)
-    local query = queries.auth()
+    local query = queries.auth
 
     if cb then
-        utils.query(query, {}, function(res, err) cb(M.handle(res, err)) end)
+        utils.query(query, {}, { callback = function(res, err) cb(M.handle(res, err)) end })
     else
         return M.handle(utils.query(query))
     end

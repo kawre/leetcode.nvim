@@ -1,5 +1,6 @@
 local log = require("leetcode.logger")
 local arguments = require("leetcode.command.arguments")
+local config = require("leetcode.config")
 local t = require("leetcode.translator")
 
 ---@class lc.Commands
@@ -149,6 +150,7 @@ function cmd.q_submit()
 end
 
 function cmd.ui_skills()
+    if config.is_cn then return end
     local skills = require("leetcode.ui.skills")
     skills:show()
 end

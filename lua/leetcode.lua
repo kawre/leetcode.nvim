@@ -50,6 +50,7 @@ function leetcode.start()
     config.home:mkdir()
 
     leetcode.setup_cmds()
+    config.load_plugins()
 
     local utils = require("leetcode.utils")
     utils.exec_hooks("LeetEnter")

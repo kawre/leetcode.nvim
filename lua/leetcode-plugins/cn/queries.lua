@@ -1,11 +1,11 @@
----@class lc.Api.Queries
-local queries = {}
+local queries = require("leetcode.api.queries")
 
 queries.auth = [[
         query globalData {
             userStatus {
-                id: userId
+                slug: userSlug
                 name: username
+                real_name: realName
                 is_signed_in: isSignedIn
                 is_premium: isPremium
                 is_verified: isVerified
@@ -15,17 +15,18 @@ queries.auth = [[
 
 queries.problemset = [[
         query problemsetQuestionList($limit: Int) {
-            problemsetQuestionList: questionList(
+            problemsetQuestionList(
                 categorySlug: ""
                 limit: $limit
                 filters: {  }
             ) {
-                questions: data {
-                    frontend_id: questionFrontendId
+                questions {
+                    frontend_id: frontendQuestionId
                     title
                     title_slug: titleSlug
+                    title_cn: titleCn
                     status
-                    paid_only: isPaidOnly
+                    paid_only: paidOnly
                     ac_rate: acRate
                     difficulty
                     topic_tags: topicTags {
@@ -40,7 +41,7 @@ queries.problemset = [[
 
 queries.qot = [[
         query questionOfToday {
-            todayRecord: activeDailyCodingChallengeQuestion {
+            todayRecord {
                 question {
                     title_slug: titleSlug
                 }
@@ -53,14 +54,14 @@ queries.question = [[
             question(titleSlug: $titleSlug) {
                 id: questionId
                 frontend_id: questionFrontendId
-                title
+                title: translatedTitle
                 title_slug: titleSlug
                 is_paid_only: isPaidOnly
                 difficulty
                 likes
                 dislikes
                 category_title: categoryTitle
-                content
+                content: translatedContent
                 mysql_schemas: mysqlSchemas
                 data_schemas: dataSchemas
                 code_snippets: codeSnippets {
@@ -74,73 +75,66 @@ queries.question = [[
                 stats
                 hints
                 topic_tags: topicTags {
-                    name
+                    name: translatedName
                     slug
                 }
-                similar: similarQuestionList {
-                    difficulty
-                    title_slug: titleSlug
-                    title
-                    paid_only: isPaidOnly
-                }
+                similar: similarQuestions
             }
         }
     ]]
 
 queries.random_question = [[
-        query randomQuestion($categorySlug: String) {
-            randomQuestion(categorySlug: $categorySlug, filters: {  }) {
-                title_slug: titleSlug
-                paid_only: isPaidOnly
+        query problemsetRandomFilteredQuestion(
+            $categorySlug: String!
+        ) {
+            randomQuestion: problemsetRandomFilteredQuestion(categorySlug: $categorySlug, filters: {  })
+        }
+    ]]
+
+queries.translations = [[
+        query getQuestionTranslation($lang: String) {
+            translations: allAppliedQuestionTranslations(lang: $lang) {
+                title
+                questionId
             }
         }
     ]]
 
-queries.translations = nil
-
 queries.solved = [[
-        query userCalendar($username: String!) {
-            allQuestionsCount {
-                difficulty
-                count
-            }
-            matchedUser(username: $username) {
-                submit_stats: submitStatsGlobal {
-                    acSubmissionNum {
-                        difficulty
-                        count
-                    }
+        query userStats($username: String!) {
+            submit_stats: userProfileUserQuestionProgress(userSlug: $username) {
+                numAcceptedQuestions {
+                    difficulty
+                    count
+                }
+                numFailedQuestions {
+                    difficulty
+                    count
+                }
+                numUntouchedQuestions {
+                    difficulty
+                    count
                 }
             }
         }
     ]]
 
 queries.calendar = [[
-        query userCalendar($username: String!, $year: Int) {
-            matchedUser(username: $username) {
-                calendar: userCalendar(year: $year) {
-                    active_years: activeYears
-                    streak
-                    total_active_days: totalActiveDays
-                    dcc_badges: dccBadges {
-                        timestamp
-                        badge {
-                            name
-                            icon
-                        }
-                    }
-                    submission_calendar: submissionCalendar
-                }
-                solved_beats: problemsSolvedBeatsStats {
-                    difficulty
-                    percentage
-                }
-                submit_stats: submitStatsGlobal {
-                    acSubmissionNum {
-                        difficulty
-                        count
-                    }
-                }
+        query userProfileCalendar($username: String!, $year: Int) {
+            calendar: userCalendar(userSlug: $username, year: $year) {
+                active_years: activeYears
+                streak
+                total_active_days: totalActiveDays
+                submission_calendar: submissionCalendar
+            }
+        }
+    ]]
+
+queries.languages = [[
+        query languageStats($username: String!) {
+            languageProblemCount: userLanguageProblemCount(userSlug: $username) {
+                lang: languageName
+                problems_solved: problemsSolved
             }
         }
     ]]
@@ -168,16 +162,3 @@ queries.skills = [[
             }
         }
     ]]
-
-queries.languages = [[
-        query languageStats($username: String!) {
-            matchedUser(username: $username) {
-                languageProblemCount {
-                    lang: languageName
-                    problems_solved: problemsSolved
-                }
-            }
-        }
-    ]]
-
-return queries

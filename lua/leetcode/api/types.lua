@@ -352,9 +352,7 @@
 ---@field acSubmissionNum table
 
 ---@class lc.Stats.Res
----@field calendar lc.Stats.CalendarData
 ---@field questions_count table<lc.Stats.QuestionCount>
----@field solved_beats table<lc.Stats.SolvedBeat>
 ---@field submit_stats lc.Stats.SubmissionStat
 
 --------------------------------------------

@@ -1,5 +1,7 @@
 local Text = require("leetcode-ui.component.text")
 local NuiLine = require("nui.line")
+local utils = require("leetcode.api.utils")
+local statistics = require("leetcode.api.statistics")
 
 local log = require("leetcode.logger")
 local hl = {
@@ -77,21 +79,17 @@ function Solved:handle_res(res)
     end
 
     self.lines = self.solved_lines
+    _Lc_Menu:draw()
 end
 
----@param res lc.Stats.Res
-function Solved:init(res, opts)
-    opts = vim.tbl_deep_extend("force", {
+function Solved:init()
+    local opts = {
         position = "center",
         hl = "Keyword",
-        -- padding = {
-        --     top = 4,
-        --     bot = 2,
-        -- },
-    }, opts or {})
+    }
 
-    self = setmetatable(Text:init({}, opts), self)
-    self:handle_res(res)
+    self = setmetatable(Text:init({ "loading..." }, opts), self)
+    statistics.solved(function(res, err) self:handle_res(res) end)
     return self
 end
 

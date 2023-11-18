@@ -17,7 +17,7 @@ function question.by_title_slug(title_slug)
         titleSlug = title_slug,
     }
 
-    local query = queries.question()
+    local query = queries.question
 
     local res, err = utils.query(query, variables)
 
@@ -34,7 +34,7 @@ function question.random()
         categorySlug = "algorithms",
     }
 
-    local query = queries.random_question()
+    local query = queries.random_question
 
     local config = require("leetcode.config")
     local res, err = utils.query(query, variables)

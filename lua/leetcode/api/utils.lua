@@ -2,49 +2,53 @@ local curl = require("plenary.curl")
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
 local headers = require("leetcode.api.headers")
-
-local lc = "https://leetcode." .. config.user.domain
-local endpoint = lc .. "/graphql"
+local urls = require("leetcode.api.urls")
 
 ---@class lc.Api.Utils
 local utils = {}
 
----@param url string
-function utils.post(url, body)
-    return utils.curl("post", url, {
+---@param endpoint string
+function utils.post(endpoint, body)
+    return utils.curl("post", {
+        endpoint = endpoint,
         body = body,
     })
 end
 
-function utils.get(url, cb)
-    return utils.curl("get", url, {
+function utils.get(endpoint, cb)
+    return utils.curl("get", {
+        endpoint = endpoint,
         callback = cb,
     })
 end
 
 ---@param query string
 ---@param variables? table optional
----@param cb? function optional
-function utils.query(query, variables, cb)
-    local body = {
-        query = query,
-        variables = variables,
-    }
+---@param opts? { callback?: function }
+function utils.query(query, variables, opts)
+    opts = vim.tbl_deep_extend("force", {
+        body = {
+            query = query,
+            variables = variables,
+        },
+    }, opts or {})
 
-    return utils.curl("post", endpoint, {
-        body = body,
-        callback = cb,
-    })
+    return utils.curl("post", opts)
 end
 
 ---@private
-function utils.curl(method, url, params)
+---@param method string
+---@param params table
+function utils.curl(method, params)
     local params_cpy = vim.deepcopy(params)
+
     params = vim.tbl_deep_extend("force", {
         headers = headers.get(),
         compressed = false,
         retry = 5,
+        endpoint = urls.base,
     }, params or {})
+    local url = config.domain .. params.endpoint
 
     if type(params.body) == "table" then params.body = vim.json.encode(params.body) end
 
@@ -58,7 +62,7 @@ function utils.curl(method, url, params)
 
             if should_retry(err) then
                 params_cpy.retry = tries - 1
-                utils.curl(method, url, params_cpy)
+                utils.curl(method, params_cpy)
             else
                 cb(res, err)
             end
@@ -71,7 +75,7 @@ function utils.curl(method, url, params)
 
         if should_retry(err) then
             params_cpy.retry = tries - 1
-            utils.curl(method, url, params_cpy)
+            utils.curl(method, params_cpy)
         else
             return res, err
         end
@@ -117,6 +121,8 @@ function utils.auth_guard()
 end
 
 function utils.normalize_similar_cn(s)
+    -- if type(s) ~= "string" then return s end
+
     s = select(2, pcall(utils.decode, s))
 
     return vim.tbl_map(function(sq)

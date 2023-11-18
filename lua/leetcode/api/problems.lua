@@ -1,6 +1,7 @@
 local utils = require("leetcode.api.utils")
 local queries = require("leetcode.api.queries")
 local config = require("leetcode.config")
+local urls = require("leetcode.api.urls")
 
 local log = require("leetcode.logger")
 
@@ -9,10 +10,10 @@ local M = {}
 
 ---@return lc.Cache.Question[]
 function M.all(cb)
-    local url = ("%s/api/problems/algorithms/"):format(config.domain)
+    local endpoint = urls.problems:format("algorithms")
 
     if cb then
-        utils.get(url, function(res, err)
+        utils.get(endpoint, function(res, err)
             if err then return end
 
             local problems = utils.normalize_problems(res.stat_status_pairs)
@@ -27,7 +28,7 @@ function M.all(cb)
             end
         end)
     else
-        local res, err = utils.get(url)
+        local res, err = utils.get(endpoint)
         local problems = utils.normalize_problems(res.stat_status_pairs)
 
         if config.is_cn and config.user.cn.translate then
@@ -40,20 +41,22 @@ function M.all(cb)
 end
 
 function M.question_of_today(cb)
-    local query = queries.qot()
+    local query = queries.qot
 
-    utils.query(query, {}, function(res)
-        local tday_record = res.data["todayRecord"]
-        local question = config.is_cn and tday_record[1].question or tday_record.question
-        cb(question)
-    end)
+    utils.query(query, {}, {
+        callback = function(res)
+            local tday_record = res.data["todayRecord"]
+            local question = config.is_cn and tday_record[1].question or tday_record.question
+            cb(question)
+        end,
+    })
 end
 
 function M.translated_titles(cb)
-    local query = queries.translations()
+    local query = queries.translations
 
     if cb then
-        utils.query(query, {}, function(res, err) cb(res.data.translations) end)
+        utils.query(query, {}, { callback = function(res, err) cb(res.data.translations) end })
     else
         local res, err = utils.query(query, {})
         return res.data.translations

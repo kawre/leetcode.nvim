@@ -1,5 +1,6 @@
 local log = require("leetcode.logger")
 local t = require("leetcode.translator")
+local urls = require("leetcode.api.urls")
 
 local utils = require("leetcode.api.utils")
 local config = require("leetcode.config")
@@ -52,14 +53,14 @@ end
 ---@param body lc.Interpret.body
 ---@param callback function
 function interpreter.interpret_solution(title_slug, body, callback)
-    local url = ("%s/problems/%s/interpret_solution/"):format(config.domain, title_slug)
+    local url = urls.interpret:format(title_slug)
     local res = interpreter.fetch(url, body)
 
     if res then interpreter.listener(res.interpret_id, callback) end
 end
 
 function interpreter.submit(title_slug, body, callback)
-    local url = ("%s/problems/%s/submit/"):format(config.domain, title_slug)
+    local url = urls.submit:format(title_slug)
     local res = interpreter.fetch(url, body)
 
     if res then interpreter.listener(res.submission_id, callback) end
@@ -70,7 +71,7 @@ end
 ---
 ---@return lc.Interpreter.Response
 function interpreter.check(id, cb)
-    local url = ("%s/submissions/detail/%s/check/"):format(config.domain, id)
+    local url = urls.check:format(id)
     utils.get(url, cb)
 end
 

@@ -32,10 +32,18 @@ function config.apply(cfg)
 
     config.debug = config.user.debug or false ---@diagnostic disable-line
     config.domain = "https://leetcode." .. config.user.domain
-
     config.is_cn = config.user.domain == "cn"
-
     config.lang = config.user.lang
+end
+
+function config.load_plugins()
+    local plugins = {}
+    if config.is_cn then table.insert(plugins, "cn") end
+
+    for _, plugin in ipairs(plugins) do
+        local ok, plug = pcall(require, "leetcode-plugins." .. plugin)
+        if ok then plug.load() end
+    end
 end
 
 return config

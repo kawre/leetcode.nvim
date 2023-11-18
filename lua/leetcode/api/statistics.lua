@@ -1,7 +1,10 @@
 local utils = require("leetcode.api.utils")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
+local urls = require("leetcode.api.urls")
+local queries = require("leetcode.api.queries")
 
+---@lc.api.statistics
 local statistics = {}
 
 function statistics.calendar(cb)
@@ -9,95 +12,50 @@ function statistics.calendar(cb)
         username = config.auth.name,
     }
 
-    local query = [[
-        query userProfileCalendar($username: String!, $year: Int) {
-            matchedUser(username: $username) {
-                userCalendar(year: $year) {
-                    active_years: activeYears
-                    streak
-                    total_active_days: totalActiveDays
-                    dcc_badges: dccBadges {
-                        timestamp
-                        badge {
-                            name
-                            icon
-                        }
-                    }
-                    submission_calendar: submissionCalendar
-                }
-            }
-        }
-    ]]
+    local query = queries.calendar
 
-    utils.query(query, variables, function(res, err)
-        local data = res.data
-        local calendar = data["matchedUser"]["userCalendar"]
+    utils.query(query, variables, {
+        endpoint = urls.calendar,
+        callback = function(res, err)
+            if err then return cb(nil, err) end
 
-        calendar.submission_calendar = select(2, pcall(utils.decode, calendar.submission_calendar))
+            local data = res.data
+            local calendar = data["matchedUser"]["calendar"]
 
-        cb(calendar)
-    end)
+            calendar.submission_calendar =
+                select(2, pcall(utils.decode, calendar.submission_calendar))
+
+            cb({
+                calendar = calendar,
+            }, nil)
+        end,
+    })
 end
 
----@param cb fun(res: lc.Stats.Res, err: lc.err)
+---@param cb fun(res: lc.Stats.Res|nil, err: lc.err|nil)
 function statistics.solved(cb)
     local variables = {
         username = config.auth.name,
     }
 
-    local query = [[
-        query userStatistics($username: String!, $year: Int) {
-            allQuestionsCount {
-                difficulty
-                count
-            }
-            matchedUser(username: $username) {
-                calendar: userCalendar(year: $year) {
-                    active_years: activeYears
-                    streak
-                    total_active_days: totalActiveDays
-                    dcc_badges: dccBadges {
-                        timestamp
-                        badge {
-                            name
-                            icon
-                        }
-                    }
-                    submission_calendar: submissionCalendar
-                }
-                solved_beats: problemsSolvedBeatsStats {
-                    difficulty
-                    percentage
-                }
-                submit_stats: submitStatsGlobal {
-                    acSubmissionNum {
-                        difficulty
-                        count
-                    }
-                }
-            }
-        }
-    ]]
+    local query = queries.solved
 
-    utils.query(query, variables, function(res, err)
-        if err then return cb(nil, err) end
+    utils.query(query, variables, {
+        endpoint = urls.solved,
+        callback = function(res, err)
+            if err then return cb(nil, err) end
 
-        local data = res.data
+            local data = res.data
 
-        local questions_count = data["allQuestionsCount"]
-        local calendar = data["matchedUser"]["calendar"]
-        local submit_stats = data["matchedUser"]["submit_stats"]
-        local solved_beats = data["matchedUser"]["solved_beats"]
+            local questions_count = data["allQuestionsCount"]
+            local submit_stats = data["matchedUser"]["submit_stats"]
 
-        calendar.submission_calendar = select(2, pcall(utils.decode, calendar.submission_calendar))
-
-        cb({
-            calendar = calendar,
-            questions_count = questions_count,
-            submit_stats = submit_stats,
-            solved_beats = solved_beats,
-        }, nil)
-    end)
+            cb({
+                questions_count = questions_count,
+                submit_stats = submit_stats,
+            }, nil)
+        end,
+    })
 end
 
 ---@param cb fun(res: lc.Skills.Res)
@@ -106,35 +64,16 @@ function statistics.skills(cb)
         username = config.auth.name,
     }
 
-    local query = [[
-        query skillStats($username: String!) {
-            matchedUser(username: $username) {
-                tag_problems_counts: tagProblemCounts {
-                    advanced {
-                        tag: tagName
-                        slug: tagSlug
-                        problems_solved: problemsSolved
-                    }
-                    intermediate {
-                        tag: tagName
-                        slug: tagSlug
-                        problems_solved: problemsSolved
-                    }
-                    fundamental {
-                        tag: tagName
-                        slug: tagSlug
-                        problems_solved: problemsSolved
-                    }
-                }
-            }
-        }
-    ]]
+    local query = queries.skills
 
-    utils.query(query, variables, function(res, err)
-        local data = res.data
-        local tag_problems_counts = data["matchedUser"]["tag_problems_counts"]
-        cb(tag_problems_counts)
-    end)
+    utils.query(query, variables, {
+        endpoint = urls.skills,
+        callback = function(res, err)
+            local data = res.data
+            local tag_problems_counts = data["matchedUser"]["tag_problems_counts"]
+            cb(tag_problems_counts)
+        end,
+    })
 end
 
 ---@param cb fun(res: lc.Languages.Res)
@@ -143,22 +82,16 @@ function statistics.languages(cb)
         username = config.auth.name,
     }
 
-    local query = [[
-        query languageStats($username: String!) {
-            matchedUser(username: $username) {
-                languageProblemCount {
-                    lang: languageName
-                    problems_solved: problemsSolved
-                }
-            }
-        }
-    ]]
+    local query = queries.languages
 
-    utils.query(query, variables, function(res, err)
-        local data = res.data
-        local lang_prob_count = data["matchedUser"]["languageProblemCount"]
-        cb(lang_prob_count)
-    end)
+    utils.query(query, variables, {
+        endpoint = urls.languages,
+        callback = function(res, err)
+            local data = res.data
+            local lang_prob_count = data["matchedUser"]["languageProblemCount"]
+            cb(lang_prob_count)
+        end,
+    })
 end
 
 return statistics

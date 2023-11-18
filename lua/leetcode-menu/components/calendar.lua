@@ -1,5 +1,6 @@
 local Header = require("leetcode-menu.components.header")
 local Text = require("leetcode-ui.component.text")
+local statistics = require("leetcode.api.statistics")
 
 local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
@@ -75,6 +76,7 @@ function Calendar:handle_res(res)
     self:handle_months()
     self:handle_submissions()
     self.lines = self.calendar_lines
+    _Lc_Menu:draw()
 end
 
 function Calendar:handle_submissions()
@@ -158,15 +160,14 @@ function Calendar:handle_weekdays(m)
     self.curr_time = self.curr_time + (60 * 60 * 24)
 end
 
----@param res lc.Stats.Res
-function Calendar:init(res, opts)
-    opts = vim.tbl_deep_extend("force", {
+function Calendar:init()
+    local opts = {
         position = "center",
         hl = "Keyword",
-    }, opts or {})
+    }
 
-    self = setmetatable(Text:init({}, opts), self)
-    self:handle_res(res)
+    self = setmetatable(Text:init({ "loading..." }, opts), self)
+    statistics.calendar(function(res, err) self:handle_res(res) end)
     return self
 end
 

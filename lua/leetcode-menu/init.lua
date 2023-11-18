@@ -93,6 +93,7 @@ function menu:set_layout(layout_name)
     self:cursor_reset()
 
     local ok, layout = pcall(require, "leetcode-menu.layout." .. layout_name)
+    log.debug(layout)
     if ok then
         self.layout = layout
         self:draw()
