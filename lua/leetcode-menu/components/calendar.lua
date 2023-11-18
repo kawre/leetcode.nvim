@@ -1,6 +1,7 @@
 local Header = require("leetcode-menu.components.header")
 local Text = require("leetcode-ui.component.text")
 local statistics = require("leetcode.api.statistics")
+local t = require("leetcode.translator")
 
 local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
@@ -87,15 +88,15 @@ function Calendar:handle_submissions()
 
     local subs_line = NuiLine()
     subs_line:append("" .. self.last_year_sub_count)
-    subs_line:append(" submissions", "leetcode_alt")
+    subs_line:append((" %s"):format(t("submissions")), "leetcode_alt")
 
     local ad_line = NuiLine()
-    ad_line:append("active days:", "leetcode_alt")
+    ad_line:append(("%s:"):format(t("active days")), "leetcode_alt")
     ad_line:append("  ", "leetcode_list")
     ad_line:append("" .. self.calendar.total_active_days)
 
     local streak_line = NuiLine()
-    streak_line:append("max streak:", "leetcode_alt")
+    streak_line:append(("%s:"):format(t("max streak")), "leetcode_alt")
     streak_line:append(" 󰈸 ", "leetcode_list")
     streak_line:append("" .. self.calendar.streak)
 
@@ -166,7 +167,7 @@ function Calendar:init()
         hl = "Keyword",
     }
 
-    self = setmetatable(Text:init({ "loading..." }, opts), self)
+    self = setmetatable(Text:init({ t("loading...") }, opts), self)
     statistics.calendar(function(res, err) self:handle_res(res) end)
     return self
 end

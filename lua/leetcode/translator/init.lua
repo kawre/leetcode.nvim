@@ -57,8 +57,13 @@ local translate = {
     ["finished"] = "完成",
     ["failed"] = "失败",
     ["you have attempted to run code too soon"] = "你的提交过于频繁，请稍候重试。",
+    ["stdout"] = "标准输出",
+    ["submissions"] = "过去一年共提交",
+    ["active days"] = "累计提交天数",
+    ["max streak"] = "连续提交",
 
     -- difficulty
+    ["all"] = "所有",
     ["easy"] = "简单",
     ["medium"] = "中等",
     ["hard"] = "困难",
@@ -70,6 +75,7 @@ local translate = {
     ["time limit exceeded"] = "超出时间限制",
     ["output limit exceeded"] = "output limit exceeded",
     ["internal error"] = "internal error",
+    ["memory limit exceeded"] = "超出内存限制",
 }
 
 ---@param text string

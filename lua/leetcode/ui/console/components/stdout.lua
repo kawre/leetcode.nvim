@@ -1,5 +1,6 @@
 local config = require("leetcode.config")
 local Pre = require("leetcode.ui.console.components.pre")
+local t = require("leetcode.translator")
 
 local NuiLine = require("nui.line")
 
@@ -19,7 +20,7 @@ function stdout:init(output)
         table.insert(tbl, NuiLine():append(output_list[i]))
     end
 
-    return Pre:init(NuiLine():append(" Stdout", "leetcode_alt"), tbl)
+    return Pre:init(NuiLine():append((" %s"):format(t("Stdout")), "leetcode_alt"), tbl)
 end
 
 return stdout
