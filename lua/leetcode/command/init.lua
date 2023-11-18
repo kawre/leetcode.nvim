@@ -238,22 +238,22 @@ function cmd.rec_complete(args, options, cmds)
 end
 
 function cmd.exec(args)
-    local t = cmd.commands
+    local tbl = cmd.commands
 
     local options = {}
     for s in vim.gsplit(args.args, "%s+", { trimempty = true }) do
         local opt = vim.split(s, "=")
         if opt[2] then
             options[opt[1]] = vim.split(opt[2], ",", { trimempty = true })
-        elseif t then
-            t = t[s]
+        elseif tbl then
+            tbl = tbl[s]
         else
             break
         end
     end
 
-    if t and type(t[1]) == "function" then
-        t[1](options) ---@diagnostic disable-line
+    if tbl and type(tbl[1]) == "function" then
+        tbl[1](options) ---@diagnostic disable-line
     else
         log.error(("Invalid command: `%s %s`"):format(args.name, args.args))
     end

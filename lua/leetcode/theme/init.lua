@@ -89,17 +89,17 @@ end
 function theme.create_dynamic(name, tags, defaults)
     defaults = defaults or require("leetcode.theme.default").get()
 
-    local t = defaults["normal"]
+    local tbl = defaults["normal"]
     for _, tag in ipairs(tags) do
         local hl = highlights[tag]
-        if hl then t = vim.tbl_extend("force", t, defaults[hl]) end
+        if hl then tbl = vim.tbl_extend("force", tbl, defaults[hl]) end
     end
 
-    if t.italic or t.bold then
-        if t.fg == defaults["normal"].fg then t.fg = defaults[""].fg end
+    if tbl.italic or tbl.bold then
+        if tbl.fg == defaults["normal"].fg then tbl.fg = defaults[""].fg end
     end
 
-    if pcall(vim.api.nvim_set_hl, 0, name, t) then
+    if pcall(vim.api.nvim_set_hl, 0, name, tbl) then
         dynamic_hls[name] = tags
         return name
     else

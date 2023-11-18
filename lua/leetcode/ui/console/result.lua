@@ -21,7 +21,7 @@ local result = {}
 result.__index = result
 setmetatable(result, console_popup)
 
-local function passed_testcases(item)
+local function testcases_passed(item)
     local correct = item.total_correct ~= vim.NIL and item.total_correct or "0"
     local total = item.total_testcases ~= vim.NIL and item.total_testcases or "0"
 
@@ -139,7 +139,7 @@ function result:handle_submission_error(item) -- status code = 11
     local header = NuiLine()
     header:append(item._.title, item._.hl)
     header:append(" | ")
-    header:append(passed_testcases(item), "leetcode_alt")
+    header:append(testcases_passed(item), "leetcode_alt")
     group:append(Text:init({ header }))
 
     local text = Case:init(
@@ -166,6 +166,10 @@ function result:handle_limit_exceeded(item) -- status code = 12,13,14
 
     local header = NuiLine()
     header:append(item._.title, item._.hl)
+    if item._.submission then
+        header:append(" | ")
+        header:append(testcases_passed(item), "leetcode_alt")
+    end
     group:append(Text:init({ header }))
 
     if item._.submission then
@@ -201,14 +205,14 @@ function result:handle_runtime_error(item) -- status code = 15
 
     if item._.submission then
         header:append(" | ")
-        header:append(passed_testcases(item), "leetcode_alt")
+        header:append(testcases_passed(item), "leetcode_alt")
     end
 
-    local t = {}
+    local tbl = {}
     for line in vim.gsplit(item.full_runtime_error, "\n") do
-        table.insert(t, NuiLine():append(line, "leetcode_error"))
+        table.insert(tbl, NuiLine():append(line, "leetcode_error"))
     end
-    group:append(Pre:init(header, t))
+    group:append(Pre:init(header, tbl))
 
     if item._.submission then
         local pre_header = NuiLine()
@@ -219,6 +223,9 @@ function result:handle_runtime_error(item) -- status code = 15
 
         local last_exec = Pre:init(pre_header, { last_testcase })
         group:append(last_exec)
+    else
+        local stdout = Stdout:init(item.std_output_list[1])
+        if stdout then group:append(stdout) end
     end
 
     self.layout:append(group)
@@ -250,15 +257,15 @@ function result:handle_compile_error(item) -- status code = 20
     header:append(item._.title, item._.hl)
     if item._.submission then
         header:append(" | ")
-        header:append(passed_testcases(item), "leetcode_alt")
+        header:append(testcases_passed(item), "leetcode_alt")
     end
 
-    local t = {}
+    local tbl = {}
     for line in vim.gsplit(item.full_compile_error, "\n") do
-        table.insert(t, NuiLine():append(line, "leetcode_error"))
+        table.insert(tbl, NuiLine():append(line, "leetcode_error"))
     end
 
-    group:append(Pre:init(header, t))
+    group:append(Pre:init(header, tbl))
     self.layout:append(group)
 end
 

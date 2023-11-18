@@ -28,12 +28,12 @@ function Component:append(content, highlight)
 end
 
 local function create_padding(val)
-    local t = {}
+    local tbl = {}
     for _ = 1, val, 1 do
-        table.insert(t, NuiLine():append(""))
+        table.insert(tbl, NuiLine():append(""))
     end
 
-    return t
+    return tbl
 end
 
 ---@param layout lc-ui.Layout

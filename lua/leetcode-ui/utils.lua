@@ -25,21 +25,21 @@ end
 ---
 ---@return NuiLine[]
 function utils.parse_lines(lines, opts)
-    local t = {}
+    local tbl = {}
 
     if type(lines) == "table" then
         for _, line in pairs(lines) do
             if type(line) == "string" then
                 local nui_line = Line()
                 nui_line:append(line, opts and opts.hl or nil)
-                table.insert(t, nui_line)
+                table.insert(tbl, nui_line)
             else
-                table.insert(t, line)
+                table.insert(tbl, line)
             end
         end
     end
 
-    return t
+    return tbl
 end
 
 ---@param component lc-ui.Component

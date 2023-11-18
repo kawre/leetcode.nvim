@@ -14,8 +14,8 @@ setmetatable(testcase, console_popup)
 function testcase:content()
     self.testcases = {}
 
-    local t = vim.api.nvim_buf_get_lines(self.popup.bufnr, 0, -1, false)
-    local str = table.concat(t, "\n")
+    local tbl = vim.api.nvim_buf_get_lines(self.popup.bufnr, 0, -1, false)
+    local str = table.concat(tbl, "\n")
 
     local testcases = {}
     for tcase in vim.gsplit(str, "\n\n") do
@@ -28,18 +28,18 @@ function testcase:content()
 end
 
 function testcase:draw()
-    local t = {}
+    local tbl = {}
     for i, case in ipairs(self.parent.parent.q.testcase_list) do
-        if i ~= 1 then table.insert(t, "") end
+        if i ~= 1 then table.insert(tbl, "") end
 
         table.insert(self.testcases, case:gsub("\n", " ")[1])
 
         for s in vim.gsplit(case, "\n", { trimempty = true }) do
-            table.insert(t, s)
+            table.insert(tbl, s)
         end
     end
 
-    vim.api.nvim_buf_set_lines(self.popup.bufnr, 0, -1, false, t)
+    vim.api.nvim_buf_set_lines(self.popup.bufnr, 0, -1, false, tbl)
 
     self:draw_extmarks()
     return self
