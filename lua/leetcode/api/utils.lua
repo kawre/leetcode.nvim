@@ -121,16 +121,20 @@ function utils.auth_guard()
 end
 
 function utils.normalize_similar_cn(s)
-    -- if type(s) ~= "string" then return s end
-
     s = select(2, pcall(utils.decode, s))
 
-    return vim.tbl_map(function(sq)
-        sq.title = sq.translatedTitle
-        sq.paid_only = sq.isPaidOnly
-        sq.title_slug = sq.titleSlug
-        return sq
-    end, s)
+    return vim.tbl_map(
+        function(sq)
+            return {
+                title = sq.title,
+                translated_title = sq.translatedTitle,
+                paid_only = sq.isPaidOnly,
+                title_slug = sq.titleSlug,
+                difficulty = sq.difficulty,
+            }
+        end,
+        s
+    )
 end
 
 function utils.lvl_to_name(lvl) return ({ "Easy", "Medium", "Hard" })[lvl] end

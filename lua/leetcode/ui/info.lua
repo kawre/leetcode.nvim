@@ -4,6 +4,7 @@ local NuiText = require("nui.text")
 local NuiLine = require("nui.line")
 local config = require("leetcode.config")
 local t = require("leetcode.translator")
+local utils = require("leetcode.utils")
 
 ---@class lc.Hints
 ---@field popup NuiPopup
@@ -73,7 +74,7 @@ function Info:mount()
             ["Hard"] = "leetcode_hard",
         }
         line:append("󱓻 ", hl[q.difficulty])
-        line:append(q.title)
+        line:append(utils.translate(q.title, q.translated_title))
 
         local lock = not config.auth.is_premium and q.paid_only and "  " .. t("Premium") or ""
         line:append(lock, "leetcode_medium")

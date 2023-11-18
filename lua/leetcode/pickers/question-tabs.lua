@@ -10,11 +10,11 @@ local entry_display = require("telescope.pickers.entry_display")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
----@param question lc.Cache.Question
+---@param q lc.QuestionResponse
 ---
 ---@return string
-local function question_formatter(question)
-    return string.format("%d. %s", question.frontend_id, question.title)
+local function question_formatter(q)
+    return string.format("%d. %s %s", q.frontend_id, q.title, q.translated_title)
 end
 
 local function display_current(entry)
@@ -30,7 +30,7 @@ local function display_difficulty(q)
     return { lang.icon, "leetcode_lang_" .. lang.slug }
 end
 
----@param question lc.Cache.Question
+---@param question lc.QuestionResponse
 local function display_question(question)
     local hl = {
         ["Easy"] = "leetcode_easy",
@@ -39,7 +39,7 @@ local function display_question(question)
     }
 
     local index = { question.frontend_id .. ".", hl[question.difficulty] }
-    local title = { question.title }
+    local title = { utils.translate(question.title, question.translated_title) }
 
     return unpack({ index, title })
 end
@@ -88,7 +88,7 @@ return {
                     entry_maker = entry_maker,
                 }),
                 sorter = conf.generic_sorter(opts),
-                attach_mappings = function(prompt_bufnr, map)
+                attach_mappings = function(prompt_bufnr)
                     actions.select_default:replace(function()
                         actions.close(prompt_bufnr)
                         local selection = action_state.get_selected_entry()
