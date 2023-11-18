@@ -29,29 +29,6 @@ local problems_api = require("leetcode.api.problems")
 ---@class lc.cache.Problemlist
 local Problemlist = {}
 
-function Problemlist.populate()
-    local spinner = require("leetcode.logger.spinner")
-
-    local noti = spinner:init("fetching problem list", "points")
-    local data = problems_api.all()
-    noti:stop("problems cache updated")
-    Problemlist.write(data)
-    return data
-end
-
----@param data string|table
-function Problemlist.write(data)
-    local str
-
-    if type(data) == "table" then
-        str = vim.json.encode(data)
-    else
-        str = data
-    end
-
-    file:write(str, "w")
-end
-
 ---@return lc.Cache.Question[]
 function Problemlist.get()
     if not file:exists() then return Problemlist.populate() end
@@ -68,11 +45,22 @@ function Problemlist.get()
     local contents = file:read()
     if not contents or type(contents) ~= "string" then return Problemlist.populate() end
 
-    local problems = Problemlist.parse(contents)
-    if not problems then return Problemlist.populate() end
+    local cached = Problemlist.parse(contents)
+    if not cached or cached.version ~= config.version then return Problemlist.populate() end
 
-    hist[ftime] = problems
-    return problems
+    hist[ftime] = cached.data
+    return cached.data
+end
+
+function Problemlist.populate()
+    local spinner = require("leetcode.logger.spinner")
+    local noti = spinner:init("fetching problem list", "points")
+
+    local data = problems_api.all()
+    noti:stop("problems cache updated")
+
+    Problemlist.write(data)
+    return data
 end
 
 function Problemlist.update()
@@ -91,9 +79,22 @@ function Problemlist.get_by_title_slug(title_slug)
     return vim.tbl_filter(function(e) return e.title_slug == title_slug end, problems)[1] or {}
 end
 
+---@param problems table
+function Problemlist.write(problems)
+    local tbl = {
+        version = config.version,
+        data = problems,
+    }
+
+    file:write(vim.json.encode(tbl), "w")
+
+    local ftime = file:_stat().mtime.sec
+    hist[ftime] = problems
+end
+
 ---@param str string
 ---
----@return lc.Cache.Question[]
+---@return { version: string, data: lc.Cache.Question[] }
 function Problemlist.parse(str)
     return vim.json.decode(str) ---@diagnostic disable-line
 end

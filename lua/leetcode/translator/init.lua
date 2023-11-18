@@ -87,7 +87,7 @@ local function t(text)
 
     local txt = text:lower()
     if not vim.tbl_contains(keys, txt) then
-        log.error(("Translation for `%s` not found"):format(text))
+        log.debug(("Translation for `%s` not found"):format(text), true)
         return text
     end
 

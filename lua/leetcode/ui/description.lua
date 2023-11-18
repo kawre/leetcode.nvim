@@ -120,7 +120,7 @@ function description:populate()
     local q = self.parent.q
 
     local linkline = NuiLine()
-    linkline:append(self.parent.cache.link, "leetcode_alt")
+    linkline:append(self.parent.cache.link or "", "leetcode_alt")
 
     local titleline = NuiLine()
     titleline:append(q.frontend_id .. ". ", "leetcode_normal")

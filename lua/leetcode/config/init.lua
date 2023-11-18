@@ -16,6 +16,7 @@ local config = {
     debug = false,
     lang = "cpp",
     home = {}, ---@type Path
+    version = "1.0.0",
 
     langs = require("leetcode.config.langs"),
     icons = require("leetcode.config.icons"),
