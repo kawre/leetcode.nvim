@@ -79,8 +79,8 @@ local translate = {
     ["wrong answer"] = "解答错误",
     ["compile error"] = "编译出错",
     ["time limit exceeded"] = "超出时间限制",
-    ["output limit exceeded"] = "output limit exceeded",
-    ["internal error"] = "internal error",
+    -- ["output limit exceeded"] = "output limit exceeded",
+    -- ["internal error"] = "internal error",
     ["memory limit exceeded"] = "超出内存限制",
     ["invalid testcase"] = "测试用例非有效值",
 }

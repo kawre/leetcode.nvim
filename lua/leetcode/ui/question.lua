@@ -43,9 +43,7 @@ function Question:mount()
     })
 
     -- https://github.com/kawre/leetcode.nvim/issues/14
-    if self.lang == "rust" then
-        pcall(function() require("rust-tools.standalone").start_standalone_client() end)
-    end
+    if self.lang == "rust" then pcall(require("rust-tools.standalone").start_standalone_client) end
 
     self.bufnr = vim.api.nvim_get_current_buf()
     self.winid = vim.api.nvim_get_current_win()

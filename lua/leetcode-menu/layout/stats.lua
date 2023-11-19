@@ -1,12 +1,8 @@
 local cmd = require("leetcode.command")
-local statistics = require("leetcode.api.statistics")
 local Solved = require("leetcode-menu.components.solved")
 local Calendar = require("leetcode-menu.components.calendar")
 local Group = require("leetcode-ui.component.group")
 local Footer = require("leetcode-menu.components.footer")
-local Header = require("leetcode-menu.components.header")
-local Spinner = require("leetcode.logger.spinner")
-local log = require("leetcode.logger")
 local config = require("leetcode.config")
 
 local Layout = require("leetcode-ui.layout")

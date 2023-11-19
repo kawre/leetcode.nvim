@@ -70,7 +70,7 @@ function Problemlist.update()
 
     problems_api.all(function(data)
         Problemlist.write(data)
-        noti:stop("problems cache updated!")
+        noti:stop("problems cache updated")
     end)
 end
 

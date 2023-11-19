@@ -25,6 +25,11 @@ function Cases:clear()
     Group.clear(self)
 end
 
+function Cases:draw(layout)
+    self:update_nav()
+    Group.draw(self, layout)
+end
+
 function Cases:update_nav()
     local cases = NuiLine()
 
@@ -34,7 +39,12 @@ function Cases:update_nav()
         text:append((" Case (%d) "):format(i), "leetcode_case_" .. hl)
 
         local keymap = { mode = "n", key = tostring(i) }
-        self.parent.popup:map(keymap.mode, keymap.key, function() self:change(i) end)
+        self.parent.popup:map(
+            keymap.mode,
+            keymap.key,
+            function() self:change(i) end,
+            { nowait = true }
+        )
         table.insert(self.keymaps, keymap)
 
         cases:append(text)
@@ -49,7 +59,6 @@ function Cases:change(idx)
     if not self.cases[idx] or idx == self.idx then return end
     self.case.components = { self.cases[idx] }
     self.idx = idx
-    self:update_nav()
     self.parent:draw()
 end
 

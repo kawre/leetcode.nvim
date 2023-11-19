@@ -81,7 +81,8 @@ end
 ---@param success? boolean
 ---@param opts? table
 function spinner:stop(msg, success, opts)
-    success = success or false
+    success = success == nil and true or success
+
     opts = vim.tbl_deep_extend("force", {
         icon = success and "" or "󰅘",
         timeout = 2000,
