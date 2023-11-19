@@ -75,7 +75,7 @@ function Cases:init(item, testcases, parent)
         )
     end
 
-    self.nav = Text:init({}, { padding = { top = 1, bot = 1 } })
+    self.nav = Text:init({}, { padding = { top = 1, bot = 0 } })
     self:append(self.nav)
 
     self.case = Group:init({})

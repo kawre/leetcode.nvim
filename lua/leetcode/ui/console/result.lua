@@ -1,19 +1,8 @@
-local log = require("leetcode.logger")
-local Stdout = require("leetcode.ui.console.components.stdout")
 local console_popup = require("leetcode.ui.console.popup")
 local problemlist = require("leetcode.cache.problemlist")
-local config = require("leetcode.config")
 local t = require("leetcode.translator")
 
-local Case = require("leetcode.ui.console.components.case")
-local Group = require("leetcode-ui.component.group")
-local Pre = require("leetcode.ui.console.components.pre")
-local Layout = require("leetcode-ui.layout")
-local ResultLayout = require("leetcode.ui.console.components.result")
-local Text = require("leetcode-ui.component.text")
-
-local NuiLine = require("nui.line")
-local NuiText = require("nui.text")
+local ResultLayout = require("leetcode.ui.console.components.result-layout")
 local NuiPopup = require("nui.popup")
 
 ---@class lc.Result : lc.Console.Popup

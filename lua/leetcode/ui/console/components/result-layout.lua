@@ -68,7 +68,6 @@ function ResultLayout:handle_accepted(item)
     local status_memory = NuiLine()
     -- if item.status_memory == "0B" then item.status_memory = "0 MB" end
     item.status_memory = item.status_memory:gsub("(%d+)%s*(%a+)", "%1 %2")
-    -- log.info(item.status_memory)
     local s_mem = vim.split(item.status_memory, " ")
     status_memory:append(s_mem[1] .. " ")
     status_memory:append(s_mem[2], "leetcode_alt")
@@ -101,13 +100,11 @@ end
 function ResultLayout:handle_runtime(item) -- status code = 10
     if item._.submission then return self:handle_accepted(item) end
 
-    local header = Text:init({})
     local h = NuiLine()
     h:append(item._.title, item._.hl)
     h:append(" | ")
     h:append(("%s: %s"):format(t("Runtime"), item.status_runtime), "leetcode_alt")
-    header:append(h)
-    self.group:append(header)
+    self.group:append(Text:init({ h }))
 
     self.cases = Cases:init(item, self.parent.testcase.testcases, self.parent.result)
     self.group:append(self.cases)
@@ -157,11 +154,9 @@ function ResultLayout:handle_limit_exceeded(item) -- status code = 12,13,14
         local last_exec = Pre:init(pre_header, { last_testcase })
         self.group:append(last_exec)
 
-        if item.std_output ~= "" then
-            local stdout = Stdout:init(item.std_output)
-            if stdout then self.group:append(stdout) end
-        end
-    elseif item.std_output_list[#item.std_output_list] ~= "" then
+        local stdout = Stdout:init(item.std_output or "")
+        if stdout then self.group:append(stdout) end
+    elseif item.std_output_list then
         local stdout = Stdout:init(item.std_output_list[#item.std_output_list])
         if stdout then self.group:append(stdout) end
     end
@@ -171,6 +166,7 @@ end
 ---
 ---@param item lc.runtime_error
 function ResultLayout:handle_runtime_error(item) -- status code = 15
+    log.debug(item)
     local header = NuiLine()
     header:append(item._.title, item._.hl)
 
@@ -183,7 +179,7 @@ function ResultLayout:handle_runtime_error(item) -- status code = 15
     for line in vim.gsplit(item.full_runtime_error, "\n") do
         table.insert(tbl, NuiLine():append(line, "leetcode_error"))
     end
-    group:append(Pre:init(header, tbl))
+    self.group:append(Pre:init(header, tbl))
 
     if item._.submission then
         local pre_header = NuiLine()
@@ -193,10 +189,13 @@ function ResultLayout:handle_runtime_error(item) -- status code = 15
         last_testcase:append(item.last_testcase:gsub("\n", " "), "leetcode_indent")
 
         local last_exec = Pre:init(pre_header, { last_testcase })
-        group:append(last_exec)
-    else
+        self.group:append(last_exec)
+
+        local stdout = Stdout:init(item.std_output or "")
+        if stdout then self.group:append(stdout) end
+    elseif item.std_output_list then
         local stdout = Stdout:init(item.std_output_list[#item.std_output_list])
-        if stdout then group:append(stdout) end
+        if stdout then self.group:append(stdout) end
     end
 end
 
@@ -236,7 +235,6 @@ end
 
 ---@param item lc.interpreter_response
 function ResultLayout:handle_res(item)
-    log.info(item.status_code)
     self.group = Group:init({}, { spacing = 1 })
 
     local handlers = {
