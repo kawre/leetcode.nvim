@@ -81,6 +81,7 @@ local translate = {
     ["output limit exceeded"] = "output limit exceeded",
     ["internal error"] = "internal error",
     ["memory limit exceeded"] = "超出内存限制",
+    ["invalid testcase"] = "测试用例非有效值",
 }
 
 ---@param text string

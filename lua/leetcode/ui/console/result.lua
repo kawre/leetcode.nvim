@@ -35,6 +35,10 @@ function result:handle_item(item)
     end
     local hl = success and "leetcode_ok" or "leetcode_error"
 
+    if item.status_code == 15 and item.invalid_testcase then
+        item.status_msg = t("Invalid Testcase")
+    end
+
     item._ = {
         title = " " .. t(item.status_msg),
         hl = hl,
@@ -106,10 +110,6 @@ function result:init(parent)
 
     self = setmetatable({
         popup = popup,
-        -- layout = Layout:init({}, {
-        --     winid = popup.winid,
-        --     bufnr = popup.bufnr,
-        -- }),
         layout = ResultLayout:init(parent, {
             winid = popup.winid,
             bufnr = popup.bufnr,

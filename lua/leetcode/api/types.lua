@@ -53,6 +53,7 @@
 ---@field code_output table
 ---@field std_output_list table
 ---@field elapsed_time number
+---@field invalid_testcase boolean
 ---@field task_finish_time number
 ---@field task_name string
 ---@field total_correct any

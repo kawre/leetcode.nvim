@@ -9,7 +9,7 @@ local NuiLine = require("nui.line")
 local pre = {}
 pre.__index = pre
 
----@param title NuiText | NuiLine | nil
+---@param title? NuiLine|NuiText
 ---@param lines NuiLine[]
 ---
 ---@return lc-ui.Text

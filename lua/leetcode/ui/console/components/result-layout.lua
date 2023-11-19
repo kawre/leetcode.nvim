@@ -166,7 +166,6 @@ end
 ---
 ---@param item lc.runtime_error
 function ResultLayout:handle_runtime_error(item) -- status code = 15
-    log.debug(item)
     local header = NuiLine()
     header:append(item._.title, item._.hl)
 
