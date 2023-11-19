@@ -36,7 +36,7 @@ function result:handle_item(item)
     local hl = success and "leetcode_ok" or "leetcode_error"
 
     if item.status_code == 15 and item.invalid_testcase then
-        item.status_msg = t("Invalid Testcase")
+        item.status_msg = "Invalid Testcase"
     end
 
     item._ = {
