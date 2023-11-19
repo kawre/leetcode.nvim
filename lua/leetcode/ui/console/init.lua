@@ -2,6 +2,7 @@ local config = require("leetcode.config")
 local Testcase = require("leetcode.ui.console.testcase")
 local Result = require("leetcode.ui.console.result")
 local Runner = require("leetcode.runner")
+local log = require("leetcode.logger")
 local NuiLayout = require("nui.layout")
 
 ---@class lc.Console
@@ -53,6 +54,15 @@ function console:hide()
     self.opened = false
 end
 
+function console:use_testcase()
+    local last_testcase = self.result.last_testcase
+    if last_testcase then
+        self.testcase:append(last_testcase)
+    else
+        log.warn("No testcase to use")
+    end
+end
+
 ---@param parent lc.Question
 function console:init(parent)
     self = setmetatable({
@@ -67,6 +77,7 @@ function console:init(parent)
         [{ "q", "<Esc>" }] = function() self:hide() end,
         ["H"] = function() self.testcase:focus() end,
         ["L"] = function() self.result:focus() end,
+        ["U"] = function() self:use_testcase() end,
     }
 
     self.testcase = Testcase:init(self):keymaps(keymap) ---@diagnostic disable-line

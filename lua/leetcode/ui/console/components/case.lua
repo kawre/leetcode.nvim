@@ -7,11 +7,14 @@ local Group = require("leetcode-ui.component.group")
 
 local NuiLine = require("nui.line")
 
+---@alias case_body { input: string, raw_input: string, output: string, expected: string, std_output: string }
+
 ---@class lc.Result.Case : lc-ui.Group
 ---@field pre lc-ui.Text
 ---@field stdout lc-ui.Text
 ---@field passed boolean
 ---@field index integer
+---@field body case_body
 local Case = {}
 Case.__index = Case
 setmetatable(Case, Group)
@@ -59,16 +62,15 @@ function Case:expected(expected, output)
     return line
 end
 
----@param input string
----@param output string
----@param expected string
----@param std_output string
+---@param body case_body
 ---@param passed boolean
 ---
 ---@return lc.Result.Case
-function Case:init(input, output, expected, std_output, passed)
+function Case:init(body, passed)
     local group = Group:init({}, { spacing = 1 })
     self = setmetatable(group, self)
+
+    self.body = body
 
     self.max_len = 0
     for _, key in ipairs({ "Input", "Output", "Expected" }) do
@@ -76,14 +78,14 @@ function Case:init(input, output, expected, std_output, passed)
     end
 
     local tbl = {}
-    table.insert(tbl, self:input(input))
-    table.insert(tbl, self:output(output, expected))
-    table.insert(tbl, self:expected(expected, output))
+    table.insert(tbl, self:input(body.input))
+    table.insert(tbl, self:output(body.output, body.expected))
+    table.insert(tbl, self:expected(body.expected, body.output))
 
     local pre = Pre:init(nil, tbl)
     self:append(pre)
 
-    local stdout = Stdout:init(std_output)
+    local stdout = Stdout:init(body.std_output)
     if stdout then self:append(stdout) end
 
     self.passed = passed

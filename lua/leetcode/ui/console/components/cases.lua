@@ -66,13 +66,12 @@ function Cases:init(item, testcases, parent)
     self.keymaps = {}
 
     for i, answer in ipairs(item.code_answer) do
-        self.cases[i] = Case:init(
-            testcases[i],
-            answer,
-            item.expected_code_answer[i],
-            item.std_output_list[i],
-            item.compare_result:sub(i, i) == "1"
-        )
+        self.cases[i] = Case:init({
+            input = testcases[i],
+            output = answer,
+            expected = item.expected_code_answer[i],
+            std_output = item.std_output_list[i],
+        }, item.compare_result:sub(i, i) == "1")
     end
 
     self.nav = Text:init({}, { padding = { top = 1, bot = 0 } })

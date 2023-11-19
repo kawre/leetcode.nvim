@@ -129,6 +129,17 @@ function testcase:reset()
     log.info("Test cases have been reset")
 end
 
+function testcase:append(input)
+    local s = vim.split(input, "\n", { trimempty = true })
+
+    local lines = vim.api.nvim_buf_get_lines(self.popup.bufnr, 0, -1, true)
+    if #lines > 1 or (#lines == 1 and lines[1] ~= "") then
+        vim.api.nvim_buf_set_lines(self.popup.bufnr, -1, -1, false, { "", unpack(s) })
+    else
+        vim.api.nvim_buf_set_lines(self.popup.bufnr, 0, -1, false, s)
+    end
+end
+
 function testcase:autocmds()
     self.popup:on(
         { "TextChanged", "TextChangedI", "TextChangedP", "TextChangedT" },
@@ -152,7 +163,7 @@ function testcase:init(parent)
             text = {
                 top = (" (H) %s "):format(t("Testcases")),
                 top_align = "center",
-                bottom = (" (r) %s "):format(t("Reset")),
+                bottom = (" (r) %s | (U) %s "):format(t("Reset"), t("Use Testcase")),
                 bottom_align = "center",
             },
         },

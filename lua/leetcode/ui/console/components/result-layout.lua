@@ -17,8 +17,7 @@ local NuiText = require("nui.text")
 ---@field parent lc.Console
 ---@field group lc-ui.Group
 ---@field cases lc.Cases
----@field case lc-ui.Group
----@field case_idx integer
+---@field case lc.Result.Case
 local ResultLayout = {}
 ResultLayout.__index = ResultLayout
 setmetatable(ResultLayout, Layout)
@@ -122,13 +121,13 @@ function ResultLayout:handle_submission_error(item) -- status code = 11
     header:append(testcases_passed(item), "leetcode_alt")
     self.group:append(Text:init({ header }))
 
-    self.case = Case:init(
-        item.input_formatted,
-        item.code_output,
-        item.expected_output,
-        item.std_output,
-        false
-    )
+    self.case = Case:init({
+        input = item.input_formatted,
+        raw_input = item.last_testcase,
+        output = item.code_output,
+        expected = item.expected_output,
+        std_output = item.std_output,
+    }, false)
     self.group:append(self.case)
 end
 
@@ -228,8 +227,11 @@ end
 function ResultLayout:change_case(idx)
     if vim.tbl_isempty(self.cases) then return end
     if not self.cases[idx] then return end
-    self.case.components = { self.cases[idx] }
-    self.parent.result:draw()
+
+    if self.case then
+        self.case.components = { self.cases[idx] }
+        self.parent.result:draw()
+    end
 end
 
 ---@param item lc.interpreter_response
@@ -283,6 +285,7 @@ end
 
 function ResultLayout:clear()
     if self.cases then self.cases:clear() end
+    self.case = nil
     Layout.clear(self)
 end
 

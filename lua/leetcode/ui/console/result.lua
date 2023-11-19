@@ -7,6 +7,7 @@ local NuiPopup = require("nui.popup")
 
 ---@class lc.Result : lc.Console.Popup
 ---@field layout lc.ResultLayout
+---@field last_testcase string
 local result = {}
 result.__index = result
 setmetatable(result, console_popup)
@@ -25,6 +26,8 @@ function result:handle(item)
     self:set_popup_border_hi(item._.hl)
     self.layout:handle_res(item)
 
+    if item.last_testcase then self.last_testcase = item.last_testcase end
+
     if item._.submission then
         local status = item.status_code == 10 and "ac" or "notac"
         problemlist.change_status(self.parent.parent.q.title_slug, status)
@@ -35,6 +38,7 @@ end
 
 function result:clear()
     self.layout:clear()
+    self.last_testcase = nil
     self.popup.border:set_highlight("FloatBorder")
 end
 
