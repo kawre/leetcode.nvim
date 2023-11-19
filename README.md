@@ -297,7 +297,7 @@ return {
 
 ## ✅ Todo
 
-- \[ \] CN version
+- \[x\] CN version
 - \[x\] Statistics menu page
 - \[ \] Docs
 - \[x\] Hints pop-up

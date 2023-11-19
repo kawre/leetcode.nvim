@@ -93,7 +93,7 @@ local function t(text)
         return text
     end
 
-    return not config.is_cn and text or translate[txt]
+    return config.is_cn and config.user.cn.translator and translate[txt] or text
 end
 
 ---@param text string|string[]
