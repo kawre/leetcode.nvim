@@ -24,18 +24,16 @@
 ---| "react"
 ---| "vanillajs"
 
----@alias lc.domain
----| "com"
----| "cn"
-
 ---@alias lc.hook
 ---| "LeetEnter"
 ---| "LeetQuestionNew"
 
 ---@class lc.UserConfig
 local M = {
-    ---@type lc.domain
-    domain = "com", -- For now "com" is the only one supported
+    cn = { -- leetcode.cn
+        enabled = false, ---@type boolean
+        translate_problems = true, ---@type boolean
+    },
 
     ---@type string
     arg = "leetcode.nvim",
@@ -48,6 +46,10 @@ local M = {
 
     ---@type boolean
     logging = true,
+
+    cache = {
+        update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
+    },
 
     console = {
         open_on_runcode = true, ---@type boolean
@@ -86,21 +88,6 @@ local M = {
 
     ---@type boolean
     image_support = false, -- setting this to `true` will disable question description wrap
-
-    cache = {
-        ---@type integer
-        update_interval = 60 * 60 * 24 * 7, -- 7 days
-    },
-
-    plugins = {
-        cn = {
-            enabled = true,
-            translate_problems = true, ---@type boolean
-        },
-    },
-    -- cn = {
-    --     translate = true, ---@type boolean
-    -- },
 }
 
 return M

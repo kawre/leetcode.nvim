@@ -79,7 +79,7 @@ arguments.list = {
     -- orderBy = { "desc", "asc" },
     difficulty = { "Easy", "Medium", "Hard" },
     status = { "ac", "notac", "todo" },
-    topics = topics,
+    -- topics = topics,
 }
 
 return arguments

@@ -174,9 +174,9 @@ function Calendar:fetch()
 end
 
 function Calendar:update()
-    local spinner = Spinner:init("updating...")
+    local spinner = Spinner:init("updating calendar")
     statistics.calendar(function(res, err)
-        spinner:stop(nil, true, { timeout = 200 })
+        spinner:stop("calendar updated", true, { timeout = 200 })
         self:handle_res(res, err)
     end)
 end

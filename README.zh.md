@@ -76,20 +76,26 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 
 ```lua
 {
-    ---@type lc.domain
-    domain = "com", -- 目前仅支持 "com"
-
     ---@type string
     arg = "leetcode.nvim",
 
     ---@type lc.lang
     lang = "cpp",
 
+    cn = { -- leetcode.cn
+        enabled = false, ---@type boolean
+        translate_problems = true, ---@type boolean
+    },
+
     ---@type string
     directory = vim.fn.stdpath("data") .. "/leetcode/",
 
     ---@type boolean
     logging = true,
+
+    cache = {
+        update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
+    },
 
     console = {
         open_on_runcode = true, ---@type boolean
@@ -127,7 +133,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
     },
 
     ---@type boolean
-    image_support = false, -- 将此设置为 `true` 将禁用问题描述的换行
+    image_support = false, -- setting this to `true` will disable question description wrap
 }
 ```
 
@@ -151,9 +157,9 @@ arg = "leetcode.nvim"
 lang = "cpp"
 ```
 
-### domain
+### cn
 
-[LeetCode] 领域
+将 [leetcode.com][leetcode] 替换为 [leetcode.cn]
 
 ```lua
 ---@type lc.domain
@@ -246,7 +252,7 @@ image_support = false, -- 将此设置为 `true` 将禁用问题描述的换行
 可以带有可选参数。要堆叠参数值，请使用 , 将它们分隔开
 
 ```
-Leet list status=<status> topics=<topic1,...,topicN> difficulty=<difficulty>
+Leet list status=<status> difficulty=<difficulty>
 ```
 
 ## 🚀 使用方法
@@ -301,6 +307,7 @@ return {
 [image.nvim]: https://github.com/3rd/image.nvim
 [lazy.nvim]: https://github.com/folke/lazy.nvim
 [leetcode]: https://leetcode.com
+[leetcode.cn]: https://leetcode.cn
 [leetcode.nvim]: https://github.com/kawre/leetcode.nvim
 [neovim]: https://github.com/neovim/neovim
 [nerd-font]: https://www.nerdfonts.com

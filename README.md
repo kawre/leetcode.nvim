@@ -72,20 +72,26 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
 ```lua
 {
-    ---@type lc.domain
-    domain = "com", -- For now "com" is the only one supported
-
     ---@type string
     arg = "leetcode.nvim",
 
     ---@type lc.lang
     lang = "cpp",
 
+    cn = { -- leetcode.cn
+        enabled = false, ---@type boolean
+        translate_problems = true, ---@type boolean
+    },
+
     ---@type string
     directory = vim.fn.stdpath("data") .. "/leetcode/",
 
     ---@type boolean
     logging = true,
+
+    cache = {
+        update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
+    },
 
     console = {
         open_on_runcode = true, ---@type boolean
@@ -147,13 +153,15 @@ Language to start your session with
 lang = "cpp"
 ```
 
-### domain
+### cn
 
-[LeetCode] domain.
+Use [leetcode.cn] instead of [leetcode.com][leetcode]
 
 ```lua
----@type lc.domain
-domain = "com" -- For now "com" is the only one supported
+cn = { -- leetcode.cn
+    enabled = false, ---@type boolean
+    translate_problems = true, ---@type boolean
+},
 ```
 
 ### directory
@@ -242,7 +250,7 @@ image_support = false, -- setting this to `true` will disable question descripti
 Can take optional arguments. To stack argument values separate them by a `,`
 
 ```
-Leet list status=<status> topics=<topic1,...,topicN> difficulty=<difficulty>
+Leet list status=<status> difficulty=<difficulty>
 ```
 
 ## 🚀 Usage
@@ -303,6 +311,7 @@ return {
 [image.nvim]: https://github.com/3rd/image.nvim
 [lazy.nvim]: https://github.com/folke/lazy.nvim
 [leetcode]: https://leetcode.com
+[leetcode.cn]: https://leetcode.cn
 [leetcode.nvim]: https://github.com/kawre/leetcode.nvim
 [neovim]: https://github.com/neovim/neovim
 [nerd-font]: https://www.nerdfonts.com

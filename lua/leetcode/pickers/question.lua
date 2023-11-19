@@ -108,20 +108,20 @@ local function filter_questions(questions, opts)
 
     ---@param q lc.Cache.Question
     return vim.tbl_filter(function(q)
-        if opts.topics then
-            for _, topic in ipairs(opts.topics) do
-                local flag = false
-
-                for _, tag in ipairs(q.topic_tags) do
-                    if tag.slug == topic then
-                        flag = true
-                        break
-                    end
-                end
-
-                if not flag then return false end
-            end
-        end
+        -- if opts.topics then
+        --     for _, topic in ipairs(opts.topics) do
+        --         local flag = false
+        --
+        --         for _, tag in ipairs(q.topic_tags) do
+        --             if tag.slug == topic then
+        --                 flag = true
+        --                 break
+        --             end
+        --         end
+        --
+        --         if not flag then return false end
+        --     end
+        -- end
 
         if opts.difficulty then
             if not vim.tbl_contains(opts.difficulty, q.difficulty) then return false end

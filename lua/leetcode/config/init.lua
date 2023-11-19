@@ -39,7 +39,7 @@ end
 function config.load_plugins()
     local plugins = {}
 
-    if config.user.plugins.cn.enabled then table.insert(plugins, "cn") end
+    if config.user.cn.enabled then table.insert(plugins, "cn") end
 
     for _, plugin in ipairs(plugins) do
         local ok, plug = pcall(require, "leetcode-plugins." .. plugin)
