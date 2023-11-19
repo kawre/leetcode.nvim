@@ -1,6 +1,7 @@
 local Text = require("leetcode-ui.component.text")
 local config = require("leetcode.config")
 local NuiLine = require("nui.line")
+local t = require("leetcode.translator")
 
 ---@class lc-menu.Footer : lc-ui.Text
 ---@field text lc-ui.Text
@@ -19,7 +20,7 @@ function footer:init(opts)
 
     if config.auth.is_signed_in then
         local line = NuiLine()
-        line:append("Signed in as: ", "leetcode_alt")
+        line:append(t("Signed in as") .. ": ", "leetcode_alt")
         line:append(config.auth.name)
         text:append(line)
     end

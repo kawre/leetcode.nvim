@@ -1,5 +1,6 @@
 local log = require("leetcode.logger")
-local cookie = require("leetcode.cache.cookie")
+local Cookie = require("leetcode.cache.cookie")
+local utils = require("leetcode.utils")
 
 ---@class lc-menu
 ---@field layout lc-ui.Layout
@@ -113,21 +114,19 @@ function menu:keymaps()
 end
 
 function menu:handle_mount()
-    if cookie.get() then
+    if Cookie.get() then
         self:set_layout("loading")
 
         local auth_api = require("leetcode.api.auth")
-        auth_api.user(function(auth, err)
+        auth_api.user(function(_, err)
             if err then
-                local utils = require("leetcode.utils")
                 utils.log_err(err)
-
-                return self:set_layout("signin")
+                Cookie.delete()
+                self:set_layout("signin")
+                return
             end
 
-            local logged_in = auth.is_signed_in
-            local layout = logged_in and "menu" or "signin"
-            self:set_layout(layout)
+            self:set_layout("menu")
         end)
     else
         self:set_layout("signin")

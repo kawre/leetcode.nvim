@@ -1,10 +1,12 @@
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
+local utils = require("leetcode.utils")
 
 local img_ok, image_api = pcall(require, "image")
 local img_sup = img_ok and config.user.image_support
 
 local parser = require("leetcode.parser")
+local t = require("leetcode.translator")
 
 local Layout = require("leetcode-ui.layout")
 local Text = require("leetcode-ui.component.text")
@@ -16,8 +18,6 @@ local Split = require("nui.split")
 ---@class lc.Description
 ---@field split NuiSplit
 ---@field parent lc.Question
----@field content any
----@field title any
 ---@field layout lc-ui.Layout
 ---@field visible boolean
 ---@field images table<string, Image>
@@ -120,16 +120,16 @@ function description:populate()
     local q = self.parent.q
 
     local linkline = NuiLine()
-    local question_link = string.format("%s/problems/%s/", config.domain, q.title_slug)
-    linkline:append(question_link, "leetcode_alt")
+    linkline:append(self.parent.cache.link or "", "leetcode_alt")
 
     local titleline = NuiLine()
     titleline:append(q.frontend_id .. ". ", "leetcode_normal")
-    titleline:append(q.title)
+
+    titleline:append(utils.translate(q.title, q.translated_title))
 
     local statsline = NuiLine()
     statsline:append(
-        q.difficulty,
+        t(q.difficulty),
         ({
             ["Easy"] = "leetcode_easy",
             ["Medium"] = "leetcode_medium",
@@ -138,24 +138,24 @@ function description:populate()
     )
     statsline:append(" | ")
 
-    statsline:append(q.likes .. "  ", "leetcode_alt")
-    statsline:append(q.dislikes .. " ", "leetcode_alt")
+    statsline:append(q.likes .. " ", "leetcode_alt")
+    if not config.is_cn then statsline:append(" " .. q.dislikes .. " ", "leetcode_alt") end
     statsline:append(" | ")
 
     statsline:append(
-        string.format("%s of %s", q.stats.acRate, q.stats.totalSubmission),
+        ("%s %s %s"):format(q.stats.acRate, t("of"), q.stats.totalSubmission),
         "leetcode_alt"
     )
     if not vim.tbl_isempty(q.hints) then
         statsline:append(" | ")
-        statsline:append("󰛨 Hints", "leetcode_hint")
+        statsline:append("󰛨 " .. t("Hints"), "leetcode_hint")
     end
 
     local titlecomp = Text:init({ titleline }, { position = "center" })
     local statscomp = Text:init({ statsline }, { position = "center" })
     local linkcomp = Text:init({ linkline }, { position = "center" })
 
-    local contents = parser:parse(q.content)
+    local contents = parser:parse(utils.translate(q.content, q.translated_content))
 
     self.layout = Layout:init({
         linkcomp,

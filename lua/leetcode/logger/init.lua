@@ -33,11 +33,12 @@ logger.warn = function(msg) return logger.log(msg, lvls.WARN) end
 logger.error = function(msg) return logger.log(msg, lvls.ERROR) end
 
 ---@param msg any
+---@param show? boolean
 ---@return any
-logger.debug = function(msg)
+logger.debug = function(msg, show)
     if not config.debug then return msg end
 
-    logger.log(debug.traceback(normalize(msg) .. "\n"), lvls.DEBUG)
+    logger.log(debug.traceback(normalize(msg) .. "\n"), show and lvls.ERROR or lvls.DEBUG)
     return msg
 end
 

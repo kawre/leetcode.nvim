@@ -1,10 +1,12 @@
-local Header = require("leetcode-menu.components.header")
+local config = require("leetcode.config")
+local Spinner = require("leetcode.logger.spinner")
 local Text = require("leetcode-ui.component.text")
+local statistics = require("leetcode.api.statistics")
+local t = require("leetcode.translator")
 
 local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
 
-local stats_api = require("leetcode.api.statistics")
 local log = require("leetcode.logger")
 
 ---@class lc-ui.Calendar : lc-ui.Text
@@ -36,25 +38,28 @@ function Calendar:get_submission(osdate)
     end
 end
 
----@param res lc.Stats.Res
+---@param res { calendar: lc.Stats.CalendarData }
 function Calendar:handle_res(res)
     self.calendar = res.calendar
 
-    local time = os.date("*t")
-    self.curr_time = os.time({
+    local time = os.date("*t") --[[@as table]]
+    self.curr_time = os.time(vim.tbl_extend("force", time, {
         year = time.year - 1,
         month = time.month,
         day = time.day,
         hour = 1,
         isdst = false,
-    })
+    }))
+
     self.threshold = os.time({
         year = time.year,
         month = time.month,
-        day = time.day + 1,
+        day = time.day,
         hour = 1,
         isdst = false,
     })
+    if self.threshold <= os.time(time) then self.threshold = self.threshold + 24 * 60 * 60 end
+
     self.last_year_sub_count = 0
     self.month_lens = {}
     self.max_sub_count = 0
@@ -75,6 +80,7 @@ function Calendar:handle_res(res)
     self:handle_months()
     self:handle_submissions()
     self.lines = self.calendar_lines
+    _Lc_Menu:draw()
 end
 
 function Calendar:handle_submissions()
@@ -84,16 +90,22 @@ function Calendar:handle_submissions()
     end
 
     local subs_line = NuiLine()
-    subs_line:append("" .. self.last_year_sub_count)
-    subs_line:append(" submissions", "leetcode_alt")
+    if not config.is_cn then
+        subs_line:append("" .. self.last_year_sub_count)
+        subs_line:append((" %s"):format(t("submissions")), "leetcode_alt")
+    else
+        subs_line:append(t("submissions"), "leetcode_alt")
+        subs_line:append(" " .. self.last_year_sub_count)
+        subs_line:append(" 次", "leetcode_alt")
+    end
 
     local ad_line = NuiLine()
-    ad_line:append("active days:", "leetcode_alt")
+    ad_line:append(("%s:"):format(t("active days")), "leetcode_alt")
     ad_line:append("  ", "leetcode_list")
     ad_line:append("" .. self.calendar.total_active_days)
 
     local streak_line = NuiLine()
-    streak_line:append("max streak:", "leetcode_alt")
+    streak_line:append(("%s:"):format(t("max streak")), "leetcode_alt")
     streak_line:append(" 󰈸 ", "leetcode_list")
     streak_line:append("" .. self.calendar.streak)
 
@@ -145,9 +157,8 @@ local function square_hl(count, max_count)
     return ("leetcode_calendar_%d"):format(num)
 end
 
----@param m integer
-function Calendar:handle_weekdays(m)
-    if self.curr_time >= self.threshold then return end
+function Calendar:handle_weekdays()
+    if self.curr_time > self.threshold then return end
 
     local curr = os.date("*t", self.curr_time)
     local count = self:get_submission(curr) or 0
@@ -158,15 +169,26 @@ function Calendar:handle_weekdays(m)
     self.curr_time = self.curr_time + (60 * 60 * 24)
 end
 
----@param res lc.Stats.Res
-function Calendar:init(res, opts)
-    opts = vim.tbl_deep_extend("force", {
+function Calendar:fetch()
+    statistics.calendar(function(res, err) self:handle_res(res, err) end)
+end
+
+function Calendar:update()
+    local spinner = Spinner:init("updating calendar")
+    statistics.calendar(function(res, err)
+        spinner:stop("calendar updated", true, { timeout = 200 })
+        self:handle_res(res, err)
+    end)
+end
+
+function Calendar:init()
+    local opts = {
         position = "center",
         hl = "Keyword",
-    }, opts or {})
+    }
 
-    self = setmetatable(Text:init({}, opts), self)
-    self:handle_res(res)
+    self = setmetatable(Text:init({ t("loading...") }, opts), self)
+    self:fetch()
     return self
 end
 

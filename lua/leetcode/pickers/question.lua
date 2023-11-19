@@ -1,4 +1,6 @@
 local log = require("leetcode.logger")
+local t = require("leetcode.translator")
+local utils = require("leetcode.utils")
 
 local Question = require("leetcode.ui.question")
 
@@ -15,7 +17,12 @@ local action_state = require("telescope.actions.state")
 ---
 ---@return string
 local function question_formatter(question)
-    return string.format("%d. %s %s", question.frontend_id, question.title, question.title_slug)
+    return ("%s. %s %s %s"):format(
+        tostring(question.frontend_id),
+        question.title,
+        question.title_cn,
+        question.title_slug
+    )
 end
 
 ---@param question lc.Cache.Question
@@ -26,7 +33,7 @@ local function display_difficulty(question)
         ["Hard"] = "leetcode_hard",
     }
 
-    return { "󱓻", hl[question.difficulty] }
+    return { "󱓻", hl[question.difficulty] or "" }
 end
 
 ---@param question lc.Cache.Question
@@ -49,7 +56,8 @@ end
 local function display_question(question)
     local ac_rate = { ("%.1f%%"):format(question.ac_rate), "leetcode_ref" }
     local index = { question.frontend_id .. ".", "leetcode_normal" }
-    local title = { question.title }
+
+    local title = { utils.translate(question.title, question.title_cn) }
 
     return unpack({ index, title, ac_rate })
 end
@@ -100,20 +108,20 @@ local function filter_questions(questions, opts)
 
     ---@param q lc.Cache.Question
     return vim.tbl_filter(function(q)
-        if opts.topics then
-            for _, topic in ipairs(opts.topics) do
-                local flag = false
-
-                for _, tag in ipairs(q.topic_tags) do
-                    if tag.slug == topic then
-                        flag = true
-                        break
-                    end
-                end
-
-                if not flag then return false end
-            end
-        end
+        -- if opts.topics then
+        --     for _, topic in ipairs(opts.topics) do
+        --         local flag = false
+        --
+        --         for _, tag in ipairs(q.topic_tags) do
+        --             if tag.slug == topic then
+        --                 flag = true
+        --                 break
+        --             end
+        --         end
+        --
+        --         if not flag then return false end
+        --     end
+        -- end
 
         if opts.difficulty then
             if not vim.tbl_contains(opts.difficulty, q.difficulty) then return false end
@@ -132,7 +140,7 @@ return {
     pick = function(questions, opts)
         pickers
             .new(theme, {
-                prompt_title = "Select a Question",
+                prompt_title = t("Select a Question"),
                 finder = finders.new_table({
                     results = filter_questions(questions, opts),
                     entry_maker = entry_maker,
@@ -145,7 +153,7 @@ return {
 
                         local q = selection.value
                         if q.paid_only and not config.auth.is_premium then
-                            log.warn("Question is for premium users only")
+                            log.warn(t("Question is for premium users only"))
                             return
                         end
 

@@ -18,12 +18,12 @@ setmetatable(padding, component)
 ---
 ---@return lc-ui.Component
 function padding:init(int)
-    local t = {}
+    local tbl = {}
     for _ = 1, int, 1 do
-        table.insert(t, Line())
+        table.insert(tbl, Line())
     end
 
-    return setmetatable({ lines = t, opts = {} }, self)
+    return setmetatable({ lines = tbl, opts = {} }, self)
 end
 
 return padding

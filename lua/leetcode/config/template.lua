@@ -24,40 +24,33 @@
 ---| "react"
 ---| "vanillajs"
 
----@alias lc.sql
----| "pythondata"
----| "mysql"
----| "mssql"
----| "oraclesql"
----| "postgresql"
-
----@alias lc.domain
----| "com"
----| "cn"
-
 ---@alias lc.hook
 ---| "LeetEnter"
 ---| "LeetQuestionNew"
 
 ---@class lc.UserConfig
 local M = {
-    ---@type lc.domain
-    domain = "com", -- For now "com" is the only one supported
-
     ---@type string
     arg = "leetcode.nvim",
 
     ---@type lc.lang
     lang = "cpp",
 
-    ---@type lc.sql
-    sql = "mysql",
+    cn = { -- leetcode.cn
+        enabled = false, ---@type boolean
+        translate_problems = true, ---@type boolean
+        translator = true, ---@type boolean
+    },
 
     ---@type string
     directory = vim.fn.stdpath("data") .. "/leetcode/",
 
     ---@type boolean
     logging = true,
+
+    cache = {
+        update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
+    },
 
     console = {
         open_on_runcode = true, ---@type boolean

@@ -3,6 +3,8 @@ local NuiPopup = require("nui.popup")
 local NuiText = require("nui.text")
 local NuiLine = require("nui.line")
 local config = require("leetcode.config")
+local t = require("leetcode.translator")
+local utils = require("leetcode.utils")
 
 ---@class lc.Hints
 ---@field popup NuiPopup
@@ -27,11 +29,14 @@ function Info:mount()
     end
 
     if not vim.tbl_isempty(hints) then
-        table.insert(nodes, NuiTree.Node({ text = NuiText("Hints 󰛨", "leetcode_hint") }, hints))
+        table.insert(
+            nodes,
+            NuiTree.Node({ text = NuiText(t("Hints") .. " 󰛨", "leetcode_hint") }, hints)
+        )
     else
         table.insert(
             nodes,
-            NuiTree.Node({ text = NuiText(" No hints available", "leetcode_error") })
+            NuiTree.Node({ text = NuiText(" " .. t("No hints available"), "leetcode_error") })
         )
     end
     table.insert(nodes, NuiTree.Node({ text = "" }))
@@ -47,11 +52,14 @@ function Info:mount()
     end
 
     if not vim.tbl_isempty(topics) then
-        table.insert(nodes, NuiTree.Node({ text = NuiText("Topics ", "Number") }, topics))
+        table.insert(
+            nodes,
+            NuiTree.Node({ text = NuiText(t("Topics") .. " ", "Number") }, topics)
+        )
     else
         table.insert(
             nodes,
-            NuiTree.Node({ text = NuiText(" No topics available", "leetcode_error") })
+            NuiTree.Node({ text = NuiText(" " .. t("No topics available"), "leetcode_error") })
         )
     end
     table.insert(nodes, NuiTree.Node({ text = " " }))
@@ -66,9 +74,9 @@ function Info:mount()
             ["Hard"] = "leetcode_hard",
         }
         line:append("󱓻 ", hl[q.difficulty])
-        line:append(q.title)
+        line:append(utils.translate(q.title, q.translated_title))
 
-        local lock = not config.auth.is_premium and q.paid_only and "  Premium" or ""
+        local lock = not config.auth.is_premium and q.paid_only and "  " .. t("Premium") or ""
         line:append(lock, "leetcode_medium")
 
         table.insert(sim_questions, NuiTree.Node({ text = line, question = q }))
@@ -76,12 +84,17 @@ function Info:mount()
     if not vim.tbl_isempty(sim_questions) then
         table.insert(
             nodes,
-            NuiTree.Node({ text = NuiText("Similar Questions ", "leetcode_ref") }, sim_questions)
+            NuiTree.Node(
+                { text = NuiText(t("Similar Questions") .. " ", "leetcode_ref") },
+                sim_questions
+            )
         )
     else
         table.insert(
             nodes,
-            NuiTree.Node({ text = NuiText(" No similar questions available", "leetcode_error") })
+            NuiTree.Node({
+                text = NuiText(" " .. t("No similar questions available"), "leetcode_error"),
+            })
         )
     end
 
@@ -191,7 +204,7 @@ function Info:init(parent)
             },
             style = "rounded",
             text = {
-                top = " Question Info ",
+                top = (" %s "):format(t("Question Info")),
             },
         },
         buf_options = {

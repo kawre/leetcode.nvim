@@ -1,6 +1,7 @@
 local log = require("leetcode.logger")
 local Question = require("leetcode.ui.question")
 local utils = require("leetcode.utils")
+local t = require("leetcode.translator")
 
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
@@ -69,7 +70,7 @@ local opts = require("telescope.themes").get_dropdown()
 M.pick_lang = function(question, callback)
     pickers
         .new(opts, {
-            prompt_title = "Available Languages",
+            prompt_title = t("Available Languages"),
             finder = finders.new_table({
                 results = question.q.code_snippets,
                 entry_maker = entry_maker,
@@ -82,10 +83,12 @@ M.pick_lang = function(question, callback)
 
                     local snippet = selection.value
                     if question.lang == snippet.t.slug then
-                        return log.warn("Language already set to: " .. snippet.t.lang)
+                        return log.warn(
+                            ("%s: %s"):format(t("Language already set to"), snippet.t.lang)
+                        )
                     end
 
-                    config[snippet.t.sql and "sql" or "lang"] = snippet.t.slug
+                    config.lang = snippet.t.slug
                     actions.close(prompt_bufnr)
                     callback(snippet)
                 end)
@@ -100,7 +103,7 @@ end
 M.pick = function(question)
     pickers
         .new(opts, {
-            prompt_title = "Available Languages",
+            prompt_title = t("Available Languages"),
             finder = finders.new_table({
                 results = question.q.code_snippets,
                 entry_maker = entry_maker,
@@ -113,10 +116,12 @@ M.pick = function(question)
 
                     local snippet = selection.value
                     if question.lang == snippet.t.slug then
-                        return log.warn("Language already set to: " .. snippet.t.lang)
+                        return log.warn(
+                            ("%s: %s"):format(t("Language already set to"), snippet.t.lang)
+                        )
                     end
 
-                    config[snippet.t.sql and "sql" or "lang"] = snippet.t.slug
+                    config.lang = snippet.t.slug
                     actions.close(prompt_bufnr)
                     Question:init(question.cache)
                 end)

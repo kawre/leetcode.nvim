@@ -1,79 +1,66 @@
 local utils = require("leetcode.api.utils")
+local queries = require("leetcode.api.queries")
+local config = require("leetcode.config")
+local urls = require("leetcode.api.urls")
+
+local log = require("leetcode.logger")
 
 ---@class lc.ProblemsApi
 local M = {}
 
-local question_fields = [[ 
-    frontend_id: questionFrontendId
-    title
-    title_slug: titleSlug
-    status
-    paid_only: isPaidOnly
-    ac_rate: acRate
-    difficulty
-    topic_tags: topicTags {
-        name
-        slug
-        id
-    }
-]]
-
 ---@return lc.Cache.Question[]
 function M.all(cb)
-    local variables = {
-        limit = 9999,
-    }
-
-    local query = string.format(
-        [[
-            query problemsetQuestionList($limit: Int) {
-              problemsetQuestionList: questionList(
-                  categorySlug: ""
-                  limit: $limit
-                  filters: {}
-              ) {
-                questions: data { %s }
-              }
-            }
-        ]],
-        question_fields
-    )
+    local endpoint = urls.problems:format("algorithms")
 
     if cb then
-        utils.query(query, variables, function(res)
-            local data = res.data
-            local questions = data["problemsetQuestionList"]["questions"]
-            cb(questions)
+        utils.get(endpoint, function(res, err)
+            if err then return end
+
+            local problems = utils.normalize_problems(res.stat_status_pairs)
+
+            if config.is_cn then
+                M.translated_titles(function(titles)
+                    problems = utils.translate_titles(problems, titles)
+                    cb(problems)
+                end)
+            else
+                cb(problems)
+            end
         end)
     else
-        local res, err = utils.query(query, variables)
-        local data = res.data
-        return data["problemsetQuestionList"]["questions"]
+        local res, err = utils.get(endpoint)
+        local problems = utils.normalize_problems(res.stat_status_pairs)
+
+        if config.is_cn then
+            local titles = M.translated_titles()
+            return utils.translate_titles(problems, titles)
+        else
+            return problems
+        end
     end
 end
 
 function M.question_of_today(cb)
-    utils.auth_guard()
+    local query = queries.qot
 
-    local query = string.format(
-        [[
-            query questionOfToday {
-              activeDailyCodingChallengeQuestion {
-                userStatus
-                link
-                question { %s }
-              }
-            }
-        ]],
-        question_fields
-    )
+    utils.query(query, {}, {
+        callback = function(res)
+            local tday_record = res.data["todayRecord"]
+            local question = config.is_cn and tday_record[1].question or tday_record.question
+            cb(question)
+        end,
+    })
+end
 
-    local callback = function(res)
-        local question = res.data["activeDailyCodingChallengeQuestion"]["question"]
-        cb(question)
+function M.translated_titles(cb)
+    local query = queries.translations
+
+    if cb then
+        utils.query(query, {}, { callback = function(res, err) cb(res.data.translations) end })
+    else
+        local res, err = utils.query(query, {})
+        return res.data.translations
     end
-
-    utils.query(query, {}, callback)
 end
 
 return M

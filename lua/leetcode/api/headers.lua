@@ -1,19 +1,21 @@
-local cookie = require("leetcode.cache.cookie")
+local Cookie = require("leetcode.cache.cookie")
+local config = require("leetcode.config")
 
 local headers = {}
 
-headers.get = function()
-    local c = cookie.get()
+function headers.get()
+    local cookie = Cookie.get()
 
-    return {
-        ["Referer"] = "https://leetcode.com/",
-        ["Origin"] = "https://leetcode.com",
-        ["Host"] = "leetcode.com",
-        ["Cookie"] = cookie.to_str(),
-        ["Content-Type"] = "application/json",
+    return vim.tbl_extend("force", {
+        ["Referer"] = ("https://leetcode.%s"):format(config.domain),
+        ["Origin"] = ("https://leetcode.%s/"):format(config.domain),
+        ["content-type"] = "application/json",
         ["Accept"] = "application/json",
-        ["x-csrftoken"] = c and c.csrftoken or nil,
-    }
+        ["Host"] = ("leetcode.%s"):format(config.domain),
+    }, cookie and {
+        ["Cookie"] = cookie.str,
+        ["x-csrftoken"] = cookie.csrftoken,
+    } or {})
 end
 
 return headers

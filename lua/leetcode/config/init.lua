@@ -12,17 +12,18 @@ local config = {
     user = template,
 
     name = "leetcode.nvim",
-    domain = "https://leetcode.com",
+    domain = "com",
+    is_cn = false,
     debug = false,
     lang = "cpp",
-    sql = "mysql",
     home = {}, ---@type Path
+    version = "1.0.0",
 
     langs = require("leetcode.config.langs"),
     icons = require("leetcode.config.icons"),
 
-    ---@diagnostic disable-next-line
-    auth = {}, ---@type lc.UserStatus
+    ---@type lc.UserStatus
+    auth = {}, ---@diagnostic disable-line
 }
 
 ---Merge configurations into default configurations and set it as user configurations.
@@ -32,10 +33,18 @@ function config.apply(cfg)
     config.user = vim.tbl_deep_extend("force", config.default, cfg)
 
     config.debug = config.user.debug or false ---@diagnostic disable-line
-    config.domain = "https://leetcode." .. config.user.domain
-
     config.lang = config.user.lang
-    config.sql = config.user.sql
+end
+
+function config.load_plugins()
+    local plugins = {}
+
+    if config.user.cn.enabled then table.insert(plugins, "cn") end
+
+    for _, plugin in ipairs(plugins) do
+        local ok, plug = pcall(require, "leetcode-plugins." .. plugin)
+        if ok then plug.load() end
+    end
 end
 
 return config

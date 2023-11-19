@@ -38,7 +38,6 @@ function leetcode.validate()
 
     assert(vim.fn.has("nvim-0.9.0") == 1, "Neovim >= 0.9.0 required")
     assert(utils.get_lang(config.lang), "Unsupported Language: " .. config.lang)
-    assert(utils.get_lang(config.sql), "Unsupported SQL dialect: " .. config.sql)
 end
 
 function leetcode.start()
@@ -51,6 +50,7 @@ function leetcode.start()
     config.home:mkdir()
 
     leetcode.setup_cmds()
+    config.load_plugins()
 
     local utils = require("leetcode.utils")
     utils.exec_hooks("LeetEnter")

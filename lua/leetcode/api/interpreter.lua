@@ -1,4 +1,6 @@
 local log = require("leetcode.logger")
+local t = require("leetcode.translator")
+local urls = require("leetcode.api.urls")
 
 local utils = require("leetcode.api.utils")
 local config = require("leetcode.config")
@@ -8,10 +10,10 @@ local spinner = require("leetcode.logger.spinner")
 local interpreter = {}
 
 local check_state = {
-    ["PENDING"] = "Pending…",
-    ["STARTED"] = "Judging…",
-    ["SUCCESS"] = "Finished",
-    ["FAILURE"] = "Failed", -- CODE: 16
+    ["PENDING"] = t("Pending") .. "…",
+    ["STARTED"] = t("Judging") .. "…",
+    ["SUCCESS"] = t("Finished"),
+    ["FAILURE"] = t("Failed"), -- CODE: 16
 }
 
 ---@param id string
@@ -22,7 +24,7 @@ function interpreter.listener(id, callback)
     local function listen()
         interpreter.check(id, function(item)
             if item.status_code then
-                noti:stop(item.status_msg, false)
+                noti:stop(t(item.status_msg), false)
                 callback(item)
                 return
             end
@@ -51,14 +53,14 @@ end
 ---@param body lc.Interpret.body
 ---@param callback function
 function interpreter.interpret_solution(title_slug, body, callback)
-    local url = (config.domain .. "/problems/%s/interpret_solution/"):format(title_slug)
+    local url = urls.interpret:format(title_slug)
     local res = interpreter.fetch(url, body)
 
     if res then interpreter.listener(res.interpret_id, callback) end
 end
 
 function interpreter.submit(title_slug, body, callback)
-    local url = (config.domain .. "/problems/%s/submit/"):format(title_slug)
+    local url = urls.submit:format(title_slug)
     local res = interpreter.fetch(url, body)
 
     if res then interpreter.listener(res.submission_id, callback) end
@@ -69,7 +71,7 @@ end
 ---
 ---@return lc.Interpreter.Response
 function interpreter.check(id, cb)
-    local url = (config.domain .. "/submissions/detail/%s/check/"):format(id)
+    local url = urls.check:format(id)
     utils.get(url, cb)
 end
 
@@ -77,7 +79,7 @@ function interpreter.fetch(url, body)
     local res, err = utils.post(url, body)
 
     if err then
-        if err.status == 429 then log.warn("You have attempted to run code too soon") end
+        if err.status == 429 then log.warn(t("You have attempted to run code too soon")) end
         return
     end
 

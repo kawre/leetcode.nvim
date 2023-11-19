@@ -1,4 +1,5 @@
 local config = require("leetcode.config")
+local t = require("leetcode.translator")
 
 ---@class lc.Utils
 local utils = {}
@@ -61,14 +62,13 @@ function utils.map(mode, lhs, rhs, opts)
     vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 
-function utils.detect_duplicate_question(title_slug)
+---@param title_slug string
+---@param lang lc.lang
+function utils.detect_duplicate_question(title_slug, lang)
     local tabs = utils.curr_question_tabs()
 
     for _, q in ipairs(tabs) do
-        if
-            title_slug == q.question.q.title_slug
-            and (config.sql == q.question.lang or config.lang == q.question.lang)
-        then
+        if title_slug == q.question.q.title_slug and lang == q.question.lang then
             return q.tabpage
         end
     end
@@ -107,7 +107,7 @@ function utils.curr_question()
         return tab.question
     else
         local log = require("leetcode.logger")
-        log.error("No current question found")
+        log.error(t("No current question found"))
     end
 end
 
@@ -138,6 +138,20 @@ function utils.log_err(err)
         end
     else
         log.error(err)
+    end
+end
+
+---@param content string
+---@param translated_content string
+function utils.translate(content, translated_content)
+    if config.is_cn then
+        if config.user.cn.translate_problems then
+            return translated_content or content
+        else
+            return content or translated_content
+        end
+    else
+        return content
     end
 end
 

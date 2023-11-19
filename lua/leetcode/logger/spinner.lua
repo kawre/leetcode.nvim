@@ -1,5 +1,6 @@
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
+local t = require("leetcode.translator")
 
 ---@class lc.Spinner
 ---@field spinner lc.spinner | nil

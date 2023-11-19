@@ -1,5 +1,8 @@
 local Text = require("leetcode-ui.component.text")
 local NuiLine = require("nui.line")
+local utils = require("leetcode.api.utils")
+local statistics = require("leetcode.api.statistics")
+local t = require("leetcode.translator")
 
 local log = require("leetcode.logger")
 local hl = {
@@ -57,13 +60,19 @@ function Solved:handle_res(res)
     end
 
     local order = { "All", "Easy", "Medium", "Hard" }
+    local pad_len = 0
+    for _, diff in ipairs(order) do
+        pad_len = math.max(pad_len, vim.api.nvim_strwidth(t(diff)))
+    end
+
     for _, diff in ipairs(order) do
         local stat = subs[diff]
+        local diff_str = t(diff)
 
         local line = NuiLine()
-        line:append(diff, hl[diff])
+        line:append(diff_str, hl[diff])
 
-        local pad1 = (" "):rep(8 - vim.api.nvim_strwidth(diff))
+        local pad1 = (" "):rep(pad_len + 2 - vim.api.nvim_strwidth(diff_str))
         line:append(pad1)
 
         line:append(stat.line)
@@ -77,21 +86,17 @@ function Solved:handle_res(res)
     end
 
     self.lines = self.solved_lines
+    _Lc_Menu:draw()
 end
 
----@param res lc.Stats.Res
-function Solved:init(res, opts)
-    opts = vim.tbl_deep_extend("force", {
+function Solved:init()
+    local opts = {
         position = "center",
         hl = "Keyword",
-        -- padding = {
-        --     top = 4,
-        --     bot = 2,
-        -- },
-    }, opts or {})
+    }
 
-    self = setmetatable(Text:init({}, opts), self)
-    self:handle_res(res)
+    self = setmetatable(Text:init({ t("loading...") }, opts), self)
+    statistics.solved(function(res, err) self:handle_res(res) end)
     return self
 end
 

@@ -2,6 +2,8 @@ local NuiPopup = require("nui.popup")
 local NuiLine = require("nui.line")
 local Group = require("leetcode-ui.component.group")
 local Text = require("leetcode-ui.component.text")
+local config = require("leetcode.config")
+local t = require("leetcode.translator")
 
 local stats_api = require("leetcode.api.statistics")
 local Spinner = require("leetcode.logger.spinner")
@@ -31,8 +33,13 @@ function Languages.handle(lang)
     local line = NuiLine()
     line:append(lang.lang, "leetcode_code")
     line:append(" - ", "leetcode_list")
-    line:append("" .. lang.problems_solved)
-    line:append(" problems solved", "leetcode_alt")
+    if config.is_cn then
+        line:append("解题数", "leetcode_alt")
+        line:append(" " .. lang.problems_solved)
+    else
+        line:append("" .. lang.problems_solved)
+        line:append(" problems solved", "leetcode_alt")
+    end
 
     text:append(line)
     return text
@@ -73,7 +80,7 @@ function Languages.mount()
             },
             style = "rounded",
             text = {
-                top = " Languages ",
+                top = (" %s "):format(t("Languages")),
             },
         },
         buf_options = {

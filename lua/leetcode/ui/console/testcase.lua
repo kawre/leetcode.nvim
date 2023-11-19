@@ -2,6 +2,7 @@ local log = require("leetcode.logger")
 local config = require("leetcode.config")
 local NuiPopup = require("nui.popup")
 local console_popup = require("leetcode.ui.console.popup")
+local t = require("leetcode.translator")
 
 ---@class lc.Testcase: lc.Console.Popup
 ---@field testcases string[]
@@ -13,8 +14,8 @@ setmetatable(testcase, console_popup)
 function testcase:content()
     self.testcases = {}
 
-    local t = vim.api.nvim_buf_get_lines(self.popup.bufnr, 0, -1, false)
-    local str = table.concat(t, "\n")
+    local tbl = vim.api.nvim_buf_get_lines(self.popup.bufnr, 0, -1, false)
+    local str = table.concat(tbl, "\n")
 
     local testcases = {}
     for tcase in vim.gsplit(str, "\n\n") do
@@ -27,18 +28,18 @@ function testcase:content()
 end
 
 function testcase:draw()
-    local t = {}
+    local tbl = {}
     for i, case in ipairs(self.parent.parent.q.testcase_list) do
-        if i ~= 1 then table.insert(t, "") end
+        if i ~= 1 then table.insert(tbl, "") end
 
         table.insert(self.testcases, case:gsub("\n", " ")[1])
 
         for s in vim.gsplit(case, "\n", { trimempty = true }) do
-            table.insert(t, s)
+            table.insert(tbl, s)
         end
     end
 
-    vim.api.nvim_buf_set_lines(self.popup.bufnr, 0, -1, false, t)
+    vim.api.nvim_buf_set_lines(self.popup.bufnr, 0, -1, false, tbl)
 
     self:draw_extmarks()
     return self
@@ -77,24 +78,26 @@ function testcase:draw_extmarks()
 
     if not md.params then return end
 
-    local max_len = 1
+    local max_lens = {}
+    local j, k = 1, 1
     for _, line in ipairs(lines) do
-        max_len = math.max(max_len, line:len() + 1)
+        if line == "" then k = k + 1 end
+        max_lens[k] = math.max(max_lens[k] or 1, line:len() + 1)
     end
 
-    local function get_param(idx, len)
+    local function get_param(idx, param_idx, len)
         return {
-            { (" "):rep(max_len - len) },
+            { (" "):rep(max_lens[idx] - len) },
             { "", "Operator" },
             { " " },
-            { md.params[idx].name, "Comment" },
+            { md.params[param_idx].name, "Comment" },
             { " " },
-            { md.params[idx].type, "Type" },
+            { md.params[param_idx].type, "Type" },
         }
     end
 
-    local j = 1
     local invalid = false
+    k = 1
 
     for i, line in ipairs(lines) do
         pcall(function()
@@ -102,12 +105,15 @@ function testcase:draw_extmarks()
         end)
 
         if line ~= "" then
-            local ok, text = pcall(get_param, j, line:len())
-            if not ok or invalid then text = { { " invalid", "leetcode_error" } } end
+            local ok, text = pcall(get_param, k, j, line:len())
+            if not ok or invalid then
+                text = { { (" %s"):format(t("invalid")), "leetcode_error" } }
+            end
 
             self:add_extmark(i - 1, -1, { virt_text = text })
             j = j + 1
         else
+            k = k + 1
             j = 1
         end
     end
@@ -144,9 +150,9 @@ function testcase:init(parent)
             },
             style = "rounded",
             text = {
-                top = " (H) Testcases ",
+                top = (" (H) %s "):format(t("Testcases")),
                 top_align = "center",
-                bottom = " (r) Reset ",
+                bottom = (" (r) %s "):format(t("Reset")),
                 bottom_align = "center",
             },
         },

@@ -1,5 +1,6 @@
 local config = require("leetcode.config")
 local Pre = require("leetcode.ui.console.components.pre")
+local t = require("leetcode.translator")
 
 local NuiLine = require("nui.line")
 
@@ -14,12 +15,12 @@ function stdout:init(output)
 
     if vim.tbl_isempty(output_list) then return end
 
-    local t = {}
+    local tbl = {}
     for i = 1, #output_list, 1 do
-        table.insert(t, NuiLine():append(output_list[i]))
+        table.insert(tbl, NuiLine():append(output_list[i]))
     end
 
-    return Pre:init(NuiLine():append(" Stdout", "leetcode_alt"), t)
+    return Pre:init(NuiLine():append((" %s"):format(t("Stdout")), "leetcode_alt"), tbl)
 end
 
 return stdout

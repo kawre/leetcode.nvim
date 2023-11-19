@@ -1,5 +1,7 @@
 local log = require("leetcode.logger")
 local arguments = require("leetcode.command.arguments")
+local config = require("leetcode.config")
+local t = require("leetcode.translator")
 
 ---@class lc.Commands
 local cmd = {}
@@ -23,8 +25,7 @@ function cmd.problems(options)
     )
 end
 
----@param cb? function
-function cmd.cookie_prompt(cb)
+function cmd.cookie_prompt()
     local cookie = require("leetcode.cache.cookie")
 
     local popup_options = {
@@ -37,7 +38,7 @@ function cmd.cookie_prompt(cb)
         border = {
             style = "rounded",
             text = {
-                top = " Enter cookie ",
+                top = (" %s "):format(t("Enter cookie")),
                 top_align = "left",
             },
         },
@@ -46,16 +47,18 @@ function cmd.cookie_prompt(cb)
         },
     }
 
-    local Input = require("nui.input")
-    local input = Input(popup_options, {
+    local NuiInput = require("nui.input")
+    local input = NuiInput(popup_options, {
         prompt = " 󰆘 ",
         on_submit = function(value)
-            local c_ok, err = pcall(cookie.update, value)
-            if not c_ok then return log.warn(err) end
+            local success = cookie.set(value)
 
-            cmd.menu_layout("menu")
-            log.info("Sign-in successful")
-            if cb then cb() end
+            if success then
+                log.info(t("Sign-in successful"))
+                cmd.menu_layout("menu")
+            else
+                log.error(t("Sign-in failed"))
+            end
         end,
     })
 
@@ -65,7 +68,7 @@ end
 
 ---Sign out
 function cmd.delete_cookie()
-    log.warn("You're now signed out")
+    log.warn(t("You're now signed out"))
     local cookie = require("leetcode.cache.cookie")
     pcall(cookie.delete)
 
@@ -79,7 +82,10 @@ function cmd.qot()
     local problems = require("leetcode.api.problems")
     local Question = require("leetcode.ui.question")
 
-    problems.question_of_today(function(qot) Question:init(qot) end)
+    problems.question_of_today(function(qot)
+        local problemlist = require("leetcode.cache.problemlist")
+        Question:init(problemlist.get_by_title_slug(qot.title_slug))
+    end)
 end
 
 function cmd.random_question()
@@ -145,6 +151,7 @@ function cmd.q_submit()
 end
 
 function cmd.ui_skills()
+    if config.is_cn then return end
     local skills = require("leetcode.ui.skills")
     skills:show()
 end
@@ -234,22 +241,22 @@ function cmd.rec_complete(args, options, cmds)
 end
 
 function cmd.exec(args)
-    local t = cmd.commands
+    local tbl = cmd.commands
 
     local options = {}
     for s in vim.gsplit(args.args, "%s+", { trimempty = true }) do
         local opt = vim.split(s, "=")
         if opt[2] then
             options[opt[1]] = vim.split(opt[2], ",", { trimempty = true })
-        elseif t then
-            t = t[s]
+        elseif tbl then
+            tbl = tbl[s]
         else
             break
         end
     end
 
-    if t and type(t[1]) == "function" then
-        t[1](options) ---@diagnostic disable-line
+    if tbl and type(tbl[1]) == "function" then
+        tbl[1](options) ---@diagnostic disable-line
     else
         log.error(("Invalid command: `%s %s`"):format(args.name, args.args))
     end
