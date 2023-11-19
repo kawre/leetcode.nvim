@@ -30,17 +30,17 @@
 
 ---@class lc.UserConfig
 local M = {
-    cn = { -- leetcode.cn
-        enabled = false, ---@type boolean
-        translate_problems = true, ---@type boolean
-        translator = true, ---@type boolean
-    },
-
     ---@type string
     arg = "leetcode.nvim",
 
     ---@type lc.lang
     lang = "cpp",
+
+    cn = { -- leetcode.cn
+        enabled = false, ---@type boolean
+        translate_problems = true, ---@type boolean
+        translator = true, ---@type boolean
+    },
 
     ---@type string
     directory = vim.fn.stdpath("data") .. "/leetcode/",
