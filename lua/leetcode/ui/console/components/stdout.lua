@@ -10,14 +10,14 @@ local stdout = {}
 ---
 ---@return lc-ui.Text | nil
 function stdout:init(output)
-    output = output or ""
-    local output_list = vim.split(output, "\n", { trimempty = true })
-
+    local output_list = vim.split(output or "", "\n", { trimempty = true })
     if vim.tbl_isempty(output_list) then return end
 
     local tbl = {}
     for i = 1, #output_list, 1 do
-        table.insert(tbl, NuiLine():append(output_list[i]))
+        local line = NuiLine()
+        line:append(output_list[i])
+        table.insert(tbl, line)
     end
 
     return Pre:init(NuiLine():append((" %s"):format(t("Stdout")), "leetcode_alt"), tbl)

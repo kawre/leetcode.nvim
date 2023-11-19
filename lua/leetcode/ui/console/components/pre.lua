@@ -9,12 +9,13 @@ local NuiLine = require("nui.line")
 local pre = {}
 pre.__index = pre
 
----@param title NuiText | NuiLine
+---@param title NuiText | NuiLine | nil
 ---@param lines NuiLine[]
 ---
 ---@return lc-ui.Text
 function pre:init(title, lines)
-    local text = Text:init({ title, NuiLine() })
+    local text = Text:init({})
+    if title then text:append({ title, NuiLine() }) end
 
     for _, line in ipairs(lines) do
         local new_line = NuiLine({ NuiText("\t▎\t", "leetcode_indent") })
