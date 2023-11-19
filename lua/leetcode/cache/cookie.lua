@@ -19,8 +19,8 @@ local Cookie = {}
 ---
 ---@return boolean
 function Cookie.set(str)
-    local cookie, cerr = Cookie.parse(str)
-    if not cookie then
+    local _, cerr = Cookie.parse(str)
+    if cerr then
         log.error(cerr)
         return false
     end
@@ -54,10 +54,16 @@ function Cookie.get()
     if hcookie then return hcookie end
 
     local contents = file:read()
-    if not contents or type(contents) ~= "string" then return end
+    if not contents or type(contents) ~= "string" then
+        Cookie.delete()
+        return
+    end
 
     local cookie = Cookie.parse(contents)
-    if not cookie then return end
+    if not cookie then
+        Cookie.delete()
+        return
+    end
 
     hist[ftime] = cookie
     return cookie
