@@ -20,39 +20,8 @@ function result:focus()
 end
 
 ---@param item lc.interpreter_response
----
----@return lc.interpreter_response
-function result:handle_item(item)
-    local success = false
-    if item.status_code == 10 then
-        success = item.compare_result:match("^[1]+$") and true or false
-        item.status_msg = success and "Accepted" or "Wrong Answer"
-    end
-
-    local submission = false
-    if item.submission_id then
-        submission = not item.submission_id:find("runcode") and true or false
-    end
-    local hl = success and "leetcode_ok" or "leetcode_error"
-
-    if item.status_code == 15 and item.invalid_testcase then
-        item.status_msg = "Invalid Testcase"
-    end
-
-    item._ = {
-        title = " " .. t(item.status_msg),
-        hl = hl,
-        success = success,
-        submission = submission,
-    }
-
-    return item
-end
-
----@param item lc.interpreter_response
 function result:handle(item)
     self.layout:clear()
-    item = self:handle_item(item)
     self:set_popup_border_hi(item._.hl)
     self.layout:handle_res(item)
 

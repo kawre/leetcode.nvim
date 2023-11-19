@@ -16,6 +16,36 @@ local check_state = {
     ["FAILURE"] = t("Failed"), -- CODE: 16
 }
 
+---@param item lc.interpreter_response
+---
+---@return lc.interpreter_response
+function interpreter:handle_item(item)
+    local success = false
+    if item.status_code == 10 then
+        success = item.compare_result:match("^[1]+$") and true or false
+        item.status_msg = success and "Accepted" or "Wrong Answer"
+    end
+
+    local submission = false
+    if item.submission_id then
+        submission = not item.submission_id:find("runcode") and true or false
+    end
+    local hl = success and "leetcode_ok" or "leetcode_error"
+
+    if item.status_code == 15 and item.invalid_testcase then
+        item.status_msg = "Invalid Testcase"
+    end
+
+    item._ = {
+        title = " " .. t(item.status_msg),
+        hl = hl,
+        success = success,
+        submission = submission,
+    }
+
+    return item
+end
+
 ---@param id string
 ---@param callback function
 function interpreter.listener(id, callback)
@@ -24,20 +54,18 @@ function interpreter.listener(id, callback)
     local function listen()
         interpreter.check(id, function(item)
             if item.status_code then
-                noti:stop(t(item.status_msg), false)
-                callback(item)
-                return
+                item = interpreter:handle_item(item)
+                noti:stop(item.status_msg, item._.success)
+                return callback(item)
+            else
+                noti:update(check_state[item.state])
+                if item.state == "PENDING" then
+                    noti:change("points")
+                elseif item.state == "STARTED" then
+                    noti:change("dot")
+                end
+                vim.defer_fn(listen, 500)
             end
-
-            noti:update(check_state[item.state])
-
-            if item.state == "PENDING" then
-                noti:change("points")
-            elseif item.state == "STARTED" then
-                noti:change("dot")
-            end
-
-            vim.defer_fn(listen, 500)
         end)
     end
 
