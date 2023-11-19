@@ -138,6 +138,8 @@ function testcase:append(input)
     else
         vim.api.nvim_buf_set_lines(self.popup.bufnr, 0, -1, false, s)
     end
+
+    self:draw_extmarks()
 end
 
 function testcase:autocmds()
