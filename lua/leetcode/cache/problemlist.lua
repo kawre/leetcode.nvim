@@ -1,5 +1,6 @@
 local path = require("plenary.path")
 local log = require("leetcode.logger")
+local async = require("plenary.async")
 
 local config = require("leetcode.config")
 ---@type Path
@@ -54,8 +55,8 @@ end
 
 function Problemlist.populate()
     local spinner = require("leetcode.logger.spinner")
-    local noti = spinner:init("fetching problem list", "points")
 
+    local noti = spinner:init("fetching problem list", "points")
     local data = problems_api.all()
     noti:stop("problems cache updated")
 
@@ -81,15 +82,13 @@ end
 
 ---@param problems table
 function Problemlist.write(problems)
-    local tbl = {
+    local encoded = vim.json.encode({
         version = config.version,
         data = problems,
-    }
+    })
 
-    file:write(vim.json.encode(tbl), "w")
-
-    local ftime = file:_stat().mtime.sec
-    hist[ftime] = problems
+    file:write(encoded, "w")
+    hist[file:_stat().mtime.sec] = problems
 end
 
 ---@param str string

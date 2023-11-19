@@ -83,7 +83,9 @@ M.pick_lang = function(question, callback)
 
                     local snippet = selection.value
                     if question.lang == snippet.t.slug then
-                        return log.warn("Language already set to: " .. snippet.t.lang)
+                        return log.warn(
+                            ("%s: %s"):format(t("Language already set to"), snippet.t.lang)
+                        )
                     end
 
                     config.lang = snippet.t.slug
@@ -101,7 +103,7 @@ end
 M.pick = function(question)
     pickers
         .new(opts, {
-            prompt_title = "Available Languages",
+            prompt_title = t("Available Languages"),
             finder = finders.new_table({
                 results = question.q.code_snippets,
                 entry_maker = entry_maker,
@@ -114,7 +116,9 @@ M.pick = function(question)
 
                     local snippet = selection.value
                     if question.lang == snippet.t.slug then
-                        return log.warn("Language already set to: " .. snippet.t.lang)
+                        return log.warn(
+                            ("%s: %s"):format(t("Language already set to"), snippet.t.lang)
+                        )
                     end
 
                     config.lang = snippet.t.slug

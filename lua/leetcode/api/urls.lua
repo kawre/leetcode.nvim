@@ -6,6 +6,7 @@ urls.solved = "/graphql/"
 urls.calendar = "/graphql/"
 urls.languages = "/graphql/"
 urls.skills = "/graphql/"
+urls.auth = "/graphql/"
 
 urls.problems = "/api/problems/%s/"
 urls.interpret = "/problems/%s/interpret_solution/"

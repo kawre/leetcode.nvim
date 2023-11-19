@@ -24,7 +24,7 @@ end
 
 ---@param query string
 ---@param variables? table optional
----@param opts? { callback?: function }
+---@param opts? { callback?: function, endpoint?: string }
 function utils.query(query, variables, opts)
     opts = vim.tbl_deep_extend("force", {
         body = {
@@ -48,7 +48,7 @@ function utils.curl(method, params)
         retry = 5,
         endpoint = urls.base,
     }, params or {})
-    local url = config.domain .. params.endpoint
+    local url = ("https://leetcode.%s%s"):format(config.domain, params.endpoint)
 
     if type(params.body) == "table" then params.body = vim.json.encode(params.body) end
 
@@ -171,7 +171,10 @@ function utils.normalize_problems(problems)
                 title = p.stat.question__title,
                 title_cn = "",
                 title_slug = p.stat.question__title_slug,
-                link = ("%s/problems/%s/"):format(config.domain, p.stat.question__title_slug),
+                link = ("https://leetcode.%s/problems/%s/"):format(
+                    config.domain,
+                    p.stat.question__title_slug
+                ),
                 paid_only = p.paid_only,
                 ac_rate = p.stat.total_acs * 100 / p.stat.total_submitted,
                 difficulty = utils.lvl_to_name(p.difficulty.level),

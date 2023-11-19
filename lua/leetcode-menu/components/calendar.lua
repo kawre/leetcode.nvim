@@ -1,4 +1,3 @@
-local Header = require("leetcode-menu.components.header")
 local config = require("leetcode.config")
 local Spinner = require("leetcode.logger.spinner")
 local Text = require("leetcode-ui.component.text")
@@ -8,7 +7,6 @@ local t = require("leetcode.translator")
 local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
 
-local stats_api = require("leetcode.api.statistics")
 local log = require("leetcode.logger")
 
 ---@class lc-ui.Calendar : lc-ui.Text
@@ -40,25 +38,28 @@ function Calendar:get_submission(osdate)
     end
 end
 
----@param res lc.Stats.Res
+---@param res { calendar: lc.Stats.CalendarData }
 function Calendar:handle_res(res)
     self.calendar = res.calendar
 
-    local time = os.date("*t")
-    self.curr_time = os.time({
+    local time = os.date("*t") --[[@as table]]
+    self.curr_time = os.time(vim.tbl_extend("force", time, {
         year = time.year - 1,
         month = time.month,
         day = time.day,
         hour = 1,
         isdst = false,
-    })
+    }))
+
     self.threshold = os.time({
         year = time.year,
         month = time.month,
-        day = time.day + 1,
+        day = time.day,
         hour = 1,
         isdst = false,
     })
+    if self.threshold <= os.time(time) then self.threshold = self.threshold + 24 * 60 * 60 end
+
     self.last_year_sub_count = 0
     self.month_lens = {}
     self.max_sub_count = 0
@@ -156,9 +157,8 @@ local function square_hl(count, max_count)
     return ("leetcode_calendar_%d"):format(num)
 end
 
----@param m integer
-function Calendar:handle_weekdays(m)
-    if self.curr_time >= self.threshold then return end
+function Calendar:handle_weekdays()
+    if self.curr_time > self.threshold then return end
 
     local curr = os.date("*t", self.curr_time)
     local count = self:get_submission(curr) or 0

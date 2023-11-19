@@ -7,11 +7,11 @@ function headers.get()
     local cookie = Cookie.get()
 
     return vim.tbl_extend("force", {
-        ["Referer"] = config.domain,
-        ["Origin"] = config.domain .. "/",
-        ["Content-Type"] = "application/json",
+        ["Referer"] = ("https://leetcode.%s"):format(config.domain),
+        ["Origin"] = ("https://leetcode.%s/"):format(config.domain),
+        ["content-type"] = "application/json",
         ["Accept"] = "application/json",
-        ["Host"] = ("leetcode.%s"):format(config.user.domain),
+        ["Host"] = ("leetcode.%s"):format(config.domain),
     }, cookie and {
         ["Cookie"] = cookie.str,
         ["x-csrftoken"] = cookie.csrftoken,

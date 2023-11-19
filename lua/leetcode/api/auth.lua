@@ -3,6 +3,7 @@ local config = require("leetcode.config")
 local log = require("leetcode.logger")
 local queries = require("leetcode.api.queries")
 local t = require("leetcode.translator")
+local urls = require("leetcode.api.urls")
 
 ---@class lc.AuthApi
 local Auth = {}
@@ -12,9 +13,14 @@ function Auth.user(cb)
     local query = queries.auth
 
     if cb then
-        utils.query(query, {}, { callback = function(res, err) cb(Auth.handle(res, err)) end })
+        utils.query(query, {}, {
+            callback = function(res, err) cb(Auth.handle(res, err)) end,
+            endpoint = urls.auth,
+        })
     else
-        return Auth.handle(utils.query(query))
+        return Auth.handle(utils.query(query, {}, {
+            endpoint = urls.auth,
+        }))
     end
 end
 
