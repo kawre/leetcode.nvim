@@ -30,7 +30,7 @@ function Cookie.set(str)
     local _, aerr = auth_api.user()
 
     if aerr then
-        Cookie.delete()
+        require("leetcode.command").delete_cookie()
         return false
     else
         return true
@@ -55,13 +55,13 @@ function Cookie.get()
 
     local contents = file:read()
     if not contents or type(contents) ~= "string" then
-        Cookie.delete()
+        require("leetcode.command").delete_cookie()
         return
     end
 
     local cookie = Cookie.parse(contents)
     if not cookie then
-        Cookie.delete()
+        require("leetcode.command").delete_cookie()
         return
     end
 

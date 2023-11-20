@@ -2,6 +2,7 @@ local log = require("leetcode.logger")
 local arguments = require("leetcode.command.arguments")
 local config = require("leetcode.config")
 local t = require("leetcode.translator")
+local event = require("nui.utils.autocmd").event
 
 ---@class lc.Commands
 local cmd = {}
@@ -12,10 +13,16 @@ function cmd.deprecate(old_name, new_name)
     log.warn(("`%s` is deprecated, use `%s` instead."):format(old_name, new_name))
 end
 
-function cmd.cache_update() require("leetcode.cache").update() end
+function cmd.cache_update()
+    require("leetcode.utils").auth_guard()
+
+    require("leetcode.cache").update()
+end
 
 ---@param options table<string, string[]>
 function cmd.problems(options)
+    require("leetcode.utils").auth_guard()
+
     local async = require("plenary.async")
     local problems = require("leetcode.cache.problemlist")
 
@@ -65,8 +72,10 @@ function cmd.cookie_prompt(cb)
         end,
     })
 
-    input:map("n", { "<Esc>", "q" }, function() input:unmount() end)
     input:mount()
+
+    input:map("n", { "<Esc>", "q" }, function() input:unmount() end)
+    input:on(event.BufLeave, function() input:unmount() end)
 end
 
 function cmd.sign_out()
@@ -78,6 +87,7 @@ end
 
 ---Sign out
 function cmd.delete_cookie()
+    config.auth = {}
     local cookie = require("leetcode.cache.cookie")
     cookie.delete()
 end
@@ -97,12 +107,12 @@ function cmd.expire()
 
     cmd.cookie_prompt(function(success)
         if success then
-            if vim.api.nvim_tabpage_is_valid(tabp) then vim.cmd.tabnext(tabp) end
+            if vim.api.nvim_tabpage_is_valid(tabp) then pcall(vim.cmd.tabnext, tabp) end
             log.info("Successful re-login")
         else
             cmd.delete_cookie()
             cmd.menu_layout("signin")
-            cmd.q_close_all()
+            vim.schedule(cmd.q_close_all)
         end
     end)
 end
@@ -111,6 +121,8 @@ end
 ---
 --@param theme lc-db.Theme
 function cmd.qot()
+    require("leetcode.utils").auth_guard()
+
     local problems = require("leetcode.api.problems")
     local Question = require("leetcode.ui.question")
 
@@ -122,16 +134,16 @@ function cmd.qot()
 end
 
 function cmd.random_question()
+    require("leetcode.utils").auth_guard()
+
     local problems = require("leetcode.cache.problemlist")
     local question = require("leetcode.api.question")
 
     local q, err = question.random()
     if err then return log.err(err) end
 
-    if q then
-        local item = problems.get_by_title_slug(q.title_slug) or {}
-        require("leetcode.ui.question"):init(item)
-    end
+    local item = problems.get_by_title_slug(q.title_slug) or {}
+    require("leetcode.ui.question"):init(item)
 end
 
 function cmd.menu()
@@ -175,12 +187,14 @@ end
 
 function cmd.q_run()
     local utils = require("leetcode.utils")
+    utils.auth_guard()
     local q = utils.curr_question()
     if q then q.console:run() end
 end
 
 function cmd.q_submit()
     local utils = require("leetcode.utils")
+    utils.auth_guard()
     local q = utils.curr_question()
     if q then q.console:submit() end
 end

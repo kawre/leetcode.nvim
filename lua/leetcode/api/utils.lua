@@ -203,8 +203,8 @@ end
 ---@param titles { questionId: integer, title: string }[]
 function utils.translate_titles(problems, titles)
     local map = {}
-    for _, t in ipairs(titles) do
-        map[t.questionId] = t.title
+    for _, title in ipairs(titles) do
+        map[title.questionId] = title.title
     end
 
     return vim.tbl_map(function(p)
