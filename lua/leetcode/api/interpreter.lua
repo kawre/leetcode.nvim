@@ -10,10 +10,10 @@ local spinner = require("leetcode.logger.spinner")
 local interpreter = {}
 
 local check_state = {
-    ["PENDING"] = t("Pending") .. "…",
-    ["STARTED"] = t("Judging") .. "…",
-    ["SUCCESS"] = t("Finished"),
-    ["FAILURE"] = t("Failed"), -- CODE: 16
+    ["PENDING"] = "Pending…",
+    ["STARTED"] = "Judging…",
+    ["SUCCESS"] = "Finished",
+    ["FAILURE"] = "Failed", -- CODE: 16
 }
 
 ---@param item lc.interpreter_response

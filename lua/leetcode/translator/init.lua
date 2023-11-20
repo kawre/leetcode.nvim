@@ -57,10 +57,6 @@ local translate = {
     ["no questions opened"] = "没有打开的问题",
     ["no current question found"] = "未找到当前问题",
     ["you're now signed out"] = "您现在已注销",
-    ["pending"] = "运行中",
-    ["judging"] = "判题中",
-    ["finished"] = "完成",
-    ["failed"] = "失败",
     ["you have attempted to run code too soon"] = "你的提交过于频繁，请稍候重试。",
     ["stdout"] = "标准输出",
     ["submissions"] = "过去一年共提交",
@@ -86,24 +82,31 @@ local translate = {
     -- err
     ["http error"] = "HTTP 错误",
     ["curl failed"] = "curl 失败",
+
+    -- interpreter status
+    ["pending…"] = "运行中…",
+    ["judging…"] = "判题中…",
+    ["finished"] = "完成",
+    ["failed"] = "失败",
 }
 
 ---@param text string
 local function t(text)
     local keys = vim.tbl_map(function(key) return key:lower() end, vim.tbl_keys(translate))
 
-    local txt = text:lower()
-    if not vim.tbl_contains(keys, txt) then
-        local msg = ("Translation for `%s` not found"):format(text)
-        vim.notify(msg, vim.log.levels.DEBUG, { title = config.name })
+    if not vim.tbl_contains(keys, text:lower()) then
+        if config.debug then
+            local msg = ("Translation for `%s` not found"):format(text)
+            vim.notify(msg, vim.log.levels.DEBUG, { title = config.name })
+        end
         return text
     end
 
-    return config.is_cn and config.user.cn.translator and translate[txt] or text
+    return translate[text:lower()]
 end
 
 return function(text)
-    if type(text) == "string" then
+    if config.translator and type(text) == "string" then
         return t(text)
     else
         return text

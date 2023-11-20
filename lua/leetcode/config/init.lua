@@ -19,6 +19,8 @@ local config = {
     home = {}, ---@type Path
     version = "1.0.0",
 
+    translator = false,
+
     langs = require("leetcode.config.langs"),
     icons = require("leetcode.config.icons"),
 
@@ -39,7 +41,10 @@ end
 function config.load_plugins()
     local plugins = {}
 
-    if config.user.cn.enabled then table.insert(plugins, "cn") end
+    if config.user.cn.enabled then
+        config.translator = config.user.cn.translator
+        table.insert(plugins, "cn")
+    end
 
     for _, plugin in ipairs(plugins) do
         local ok, plug = pcall(require, "leetcode-plugins." .. plugin)
