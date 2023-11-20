@@ -32,14 +32,18 @@ function Auth.handle(res, err)
     local auth = res.data.userStatus
     err = {}
 
-    if not auth.id then
+    if auth.id == vim.NIL then
         err.msg = t("Session expired?")
     elseif not auth.is_signed_in then
         err.msg = t("Sign-in failed")
     elseif not auth.is_verified then
         err.msg = t("Please verify your email address in order to use your account")
     end
-    if err.msg then return nil, err end
+
+    if err.msg then
+        require("leetcode.command").delete_cookie()
+        return nil, err
+    end
 
     config.auth = log.debug(auth) ---@diagnostic disable-line
     return auth

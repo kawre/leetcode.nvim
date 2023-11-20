@@ -1,3 +1,5 @@
+--
+--
 local log = require("leetcode.logger")
 local Cookie = require("leetcode.cache.cookie")
 local utils = require("leetcode.utils")
@@ -119,8 +121,12 @@ function menu:handle_mount()
 
         local auth_api = require("leetcode.api.auth")
         auth_api.user(function(_, err)
-            if err then return log.error(err.msg) end
-            self:set_layout("menu")
+            if err then
+                self:set_layout("signin")
+                return log.error(err.msg)
+            else
+                self:set_layout("menu")
+            end
         end)
     else
         self:set_layout("signin")

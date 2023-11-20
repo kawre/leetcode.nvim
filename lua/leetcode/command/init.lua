@@ -72,26 +72,31 @@ end
 function cmd.sign_out()
     log.warn(t("You're now signed out"))
     cmd.delete_cookie()
+    cmd.menu_layout("signin")
+    cmd.q_close_all()
 end
 
 ---Sign out
 function cmd.delete_cookie()
     local cookie = require("leetcode.cache.cookie")
     cookie.delete()
-    cmd.menu_layout("signin")
+end
+
+function cmd.q_close_all()
+    local utils = require("leetcode.utils")
+    local qs = utils.curr_question_tabs()
+
+    for _, tabp in ipairs(qs) do
+        tabp.question:unmount()
+    end
 end
 
 function cmd.expire()
     cmd.cookie_prompt(function(success)
         if not success then
             cmd.delete_cookie()
-
-            local utils = require("leetcode.utils")
-            local qs = utils.curr_question_tabs()
-
-            for _, tabp in ipairs(qs) do
-                tabp.question:unmount()
-            end
+            cmd.menu_layout("signin")
+            cmd.q_close_all()
         end
     end)
 end
