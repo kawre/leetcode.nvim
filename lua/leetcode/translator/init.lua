@@ -83,6 +83,10 @@ local translate = {
     -- ["internal error"] = "internal error",
     ["memory limit exceeded"] = "超出内存限制",
     ["invalid testcase"] = "测试用例非有效值",
+
+    -- err
+    ["http error"] = "HTTP 错误",
+    ["curl failed"] = "curl 失败",
 }
 
 ---@param text string
@@ -91,7 +95,7 @@ local function t(text)
 
     local txt = text:lower()
     if not vim.tbl_contains(keys, txt) then
-        log.debug(("Translation for `%s` not found"):format(text), true)
+        log.debug(("Translation for `%s` not found"):format(text))
         return text
     end
 

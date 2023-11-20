@@ -54,7 +54,7 @@ function interpreter.listener(id, callback)
     local function listen()
         interpreter.check(id, function(item, err)
             if err then
-                noti:stop(err.msg, false, { timeout = 1000 })
+                noti:stop(err.msg, false)
                 return
             end
 

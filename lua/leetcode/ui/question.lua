@@ -32,6 +32,19 @@ function Question:create_file()
     if not self.file:exists() then self.file:write(self:get_snippet().code, "w") end
 end
 
+function Question:unmount()
+    self.hints:unmount()
+    self.console:unmount()
+    self.description:unmount()
+
+    if vim.api.nvim_buf_is_valid(self.bufnr) then
+        vim.api.nvim_buf_delete(self.bufnr, { force = true })
+    end
+    if vim.api.nvim_win_is_valid(self.winid) then vim.api.nvim_win_close(self.winid, true) end
+
+    self = nil
+end
+
 function Question:mount()
     self:create_file()
 

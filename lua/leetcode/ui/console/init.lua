@@ -14,6 +14,11 @@ local NuiLayout = require("nui.layout")
 local console = {}
 console.__index = console
 
+function console:unmount()
+    self.layout:unmount()
+    self = nil
+end
+
 function console:mount()
     self.layout:mount()
     return self

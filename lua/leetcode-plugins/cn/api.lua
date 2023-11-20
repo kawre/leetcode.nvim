@@ -65,6 +65,7 @@ statistics.languages = function(cb) ---@diagnostic disable-line
         endpoint = urls.languages,
         callback = function(res, err)
             if err then return cb(nil, err) end
+
             local data = res.data
             local lang_prob_count = data["languageProblemCount"]
             cb(lang_prob_count)

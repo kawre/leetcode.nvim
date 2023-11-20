@@ -78,6 +78,17 @@ function cmd.delete_cookie()
     cmd.menu_layout("signin")
 end
 
+function cmd.expire()
+    cmd.delete_cookie()
+
+    local utils = require("leetcode.utils")
+    local qs = utils.curr_question_tabs()
+
+    for _, tabp in ipairs(qs) do
+        tabp.question:unmount()
+    end
+end
+
 ---Merge configurations into default configurations and set it as user configurations.
 ---
 --@param theme lc-db.Theme

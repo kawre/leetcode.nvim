@@ -74,12 +74,8 @@ function utils.detect_duplicate_question(title_slug, lang)
     end
 end
 
+---@return { tabpage: integer, question: lc.Question }[]
 function utils.curr_question_tabs()
-    ---@class lc.Question.Tab
-    ---@field tabpage integer
-    ---@field question lc.Question
-
-    ---@type lc.Question.Tab[]
     local questions = {}
 
     for _, q in ipairs(_Lc_questions) do

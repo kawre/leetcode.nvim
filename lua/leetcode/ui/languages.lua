@@ -95,7 +95,7 @@ function Languages.mount()
     local spinner = Spinner:init("fetching user languages", "dot")
     stats_api.languages(function(res, err)
         if err then
-            spinner:stop(err.msg, false, { timeout = 1000 })
+            spinner:stop(err.msg, false)
         else
             Languages.populate(res)
             spinner:stop(nil, true, { timeout = 200 })

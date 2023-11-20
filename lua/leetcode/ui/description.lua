@@ -34,6 +34,11 @@ function description:autocmds()
     })
 end
 
+function description:unmount()
+    self.split:unmount()
+    self = nil
+end
+
 function description:mount()
     self.visible = true
     self:populate()

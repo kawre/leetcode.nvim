@@ -13,6 +13,11 @@ local utils = require("leetcode.utils")
 local Info = {}
 Info.__index = Info
 
+function Info:unmount()
+    self.popup:unmount()
+    self = nil
+end
+
 function Info:mount()
     local NuiTree = require("nui.tree")
     local nodes = {}
