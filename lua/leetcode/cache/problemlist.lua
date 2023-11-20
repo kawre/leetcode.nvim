@@ -58,7 +58,7 @@ function Problemlist.populate()
 
     local noti = spinner:init("fetching problem list", "points")
     local res, err = problems_api.all()
-    assert(res and not err, err.msg)
+    assert(not err, err.msg)
     Problemlist.write(res)
     noti:stop("problems cache updated")
     return res

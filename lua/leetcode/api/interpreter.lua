@@ -69,6 +69,7 @@ function interpreter.listener(id, callback)
                 elseif item.state == "STARTED" then
                     noti:change("dot")
                 end
+
                 vim.defer_fn(listen, 500)
             end
         end)

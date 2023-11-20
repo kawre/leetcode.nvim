@@ -1,5 +1,4 @@
 local config = require("leetcode.config")
-local log = require("leetcode.logger")
 local t = require("leetcode.translator")
 
 ---@class lc.Spinner
@@ -70,7 +69,7 @@ end
 function spinner:change(spinner_type) self.spinner = spinners[spinner_type] end
 
 ---@param msg any
-function spinner:update(msg) self.msg = tostring(msg) end
+function spinner:update(msg) self.msg = t(tostring(msg)) end
 
 function spinner:start()
     self:spin()
@@ -97,12 +96,11 @@ end
 ---@param spinner_type? lc.spinner_types
 function spinner:init(msg, spinner_type)
     self = setmetatable({
-        msg = msg or "",
         index = 0,
         spinner = spinners[spinner_type or "dot"],
-        noti = nil,
     }, self)
 
+    self:update(msg or "")
     return self:start()
 end
 

@@ -8,7 +8,7 @@ local log = require("leetcode.logger")
 ---@class lc.ProblemsApi
 local Problems = {}
 
----@return lc.Cache.Question[]|nil
+---@return lc.Cache.Question[], lc.err
 function Problems.all(cb)
     local endpoint = urls.problems:format("algorithms")
 
