@@ -99,10 +99,14 @@ function Skills.mount()
     Skills._ = popup
 
     local spinner = Spinner:init("fetching user skills", "dot")
-    stats_api.skills(function(res)
-        Skills.populate(res)
-        spinner:stop(nil, true, { timeout = 200 })
-        Skills.layout:draw(Skills._)
+    stats_api.skills(function(res, err)
+        if err then
+            spinner:stop(err.msg, false)
+        else
+            Skills.populate(res)
+            spinner:stop(nil, true, { timeout = 200 })
+            Skills.layout:draw(Skills._)
+        end
     end)
 
     popup:mount()

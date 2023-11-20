@@ -119,13 +119,7 @@ function menu:handle_mount()
 
         local auth_api = require("leetcode.api.auth")
         auth_api.user(function(_, err)
-            if err then
-                utils.log_err(err)
-                Cookie.delete()
-                self:set_layout("signin")
-                return
-            end
-
+            if err then return log.error(err.msg) end
             self:set_layout("menu")
         end)
     else

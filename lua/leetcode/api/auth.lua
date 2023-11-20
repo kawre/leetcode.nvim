@@ -28,21 +28,21 @@ end
 ---@return lc.UserStatus|nil, lc.err|nil
 function Auth.handle(res, err)
     if err then return res, err end
+
     local auth = res.data.userStatus
+    err = {}
 
-    local msgs = {}
-    if not auth.is_signed_in then table.insert(msgs, t("Sign-in failed")) end
-    if not auth.is_verified then
-        table.insert(msgs, t("Please verify your email address in order to use your account"))
+    if not auth.id then
+        err.msg = t("Session expired?")
+    elseif not auth.is_signed_in then
+        err.msg = t("Sign-in failed")
+    elseif not auth.is_verified then
+        err.msg = t("Please verify your email address in order to use your account")
     end
+    if err.msg then return nil, err end
 
-    if not vim.tbl_isempty(msgs) then
-        err = vim.tbl_deep_extend("force", err or {}, { msgs = msgs })
-        return nil, err
-    else
-        config.auth = log.debug(auth) ---@diagnostic disable-line
-        return auth
-    end
+    config.auth = log.debug(auth) ---@diagnostic disable-line
+    return auth
 end
 
 return Auth

@@ -93,10 +93,14 @@ function Languages.mount()
     Languages._ = popup
 
     local spinner = Spinner:init("fetching user languages", "dot")
-    stats_api.languages(function(res)
-        Languages.populate(res)
-        spinner:stop(nil, true, { timeout = 200 })
-        Languages.layout:draw(Languages._)
+    stats_api.languages(function(res, err)
+        if err then
+            spinner:stop(err.msg, false, { timeout = 1000 })
+        else
+            Languages.populate(res)
+            spinner:stop(nil, true, { timeout = 200 })
+            Languages.layout:draw(Languages._)
+        end
     end)
 
     popup:mount()

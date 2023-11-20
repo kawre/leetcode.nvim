@@ -53,7 +53,7 @@ statistics.calendar = function(cb) ---@diagnostic disable-line
     })
 end
 
----@param cb fun(res: lc.Languages.Res)
+---@param cb fun(res: lc.Languages.Res|nil, err: lc.err|nil)
 statistics.languages = function(cb) ---@diagnostic disable-line
     local variables = {
         username = config.auth.name,
@@ -64,6 +64,7 @@ statistics.languages = function(cb) ---@diagnostic disable-line
     utils.query(query, variables, {
         endpoint = urls.languages,
         callback = function(res, err)
+            if err then return cb(nil, err) end
             local data = res.data
             local lang_prob_count = data["languageProblemCount"]
             cb(lang_prob_count)

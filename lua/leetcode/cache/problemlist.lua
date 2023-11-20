@@ -57,20 +57,24 @@ function Problemlist.populate()
     local spinner = require("leetcode.logger.spinner")
 
     local noti = spinner:init("fetching problem list", "points")
-    local data = problems_api.all()
+    local res, err = problems_api.all()
+    assert(res and not err, err.msg)
+    Problemlist.write(res)
     noti:stop("problems cache updated")
-
-    Problemlist.write(data)
-    return data
+    return res
 end
 
 function Problemlist.update()
     local spinner = require("leetcode.logger.spinner")
     local noti = spinner:init("fetching problemlist", "points")
 
-    problems_api.all(function(data)
-        Problemlist.write(data)
-        noti:stop("problems cache updated")
+    problems_api.all(function(res, err)
+        if err then
+            noti:stop(err.msg, false)
+        else
+            Problemlist.write(res)
+            noti:stop("problems cache updated")
+        end
     end)
 end
 

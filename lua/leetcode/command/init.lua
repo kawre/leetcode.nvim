@@ -66,12 +66,15 @@ function cmd.cookie_prompt()
     input:mount()
 end
 
+function cmd.sign_out()
+    log.warn(t("You're now signed out"))
+    cmd.delete_cookie()
+end
+
 ---Sign out
 function cmd.delete_cookie()
-    log.warn(t("You're now signed out"))
     local cookie = require("leetcode.cache.cookie")
-    pcall(cookie.delete)
-
+    cookie.delete()
     cmd.menu_layout("signin")
 end
 
@@ -301,7 +304,7 @@ cmd.commands = {
 
     cookie = {
         update = { cmd.cookie_prompt },
-        delete = { cmd.delete_cookie },
+        delete = { cmd.sign_out },
     },
 
     cache = {

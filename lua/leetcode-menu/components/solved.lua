@@ -96,7 +96,10 @@ function Solved:init()
     }
 
     self = setmetatable(Text:init({ t("loading...") }, opts), self)
-    statistics.solved(function(res, err) self:handle_res(res) end)
+    statistics.solved(function(res, err)
+        if err then log.error(err.msg) end
+        self:handle_res(res)
+    end)
     return self
 end
 

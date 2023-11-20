@@ -46,19 +46,18 @@ function statistics.solved(cb)
             if err then return cb(nil, err) end
 
             local data = res.data
-
             local questions_count = data["allQuestionsCount"]
             local submit_stats = data["matchedUser"]["submit_stats"]
 
             cb({
                 questions_count = questions_count,
                 submit_stats = submit_stats,
-            }, nil)
+            })
         end,
     })
 end
 
----@param cb fun(res: lc.Skills.Res)
+---@param cb fun(res: lc.Skills.Res, err: lc.err|nil)
 function statistics.skills(cb)
     local variables = {
         username = config.auth.name,
@@ -69,6 +68,7 @@ function statistics.skills(cb)
     utils.query(query, variables, {
         endpoint = urls.skills,
         callback = function(res, err)
+            if err then return cb(nil, err) end
             local data = res.data
             local tag_problems_counts = data["matchedUser"]["tag_problems_counts"]
             cb(tag_problems_counts)
@@ -76,7 +76,7 @@ function statistics.skills(cb)
     })
 end
 
----@param cb fun(res: lc.Languages.Res)
+---@param cb fun(res: lc.Languages.Res|nil, err: lc.err|nil)
 function statistics.languages(cb)
     local variables = {
         username = config.auth.name,
@@ -87,6 +87,7 @@ function statistics.languages(cb)
     utils.query(query, variables, {
         endpoint = urls.languages,
         callback = function(res, err)
+            if err then return cb(nil, err) end
             local data = res.data
             local lang_prob_count = data["matchedUser"]["languageProblemCount"]
             cb(lang_prob_count)

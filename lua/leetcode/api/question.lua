@@ -20,6 +20,7 @@ function question.by_title_slug(title_slug)
     local query = queries.question
 
     local res, err = utils.query(query, variables)
+    if err then return log.error(err.msg) end
 
     local q = res.data.question
     q.meta_data = select(2, pcall(utils.decode, q.meta_data))
@@ -38,6 +39,7 @@ function question.random()
 
     local config = require("leetcode.config")
     local res, err = utils.query(query, variables)
+    if err then return log.error(err.msg) end
 
     local q = res.data.randomQuestion
     if config.is_cn then

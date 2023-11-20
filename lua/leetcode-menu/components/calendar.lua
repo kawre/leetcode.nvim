@@ -170,14 +170,21 @@ function Calendar:handle_weekdays()
 end
 
 function Calendar:fetch()
-    statistics.calendar(function(res, err) self:handle_res(res, err) end)
+    statistics.calendar(function(res, err)
+        if err then return log.error(err.msg) end
+        self:handle_res(res)
+    end)
 end
 
 function Calendar:update()
     local spinner = Spinner:init("updating calendar")
     statistics.calendar(function(res, err)
-        spinner:stop("calendar updated", true, { timeout = 200 })
-        self:handle_res(res, err)
+        if err then
+            spinner:stop(err.msg, false)
+        else
+            spinner:stop("calendar updated", true, { timeout = 200 })
+            self:handle_res(res)
+        end
     end)
 end
 

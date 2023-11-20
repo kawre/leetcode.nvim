@@ -52,7 +52,12 @@ function interpreter.listener(id, callback)
     local noti = spinner:init(check_state["PENDING"], "points")
 
     local function listen()
-        interpreter.check(id, function(item)
+        interpreter.check(id, function(item, err)
+            if err then
+                noti:stop(err.msg, false, { timeout = 1000 })
+                return
+            end
+
             if item.status_code then
                 item = interpreter:handle_item(item)
                 noti:stop(item.status_msg, item._.success)
@@ -105,12 +110,7 @@ end
 
 function interpreter.fetch(url, body)
     local res, err = utils.post(url, body)
-
-    if err then
-        if err.status == 429 then log.warn(t("You have attempted to run code too soon")) end
-        return
-    end
-
+    if err then return log.error(err.msg) end
     return res
 end
 

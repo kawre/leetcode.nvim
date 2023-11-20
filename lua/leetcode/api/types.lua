@@ -388,4 +388,4 @@
 ---@field out string
 ---@field response table
 ---@field status integer
----@field msgs string[]|nil
+---@field msg string

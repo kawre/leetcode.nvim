@@ -3,6 +3,7 @@ local log = require("leetcode.logger")
 local config = require("leetcode.config")
 local headers = require("leetcode.api.headers")
 local urls = require("leetcode.api.urls")
+local t = require("leetcode.translator")
 
 ---@class lc.Api.Utils
 local utils = {}
@@ -91,7 +92,7 @@ function utils.handle_res(out)
     if out.exit ~= 0 then
         err = {
             code = out.exit,
-            err = "curl failed",
+            msg = "curl failed",
         }
     elseif out.status >= 300 then
         res = out.body
@@ -99,25 +100,37 @@ function utils.handle_res(out)
             code = 0,
             status = out.status,
             response = out,
+            msg = "http error",
             out = out.body,
         }
     else
         res = utils.decode(out.body)
     end
 
-    return res, err
+    return res, utils.check_err(err)
+end
+
+---@param err lc.err|nil
+function utils.check_err(err)
+    if not err then return end
+
+    if err.status then
+        if err.status == 401 or err.status == 403 then
+            err.msg = "Session expired? Restart `leetcode.nvim` to login again"
+            require("leetcode.command").delete_cookie()
+        elseif err.status == 429 then
+            err.msg = "You have attempted to run code too soon"
+        end
+    end
+
+    err.msg = t(err.msg)
+    return err
 end
 
 function utils.decode(str)
     local ok, res = pcall(vim.json.decode, str)
     assert(ok, str)
     return res
-end
-
----@private
-function utils.auth_guard()
-    local auth = require("leetcode.config").auth
-    assert(auth and auth.is_signed_in, "User not signed in")
 end
 
 function utils.normalize_similar_cn(s)

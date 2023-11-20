@@ -22,6 +22,9 @@ function Cases:clear()
         pcall(function() self.parent.popup:unmap(map.mode, map.key) end)
     end
     self.keymaps = {}
+    self.cases = {}
+    self.nav:clear()
+    self.case:clear()
     Group.clear(self)
 end
 

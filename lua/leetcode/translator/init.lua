@@ -105,4 +105,6 @@ return function(text)
     elseif type(text) == "table" then
         return vim.tbl_map(t, text)
     end
+
+    return ""
 end

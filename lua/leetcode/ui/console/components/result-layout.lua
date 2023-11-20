@@ -293,7 +293,6 @@ end
 ---@param opts? lc-ui.Layout.opts
 function ResultLayout:init(parent, opts)
     local layout = Layout:init({}, opts)
-
     self = setmetatable(layout, self)
 
     self.parent = parent

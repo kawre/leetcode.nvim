@@ -9,7 +9,7 @@ local cmd = require("leetcode.command")
 
 local update_btn = Button:init({ icon = "󱛬", src = "Update" }, "u", cmd.cookie_prompt)
 
-local delete_btn = Button:init({ icon = "󱛪", src = "Delete / Sign out" }, "d", cmd.delete_cookie)
+local delete_btn = Button:init({ icon = "󱛪", src = "Delete / Sign out" }, "d", cmd.sign_out)
 
 local back_btn = Button:init(
     { icon = "", src = "Back" },
