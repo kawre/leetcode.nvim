@@ -113,7 +113,13 @@ end
 
 function interpreter.fetch(url, body)
     local res, err = utils.post(url, body)
-    if err then return nil, err end
+    if err then
+        if err.status == 429 then
+            err.msg = "You have attempted to run code too soon"
+            err.lvl = vim.log.levels.WARN
+        end
+        return nil, err
+    end
     return res
 end
 

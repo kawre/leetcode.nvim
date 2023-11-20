@@ -138,14 +138,6 @@ function utils.translate(content, translated_content)
     end
 end
 
-function utils.auth_guard()
-    -- if not config.auth.is_signed_in then
-    --     local log = require("leetcode.logger")
-    --     log.error("User not logged-in")
-    --     return false
-    -- end
-    -- require("leetcode.logger").info(config.auth)
-    assert(config.auth.is_signed_in, "User not logged-in")
-end
+function utils.auth_guard() assert(config.auth.is_signed_in, "User not logged-in") end
 
 return utils
