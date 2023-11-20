@@ -1,20 +1,17 @@
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
-local NuiPopup = require("nui.popup")
 local ConsolePopup = require("leetcode.ui.console.popup")
 local t = require("leetcode.translator")
 
----@class lc.Testcase: lc.Console.Popup
+---@class lc.ui.Console.TestcasePopup : lc.ui.Console.Popup
 ---@field testcases string[]
 ---@field extmarks integer[]
-local testcase = {}
-testcase.__index = testcase
-setmetatable(testcase, ConsolePopup)
+local TestcasePopup = ConsolePopup:extend("LeetTestcasePopup")
 
-function testcase:content()
+function TestcasePopup:content()
     self.testcases = {}
 
-    local tbl = vim.api.nvim_buf_get_lines(self.popup.bufnr, 0, -1, false)
+    local tbl = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, false)
     local str = table.concat(tbl, "\n")
 
     local testcases = {}
@@ -27,7 +24,7 @@ function testcase:content()
     return testcases
 end
 
-function testcase:draw()
+function TestcasePopup:draw()
     local tbl = {}
     for i, case in ipairs(self.parent.parent.q.testcase_list) do
         if i ~= 1 then table.insert(tbl, "") end
@@ -39,18 +36,18 @@ function testcase:draw()
         end
     end
 
-    vim.api.nvim_buf_set_lines(self.popup.bufnr, 0, -1, false, tbl)
+    vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, tbl)
 
     self:draw_extmarks()
     return self
 end
 
-function testcase:clear_extmarks()
+function TestcasePopup:clear_extmarks()
     if not config.user.console.testcase.virt_text then return end
     local ns = vim.api.nvim_create_namespace("leetcode_extmarks")
 
     self.extmarks = vim.tbl_filter(
-        function(extmark) return not vim.api.nvim_buf_del_extmark(self.popup.bufnr, ns, extmark) end,
+        function(extmark) return not vim.api.nvim_buf_del_extmark(self.bufnr, ns, extmark) end,
         self.extmarks
     )
 end
@@ -58,20 +55,17 @@ end
 ---@param line integer
 ---@param col integer
 ---@param opts? table<string, table>
-function testcase:add_extmark(line, col, opts)
+function TestcasePopup:add_extmark(line, col, opts)
     local ns = vim.api.nvim_create_namespace("leetcode_extmarks")
 
-    table.insert(
-        self.extmarks,
-        vim.api.nvim_buf_set_extmark(self.popup.bufnr, ns, line, col, opts or {})
-    )
+    table.insert(self.extmarks, vim.api.nvim_buf_set_extmark(self.bufnr, ns, line, col, opts or {}))
 end
 
-function testcase:draw_extmarks()
+function TestcasePopup:draw_extmarks()
     if not config.user.console.testcase.virt_text then return end
 
     self:clear_extmarks()
-    local bufnr = self.popup.bufnr
+    local bufnr = self.bufnr
 
     local md = self.parent.parent.q.meta_data
     local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
@@ -119,44 +113,36 @@ function testcase:draw_extmarks()
     end
 end
 
-function testcase:reset()
+function TestcasePopup:reset()
     self:draw()
     log.info("Test cases have been reset")
 end
 
-function testcase:append(input)
+function TestcasePopup:append(input)
     local s = vim.split(input, "\n", { trimempty = true })
 
-    local lines = vim.api.nvim_buf_get_lines(self.popup.bufnr, 0, -1, true)
+    local lines = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, true)
     if #lines > 1 or (#lines == 1 and lines[1] ~= "") then
-        vim.api.nvim_buf_set_lines(self.popup.bufnr, -1, -1, false, { "", unpack(s) })
+        vim.api.nvim_buf_set_lines(self.bufnr, -1, -1, false, { "", unpack(s) })
     else
-        vim.api.nvim_buf_set_lines(self.popup.bufnr, 0, -1, false, s)
+        vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, s)
     end
 
     self:draw_extmarks()
 end
 
-function testcase:autocmds()
-    self.popup:on(
+function TestcasePopup:autocmds()
+    self:on(
         { "TextChanged", "TextChangedI", "TextChangedP", "TextChangedT" },
         function() self:draw_extmarks() end
     )
 end
 
----@param parent lc.Console
-function testcase:init(parent)
-    local popup = NuiPopup({
+---@param parent lc.ui.ConsoleLayout
+function TestcasePopup:init(parent)
+    TestcasePopup.super.init(self, {
         enter = true,
-        focusable = true,
         border = {
-            padding = {
-                top = 1,
-                bottom = 1,
-                left = 3,
-                right = 3,
-            },
-            style = "rounded",
             text = {
                 top = (" (H) %s "):format(t("Testcases")),
                 top_align = "center",
@@ -173,15 +159,19 @@ function testcase:init(parent)
         },
     })
 
-    self = setmetatable({
-        popup = popup,
-        testcases = {},
-        extmarks = {},
-        parent = parent,
-    }, self)
+    self.testcases = {}
+    self.extmarks = {}
+    self.parent = parent
 
-    self:autocmds()
-    return self:draw()
+    self:on(
+        { "TextChanged", "TextChangedI", "TextChangedP", "TextChangedT" },
+        function() self:draw_extmarks() end
+    )
+
+    self:draw()
 end
 
-return testcase
+---@type fun(parent: lc.ui.ConsoleLayout): lc.ui.Console.TestcasePopup
+local LeetTestcasePopup = TestcasePopup
+
+return LeetTestcasePopup

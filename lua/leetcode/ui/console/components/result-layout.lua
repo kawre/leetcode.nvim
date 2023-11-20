@@ -14,7 +14,7 @@ local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
 
 ---@class lc.ResultLayout : lc-ui.Layout
----@field parent lc.Console
+---@field parent lc.ui.ConsoleLayout
 ---@field group lc-ui.Group
 ---@field cases lc.Cases
 ---@field case lc.Result.Case
@@ -289,7 +289,7 @@ function ResultLayout:clear()
     Layout.clear(self)
 end
 
----@param parent lc.Console
+---@param parent lc.ui.ConsoleLayout
 ---@param opts? lc-ui.Layout.opts
 function ResultLayout:init(parent, opts)
     local layout = Layout:init({}, opts)

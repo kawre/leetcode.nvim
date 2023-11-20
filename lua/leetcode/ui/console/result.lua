@@ -1,25 +1,17 @@
-local console_popup = require("leetcode.ui.console.popup")
 local problemlist = require("leetcode.cache.problemlist")
 local t = require("leetcode.translator")
-
+local ConsolePopup = require("leetcode.ui.console.popup")
 local ResultLayout = require("leetcode.ui.console.components.result-layout")
-local NuiPopup = require("nui.popup")
-local event = require("nui.utils.autocmd").event
 
----@class lc.Result : lc.Console.Popup
+---@class lc.ui.Console.ResultPopup : lc.ui.Console.Popup
 ---@field layout lc.ResultLayout
 ---@field last_testcase string
-local result = {}
-result.__index = result
-setmetatable(result, console_popup)
-
----@param hi string
-function result:set_popup_border_hi(hi) self.popup.border:set_highlight(hi) end
+local ResultPopup = ConsolePopup:extend("LeetResultPopup")
 
 ---@param item lc.interpreter_response
-function result:handle(item)
+function ResultPopup:handle(item)
     self.layout:clear()
-    self:set_popup_border_hi(item._.hl)
+    self.border:set_highlight(item._.hl)
     self.layout:handle_res(item)
 
     if item.last_testcase then self.last_testcase = item.last_testcase end
@@ -32,35 +24,20 @@ function result:handle(item)
     self:draw()
 end
 
-function result:clear()
+function ResultPopup:clear()
     self.layout:clear()
     self.last_testcase = nil
-    self.popup.border:set_highlight("FloatBorder")
+    self.border:set_highlight("FloatBorder")
 end
 
-function result:draw() self.layout:draw(self.popup) end
+function ResultPopup:draw() self.layout:draw(self) end
 
----@param parent lc.Console
+---@param parent lc.ui.ConsoleLayout
 ---
----@return lc.Result
-function result:init(parent)
-    local tbl = {}
-    for _, case in ipairs(parent.parent.q.testcase_list) do
-        for s in vim.gsplit(case, "\n", { trimempty = true }) do
-            table.insert(tbl, s)
-        end
-    end
-
-    local popup = NuiPopup({
-        focusable = true,
+---@return lc.ui.Console.ResultPopup
+function ResultPopup:init(parent)
+    ResultPopup.super.init(self, {
         border = {
-            padding = {
-                top = 1,
-                bottom = 1,
-                left = 3,
-                right = 3,
-            },
-            style = "rounded",
             text = {
                 top = (" (L) %s "):format(t("Result")),
                 top_align = "center",
@@ -77,16 +54,15 @@ function result:init(parent)
         },
     })
 
-    self = setmetatable({
-        popup = popup,
-        layout = ResultLayout:init(parent, {
-            winid = popup.winid,
-            bufnr = popup.bufnr,
-        }),
-        parent = parent,
-    }, self)
+    self.parent = parent
 
-    return self
+    self.layout = ResultLayout:init(parent, {
+        winid = self.winid,
+        bufnr = self.bufnr,
+    })
 end
 
-return result
+---@type fun(parent: lc.ui.ConsoleLayout): lc.ui.Console.ResultPopup
+local LeetResultPopup = ResultPopup
+
+return LeetResultPopup

@@ -12,15 +12,16 @@ local NuiLine = require("nui.line")
 ---@field cases table<integer, lc.Result.Case>
 ---@field keymaps { mode: string, key: string }
 ---@field idx integer
----@field parent lc.Result
+---@field parent lc.ui.Console.ResultPopup
 local Cases = {}
 Cases.__index = Cases
 setmetatable(Cases, Group)
 
 function Cases:clear()
     for _, map in ipairs(self.keymaps) do
-        pcall(function() self.parent.popup:unmap(map.mode, map.key) end)
+        pcall(function() self.parent:unmap(map.mode, map.key) end)
     end
+
     self.keymaps = {}
     self.cases = {}
     self.nav:clear()
@@ -37,7 +38,7 @@ function Cases:update_nav()
         text:append((" Case (%d) "):format(i), "leetcode_case_" .. hl)
 
         local keymap = { mode = "n", key = tostring(i) }
-        self.parent.popup:map(keymap.mode, keymap.key, function() self:change(i) end)
+        self.parent:map(keymap.mode, keymap.key, function() self:change(i) end)
         table.insert(self.keymaps, keymap)
 
         cases:append(text)
@@ -58,7 +59,7 @@ end
 
 ---@param item lc.runtime
 ---@param testcases string[]
----@param parent lc.Result
+---@param parent lc.ui.Console.ResultPopup
 ---@return lc.Cases
 function Cases:init(item, testcases, parent)
     local group = Group:init({}, { spacing = 1 })

@@ -153,8 +153,7 @@ return {
 
                         local q = selection.value
                         if q.paid_only and not config.auth.is_premium then
-                            log.warn("Question is for premium users only")
-                            return
+                            return log.warn("Question is for premium users only")
                         end
 
                         actions.close(prompt_bufnr)

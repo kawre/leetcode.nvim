@@ -177,7 +177,7 @@ end
 function cmd.info()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-    if q then q.hints:toggle() end
+    if q then q.info:toggle() end
 end
 
 function cmd.hints()

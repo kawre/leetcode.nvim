@@ -1,4 +1,4 @@
-local NuiPopup = require("nui.popup")
+local Popup = require("leetcode.ui.popup")
 local NuiLine = require("nui.line")
 local Group = require("leetcode-ui.component.group")
 local Text = require("leetcode-ui.component.text")
@@ -9,21 +9,9 @@ local Layout = require("leetcode-ui.layout")
 
 local log = require("leetcode.logger")
 
----@class lc.ui.Skills
----@field _ NuiPopup
----@field mounted boolean
+---@class lc.ui.SkillsPopup : lc.ui.Popup
 ---@field layout lc-ui.Layout
-local Skills = {}
-
-Skills.mounted = false
-
-function Skills.show()
-    if Skills.mounted then
-        Skills._:show()
-    else
-        Skills.mount()
-    end
-end
+local Skills = Popup:extend("LeetSkills")
 
 local hl = {
     advanced = "leetcode_hard",
@@ -31,7 +19,7 @@ local hl = {
     fundamental = "leetcode_easy",
 }
 
-function Skills.handle(name, skills)
+function Skills:handle(name, skills)
     local adv = Text:init({})
 
     table.sort(skills, function(a, b) return a.problems_solved > b.problems_solved end)
@@ -53,21 +41,19 @@ end
 
 ---@private
 ---@param res lc.Skills.Res
-function Skills.populate(res)
+function Skills:populate(res)
     local group = Group:init({}, { spacing = 2 })
 
     local order = { "advanced", "intermediate", "fundamental" }
     for _, key in ipairs(order) do
-        group:append(Skills.handle(key, res[key]))
+        group:append(self:handle(key, res[key]))
     end
 
-    Skills.layout:append(group)
+    self.layout:append(group)
 end
 
-function Skills.mount()
-    Skills.layout = Layout:init({})
-
-    local popup = NuiPopup({
+function Skills:init()
+    Skills.super.init(self, {
         position = "50%",
         size = {
             width = 75,
@@ -95,23 +81,24 @@ function Skills.mount()
         },
     })
 
-    popup:map("n", { "q", "<Esc>" }, function() popup:hide() end, { nowait = true })
-    popup:on("BufLeave", function() popup:hide() end)
-    Skills._ = popup
-
-    local spinner = Spinner:init("fetching user skills", "dot")
-    stats_api.skills(function(res, err)
-        if err then
-            spinner:stop(err.msg, false)
-        else
-            Skills.populate(res)
-            spinner:stop(nil, true, { timeout = 200 })
-            Skills.layout:draw(Skills._)
-        end
-    end)
-
-    popup:mount()
-    Skills.mounted = true
+    self.layout = Layout:init({})
 end
 
-return Skills
+function Skills:show()
+    if not self._.mounted then
+        local spinner = Spinner:init("fetching user skills", "dot")
+        stats_api.skills(function(res, err)
+            if err then
+                spinner:stop(err.msg, false)
+            else
+                self:populate(res)
+                spinner:stop(nil, true, { timeout = 200 })
+                self.layout:draw(self)
+            end
+        end)
+    end
+
+    Skills.super.show(self)
+end
+
+return Skills()

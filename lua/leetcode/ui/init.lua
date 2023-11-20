@@ -1,6 +1,3 @@
-local api_problems = require("leetcode.api.problems")
-local Popup = require("nui.popup")
-
 ---@class lc.UI
 local Ui = {}
 

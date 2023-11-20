@@ -1,4 +1,4 @@
-local NuiPopup = require("nui.popup")
+local Popup = require("leetcode.ui.popup")
 local NuiLine = require("nui.line")
 local Group = require("leetcode-ui.component.group")
 local Text = require("leetcode-ui.component.text")
@@ -11,23 +11,11 @@ local Layout = require("leetcode-ui.layout")
 
 local log = require("leetcode.logger")
 
----@class lc.ui.Languages
----@field _ NuiPopup
----@field mounted boolean
+---@class lc.ui.LanguagesPopup : lc.ui.SkillsPopup
 ---@field layout lc-ui.Layout
-local Languages = {}
+local Languages = Popup:extend("LeetLanguages")
 
-Languages.mounted = false
-
-function Languages.show()
-    if Languages.mounted then
-        Languages._:show()
-    else
-        Languages.mount()
-    end
-end
-
-function Languages.handle(lang)
+function Languages:handle(lang)
     local text = Text:init({})
 
     local line = NuiLine()
@@ -47,21 +35,36 @@ end
 
 ---@private
 ---@param res lc.Languages.Res
-function Languages.populate(res)
+function Languages:populate(res)
     local group = Group:init({}, { spacing = 2 })
 
     table.sort(res, function(a, b) return a.problems_solved > b.problems_solved end)
     for _, lang in ipairs(res) do
-        group:append(Languages.handle(lang))
+        group:append(self:handle(lang))
     end
 
-    Languages.layout:append(group)
+    self.layout:append(group)
 end
 
-function Languages.mount()
-    Languages.layout = Layout:init({})
+function Languages:show()
+    if not self._.mounted then
+        local spinner = Spinner:init("fetching user languages", "dot")
+        stats_api.languages(function(res, err)
+            if err then
+                spinner:stop(err.msg, false)
+            else
+                self:populate(res)
+                spinner:stop(nil, true, { timeout = 200 })
+                self.layout:draw(self)
+            end
+        end)
+    end
 
-    local popup = NuiPopup({
+    Languages.super.show(self)
+end
+
+function Languages:init()
+    Languages.super.init(self, {
         position = "50%",
         size = {
             width = 75,
@@ -89,23 +92,7 @@ function Languages.mount()
         },
     })
 
-    popup:map("n", { "q", "<Esc>" }, function() popup:hide() end, { nowait = true })
-    popup:on("BufLeave", function() popup:hide() end)
-    Languages._ = popup
-
-    local spinner = Spinner:init("fetching user languages", "dot")
-    stats_api.languages(function(res, err)
-        if err then
-            spinner:stop(err.msg, false)
-        else
-            Languages.populate(res)
-            spinner:stop(nil, true, { timeout = 200 })
-            Languages.layout:draw(Languages._)
-        end
-    end)
-
-    popup:mount()
-    Languages.mounted = true
+    self.layout = Layout:init({})
 end
 
-return Languages
+return Languages()

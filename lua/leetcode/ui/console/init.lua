@@ -4,72 +4,61 @@ local Result = require("leetcode.ui.console.result")
 local Runner = require("leetcode.runner")
 local log = require("leetcode.logger")
 local NuiLayout = require("nui.layout")
+local Popup = require("leetcode.ui.popup")
 
----@class lc.Console
+---@class lc.ui.ConsoleLayout : NuiLayout
 ---@field parent lc.Question
 ---@field layout NuiLayout
----@field testcase lc.Testcase
----@field result lc.Result
----@field opened boolean
-local console = {}
-console.__index = console
+---@field testcase lc.ui.Console.TestcasePopup
+---@field result lc.ui.Console.ResultPopup
+local ConsoleLayout = NuiLayout:extend("LeetConsoleLayout")
 
-function console:unmount()
-    self.layout:unmount()
+function ConsoleLayout:unmount()
+    ConsoleLayout.super.unmount(self)
     self = nil
 end
 
-function console:mount()
-    self.layout:mount()
+function ConsoleLayout:mount()
+    ConsoleLayout.super.mount(self)
     return self
 end
 
-function console:run()
+function ConsoleLayout:run()
     self.result:clear()
     Runner:init(self.parent):run()
 end
 
-function console:submit()
+function ConsoleLayout:submit()
     self.result:clear()
     Runner:init(self.parent):run(true)
 end
 
-function console:toggle()
-    if self.opened then
+function ConsoleLayout:show()
+    if not self._.mounted then
+        ConsoleLayout.super.mount(self)
+    elseif not self.visible then
+        ConsoleLayout.super.show(self)
+    end
+
+    self.visible = true
+end
+
+function ConsoleLayout:hide()
+    if not self.visible then return end
+    ConsoleLayout.super.hide(self)
+    self.visible = false
+end
+
+function ConsoleLayout:toggle()
+    log.info({ toggle = self.visible })
+    if self.visible then
         self:hide()
     else
         self:show()
     end
 end
 
-function console:show()
-    if not self.layout._.mounted then
-        self.layout:mount()
-    elseif not self.opened then
-        self.layout:show()
-    end
-
-    self.opened = true
-end
-
-function console:handle_buf_leave()
-    log.info(self.result.popup.winid)
-    log.info(self.testcase.popup.winid)
-    log.info("-")
-
-    local winid = vim.api.nvim_get_current_win()
-    --
-    log.info(winid)
-end
-
-function console:hide()
-    if not self.opened then return end
-
-    self.layout:hide()
-    self.opened = false
-end
-
-function console:use_testcase()
+function ConsoleLayout:use_testcase()
     local last_testcase = self.result.last_testcase
     if last_testcase then
         self.testcase:append(last_testcase)
@@ -79,50 +68,49 @@ function console:use_testcase()
 end
 
 ---@param parent lc.Question
-function console:init(parent)
-    self = setmetatable({
-        parent = parent,
-        opened = false,
-    }, self)
+function ConsoleLayout:init(parent)
+    ConsoleLayout.super.init(self, {
+        relative = "editor",
+        position = "50%",
+        size = config.user.console.size,
+    }, NuiLayout.Box(
+        { NuiLayout.Box(Popup(), { size = 0 }) },
+        { dir = config.user.console.dir }
+    ))
 
-    self.testcase = Testcase:init(self)
-    self.result = Result:init(self)
+    self.visible = false
+    self.parent = parent
 
-    self.layout = NuiLayout(
+    self.testcase = Testcase(self)
+    self.result = Result(self)
+
+    self:update(
         {
             relative = "editor",
             position = "50%",
             size = config.user.console.size,
         },
         NuiLayout.Box({
-            NuiLayout.Box(self.testcase.popup, { size = config.user.console.testcase.size }),
-            NuiLayout.Box(self.result.popup, { size = config.user.console.result.size }),
+            NuiLayout.Box(self.testcase, { size = config.user.console.testcase.size }),
+            NuiLayout.Box(self.result, { size = config.user.console.result.size }),
         }, { dir = config.user.console.dir })
     )
-
-    local popups = { self.testcase.popup, self.result.popup } ---@type NuiPopup[]
 
     local keymaps = {
         ["R"] = function() self:run() end,
         ["S"] = function() self:submit() end,
         ["r"] = function() self.testcase:reset() end,
-        [{ "q", "<Esc>" }] = function() self:hide() end,
         ["H"] = function() self.testcase:focus() end,
         ["L"] = function() self.result:focus() end,
         ["U"] = function() self:use_testcase() end,
     }
 
-    -- apply keymaps to all popups
-    for key, fn in pairs(keymaps) do
-        for _, popup in pairs(popups) do
-            popup:map("n", key, fn, { nowait = true })
-        end
-    end
-
-    -- hide layout on layout leave
+    local popups = { self.testcase, self.result }
     for _, popup in pairs(popups) do
+        popup:set_keymaps(keymaps)
+
         popup:on(
-            "BufLeave",
+            { "BufLeave", "WinLeave" },
             vim.schedule_wrap(function()
                 local curr_bufnr = vim.api.nvim_get_current_buf()
                 for _, p in pairs(popups) do
@@ -132,8 +120,9 @@ function console:init(parent)
             end)
         )
     end
-
-    return self
 end
 
-return console
+---@type fun(parent: lc.Question): lc.ui.ConsoleLayout
+local LeetConsoleLayout = ConsoleLayout
+
+return LeetConsoleLayout

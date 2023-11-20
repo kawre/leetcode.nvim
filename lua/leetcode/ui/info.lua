@@ -1,25 +1,29 @@
-local log = require("leetcode.logger")
-local NuiPopup = require("nui.popup")
-local event = require("nui.utils.autocmd").event
+local Popup = require("leetcode.ui.popup")
 local NuiText = require("nui.text")
 local NuiLine = require("nui.line")
 local config = require("leetcode.config")
-local t = require("leetcode.translator")
 local utils = require("leetcode.utils")
 
----@class lc.Hints
+local t = require("leetcode.translator")
+local log = require("leetcode.logger")
+
+---@class lc.ui.InfoPopup : lc.ui.Popup
 ---@field popup NuiPopup
 ---@field parent lc.Question
 ---@field hints table[]
-local Info = {}
-Info.__index = Info
+local InfoPopup = Popup:extend("LeetInfoPopup")
 
-function Info:unmount()
-    self.popup:unmount()
+function InfoPopup:unmount()
+    InfoPopup.super.unmount(self)
     self = nil
 end
 
-function Info:mount()
+function InfoPopup:toggle()
+    --
+    InfoPopup.super.toggle(self)
+end
+
+function InfoPopup:mount()
     local NuiTree = require("nui.tree")
     local nodes = {}
 
@@ -105,7 +109,7 @@ function Info:mount()
     end
 
     local tree = NuiTree({
-        bufnr = self.popup.bufnr,
+        bufnr = self.bufnr,
         nodes = nodes,
         prepare_node = function(node)
             local line = NuiLine()
@@ -130,9 +134,8 @@ function Info:mount()
     })
 
     local opts = { noremap = true, nowait = true }
-    self.popup:map("n", { "<Esc>", "q" }, function() self:hide() end, opts)
 
-    self.popup:map("n", { "<Tab>", "<CR>" }, function()
+    self:map("n", { "<Tab>", "<CR>" }, function()
         local node = tree:get_node()
         if not node then return end
 
@@ -151,14 +154,14 @@ function Info:mount()
         tree:render()
     end, opts)
 
-    self.popup:mount()
+    InfoPopup.super.mount(self)
     local utils = require("leetcode-menu.utils")
     local winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder"
-    utils.set_win_opts(self.popup.winid, {
+    utils.set_win_opts(self.winid, {
         winhighlight = winhighlight,
         wrap = true,
     })
-    utils.set_win_opts(self.popup.border.winid, {
+    utils.set_win_opts(self.border.winid, {
         winhighlight = winhighlight,
     })
     tree:render()
@@ -166,32 +169,9 @@ function Info:mount()
     return self
 end
 
-function Info:show()
-    if self.popup._.mounted then
-        self.popup:show()
-    else
-        self:mount()
-    end
-
-    self.opened = true
-end
-
-function Info:hide()
-    self.popup:hide()
-    self.opened = false
-end
-
-function Info:toggle()
-    if self.opened then
-        self:hide()
-    else
-        self:show()
-    end
-end
-
 ---@param parent lc.Question
-function Info:init(parent)
-    local popup = NuiPopup({
+function InfoPopup:init(parent)
+    InfoPopup.super.init(self, {
         position = "50%",
         size = {
             width = "50%",
@@ -199,7 +179,6 @@ function Info:init(parent)
         },
         enter = true,
         focusable = true,
-        zindex = 50,
         relative = "editor",
         border = {
             padding = {
@@ -219,16 +198,11 @@ function Info:init(parent)
         },
     })
 
-    self = setmetatable({
-        popup = popup,
-        hints = parent.q.hints,
-        parent = parent,
-        opened = false,
-    }, self)
-
-    popup:on(event.BufLeave, function() self:hide() end)
-
-    return self
+    self.hints = parent.q.hints
+    self.parent = parent
 end
 
-return Info
+---@type fun(parent: lc.Question): lc.ui.InfoPopup
+local LeetInfoPopup = InfoPopup
+
+return LeetInfoPopup

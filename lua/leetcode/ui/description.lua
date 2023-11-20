@@ -13,39 +13,38 @@ local Text = require("leetcode-ui.component.text")
 local padding = require("leetcode-ui.component.padding")
 
 local NuiLine = require("nui.line")
-local Split = require("nui.split")
+local NuiSplit = require("nui.split")
 
----@class lc.Description
+---@class lc.ui.DescriptionSplit : NuiSplit
 ---@field split NuiSplit
 ---@field parent lc.Question
 ---@field layout lc-ui.Layout
 ---@field visible boolean
 ---@field images table<string, Image>
-local description = {}
-description.__index = description
+local DescriptionSplit = NuiSplit:extend("LeetDescription")
 
 local group_id = vim.api.nvim_create_augroup("leetcode_description", { clear = true })
 
-function description:autocmds()
+function DescriptionSplit:autocmds()
     vim.api.nvim_create_autocmd("WinResized", {
         group = group_id,
-        buffer = self.split.bufnr,
+        buffer = self.bufnr,
         callback = function() self:draw() end,
     })
 end
 
-function description:unmount()
-    self.split:unmount()
+function DescriptionSplit:unmount()
+    DescriptionSplit.super.unmount(self)
     self = nil
 end
 
-function description:mount()
+function DescriptionSplit:mount()
     self.visible = true
     self:populate()
-    self.split:mount()
+    DescriptionSplit.super.mount(self)
 
     local utils = require("leetcode-menu.utils")
-    utils.set_buf_opts(self.split.bufnr, {
+    utils.set_buf_opts(self.bufnr, {
         modifiable = false,
         buflisted = false,
         matchpairs = "",
@@ -54,7 +53,7 @@ function description:mount()
         filetype = "leetcode.nvim",
         synmaxcol = 0,
     })
-    utils.set_win_opts(self.split.winid, {
+    utils.set_win_opts(self.winid, {
         winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
         wrap = not img_sup,
         colorcolumn = "",
@@ -77,25 +76,25 @@ function description:mount()
     return self
 end
 
-function description:toggle()
+function DescriptionSplit:toggle()
     if self.visible then
-        self.split:hide()
+        self:hide()
     else
-        self.split:show()
+        self:show()
     end
 
     self.visible = not self.visible
 end
 
-function description:draw()
-    self.layout:draw(self.split)
+function DescriptionSplit:draw()
+    self.layout:draw(self)
     self:draw_imgs()
 end
 
-function description:draw_imgs()
+function DescriptionSplit:draw_imgs()
     if not img_sup then return end
 
-    local lines = vim.api.nvim_buf_get_lines(self.split.bufnr, 1, -1, false)
+    local lines = vim.api.nvim_buf_get_lines(self.bufnr, 1, -1, false)
     for i, line in ipairs(lines) do
         for link in line:gmatch("->%((http[s]?://%S+)%)") do
             local img = self.images[link]
@@ -104,8 +103,8 @@ function description:draw_imgs()
                 self.images[link] = {}
 
                 image_api.from_url(link, {
-                    buffer = self.split.bufnr,
-                    window = self.split.winid,
+                    buffer = self.bufnr,
+                    window = self.winid,
                     with_virtual_padding = true,
                 }, function(image)
                     if not image then return end
@@ -121,7 +120,7 @@ function description:draw_imgs()
 end
 
 ---@private
-function description:populate()
+function DescriptionSplit:populate()
     local q = self.parent.q
 
     local linkline = NuiLine()
@@ -173,8 +172,8 @@ function description:populate()
 end
 
 ---@param parent lc.Question
-function description:init(parent)
-    local split = Split({
+function DescriptionSplit:init(parent)
+    DescriptionSplit.super.init(self, {
         relative = "editor",
         position = config.user.description.position,
         size = config.user.description.width,
@@ -182,15 +181,15 @@ function description:init(parent)
         focusable = true,
     })
 
-    self = setmetatable({
-        split = split,
-        parent = parent,
-        layout = {},
-        visible = false,
-        images = {},
-    }, self)
+    self.parent = parent
+    self.layout = {}
+    self.visible = false
+    self.images = {}
 
     return self:mount()
 end
 
-return description
+---@type fun(parent: lc.Question): lc.ui.DescriptionSplit
+local LeetDescription = DescriptionSplit
+
+return LeetDescription

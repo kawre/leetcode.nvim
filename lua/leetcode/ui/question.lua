@@ -1,5 +1,4 @@
 local config = require("leetcode.config")
-local t = require("leetcode.translator")
 local log = require("leetcode.logger")
 local Description = require("leetcode.ui.description")
 local api_question = require("leetcode.api.question")
@@ -10,9 +9,9 @@ local Info = require("leetcode.ui.info")
 ---@class lc.Question
 ---@field file Path
 ---@field q lc.question_res
----@field description lc.Description
+---@field description lc.ui.DescriptionSplit
 ---@field bufnr integer
----@field console lc.Console
+---@field console lc.ui.ConsoleLayout
 ---@field lang string
 ---@field cache lc.Cache.Question
 local Question = {}
@@ -33,7 +32,7 @@ function Question:create_file()
 end
 
 function Question:unmount()
-    self.hints:unmount()
+    self.info:unmount()
     self.console:unmount()
     self.description:unmount()
 
@@ -63,8 +62,8 @@ function Question:mount()
     table.insert(_Lc_questions, self)
 
     self.description = Description:init(self)
-    self.console = Console:init(self)
-    self.hints = Info:init(self)
+    self.console = Console(self)
+    self.info = Info(self)
 
     return self
 end

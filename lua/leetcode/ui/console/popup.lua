@@ -1,12 +1,30 @@
----@class lc.Console.Popup
----@field popup NuiPopup
----@field parent lc.Console
-local cpopup = {}
-cpopup.__index = cpopup
+local Popup = require("leetcode.ui.popup")
 
-function cpopup:focus()
-    if not vim.api.nvim_win_is_valid(self.popup.winid) then return end
-    vim.api.nvim_set_current_win(self.popup.winid)
+---@class lc.ui.Console.Popup : lc.ui.Popup
+---@field popup NuiPopup
+---@field parent lc.ui.ConsoleLayout
+local ConsolePopup = Popup:extend("LeetConsolePopup")
+
+---@param keymaps table<string, function>
+function ConsolePopup:set_keymaps(keymaps)
+    for key, fn in pairs(keymaps) do
+        self:map("n", key, fn, { nowait = true })
+    end
 end
 
-return cpopup
+---@param keymaps table<string, function>
+function ConsolePopup:clear_keymaps(keymaps)
+    for key, fn in pairs(keymaps) do
+        self:map("n", key, fn, { nowait = true })
+    end
+end
+
+function ConsolePopup:init(opts)
+    ConsolePopup.super.init(self, opts)
+    self:off({ "BufLeave", "WinLeave" })
+end
+
+---@type fun(opts: table): lc.ui.Console.Popup
+local LeetConsolePopup = ConsolePopup
+
+return LeetConsolePopup
