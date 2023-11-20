@@ -55,10 +55,10 @@ function cmd.cookie_prompt(cb)
             local success = cookie.set(value)
 
             if success then
-                log.info(t("Sign-in successful"))
+                log.info("Sign-in successful")
                 cmd.menu_layout("menu")
             else
-                log.error(t("Sign-in failed"))
+                log.error("Sign-in failed")
             end
 
             if cb then cb(success) end
@@ -70,7 +70,7 @@ function cmd.cookie_prompt(cb)
 end
 
 function cmd.sign_out()
-    log.warn(t("You're now signed out"))
+    log.warn("You're now signed out")
     cmd.delete_cookie()
     cmd.menu_layout("signin")
     cmd.q_close_all()
@@ -92,8 +92,14 @@ function cmd.q_close_all()
 end
 
 function cmd.expire()
+    local tabp = vim.api.nvim_get_current_tabpage()
+    cmd.menu()
+
     cmd.cookie_prompt(function(success)
-        if not success then
+        if success then
+            if vim.api.nvim_tabpage_is_valid(tabp) then vim.cmd.tabnext(tabp) end
+            log.info("Successful re-login")
+        else
             cmd.delete_cookie()
             cmd.menu_layout("signin")
             cmd.q_close_all()
@@ -109,7 +115,7 @@ function cmd.qot()
     local Question = require("leetcode.ui.question")
 
     problems.question_of_today(function(qot, err)
-        if err then return log.error(err.msg) end
+        if err then return log.err(err) end
         local problemlist = require("leetcode.cache.problemlist")
         Question:init(problemlist.get_by_title_slug(qot.title_slug))
     end)
@@ -120,7 +126,7 @@ function cmd.random_question()
     local question = require("leetcode.api.question")
 
     local q, err = question.random()
-    if err then return log.error(err.msg) end
+    if err then return log.err(err) end
 
     if q then
         local item = problems.get_by_title_slug(q.title_slug) or {}

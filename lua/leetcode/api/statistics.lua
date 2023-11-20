@@ -32,7 +32,7 @@ function statistics.calendar(cb)
     })
 end
 
----@param cb fun(res: lc.Stats.Res|nil, err: lc.err|nil)
+---@param cb fun(res: lc.Stats.Res, err: lc.err)
 function statistics.solved(cb)
     local variables = {
         username = config.auth.name,
@@ -57,7 +57,7 @@ function statistics.solved(cb)
     })
 end
 
----@param cb fun(res: lc.Skills.Res, err: lc.err|nil)
+---@param cb fun(res: lc.Skills.Res, err: lc.err)
 function statistics.skills(cb)
     local variables = {
         username = config.auth.name,
@@ -76,7 +76,7 @@ function statistics.skills(cb)
     })
 end
 
----@param cb fun(res: lc.Languages.Res|nil, err: lc.err|nil)
+---@param cb fun(res: lc.Languages.Res, err: lc.err)
 function statistics.languages(cb)
     local variables = {
         username = config.auth.name,

@@ -1,5 +1,4 @@
 local config = require("leetcode.config")
-local log = require("leetcode.logger")
 
 ---@class lc.translate
 local translate = {
@@ -95,20 +94,18 @@ local function t(text)
 
     local txt = text:lower()
     if not vim.tbl_contains(keys, txt) then
-        log.debug(("Translation for `%s` not found"):format(text))
+        local msg = ("Translation for `%s` not found"):format(text)
+        vim.notify(msg, vim.log.levels.DEBUG, { title = config.name })
         return text
     end
 
     return config.is_cn and config.user.cn.translator and translate[txt] or text
 end
 
----@param text string|string[]
 return function(text)
     if type(text) == "string" then
         return t(text)
-    elseif type(text) == "table" then
-        return vim.tbl_map(t, text)
+    else
+        return text
     end
-
-    return ""
 end

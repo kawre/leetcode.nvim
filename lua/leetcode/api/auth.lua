@@ -8,7 +8,7 @@ local urls = require("leetcode.api.urls")
 ---@class lc.AuthApi
 local Auth = {}
 
----@return lc.UserStatus|nil, lc.err|nil
+---@return lc.UserStatus, lc.err
 function Auth.user(cb)
     local query = queries.auth
 
@@ -25,7 +25,7 @@ function Auth.user(cb)
 end
 
 ---@private
----@return lc.UserStatus|nil, lc.err|nil
+---@return lc.UserStatus, lc.err
 function Auth.handle(res, err)
     if err then return res, err end
 
@@ -33,11 +33,11 @@ function Auth.handle(res, err)
     err = {}
 
     if auth.id == vim.NIL then
-        err.msg = t("Session expired?")
+        err.msg = "Session expired?"
     elseif not auth.is_signed_in then
-        err.msg = t("Sign-in failed")
+        err.msg = "Sign-in failed"
     elseif not auth.is_verified then
-        err.msg = t("Please verify your email address in order to use your account")
+        err.msg = "Please verify your email address in order to use your account"
     end
 
     if err.msg then

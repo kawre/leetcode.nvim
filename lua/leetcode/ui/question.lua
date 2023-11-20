@@ -92,8 +92,8 @@ function Question:init(problem)
     if tabp then return pcall(vim.cmd.tabnext, tabp) end
 
     local q = api_question.by_title_slug(problem.title_slug)
-    if q.is_paid_only and not config.auth.is_premium then
-        return log.warn(t("Question is for premium users only"))
+    if not q or q.is_paid_only and not config.auth.is_premium then
+        return log.warn("Question is for premium users only")
     end
 
     self = setmetatable({

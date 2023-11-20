@@ -98,12 +98,12 @@ function utils.curr_question()
     local tabp = vim.api.nvim_get_current_tabpage()
     local tabs = utils.curr_question_tabs()
 
-    local tab = vim.tbl_filter(function(t) return t.tabpage == tabp end, tabs)[1] or {}
+    local tab = vim.tbl_filter(function(tab) return tab.tabpage == tabp end, tabs)[1] or {}
     if tab.question then
-        return tab.question
+        return tab.question, tabp
     else
         local log = require("leetcode.logger")
-        log.error(t("No current question found"))
+        log.error("No current question found")
     end
 end
 
@@ -121,19 +121,6 @@ function utils.exec_hooks(event, ...)
     for i, fn in ipairs(fns) do
         local ok, msg = pcall(fn, ...)
         if not ok then log.error(("bad hook #%d in `%s` event: %s"):format(i, event, msg)) end
-    end
-end
-
----@param err lc.err
-function utils.log_err(err)
-    local log = require("leetcode.logger")
-
-    if err.msgs then
-        for _, msg in ipairs(err.msgs) do
-            log.error(msg)
-        end
-    else
-        log.error(err)
     end
 end
 

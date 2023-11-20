@@ -13,7 +13,7 @@ setmetatable(title, Text)
 ---@param str string
 ---@param opts? any
 function title:init(history, str, opts)
-    history = t(history)
+    history = vim.tbl_map(t, history)
     str = t(str)
 
     opts = vim.tbl_deep_extend("force", {

@@ -11,7 +11,7 @@ local question = {}
 
 ---@param title_slug string
 ---
----@return lc.question_res
+---@return lc.question_res|nil
 function question.by_title_slug(title_slug)
     local variables = {
         titleSlug = title_slug,
@@ -20,7 +20,7 @@ function question.by_title_slug(title_slug)
     local query = queries.question
 
     local res, err = utils.query(query, variables)
-    if err then return log.error(err.msg) end
+    if err then return log.err(err) end
 
     local q = res.data.question
     q.meta_data = select(2, pcall(utils.decode, q.meta_data))
@@ -50,8 +50,10 @@ function question.random()
     end
 
     if not config.auth.is_premium and q.paid_only then
-        log.warn(t("Drawn question is for premium users only. Please try again"))
-        return
+        err = err or {}
+        err.msg = "Drawn question is for premium users only. Please try again"
+        err.lvl = vim.log.levels.WARN
+        return nil, err
     end
 
     return q

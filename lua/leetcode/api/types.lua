@@ -382,10 +382,13 @@
 --------------------------------------------
 --- Error
 --------------------------------------------
----@class lc.err
+---@class lc.Api.err
 ---@field code integer
 ---@field err string
 ---@field out string
 ---@field response table
 ---@field status integer
 ---@field msg string
+---@field lvl integer
+
+---@alias lc.err lc.Api.err|nil

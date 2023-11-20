@@ -171,7 +171,7 @@ end
 
 function Calendar:fetch()
     statistics.calendar(function(res, err)
-        if err then return log.error(err.msg) end
+        if err then return log.err(err) end
         self:handle_res(res)
     end)
 end

@@ -88,7 +88,7 @@ end
 function interpreter.interpret_solution(title_slug, body, callback)
     local url = urls.interpret:format(title_slug)
     local res, err = interpreter.fetch(url, body)
-    if err then return log.error(err.msg) end
+    if err then return log.err(err) end
 
     interpreter.listener(res.interpret_id, callback)
 end
@@ -96,7 +96,7 @@ end
 function interpreter.submit(title_slug, body, callback)
     local url = urls.submit:format(title_slug)
     local res, err = interpreter.fetch(url, body)
-    if err then return log.error(err.msg) end
+    if err then return log.err(err) end
 
     interpreter.listener(res.submission_id, callback)
 end

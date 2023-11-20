@@ -84,10 +84,10 @@ function utils.curl(method, params)
 end
 
 ---@private
----@return table|nil, lc.err|nil
+---@return table, lc.err
 function utils.handle_res(out)
-    log.debug(out)
     local res, err
+    log.debug(out)
 
     if out.exit ~= 0 then
         err = {
@@ -110,7 +110,7 @@ function utils.handle_res(out)
     return res, utils.check_err(err)
 end
 
----@param err lc.err|nil
+---@param err lc.err
 function utils.check_err(err)
     if not err then return end
 
@@ -120,10 +120,10 @@ function utils.check_err(err)
             err.msg = "Session expired? Enter a new cookie to keep using `leetcode.nvim`"
         elseif err.status == 429 then
             err.msg = "You have attempted to run code too soon"
+            err.lvl = vim.log.levels.WARN
         end
     end
 
-    err.msg = t(err.msg)
     return err
 end
 

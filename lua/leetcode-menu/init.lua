@@ -123,7 +123,7 @@ function menu:handle_mount()
         auth_api.user(function(_, err)
             if err then
                 self:set_layout("signin")
-                return log.error(err.msg)
+                return log.err(err)
             else
                 self:set_layout("menu")
             end
