@@ -25,7 +25,8 @@ function cmd.problems(options)
     )
 end
 
-function cmd.cookie_prompt()
+---@param cb? function
+function cmd.cookie_prompt(cb)
     local cookie = require("leetcode.cache.cookie")
 
     local popup_options = {
@@ -59,6 +60,8 @@ function cmd.cookie_prompt()
             else
                 log.error(t("Sign-in failed"))
             end
+
+            if cb then cb(success) end
         end,
     })
 
@@ -79,14 +82,18 @@ function cmd.delete_cookie()
 end
 
 function cmd.expire()
-    cmd.delete_cookie()
+    cmd.cookie_prompt(function(success)
+        if not success then
+            cmd.delete_cookie()
 
-    local utils = require("leetcode.utils")
-    local qs = utils.curr_question_tabs()
+            local utils = require("leetcode.utils")
+            local qs = utils.curr_question_tabs()
 
-    for _, tabp in ipairs(qs) do
-        tabp.question:unmount()
-    end
+            for _, tabp in ipairs(qs) do
+                tabp.question:unmount()
+            end
+        end
+    end)
 end
 
 ---Merge configurations into default configurations and set it as user configurations.

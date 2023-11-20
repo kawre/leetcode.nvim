@@ -117,7 +117,7 @@ function utils.check_err(err)
     if err.status then
         if err.status == 401 or err.status == 403 then
             require("leetcode.command").expire()
-            err.msg = "Session expired? Restart `leetcode.nvim` to login again"
+            err.msg = "Session expired? Enter a new cookie to keep using `leetcode.nvim`"
         elseif err.status == 429 then
             err.msg = "You have attempted to run code too soon"
         end
