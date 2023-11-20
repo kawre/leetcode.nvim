@@ -36,7 +36,7 @@ function Problems.all(cb)
 
         if config.is_cn then
             local titles, terr = Problems.translated_titles()
-            if terr then return log.error(terr.msg) end
+            if terr then return nil, terr end
             return utils.translate_titles(problems, titles)
         else
             return problems
@@ -70,7 +70,7 @@ function Problems.translated_titles(cb)
         })
     else
         local res, err = utils.query(query, {})
-        if err then return log.error(err.msg), err end
+        if err then return nil, err end
         return res.data.translations
     end
 end

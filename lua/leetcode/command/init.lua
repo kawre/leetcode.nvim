@@ -85,7 +85,8 @@ function cmd.qot()
     local problems = require("leetcode.api.problems")
     local Question = require("leetcode.ui.question")
 
-    problems.question_of_today(function(qot)
+    problems.question_of_today(function(qot, err)
+        if err then return log.error(err.msg) end
         local problemlist = require("leetcode.cache.problemlist")
         Question:init(problemlist.get_by_title_slug(qot.title_slug))
     end)
@@ -95,7 +96,9 @@ function cmd.random_question()
     local problems = require("leetcode.cache.problemlist")
     local question = require("leetcode.api.question")
 
-    local q = question.random()
+    local q, err = question.random()
+    if err then return log.error(err.msg) end
+
     if q then
         local item = problems.get_by_title_slug(q.title_slug) or {}
         require("leetcode.ui.question"):init(item)

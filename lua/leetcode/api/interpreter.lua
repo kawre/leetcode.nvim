@@ -87,16 +87,18 @@ end
 ---@param callback function
 function interpreter.interpret_solution(title_slug, body, callback)
     local url = urls.interpret:format(title_slug)
-    local res = interpreter.fetch(url, body)
+    local res, err = interpreter.fetch(url, body)
+    if err then return log.error(err.msg) end
 
-    if res then interpreter.listener(res.interpret_id, callback) end
+    interpreter.listener(res.interpret_id, callback)
 end
 
 function interpreter.submit(title_slug, body, callback)
     local url = urls.submit:format(title_slug)
-    local res = interpreter.fetch(url, body)
+    local res, err = interpreter.fetch(url, body)
+    if err then return log.error(err.msg) end
 
-    if res then interpreter.listener(res.submission_id, callback) end
+    interpreter.listener(res.submission_id, callback)
 end
 
 ---@param id string
@@ -110,7 +112,7 @@ end
 
 function interpreter.fetch(url, body)
     local res, err = utils.post(url, body)
-    if err then return log.error(err.msg) end
+    if err then return nil, err end
     return res
 end
 

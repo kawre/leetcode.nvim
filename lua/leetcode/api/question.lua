@@ -39,7 +39,7 @@ function question.random()
 
     local config = require("leetcode.config")
     local res, err = utils.query(query, variables)
-    if err then return log.error(err.msg) end
+    if err then return nil, err end
 
     local q = res.data.randomQuestion
     if config.is_cn then
@@ -48,6 +48,7 @@ function question.random()
             paid_only = problemlist.get_by_title_slug(q).paid_only,
         }
     end
+
     if not config.auth.is_premium and q.paid_only then
         log.warn(t("Drawn question is for premium users only. Please try again"))
         return
