@@ -1,15 +1,12 @@
 ---@class lc.Console.Popup
 ---@field popup NuiPopup
 ---@field parent lc.Console
-local popup = {}
-popup.__index = popup
+local cpopup = {}
+cpopup.__index = cpopup
 
-function popup:keymaps(keymaps)
-    for key, fn in pairs(keymaps) do
-        self.popup:map("n", key, fn, { nowait = true })
-    end
-
-    return self
+function cpopup:focus()
+    if not vim.api.nvim_win_is_valid(self.popup.winid) then return end
+    vim.api.nvim_set_current_win(self.popup.winid)
 end
 
-return popup
+return cpopup

@@ -1,5 +1,6 @@
 local log = require("leetcode.logger")
 local NuiPopup = require("nui.popup")
+local event = require("nui.utils.autocmd").event
 local NuiText = require("nui.text")
 local NuiLine = require("nui.line")
 local config = require("leetcode.config")
@@ -218,14 +219,16 @@ function Info:init(parent)
         },
     })
 
-    local obj = setmetatable({
+    self = setmetatable({
         popup = popup,
         hints = parent.q.hints,
         parent = parent,
         opened = false,
     }, self)
 
-    return obj
+    popup:on(event.BufLeave, function() self:hide() end)
+
+    return self
 end
 
 return Info

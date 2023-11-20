@@ -53,10 +53,7 @@ function interpreter.listener(id, callback)
 
     local function listen()
         interpreter.check(id, function(item, err)
-            if err then
-                noti:stop(err.msg, false)
-                return
-            end
+            if err then return noti:stop(err.msg, false) end
 
             if item.status_code then
                 item = interpreter:handle_item(item)

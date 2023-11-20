@@ -4,6 +4,7 @@ local t = require("leetcode.translator")
 
 local ResultLayout = require("leetcode.ui.console.components.result-layout")
 local NuiPopup = require("nui.popup")
+local event = require("nui.utils.autocmd").event
 
 ---@class lc.Result : lc.Console.Popup
 ---@field layout lc.ResultLayout
@@ -14,11 +15,6 @@ setmetatable(result, console_popup)
 
 ---@param hi string
 function result:set_popup_border_hi(hi) self.popup.border:set_highlight(hi) end
-
-function result:focus()
-    if not vim.api.nvim_win_is_valid(self.popup.winid) then return end
-    vim.api.nvim_set_current_win(self.popup.winid)
-end
 
 ---@param item lc.interpreter_response
 function result:handle(item)

@@ -1,7 +1,7 @@
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
 local NuiPopup = require("nui.popup")
-local console_popup = require("leetcode.ui.console.popup")
+local ConsolePopup = require("leetcode.ui.console.popup")
 local t = require("leetcode.translator")
 
 ---@class lc.Testcase: lc.Console.Popup
@@ -9,7 +9,7 @@ local t = require("leetcode.translator")
 ---@field extmarks integer[]
 local testcase = {}
 testcase.__index = testcase
-setmetatable(testcase, console_popup)
+setmetatable(testcase, ConsolePopup)
 
 function testcase:content()
     self.testcases = {}
@@ -117,11 +117,6 @@ function testcase:draw_extmarks()
             j = 1
         end
     end
-end
-
-function testcase:focus()
-    if not vim.api.nvim_win_is_valid(self.popup.winid) then return end
-    vim.api.nvim_set_current_win(self.popup.winid)
 end
 
 function testcase:reset()

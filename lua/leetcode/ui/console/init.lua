@@ -52,6 +52,16 @@ function console:show()
     self.opened = true
 end
 
+function console:handle_buf_leave()
+    log.info(self.result.popup.winid)
+    log.info(self.testcase.popup.winid)
+    log.info("-")
+
+    local winid = vim.api.nvim_get_current_win()
+    --
+    log.info(winid)
+end
+
 function console:hide()
     if not self.opened then return end
 
@@ -75,18 +85,8 @@ function console:init(parent)
         opened = false,
     }, self)
 
-    local keymap = {
-        ["R"] = function() self:run() end,
-        ["S"] = function() self:submit() end,
-        ["r"] = function() self.testcase:reset() end,
-        [{ "q", "<Esc>" }] = function() self:hide() end,
-        ["H"] = function() self.testcase:focus() end,
-        ["L"] = function() self.result:focus() end,
-        ["U"] = function() self:use_testcase() end,
-    }
-
-    self.testcase = Testcase:init(self):keymaps(keymap) ---@diagnostic disable-line
-    self.result = Result:init(self):keymaps(keymap) ---@diagnostic disable-line
+    self.testcase = Testcase:init(self)
+    self.result = Result:init(self)
 
     self.layout = NuiLayout(
         {
@@ -99,6 +99,39 @@ function console:init(parent)
             NuiLayout.Box(self.result.popup, { size = config.user.console.result.size }),
         }, { dir = config.user.console.dir })
     )
+
+    local popups = { self.testcase.popup, self.result.popup } ---@type NuiPopup[]
+
+    local keymaps = {
+        ["R"] = function() self:run() end,
+        ["S"] = function() self:submit() end,
+        ["r"] = function() self.testcase:reset() end,
+        [{ "q", "<Esc>" }] = function() self:hide() end,
+        ["H"] = function() self.testcase:focus() end,
+        ["L"] = function() self.result:focus() end,
+        ["U"] = function() self:use_testcase() end,
+    }
+
+    -- apply keymaps to all popups
+    for key, fn in pairs(keymaps) do
+        for _, popup in pairs(popups) do
+            popup:map("n", key, fn, { nowait = true })
+        end
+    end
+
+    -- hide layout on layout leave
+    for _, popup in pairs(popups) do
+        popup:on(
+            "BufLeave",
+            vim.schedule_wrap(function()
+                local curr_bufnr = vim.api.nvim_get_current_buf()
+                for _, p in pairs(popups) do
+                    if p.bufnr == curr_bufnr then return end
+                end
+                self:hide()
+            end)
+        )
+    end
 
     return self
 end

@@ -96,6 +96,7 @@ function Skills.mount()
     })
 
     popup:map("n", { "q", "<Esc>" }, function() popup:hide() end, { nowait = true })
+    popup:on("BufLeave", function() popup:hide() end)
     Skills._ = popup
 
     local spinner = Spinner:init("fetching user skills", "dot")
