@@ -6,14 +6,14 @@ local Console = require("leetcode.ui.console")
 local utils = require("leetcode.utils")
 local Info = require("leetcode.ui.info")
 
----@class lc.Question
+---@class lc.ui.Question
 ---@field file Path
 ---@field q lc.question_res
 ---@field description lc.ui.DescriptionSplit
 ---@field bufnr integer
 ---@field console lc.ui.ConsoleLayout
 ---@field lang string
----@field cache lc.Cache.Question
+---@field cache lc.cache.Question
 local Question = {}
 Question.__index = Question
 
@@ -61,7 +61,7 @@ function Question:mount()
     self.winid = vim.api.nvim_get_current_win()
     table.insert(_Lc_questions, self)
 
-    self.description = Description:init(self)
+    self.description = Description(self):mount()
     self.console = Console(self)
     self.info = Info(self)
 
@@ -82,7 +82,7 @@ function Question:handle_mount()
     end
 end
 
----@param problem lc.Cache.Question
+---@param problem lc.cache.Question
 function Question:init(problem)
     log.debug(problem)
     log.debug("Initializing question: " .. problem.frontend_id .. ". " .. problem.title_slug)

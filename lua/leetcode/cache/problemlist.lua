@@ -3,6 +3,7 @@ local log = require("leetcode.logger")
 local async = require("plenary.async")
 
 local config = require("leetcode.config")
+
 ---@type Path
 local file = config.home:joinpath((".problemlist%s"):format(config.is_cn and "_cn" or ""))
 
@@ -10,11 +11,7 @@ local hist = {}
 
 local problems_api = require("leetcode.api.problems")
 
----@class lc.Cache.Question.topicTags
----@field name string
----@field slug string
-
----@class lc.Cache.Question
+---@class lc.cache.Question
 ---@field id integer
 ---@field frontend_id string
 ---@field link string
@@ -25,12 +22,12 @@ local problems_api = require("leetcode.api.problems")
 ---@field paid_only boolean
 ---@field ac_rate number
 ---@field difficulty "Easy" | "Medium" | "Hard"
----@field topic_tags lc.Cache.Question.topicTags[]
+---@field topic_tags { name:string, slug: string }
 
 ---@class lc.cache.Problemlist
 local Problemlist = {}
 
----@return lc.Cache.Question[]
+---@return lc.cache.Question[]
 function Problemlist.get()
     if not file:exists() then return Problemlist.populate() end
 
@@ -78,7 +75,7 @@ function Problemlist.update()
     end)
 end
 
----@return lc.Cache.Question
+---@return lc.cache.Question
 function Problemlist.get_by_title_slug(title_slug)
     local problems = Problemlist.get()
     return vim.tbl_filter(function(e) return e.title_slug == title_slug end, problems)[1] or {}
@@ -97,7 +94,7 @@ end
 
 ---@param str string
 ---
----@return { version: string, data: lc.Cache.Question[] }
+---@return { version: string, data: lc.cache.Question[] }
 function Problemlist.parse(str)
     return vim.json.decode(str) ---@diagnostic disable-line
 end

@@ -8,10 +8,6 @@ local utils = require("leetcode-ui.utils")
 local Component = {} ---@diagnostic disable-line
 Component.__index = Component
 
---------------------------------------------------------
---- Methods
---------------------------------------------------------
-
 ---@param content NuiLine | string | NuiLine[]
 ---@param highlight? string
 function Component:append(content, highlight)

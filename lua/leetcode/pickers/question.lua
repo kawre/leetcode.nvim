@@ -13,7 +13,7 @@ local entry_display = require("telescope.pickers.entry_display")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
----@param question lc.Cache.Question
+---@param question lc.cache.Question
 ---
 ---@return string
 local function question_formatter(question)
@@ -25,7 +25,7 @@ local function question_formatter(question)
     )
 end
 
----@param question lc.Cache.Question
+---@param question lc.cache.Question
 local function display_difficulty(question)
     local hl = {
         ["Easy"] = "leetcode_easy",
@@ -36,7 +36,7 @@ local function display_difficulty(question)
     return { "󱓻", hl[question.difficulty] or "" }
 end
 
----@param question lc.Cache.Question
+---@param question lc.cache.Question
 local function display_user_status(question)
     if question.paid_only and not config.auth.is_premium then
         return { "", "leetcode_medium" }
@@ -52,7 +52,7 @@ local function display_user_status(question)
     return user_status[question.status] or { "" }
 end
 
----@param question lc.Cache.Question
+---@param question lc.cache.Question
 local function display_question(question)
     local ac_rate = { ("%.1f%%"):format(question.ac_rate), "leetcode_ref" }
     local index = { question.frontend_id .. ".", "leetcode_normal" }
@@ -74,7 +74,7 @@ local displayer = entry_display.create({
 })
 
 local function make_display(entry)
-    ---@type lc.Cache.Question
+    ---@type lc.cache.Question
     local q = entry.value
 
     return displayer({
@@ -99,14 +99,14 @@ local theme = require("telescope.themes").get_dropdown({
     },
 })
 
----@param questions lc.Cache.Question[]
+---@param questions lc.cache.Question[]
 ---@param opts table<string, string[]>
 ---
----@return lc.Cache.Question[]
+---@return lc.cache.Question[]
 local function filter_questions(questions, opts)
     if vim.tbl_isempty(opts or {}) then return questions end
 
-    ---@param q lc.Cache.Question
+    ---@param q lc.cache.Question
     return vim.tbl_filter(function(q)
         -- if opts.topics then
         --     for _, topic in ipairs(opts.topics) do
@@ -136,7 +136,7 @@ local function filter_questions(questions, opts)
 end
 
 return {
-    ---@param questions lc.Cache.Question[]
+    ---@param questions lc.cache.Question[]
     pick = function(questions, opts)
         pickers
             .new(theme, {

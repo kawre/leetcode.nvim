@@ -7,7 +7,7 @@ local NuiLayout = require("nui.layout")
 local Popup = require("leetcode.ui.popup")
 
 ---@class lc.ui.ConsoleLayout : NuiLayout
----@field parent lc.Question
+---@field parent lc.ui.Question
 ---@field layout NuiLayout
 ---@field testcase lc.ui.Console.TestcasePopup
 ---@field result lc.ui.Console.ResultPopup
@@ -16,11 +16,6 @@ local ConsoleLayout = NuiLayout:extend("LeetConsoleLayout")
 function ConsoleLayout:unmount()
     ConsoleLayout.super.unmount(self)
     self = nil
-end
-
-function ConsoleLayout:mount()
-    ConsoleLayout.super.mount(self)
-    return self
 end
 
 function ConsoleLayout:run()
@@ -35,7 +30,7 @@ end
 
 function ConsoleLayout:show()
     if not self._.mounted then
-        ConsoleLayout.super.mount(self)
+        self:mount()
     elseif not self.visible then
         ConsoleLayout.super.show(self)
     end
@@ -50,7 +45,6 @@ function ConsoleLayout:hide()
 end
 
 function ConsoleLayout:toggle()
-    log.info({ toggle = self.visible })
     if self.visible then
         self:hide()
     else
@@ -67,7 +61,7 @@ function ConsoleLayout:use_testcase()
     end
 end
 
----@param parent lc.Question
+---@param parent lc.ui.Question
 function ConsoleLayout:init(parent)
     ConsoleLayout.super.init(self, {
         relative = "editor",
@@ -100,6 +94,7 @@ function ConsoleLayout:init(parent)
         ["R"] = function() self:run() end,
         ["S"] = function() self:submit() end,
         ["r"] = function() self.testcase:reset() end,
+        [{ "q", "<Esc>" }] = function() self:hide() end,
         ["H"] = function() self.testcase:focus() end,
         ["L"] = function() self.result:focus() end,
         ["U"] = function() self:use_testcase() end,
@@ -110,7 +105,7 @@ function ConsoleLayout:init(parent)
         popup:set_keymaps(keymaps)
 
         popup:on(
-            { "BufLeave", "WinLeave" },
+            "BufLeave",
             vim.schedule_wrap(function()
                 local curr_bufnr = vim.api.nvim_get_current_buf()
                 for _, p in pairs(popups) do
@@ -122,7 +117,7 @@ function ConsoleLayout:init(parent)
     end
 end
 
----@type fun(parent: lc.Question): lc.ui.ConsoleLayout
+---@type fun(parent: lc.ui.Question): lc.ui.ConsoleLayout
 local LeetConsoleLayout = ConsoleLayout
 
 return LeetConsoleLayout

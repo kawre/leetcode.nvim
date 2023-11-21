@@ -9,21 +9,17 @@ local log = require("leetcode.logger")
 
 ---@class lc.ui.InfoPopup : lc.ui.Popup
 ---@field popup NuiPopup
----@field parent lc.Question
+---@field parent lc.ui.Question
 ---@field hints table[]
 local InfoPopup = Popup:extend("LeetInfoPopup")
 
-function InfoPopup:unmount()
-    InfoPopup.super.unmount(self)
-    self = nil
-end
-
-function InfoPopup:toggle()
-    --
-    InfoPopup.super.toggle(self)
-end
+-- function InfoPopup:unmount()
+--     InfoPopup.super.unmount(self)
+--     self = nil
+-- end
 
 function InfoPopup:mount()
+    log.info("mount")
     local NuiTree = require("nui.tree")
     local nodes = {}
 
@@ -169,7 +165,7 @@ function InfoPopup:mount()
     return self
 end
 
----@param parent lc.Question
+---@param parent lc.ui.Question
 function InfoPopup:init(parent)
     InfoPopup.super.init(self, {
         position = "50%",
@@ -202,7 +198,7 @@ function InfoPopup:init(parent)
     self.parent = parent
 end
 
----@type fun(parent: lc.Question): lc.ui.InfoPopup
+---@type fun(parent: lc.ui.Question): lc.ui.InfoPopup
 local LeetInfoPopup = InfoPopup
 
 return LeetInfoPopup

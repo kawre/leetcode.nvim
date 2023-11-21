@@ -55,7 +55,7 @@ local displayer = entry_display.create({
 })
 
 local function make_display(entry)
-    ---@type lc.Cache.Question
+    ---@type lc.cache.Question
     local q = entry.value.question.q
 
     return displayer({

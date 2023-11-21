@@ -14,7 +14,7 @@ end
 
 function Popup:show()
     if not self._.mounted then
-        Popup.super.mount(self)
+        self:mount()
     elseif not self.visible then
         Popup.super.show(self)
     end
@@ -32,11 +32,8 @@ function Popup:toggle()
     if self.visible then
         self:hide()
     else
-        if not self._.mounted then Popup.super.mount(self) end
-        Popup.super.show(self)
+        self:show()
     end
-
-    self.visible = not self.visible
 end
 
 function Popup:init(opts)

@@ -3,7 +3,7 @@ local interpreter = require("leetcode.api.interpreter")
 local config = require("leetcode.config")
 
 ---@class lc.Runner
----@field question lc.Question
+---@field question lc.ui.Question
 local runner = {}
 runner.__index = runner
 
@@ -40,7 +40,7 @@ end
 ---@param item lc.interpreter_response
 function runner:callback(item) self.question.console.result:handle(item) end
 
----@param question lc.Question
+---@param question lc.ui.Question
 function runner:init(question) return setmetatable({ question = question }, self) end
 
 return runner

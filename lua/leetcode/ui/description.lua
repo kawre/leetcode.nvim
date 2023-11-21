@@ -17,7 +17,7 @@ local NuiSplit = require("nui.split")
 
 ---@class lc.ui.DescriptionSplit : NuiSplit
 ---@field split NuiSplit
----@field parent lc.Question
+---@field parent lc.ui.Question
 ---@field layout lc-ui.Layout
 ---@field visible boolean
 ---@field images table<string, Image>
@@ -171,7 +171,7 @@ function DescriptionSplit:populate()
     })
 end
 
----@param parent lc.Question
+---@param parent lc.ui.Question
 function DescriptionSplit:init(parent)
     DescriptionSplit.super.init(self, {
         relative = "editor",
@@ -185,11 +185,9 @@ function DescriptionSplit:init(parent)
     self.layout = {}
     self.visible = false
     self.images = {}
-
-    return self:mount()
 end
 
----@type fun(parent: lc.Question): lc.ui.DescriptionSplit
+---@type fun(parent: lc.ui.Question): lc.ui.DescriptionSplit
 local LeetDescription = DescriptionSplit
 
 return LeetDescription

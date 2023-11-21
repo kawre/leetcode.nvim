@@ -149,7 +149,7 @@ end
 
 function utils.lvl_to_name(lvl) return ({ "Easy", "Medium", "Hard" })[lvl] end
 
----@return lc.Cache.Question[]
+---@return lc.cache.Question[]
 function utils.normalize_problems(problems)
     problems = vim.tbl_filter(function(p) return not p.stat.question__hide end, problems)
 
@@ -196,7 +196,7 @@ function utils.normalize_problems(problems)
     )
 end
 
----@param problems lc.Cache.Question[]
+---@param problems lc.cache.Question[]
 ---@param titles { questionId: integer, title: string }[]
 function utils.translate_titles(problems, titles)
     local map = {}

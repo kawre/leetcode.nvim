@@ -1,7 +1,9 @@
 local problemlist = require("leetcode.cache.problemlist")
-local t = require("leetcode.translator")
 local ConsolePopup = require("leetcode.ui.console.popup")
 local ResultLayout = require("leetcode.ui.console.components.result-layout")
+
+local t = require("leetcode.translator")
+local log = require("leetcode.logger")
 
 ---@class lc.ui.Console.ResultPopup : lc.ui.Console.Popup
 ---@field layout lc.ResultLayout
