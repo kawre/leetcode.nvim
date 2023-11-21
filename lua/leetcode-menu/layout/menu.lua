@@ -4,47 +4,47 @@ local Title = require("leetcode-menu.components.title")
 local cmd = require("leetcode.command")
 local Buttons = require("leetcode-menu.components.buttons")
 
-local button = require("leetcode-ui.component.button")
+local Button = require("leetcode-ui.component.button")
 
-local problems = button:init(
+local problems = Button(
     { icon = "", src = "Problems" },
     "p",
     function() cmd.menu_layout("problems") end,
     true
 )
 
-local statistics = button:init(
+local statistics = Button(
     { icon = "󰄪", src = "Statistics" },
     "s",
     function() cmd.menu_layout("stats") end,
     true
 )
 
-local cookie = button:init(
+local cookie = Button(
     { src = "Cookie", icon = "󰆘" },
     "i",
     function() cmd.menu_layout("cookie") end,
     true
 )
 
-local cache = button:init(
+local cache = Button(
     { src = "Cache", icon = "" },
     "c",
     function() cmd.menu_layout("cache") end,
     true
 )
 
-local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
+local exit = Button({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
 
 local Header = require("leetcode-menu.components.header")
 local Footer = require("leetcode-menu.components.footer")
 
-return Layout:init({
-    Header:init(),
+return Layout({
+    Header(),
 
-    Title:init({}, "Menu"),
+    Title({}, "Menu"),
 
-    Buttons:init({
+    Buttons({
         problems,
         statistics,
         cookie,
@@ -52,7 +52,7 @@ return Layout:init({
         exit,
     }),
 
-    Footer:init(),
+    Footer(),
 }, {
     margin = 5,
 })

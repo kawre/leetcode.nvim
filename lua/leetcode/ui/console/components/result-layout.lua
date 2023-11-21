@@ -33,8 +33,9 @@ function ResultLayout:handle_accepted(item)
     local function perc_hi(perc) return perc >= 50 and "leetcode_ok" or "leetcode_error" end
     self.group:set_opts({ spacing = 2 })
 
-    local header = Text:init({})
+    local header = Text()
     header:append(item._.title .. " 🎉", item._.hl)
+
     self.group:append(header)
 
     -- runtime
@@ -99,11 +100,10 @@ end
 function ResultLayout:handle_runtime(item) -- status code = 10
     if item._.submission then return self:handle_accepted(item) end
 
-    local h = NuiLine()
-    h:append(item._.title, item._.hl)
-    h:append(" | ")
-    h:append(("%s: %s"):format(t("Runtime"), item.status_runtime), "leetcode_alt")
-    self.group:append(Text:init({ h }))
+    self.group:append(item._.title, item._.hl)
+    self.group:append(" | ")
+    self.group:append(("%s: %s"):format(t("Runtime"), item.status_runtime), "leetcode_alt")
+    self.group:newgrp()
 
     self.cases = Cases:init(item, self.parent.testcase.testcases, self.parent.result)
     self.group:append(self.cases)
@@ -115,11 +115,10 @@ end
 function ResultLayout:handle_submission_error(item) -- status code = 11
     self.group:set_opts({ spacing = 2 })
 
-    local header = NuiLine()
-    header:append(item._.title, item._.hl)
-    header:append(" | ")
-    header:append(testcases_passed(item), "leetcode_alt")
-    self.group:append(Text:init({ header }))
+    self.group:append(item._.title, item._.hl)
+    self.group:append(" | ")
+    self.group:append(testcases_passed(item), "leetcode_alt")
+    self.group:newgrp()
 
     self.case = Case:init({
         input = item.input_formatted,
@@ -135,13 +134,12 @@ end
 ---
 ---@param item lc.limit_exceeded_error
 function ResultLayout:handle_limit_exceeded(item) -- status code = 12,13,14
-    local header = NuiLine()
-    header:append(item._.title, item._.hl)
+    self.group:append(item._.title, item._.hl)
     if item._.submission then
-        header:append(" | ")
-        header:append(testcases_passed(item), "leetcode_alt")
+        self.group:append(" | ")
+        self.group:append(testcases_passed(item), "leetcode_alt")
     end
-    self.group:append(Text:init({ header }))
+    self.group:newgrp()
 
     if item._.submission then
         local last_testcase = NuiLine()
@@ -151,7 +149,9 @@ function ResultLayout:handle_limit_exceeded(item) -- status code = 12,13,14
         pre_header:append((" %s"):format(t("Last Executed Input")), "leetcode_normal")
 
         local last_exec = Pre:init(pre_header, { last_testcase })
+
         self.group:append(last_exec)
+        self.group:newgrp()
 
         local stdout = Stdout:init(item.std_output or "")
         if stdout then self.group:append(stdout) end
@@ -198,10 +198,7 @@ function ResultLayout:handle_runtime_error(item) -- status code = 15
 end
 
 function ResultLayout:handle_internal_error(item) -- status code = 16
-    local header = NuiLine()
-    header:append(item._.title, item._.hl)
-    local text = Text:init({ header })
-    self.group:append(text)
+    self.group:append(item._.title, item._.hl)
 end
 
 ---@private
@@ -229,7 +226,7 @@ function ResultLayout:change_case(idx)
     if not self.cases[idx] then return end
 
     if self.case then
-        self.case.components = { self.cases[idx] }
+        self.case.groups = { self.cases[idx] }
         self.parent.result:draw()
     end
 end
@@ -292,7 +289,7 @@ end
 ---@param parent lc.ui.ConsoleLayout
 ---@param opts? lc-ui.Layout.opts
 function ResultLayout:init(parent, opts)
-    local layout = Layout:init({}, opts)
+    local layout = Layout({}, opts)
     self = setmetatable(layout, self)
 
     self.parent = parent

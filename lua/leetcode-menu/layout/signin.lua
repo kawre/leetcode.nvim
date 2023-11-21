@@ -18,15 +18,14 @@ local buttons = Buttons:init({
 local Header = require("leetcode-menu.components.header")
 local Footer = require("leetcode-menu.components.footer")
 
-return Layout:init({
-    Header:init(),
+return Layout({
+    Header(),
 
-    Title:init({}, "Sign in"),
-    --
-    buttons,
-    --
-    Footer:init(),
+    Title({}, "Sign in"),
+
+    -- buttons,
+
+    Footer(),
 }, {
     margin = 5,
 })
-

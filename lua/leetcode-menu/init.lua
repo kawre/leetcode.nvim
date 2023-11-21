@@ -11,8 +11,8 @@ local utils = require("leetcode.utils")
 ---@field tabpage integer
 ---@field cursor lc-menu.cursor
 ---@field maps table
-local menu = {} ---@diagnostic disable-line
-menu.__index = menu
+local Menu = {} ---@diagnostic disable-line
+Menu.__index = Menu
 
 local function tbl_keys(t)
     local keys = vim.tbl_keys(t)
@@ -21,13 +21,13 @@ local function tbl_keys(t)
     return keys
 end
 
-function menu:draw()
+function Menu:draw()
     self:clear_keymaps()
     self.layout:draw(self) ---@diagnostic disable-line
     self:apply_btn_keymaps()
 end
 
-function menu:clear_keymaps()
+function Menu:clear_keymaps()
     for _, map in ipairs(self.maps) do
         vim.keymap.del(map.mode, map.lhs, { buffer = self.bufnr })
     end
@@ -35,10 +35,10 @@ function menu:clear_keymaps()
     self.maps = {}
 end
 
-function menu:apply_btn_keymaps()
+function Menu:apply_btn_keymaps()
     local opts = { noremap = false, silent = true, buffer = self.bufnr, nowait = true }
 
-    for _, btn in pairs(self.layout.buttons) do
+    for _, btn in pairs(self.layout._.buttons) do
         if not btn.sc then return end
 
         local mode = { "n" }
@@ -48,7 +48,7 @@ function menu:apply_btn_keymaps()
 end
 
 ---@private
-function menu:autocmds()
+function Menu:autocmds()
     local group_id = vim.api.nvim_create_augroup("leetcode_menu", { clear = true })
 
     vim.api.nvim_create_autocmd("WinResized", {
@@ -64,11 +64,11 @@ function menu:autocmds()
     })
 end
 
-function menu:cursor_move()
+function Menu:cursor_move()
     local curr = vim.api.nvim_win_get_cursor(self.winid)
     local prev = self.cursor.prev
 
-    local keys = tbl_keys(self.layout.buttons)
+    local keys = tbl_keys(self.layout._.buttons)
     if not keys then return end
 
     if prev then
@@ -79,20 +79,21 @@ function menu:cursor_move()
         end
     end
 
-    local row = keys[self.cursor.idx]
-    local col = #vim.fn.getline(row):match("^%s*")
-
-    self.cursor.prev = { row, col }
-    vim.api.nvim_win_set_cursor(self.winid, self.cursor.prev)
+    -- local row = keys[self.cursor.idx]
+    -- local col = #vim.fn.getline(row):match("^%s*")
+    --
+    -- self.cursor.prev = { row, col }
+    -- log.info({ self.winid, self.cursor.prev })
+    -- vim.api.nvim_win_set_cursor(self.winid, self.cursor.prev)
 end
 
-function menu:cursor_reset()
+function Menu:cursor_reset()
     self.cursor.idx = 1
     self.cursor.prev = nil
 end
 
 ---@param layout_name layouts
-function menu:set_layout(layout_name)
+function Menu:set_layout(layout_name)
     self:cursor_reset()
 
     local ok, layout = pcall(require, "leetcode-menu.layout." .. layout_name)
@@ -105,7 +106,7 @@ function menu:set_layout(layout_name)
 end
 
 ---@private
-function menu:keymaps()
+function Menu:keymaps()
     local press_fn = function()
         local row = vim.api.nvim_win_get_cursor(self.winid)[1]
         self.layout:handle_press(row)
@@ -115,7 +116,7 @@ function menu:keymaps()
     vim.keymap.set("n", "<Tab>", press_fn, { buffer = self.bufnr })
 end
 
-function menu:handle_mount()
+function Menu:handle_mount()
     if Cookie.get() then
         self:set_layout("loading")
 
@@ -135,24 +136,26 @@ function menu:handle_mount()
     return self:mount()
 end
 
-function menu:mount()
+function Menu:mount()
     self:keymaps()
     self:autocmds()
     self:draw()
 end
 
-function menu:init()
+function Menu:init()
     self = setmetatable({
         bufnr = vim.api.nvim_get_current_buf(),
         winid = vim.api.nvim_get_current_win(),
         cursor = {
             idx = 1,
+            prev = nil,
         },
         maps = {},
     }, self)
 
     vim.api.nvim_buf_set_name(self.bufnr, "")
     pcall(vim.diagnostic.disable, self.bufnr)
+
     local utils = require("leetcode-menu.utils")
     utils.set_buf_opts(self.bufnr, {
         modifiable = false,
@@ -181,4 +184,4 @@ function menu:init()
     return self:handle_mount()
 end
 
-return menu
+return Menu

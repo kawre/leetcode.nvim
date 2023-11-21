@@ -25,7 +25,7 @@ end
 function Plain:parse(html)
     self = setmetatable({
         str = html,
-        text = Text:init({}),
+        text = Text(),
     }, self)
 
     self:normalize()

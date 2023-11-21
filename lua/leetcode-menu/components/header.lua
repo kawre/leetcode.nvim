@@ -1,11 +1,9 @@
-local Text = require("leetcode-ui.component.text")
+local Lines = require("leetcode-ui.component.text")
 
 ---@class lc-menu.Header : lc-ui.Text
-local header = {}
-header.__index = header
-setmetatable(header, Text)
+local Header = Lines:extend("LeetMenuHeader")
 
-header.ascii = {
+local ascii = {
     [[ /$$                          /$$     /$$$$$$                /$$         ]],
     [[| $$                         | $$    /$$__  $$              | $$         ]],
     [[| $$       /$$$$$$  /$$$$$$ /$$$$$$ | $$  \__/ /$$$$$$  /$$$$$$$ /$$$$$$ ]],
@@ -16,20 +14,20 @@ header.ascii = {
     [[|________/\_______/\_______/  \___/  \______/ \______/ \_______/\_______/]],
 }
 
----@param lines? NuiLine[] | string[]
----@param opts? lc-ui.Component.opts
-function header:init(lines, opts)
-    opts = vim.tbl_deep_extend("force", {
+function Header:init()
+    Header.super.init(self, {
         position = "center",
         hl = "Keyword",
         padding = {
             top = 4,
             bot = 2,
         },
-    }, opts or {})
+    })
 
-    local text = Text:init(lines or header.ascii, opts)
-    return setmetatable(text, self)
+    self:from(ascii)
 end
 
-return header
+---@type fun(): lc-menu.Header
+local LeetMenuHeader = Header
+
+return LeetMenuHeader

@@ -18,7 +18,7 @@ end
 ---@param layout lc-ui.Layout
 function utils.win_width(layout)
     -- local winid = vim.api.nvimbufget
-    return vim.api.nvim_win_get_width(layout.winid)
+    return vim.api.nvim_win_get_width(layout._.winid)
 end
 
 --@param config lc-ui.Component.config
@@ -47,20 +47,20 @@ end
 ---
 ---@return string
 function utils.get_padding(component, layout)
-    local position = layout.opts.position or component.opts.position
+    local position = layout._.opts.position or component.opts.position
     local padding = ""
 
-    if layout.opts.padding then
-        if type(layout.opts.padding.left) == "string" then
-            padding = layout.opts.padding.left --[[@as string]]
-        elseif type(layout.opts.padding.left) == "number" then
-            padding = string.rep(" ", layout.opts.padding.left --[[@as integer]])
+    if layout._.opts.padding then
+        if type(layout._.opts.padding.left) == "string" then
+            padding = layout._.opts.padding.left --[[@as string]]
+        elseif type(layout._.opts.padding.left) == "number" then
+            padding = string.rep(" ", layout._.opts.padding.left --[[@as integer]])
         end
     end
 
     if component.opts.padding then
         if type(component.opts.padding.left) == "string" then
-            padding = padding .. layout.opts.padding.left --[[@as string]]
+            padding = padding .. layout._.opts.padding.left --[[@as string]]
         elseif type(component.opts.padding.left) == "number" then
             padding = padding .. string.rep(" ", component.opts.padding.left --[[@as integer]])
         end

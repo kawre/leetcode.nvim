@@ -16,17 +16,16 @@ local log = require("leetcode.logger")
 local Languages = Popup:extend("LeetLanguages")
 
 function Languages:handle(lang)
-    local text = Text:init({})
+    local lines = Text()
 
-    local line = NuiLine()
-    line:append(lang.lang, "leetcode_code")
-    line:append(" - ", "leetcode_list")
+    lines:append(lang.lang, "leetcode_code")
+    lines:append(" - ", "leetcode_list")
     if config.is_cn then
-        line:append("解题数", "leetcode_alt")
-        line:append(" " .. lang.problems_solved)
+        lines:append("解题数", "leetcode_alt")
+        lines:append(" " .. lang.problems_solved)
     else
-        line:append("" .. lang.problems_solved)
-        line:append(" problems solved", "leetcode_alt")
+        lines:append("" .. lang.problems_solved)
+        lines:append(" problems solved", "leetcode_alt")
     end
 
     text:append(line)
@@ -92,7 +91,7 @@ function Languages:init()
         },
     })
 
-    self.layout = Layout:init({})
+    self.layout = Layout()
 end
 
 return Languages()

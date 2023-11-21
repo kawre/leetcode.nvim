@@ -3,7 +3,7 @@
 ---TODO: https://leetcode.com/problems/make-array-empty/
 ---TODO: 190
 
-local Text = require("leetcode-ui.component.text")
+local Lines = require("leetcode-ui.component.text")
 local utils = require("leetcode.parser.utils")
 local log = require("leetcode.logger")
 
@@ -14,7 +14,7 @@ local NuiLine = require("nui.line")
 ---@field str string
 ---@field parser LanguageTree
 ---@field ts TreesitterModule
----@field text lc-ui.Text
+---@field lines lc-ui.Text
 ---@field newline_count integer
 ---@field ol_count table<integer>
 local Html = {}
@@ -84,18 +84,18 @@ function Html:get_text(node) return self.ts.get_node_text(node, self.str) end
 function Html:handle_entity(entity)
     if entity == "&lcnl;" then
         if self.newline_count <= 1 then
-            self.text:append(self.line)
+            self.lines:append(self.line)
             self.line = NuiLine()
         end
 
         self.newline_count = self.newline_count + 1
     elseif entity == "&lcpad;" then
-        if self.line:content() ~= "" then self.text:append(self.line) end
+        if self.line:content() ~= "" then self.lines:append(self.line) end
 
         self.line = NuiLine()
-        self.text:append({ NuiLine(), NuiLine(), NuiLine() })
+        self.lines:append({ NuiLine(), NuiLine(), NuiLine() })
     elseif entity == "&lcend;" then
-        self.text:append(self.line)
+        self.lines:append(self.line)
     end
 
     return utils.entity(entity)
@@ -262,14 +262,14 @@ end
 
 -- Trim excessive lines
 function Html:trim()
-    local lines = self.text.lines
+    local lines = self.lines.lines
     for i = #lines, 1, -1 do
         if lines[i]:content() ~= "" then break end
         table.remove(lines, i)
     end
-    self.text.lines = lines
+    self.lines.lines = lines
 
-    return self.text
+    return self.lines
 end
 
 ---@param html string
@@ -279,7 +279,7 @@ function Html:parse(html)
     self = setmetatable({
         str = html,
         ts = vim.treesitter,
-        text = Text:init({}),
+        text = Lines(),
         line = NuiLine(),
         newline_count = 0,
         ol_count = {},

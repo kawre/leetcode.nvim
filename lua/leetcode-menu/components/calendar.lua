@@ -1,6 +1,6 @@
 local config = require("leetcode.config")
 local Spinner = require("leetcode.logger.spinner")
-local Text = require("leetcode-ui.component.text")
+local Lines = require("leetcode-ui.component.text")
 local statistics = require("leetcode.api.statistics")
 local t = require("leetcode.translator")
 
@@ -14,9 +14,7 @@ local log = require("leetcode.logger")
 ---@field calendar lc.Stats.CalendarData
 ---@field calendar_lines NuiLine[]
 ---@field last_year_sub_count integer
-local Calendar = {}
-Calendar.__index = Calendar
-setmetatable(Calendar, Text)
+local Calendar = Lines:extend("LeetCalendar")
 
 local function get_days_in_month(month, year)
     local days_in_month = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
@@ -194,9 +192,13 @@ function Calendar:init()
         hl = "Keyword",
     }
 
-    self = setmetatable(Text:init({ t("loading...") }, opts), self)
+    Calendar.super.init(self, opts)
+
+    self:append(t("Loading..."))
     self:fetch()
-    return self
 end
 
-return Calendar
+---@type fun(): lc-ui.Calendar
+local LeetCalendar = Calendar
+
+return LeetCalendar

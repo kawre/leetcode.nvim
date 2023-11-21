@@ -1,11 +1,8 @@
-local component = require("leetcode-ui.component")
-local NuiLine = require("nui.line")
+local Lines = require("leetcode-ui.component.text")
 local t = require("leetcode.translator")
 
----@class lc-ui.Button: lc-ui.Component
-local button = {}
-button.__index = button
-setmetatable(button, component)
+---@class lc-ui.Button: lc-ui.Text
+local Button = Lines:extend("LeetButton")
 
 ---@class lc-ui.Button.text
 ---@field icon string
@@ -15,9 +12,8 @@ setmetatable(button, component)
 ---@param sc string|nil
 ---@param on_press function? optional
 ---@param expandable boolean? optional
-function button:init(text, sc, on_press, expandable)
+function Button:init(text, sc, on_press, expandable)
     text.src = t(text.src)
-
     local opts = {
         position = "center",
         on_press = on_press or function() end,
@@ -25,27 +21,24 @@ function button:init(text, sc, on_press, expandable)
     }
     sc = sc or ""
 
+    Button.super.init(self, opts)
+
     local width = 50
     local expand = ""
 
-    local text_line = NuiLine()
-    text_line:append(text.icon, "leetcode_list")
-    text_line:append(" ")
-    text_line:append(text.src)
-    if expandable then text_line:append(" " .. expand, "leetcode_alt") end
+    self:append(text.icon, "leetcode_list")
+    self:append(" ")
+    self:append(text.src)
+    if expandable then self:append(" " .. expand, "leetcode_alt") end
 
-    local len = vim.api.nvim_strwidth(text_line:content()) + vim.api.nvim_strwidth(sc)
+    local len = vim.api.nvim_strwidth(self:content()) + vim.api.nvim_strwidth(sc)
     local padding = string.rep(" ", width - len)
 
-    text_line:append(padding)
-    text_line:append(sc, "leetcode_info")
-
-    self = setmetatable({
-        opts = opts,
-        lines = { text_line },
-    }, self)
-
-    return self
+    self:append(padding)
+    self:append(sc, "leetcode_info")
 end
 
-return button
+---@type fun(): lc-ui.Button
+local LeetButton = Button
+
+return LeetButton

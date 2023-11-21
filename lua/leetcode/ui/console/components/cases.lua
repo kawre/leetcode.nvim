@@ -47,7 +47,7 @@ end
 ---@param idx integer
 function Cases:change(idx)
     if not self.cases[idx] or idx == self.idx then return end
-    self.case.components = { self.cases[idx] }
+    self.case.groups = { self.cases[idx] }
     self.idx = idx
     self:update_nav()
     self.parent:draw()
@@ -74,10 +74,10 @@ function Cases:init(item, testcases, parent)
         }, item.compare_result:sub(i, i) == "1")
     end
 
-    self.nav = Text:init({}, { padding = { top = 1, bot = 0 } })
+    self.nav = Text({ padding = { top = 1, bot = 0 } })
     self:append(self.nav)
 
-    self.case = Group:init({})
+    self.case = Group()
     self:append(self.case)
     self:change(1)
 

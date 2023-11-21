@@ -1,11 +1,10 @@
 local Group = require("leetcode-ui.component.group")
+local log = require("leetcode.logger")
 
 ---@class lc-menu.Buttons : lc-ui.Group
-local Buttons = {}
-Buttons.__index = Buttons
-setmetatable(Buttons, Group)
+local Buttons = Group:extend("LeetButtons")
 
-function Buttons:init(components, opts)
+function Buttons:init(buttons, opts)
     opts = vim.tbl_deep_extend("force", {
         padding = {
             top = 1,
@@ -14,8 +13,18 @@ function Buttons:init(components, opts)
         spacing = 1,
     }, opts or {})
 
-    local group = Group:init(components, opts)
-    return setmetatable(group, self)
+    Buttons.super.init(self, opts)
+
+    for _, btn in ipairs(buttons) do
+        for _, line in ipairs(btn.lines) do
+            self:append(line)
+            self:newl()
+        end
+        self:newgrp()
+    end
 end
 
-return Buttons
+---@type fun(buttons: lc-ui.Button[], opts?: table): lc-menu.Buttons
+local LeetButtons = Buttons
+
+return LeetButtons

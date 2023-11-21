@@ -9,7 +9,8 @@ local parser = require("leetcode.parser")
 local t = require("leetcode.translator")
 
 local Layout = require("leetcode-ui.layout")
-local Text = require("leetcode-ui.component.text")
+local Lines = require("leetcode-ui.component.text")
+local Group = require("leetcode-ui.component.group")
 local padding = require("leetcode-ui.component.padding")
 
 local NuiLine = require("nui.line")
@@ -123,16 +124,16 @@ end
 function DescriptionSplit:populate()
     local q = self.parent.q
 
-    local linkline = NuiLine()
-    linkline:append(self.parent.cache.link or "", "leetcode_alt")
+    local group = Group({ position = "center" })
 
-    local titleline = NuiLine()
-    titleline:append(q.frontend_id .. ". ", "leetcode_normal")
+    group:append(self.parent.cache.link or "", "leetcode_alt")
+    group:newgrp()
 
-    titleline:append(utils.translate(q.title, q.translated_title))
+    group:append(q.frontend_id .. ". ", "leetcode_normal")
+    group:append(utils.translate(q.title, q.translated_title))
+    group:newgrp()
 
-    local statsline = NuiLine()
-    statsline:append(
+    group:append(
         t(q.difficulty),
         ({
             ["Easy"] = "leetcode_easy",
@@ -140,32 +141,33 @@ function DescriptionSplit:populate()
             ["Hard"] = "leetcode_hard",
         })[q.difficulty]
     )
-    statsline:append(" | ")
+    group:append(" | ")
 
-    statsline:append(q.likes .. " ", "leetcode_alt")
-    if not config.is_cn then statsline:append(" " .. q.dislikes .. " ", "leetcode_alt") end
-    statsline:append(" | ")
+    group:append(q.likes .. " ", "leetcode_alt")
+    if not config.is_cn then group:append(" " .. q.dislikes .. " ", "leetcode_alt") end
+    group:append(" | ")
 
-    statsline:append(
+    group:append(
         ("%s %s %s"):format(q.stats.acRate, t("of"), q.stats.totalSubmission),
         "leetcode_alt"
     )
     if not vim.tbl_isempty(q.hints) then
-        statsline:append(" | ")
-        statsline:append("󰛨 " .. t("Hints"), "leetcode_hint")
+        group:append(" | ")
+        group:append("󰛨 " .. t("Hints"), "leetcode_hint")
     end
 
-    local titlecomp = Text:init({ titleline }, { position = "center" })
-    local statscomp = Text:init({ statsline }, { position = "center" })
-    local linkcomp = Text:init({ linkline }, { position = "center" })
+    -- local titlecomp = Lines:init({ titleline }, { position = "center" })
+    -- local statscomp = Lines:init({ statsline }, { position = "center" })
+    -- local linkcomp = Lines:init({ linkline }, { position = "center" })
 
     local contents = parser:parse(utils.translate(q.content, q.translated_content))
 
-    self.layout = Layout:init({
-        linkcomp,
-        padding:init(1),
-        titlecomp,
-        statscomp,
+    self.layout = Layout({
+        -- linkcomp,
+        -- padding:init(1),
+        -- titlecomp,
+        -- statscomp,
+        group,
         padding:init(3),
         contents,
     })

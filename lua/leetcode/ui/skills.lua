@@ -20,23 +20,19 @@ local hl = {
 }
 
 function Skills:handle(name, skills)
-    local adv = Text:init({})
+    local lines = Text()
 
     table.sort(skills, function(a, b) return a.problems_solved > b.problems_solved end)
-    local adv_line = NuiLine()
-    adv_line:append("󱓻", hl[name])
-    adv_line:append(" " .. name)
-    adv:append(adv_line)
+    lines:append("󱓻", hl[name])
+    lines:append(" " .. name)
 
     for _, skill in ipairs(skills) do
-        local tag_line = NuiLine()
-        tag_line:append(skill.tag, "leetcode_code")
-        tag_line:append((" x%d"):format(skill.problems_solved), "leetcode_alt")
-
-        adv:append(tag_line)
+        lines:new_line()
+        lines:append(skill.tag, "leetcode_code")
+        lines:append((" x%d"):format(skill.problems_solved), "leetcode_alt")
     end
 
-    return adv
+    return lines
 end
 
 ---@private
@@ -81,7 +77,7 @@ function Skills:init()
         },
     })
 
-    self.layout = Layout:init({})
+    self.layout = Layout()
 end
 
 function Skills:show()

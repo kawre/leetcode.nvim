@@ -9,24 +9,20 @@ local Button = require("leetcode-ui.component.button")
 local Buttons = require("leetcode-menu.components.buttons")
 local Layout = require("leetcode-ui.layout")
 
-local list_btn = Button:init({ src = "List", icon = "" }, "p", cmd.problems)
+local list_btn = Button({ src = "List", icon = "" }, "p", cmd.problems)
 
-local random_btn = Button:init({ src = "Random", icon = "" }, "r", cmd.random_question)
+local random_btn = Button({ src = "Random", icon = "" }, "r", cmd.random_question)
 
-local qot_btn = Button:init({ src = "Daily", icon = "󰃭" }, "d", cmd.qot)
+local qot_btn = Button({ src = "Daily", icon = "󰃭" }, "d", cmd.qot)
 
-local back_btn = Button:init(
-    { src = "Back", icon = "" },
-    "q",
-    function() cmd.menu_layout("menu") end
-)
+local back_btn = Button({ src = "Back", icon = "" }, "q", function() cmd.menu_layout("menu") end)
 
-return Layout:init({
+return Layout({
     -- header
-    Header:init(),
+    Header(),
 
     -- title
-    Title:init({ "Menu" }, "Problems"),
+    Title({ "Menu" }, "Problems"),
 
     -- buttons
     Buttons:init({
@@ -38,5 +34,5 @@ return Layout:init({
     }),
 
     --footer
-    Footer:init(),
+    Footer(),
 })

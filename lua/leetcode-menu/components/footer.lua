@@ -1,33 +1,26 @@
-local Text = require("leetcode-ui.component.text")
+local Lines = require("leetcode-ui.component.text")
 local config = require("leetcode.config")
 local NuiLine = require("nui.line")
 local t = require("leetcode.translator")
 
 ---@class lc-menu.Footer : lc-ui.Text
----@field text lc-ui.Text
-local footer = {}
-footer.__index = footer
-setmetatable(footer, Text)
+local Footer = Lines:extend("LeetFooter")
 
 ---@param opts? any
-function footer:init(opts)
+function Footer:init(opts)
     opts = vim.tbl_deep_extend("force", {
         position = "center",
         hl = "Number",
     }, opts or {})
 
-    local text = Text:init({}, opts)
+    Footer.super.init(self, opts)
 
     if config.auth.is_signed_in then
-        local line = NuiLine()
-        line:append(t("Signed in as") .. ": ", "leetcode_alt")
-        line:append(config.auth.name)
-        text:append(line)
+        self:append(t("Signed in as") .. ": ", "leetcode_alt")
+        self:append(config.auth.name)
     end
-
-    local obj = setmetatable(text, self)
-
-    return obj
 end
 
-return footer
+local LeetFooter = Footer
+
+return LeetFooter

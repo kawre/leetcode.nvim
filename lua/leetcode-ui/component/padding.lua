@@ -1,10 +1,7 @@
-local component = require("leetcode-ui.component")
-local Line = require("nui.line")
+local Lines = require("leetcode-ui.component.text")
 
----@class lc-ui.Padding: lc-ui.Component
-local padding = {}
-padding.__index = padding
-setmetatable(padding, component)
+---@class lc-ui.Padding: lc-ui.Text
+local Padding = Lines:extend("LeetPadding")
 
 --------------------------------------------------------
 --- Methods
@@ -17,13 +14,16 @@ setmetatable(padding, component)
 ---@param int integer
 ---
 ---@return lc-ui.Component
-function padding:init(int)
-    local tbl = {}
-    for _ = 1, int, 1 do
-        table.insert(tbl, Line())
-    end
+function Padding:init(int)
+    Padding.super.init(self, {})
 
-    return setmetatable({ lines = tbl, opts = {} }, self)
+    for _ = 1, int, 1 do
+        self:append("")
+        self:newl()
+    end
 end
 
-return padding
+---@type fun(int: integer): lc-ui.Padding
+local LeetPadding = Padding
+
+return LeetPadding

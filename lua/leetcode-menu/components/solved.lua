@@ -1,4 +1,4 @@
-local Text = require("leetcode-ui.component.text")
+local Lines = require("leetcode-ui.component.text")
 local NuiLine = require("nui.line")
 local utils = require("leetcode.api.utils")
 local statistics = require("leetcode.api.statistics")
@@ -13,9 +13,7 @@ local hl = {
 }
 
 ---@class lc-menu.Solved : lc-ui.Text
-local Solved = {}
-Solved.__index = Solved
-setmetatable(Solved, Text)
+local Solved = Lines:extend("LeetSolved")
 
 ---@return NuiLine
 function Solved:progress_bar(width, solved, total_count, difficulty)
@@ -95,12 +93,16 @@ function Solved:init()
         hl = "Keyword",
     }
 
-    self = setmetatable(Text:init({ t("loading...") }, opts), self)
+    Solved.super.init(self, opts)
+    self:append(t("Loading..."))
+
     statistics.solved(function(res, err)
         if err then log.err(err) end
         self:handle_res(res)
     end)
-    return self
 end
 
-return Solved
+---@type fun(): lc-menu.Solved
+local LeetSolved = Solved
+
+return LeetSolved

@@ -7,15 +7,11 @@ local Layout = require("leetcode-ui.layout")
 
 local cmd = require("leetcode.command")
 
-local update_btn = Button:init({ icon = "󱛬", src = "Update" }, "u", cmd.cookie_prompt)
+local update_btn = Button({ icon = "󱛬", src = "Update" }, "u", cmd.cookie_prompt)
 
-local delete_btn = Button:init({ icon = "󱛪", src = "Delete / Sign out" }, "d", cmd.sign_out)
+local delete_btn = Button({ icon = "󱛪", src = "Delete / Sign out" }, "d", cmd.sign_out)
 
-local back_btn = Button:init(
-    { icon = "", src = "Back" },
-    "q",
-    function() cmd.menu_layout("menu") end
-)
+local back_btn = Button({ icon = "", src = "Back" }, "q", function() cmd.menu_layout("menu") end)
 
 local buttons = Buttons:init({
     update_btn,
@@ -23,12 +19,12 @@ local buttons = Buttons:init({
     back_btn,
 })
 
-return Layout:init({
-    Header:init(),
+return Layout({
+    Header(),
 
-    Title:init({ "Menu" }, "Cookie"),
+    Title({ "Menu" }, "Cookie"),
 
     buttons,
 
-    Footer:init(),
+    Footer(),
 })

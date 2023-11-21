@@ -1,23 +1,77 @@
-local component = require("leetcode-ui.component")
+local NuiLine = require("nui.line")
 local utils = require("leetcode-ui.utils")
 
----@class lc-ui.Text: lc-ui.Component
-local Text = {}
-Text.__index = Text
-setmetatable(Text, component)
+---@class lc-ui.Text : NuiLine
+---@field lines NuiLine[]
+---@field opts lc-ui.Component.opts
+local Lines = NuiLine:extend("LeetLines")
 
----@param lines NuiLine[] | string[]
----@param opts? lc-ui.Component.opts
----
----@return lc-ui.Text
-function Text:init(lines, opts)
-    opts = opts or {}
-    lines = lines or {}
+local function create_padding(val)
+    local tbl = {}
+    for _ = 1, val, 1 do
+        table.insert(tbl, NuiLine():append(""))
+    end
 
-    return setmetatable({
-        lines = utils.parse_lines(lines, opts),
-        opts = opts,
-    }, self)
+    return tbl
 end
 
-return Text
+---@param layout lc-ui.Layout
+function Lines:draw(layout)
+    if not vim.tbl_isempty(self._texts) then self:newl() end
+    local lines = self.lines
+
+    local padding = self.opts.padding
+    local toppad = padding and padding.top
+    local leftpad = utils.get_padding(self, layout)
+    local botpad = padding and padding.bot
+
+    if toppad then lines = vim.list_extend(create_padding(toppad), lines) end
+    if botpad then lines = vim.list_extend(lines, create_padding(botpad)) end
+
+    for _, line in pairs(lines) do
+        local new_line = NuiLine()
+        new_line:append(leftpad)
+        new_line:append(line)
+
+        local line_idx = layout:get_line_idx(1)
+        new_line:render(layout._.bufnr, -1, line_idx, line_idx)
+
+        if self.opts.on_press then
+            layout:set_on_press(line_idx, self.opts.on_press, self.opts.sc)
+        end
+    end
+end
+
+function Lines:clear() self.lines = {} end
+
+-- function Lines:append(content, highlight)
+--     Lines.super.append(self, content, highlight)
+-- end
+
+function Lines:newl()
+    table.insert(self.lines, vim.deepcopy(self))
+    self._texts = {}
+    return self
+end
+
+---@param lines table[]
+function Lines:from(lines)
+    for _, line in ipairs(lines) do
+        self:append(line)
+        self:newl()
+    end
+
+    return self
+end
+
+function Lines:init(opts)
+    Lines.super.init(self)
+
+    self.opts = opts or {}
+    self.lines = {}
+end
+
+---@type fun(opts?: lc-ui.Component.opts): lc-ui.Component
+local LeetLines = Lines
+
+return LeetLines

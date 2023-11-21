@@ -22,21 +22,16 @@ local group = Group:init({ solved, calendar }, {
     },
 })
 
-local skills = not config.is_cn
-        and Button:init({ icon = "", src = "Skills" }, "s", cmd.ui_skills)
+local skills = not config.is_cn and Button({ icon = "", src = "Skills" }, "s", cmd.ui_skills)
     or nil
 
-local languages = Button:init({ icon = "", src = "Languages" }, "l", cmd.ui_languages)
+local languages = Button({ icon = "", src = "Languages" }, "l", cmd.ui_languages)
 
-local update = Button:init({ icon = "", src = "Update" }, "u", function() calendar:update() end)
+local update = Button({ icon = "", src = "Update" }, "u", function() calendar:update() end)
 
-local back = Button:init(
-    { icon = "", src = "Back" },
-    "q",
-    function() cmd.menu_layout("menu") end
-)
+local back = Button({ icon = "", src = "Back" }, "q", function() cmd.menu_layout("menu") end)
 
-return Layout:init({
+return Layout({
     group,
 
     Title:init({ "Menu" }, "Statistics"),
