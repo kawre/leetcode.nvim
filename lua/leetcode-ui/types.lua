@@ -31,7 +31,7 @@
 ---@field position? position
 
 ---@class lc-ui.Group.config
----@field components? lc-ui.Text[]
+---@field components? lc-ui.Lines[]
 ---@field opts? lc-ui.Group.opts
 
 --------------------------------------------
@@ -46,9 +46,9 @@
 ---@class lc-ui.Layout.opts
 ---@field padding? component.padding | integer
 ---@field position? position
----@field bufnr? integer
----@field winid? integer
+---@field bufnr integer
+---@field winid integer
 
 ---@class lc-ui.Layout.config
----@field components? lc-ui.Text[]
+---@field components? lc-ui.Lines[]
 ---@field opts? lc-ui.Layout.opts

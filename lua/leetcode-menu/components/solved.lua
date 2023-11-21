@@ -1,5 +1,5 @@
 local Lines = require("leetcode-ui.component.text")
-local NuiLine = require("nui.line")
+local Line = require("leetcode-ui.component.line")
 local utils = require("leetcode.api.utils")
 local statistics = require("leetcode.api.statistics")
 local t = require("leetcode.translator")
@@ -12,12 +12,12 @@ local hl = {
     ["Hard"] = "leetcode_hard",
 }
 
----@class lc-menu.Solved : lc-ui.Text
+---@class lc-menu.Solved : lc-ui.Lines
 local Solved = Lines:extend("LeetSolved")
 
 ---@return NuiLine
 function Solved:progress_bar(width, solved, total_count, difficulty)
-    local line = NuiLine()
+    local line = Line()
     local solved_len = math.ceil(width * (solved / total_count))
 
     for _ = 1, solved_len do
@@ -45,7 +45,7 @@ function Solved:handle_res(res)
             self.stats.questions_count
         )[1].count
 
-        local solved_line = NuiLine()
+        local solved_line = Line()
         solved_line:append(tostring(stat.count))
         solved_line:append(("/%d"):format(total_count), "leetcode_alt")
         max_count_len = math.max(solved_line:content():len(), max_count_len)
@@ -67,7 +67,7 @@ function Solved:handle_res(res)
         local stat = subs[diff]
         local diff_str = t(diff)
 
-        local line = NuiLine()
+        local line = Line()
         line:append(diff_str, hl[diff])
 
         local pad1 = (" "):rep(pad_len + 2 - vim.api.nvim_strwidth(diff_str))

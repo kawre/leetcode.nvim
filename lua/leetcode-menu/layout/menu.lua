@@ -53,6 +53,4 @@ return Layout({
     }),
 
     Footer(),
-}, {
-    margin = 5,
 })

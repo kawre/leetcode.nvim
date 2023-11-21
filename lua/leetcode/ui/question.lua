@@ -9,7 +9,7 @@ local Info = require("leetcode.ui.info")
 ---@class lc.ui.Question
 ---@field file Path
 ---@field q lc.question_res
----@field description lc.ui.DescriptionSplit
+---@field description lc.ui.Description
 ---@field bufnr integer
 ---@field console lc.ui.ConsoleLayout
 ---@field lang string

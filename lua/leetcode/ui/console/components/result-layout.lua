@@ -10,7 +10,7 @@ local Text = require("leetcode-ui.component.text")
 local Stdout = require("leetcode.ui.console.components.stdout")
 local Case = require("leetcode.ui.console.components.case")
 
-local NuiLine = require("nui.line")
+local Line = require("leetcode-ui.component.line")
 local NuiText = require("nui.text")
 
 ---@class lc.ResultLayout : lc-ui.Layout
@@ -39,12 +39,12 @@ function ResultLayout:handle_accepted(item)
     self.group:append(header)
 
     -- runtime
-    local status_runtime = NuiLine()
+    local status_runtime = Line()
     local runtime_ms = item.display_runtime or vim.split(item.status_runtime, " ")[1] or "NIL"
     status_runtime:append(runtime_ms)
     status_runtime:append(" ms", "leetcode_alt")
 
-    local perc_runtime = NuiLine()
+    local perc_runtime = Line()
     perc_runtime:append(
         ("%s %.2f%% "):format(t("Beats"), item.runtime_percentile),
         perc_hi(item.runtime_percentile)
@@ -65,14 +65,14 @@ function ResultLayout:handle_accepted(item)
     self.group:append(runtime)
 
     -- memory
-    local status_memory = NuiLine()
+    local status_memory = Line()
     -- if item.status_memory == "0B" then item.status_memory = "0 MB" end
     item.status_memory = item.status_memory:gsub("(%d+)%s*(%a+)", "%1 %2")
     local s_mem = vim.split(item.status_memory, " ")
     status_memory:append(s_mem[1] .. " ")
     status_memory:append(s_mem[2], "leetcode_alt")
 
-    local perc_mem = NuiLine()
+    local perc_mem = Line()
     perc_mem:append(
         ("%s %.2f%% "):format(t("Beats"), item.memory_percentile),
         perc_hi(item.memory_percentile)
@@ -142,10 +142,10 @@ function ResultLayout:handle_limit_exceeded(item) -- status code = 12,13,14
     self.group:endgrp()
 
     if item._.submission then
-        local last_testcase = NuiLine()
+        local last_testcase = Line()
         last_testcase:append(item.last_testcase:gsub("\n", " "), "leetcode_indent")
 
-        local pre_header = NuiLine()
+        local pre_header = Line()
         pre_header:append((" %s"):format(t("Last Executed Input")), "leetcode_normal")
 
         local last_exec = Pre:init(pre_header, { last_testcase })
@@ -165,7 +165,7 @@ end
 ---
 ---@param item lc.runtime_error
 function ResultLayout:handle_runtime_error(item) -- status code = 15
-    local header = NuiLine()
+    local header = Line()
     header:append(item._.title, item._.hl)
 
     if item._.submission then
@@ -175,15 +175,15 @@ function ResultLayout:handle_runtime_error(item) -- status code = 15
 
     local tbl = {}
     for line in vim.gsplit(item.full_runtime_error, "\n") do
-        table.insert(tbl, NuiLine():append(line, "leetcode_error"))
+        table.insert(tbl, Line():append(line, "leetcode_error"))
     end
     self.group:append(Pre:init(header, tbl))
 
     if item._.submission then
-        local pre_header = NuiLine()
+        local pre_header = Line()
         pre_header:append((" %s"):format(t("Last Executed Input")), "leetcode_normal")
 
-        local last_testcase = NuiLine()
+        local last_testcase = Line()
         last_testcase:append(item.last_testcase:gsub("\n", " "), "leetcode_indent")
 
         local last_exec = Pre:init(pre_header, { last_testcase })
@@ -205,7 +205,7 @@ end
 ---
 ---@param item lc.compile_error
 function ResultLayout:handle_compile_error(item) -- status code = 20
-    local header = NuiLine()
+    local header = Line()
     header:append(item._.title, item._.hl)
     if item._.submission then
         header:append(" | ")
@@ -214,7 +214,7 @@ function ResultLayout:handle_compile_error(item) -- status code = 20
 
     local tbl = {}
     for line in vim.gsplit(item.full_compile_error, "\n") do
-        table.insert(tbl, NuiLine():append(line, "leetcode_error"))
+        table.insert(tbl, Line():append(line, "leetcode_error"))
     end
 
     self.group:append(Pre:init(header, tbl))

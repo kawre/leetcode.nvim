@@ -1,89 +1,77 @@
-local NuiLine = require("nui.line")
+local Object = require("nui.object")
+local Line = require("leetcode-ui.component.line")
+-- local Pad = require("leetcode-ui.component.padding")
 local utils = require("leetcode-ui.utils")
 local log = require("leetcode.logger")
 
----@class lc-ui.Text : NuiLine
----@field lines NuiLine[]
+---@class lc-ui.Lines : NuiLine
+---@field _lines lc.ui.Line[]
 ---@field opts lc-ui.Component.opts
-local Lines = NuiLine:extend("LeetLines")
-
-local function create_padding(val)
-    local tbl = {}
-    for _ = 1, val, 1 do
-        table.insert(tbl, NuiLine():append(""))
-    end
-
-    return tbl
-end
+---@field _line_idx integer
+local Lines = Object("LeetLines")
 
 function Lines:set_opts(opts) --
     self.opts = vim.tbl_deep_extend("force", self.opts, opts or {})
 end
 
-function Lines:contents()
-    log.debug("get contents: " .. self.class.name)
-    local contents = vim.deepcopy(self.lines)
-    if not vim.tbl_isempty(self._texts) then table.insert(contents, vim.deepcopy(self)) end
-    return contents
+function Lines:contents() return self._lines end
+
+local function create_pad(int)
+    local lines = {}
+    for _ = 1, int do
+        local pad = Line()
+        pad:append("")
+        table.insert(lines, pad)
+    end
+    return lines
 end
 
 ---@param layout lc-ui.Layout
 function Lines:draw(layout)
-    log.debug("")
-    log.debug("[DRAW START] " .. self.class.name)
-    local lines = self:contents()
+    local lines = vim.deepcopy(self:contents())
 
     local padding = self.opts.padding
-    local toppad = padding and padding.top
-    local leftpad = utils.get_padding(self, layout)
-    local botpad = padding and padding.bot
 
-    if toppad then lines = vim.list_extend(create_padding(toppad), lines) end
-    if botpad then lines = vim.list_extend(lines, create_padding(botpad)) end
+    local toppad = padding and padding.top
+    if toppad then lines = vim.list_extend(create_pad(toppad), lines) end
+
+    local botpad = padding and padding.bot
+    if botpad then lines = vim.list_extend(lines, create_pad(botpad)) end
+
+    local leftpad = utils.get_padding(self, layout)
 
     for _, line in pairs(lines) do
-        local new_line = NuiLine()
-        new_line:append(leftpad)
-        new_line:append(line)
-
-        local line_idx = layout:get_line_idx(1)
-        new_line:render(layout.bufnr, -1, line_idx, line_idx)
-        --
-        -- if self.opts.on_press then
-        --     layout:set_on_press(line_idx, self.opts.on_press, self.opts.sc)
-        -- end
+        line:draw(layout, {
+            padding = {
+                left = leftpad:len(),
+            },
+        })
     end
-
-    log.debug("[DRAW END] " .. self.class.name)
-    log.debug("")
 end
 
 function Lines:clear()
-    log.debug("clear: " .. self.class.name)
-    self:endl()
-    self.lines = {}
+    self._lines = {}
+    self._line_idx = 1
+    return self
 end
 
 function Lines:append(content, highlight)
-    local ok, contents = pcall(Lines.contents, content)
-    if ok then
-        for _, line in ipairs(contents) do
-            Lines.super.append(self, line, highlight or self.opts.hl)
-            self:endl()
-        end
-    else
-        Lines.super.append(self, content, highlight or self.opts.hl)
-    end
+    if not self._lines[self._line_idx] then table.insert(self._lines, Line()) end
 
+    self._lines[self._line_idx]:append(content, highlight or self.opts.hl)
+    return self
+end
+
+function Lines:insert(item) --
+    table.insert(self._lines, item)
+    self._line_idx = self._line_idx + 1
     return self
 end
 
 function Lines:endl()
-    if not vim.tbl_isempty(self._texts) then
-        table.insert(self.lines, vim.deepcopy(self))
-        self._texts = {}
-    end
+    if not self._lines[self._line_idx] then table.insert(self._lines, Line()) end
 
+    self._line_idx = self._line_idx + 1
     return self
 end
 
@@ -97,14 +85,11 @@ function Lines:from(contents)
 end
 
 function Lines:init(opts)
-    Lines.super.init(self)
-
     self.opts = opts or {}
-    self.lines = {}
-    self.__is_lines = true
+    self:clear()
 end
 
----@type fun(opts?: lc-ui.Component.opts): lc-ui.Text
+---@type fun(opts?: lc-ui.Component.opts): lc-ui.Lines
 local LeetLines = Lines
 
 return LeetLines

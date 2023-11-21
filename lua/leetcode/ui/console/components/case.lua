@@ -5,13 +5,13 @@ local Pre = require("leetcode.ui.console.components.pre")
 local Stdout = require("leetcode.ui.console.components.stdout")
 local Group = require("leetcode-ui.component.group")
 
-local NuiLine = require("nui.line")
+local Line = require("leetcode-ui.component.line")
 
 ---@alias case_body { input: string, raw_input: string, output: string, expected: string, std_output: string }
 
 ---@class lc.Result.Case : lc-ui.Group
----@field pre lc-ui.Text
----@field stdout lc-ui.Text
+---@field pre lc-ui.Lines
+---@field stdout lc-ui.Lines
 ---@field passed boolean
 ---@field index integer
 ---@field body case_body
@@ -27,7 +27,7 @@ local function get_pad(key, max_len) return (" "):rep(max_len + 1 - vim.api.nvim
 function Case:input(input)
     local key = t("Input")
 
-    local line = NuiLine()
+    local line = Line()
     line:append(("%s:%s"):format(key, get_pad(key, self.max_len)))
     line:append(input, "leetcode_alt")
 
@@ -41,7 +41,7 @@ end
 function Case:output(output, expected)
     local key = t("Output")
 
-    local line = NuiLine()
+    local line = Line()
     line:append(("%s:%s"):format(key, get_pad(key, self.max_len)))
     line:append(output, "leetcode_alt")
 
@@ -55,7 +55,7 @@ end
 function Case:expected(expected, output)
     local key = t("Expected")
 
-    local line = NuiLine()
+    local line = Line()
     line:append(("%s:%s"):format(key, get_pad(key, self.max_len)))
     line:append(expected, "leetcode_alt")
 

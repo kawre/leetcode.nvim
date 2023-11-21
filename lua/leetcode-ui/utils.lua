@@ -3,7 +3,7 @@ local log = require("leetcode.logger")
 
 local utils = {}
 
----@param lines lc-ui.Text[]
+---@param lines lc-ui.Lines
 function utils.longest_line(lines)
     local width = 0
 
@@ -18,7 +18,7 @@ end
 ---@param layout lc-ui.Layout
 function utils.win_width(layout)
     -- local winid = vim.api.nvimbufget
-    return vim.api.nvim_win_get_width(layout.winid)
+    return vim.api.nvim_win_get_width(layout._.opts.winid)
 end
 
 --@param config lc-ui.Component.config
@@ -42,7 +42,7 @@ function utils.parse_lines(lines, opts)
     return tbl
 end
 
----@param lines lc-ui.Text
+---@param lines lc-ui.Lines
 ---@param layout lc-ui.Layout
 ---
 ---@return string
@@ -67,16 +67,16 @@ function utils.get_padding(lines, layout)
     end
 
     if position ~= "left" then
-        local longest_line = utils.longest_line(lines)
+        local max_len = utils.longest_line(lines)
 
         if position == "center" then
             local width = utils.win_width(layout)
-            local mid = (width - longest_line) / 2
+            local mid = (width - max_len) / 2
             local spaces = string.rep(" ", mid)
             padding = spaces
         elseif position == "right" then
             local width = utils.win_width(layout)
-            local mid = width - longest_line - 1
+            local mid = width - max_len - 1
             local spaces = string.rep(" ", mid)
             padding = spaces
         end

@@ -9,24 +9,24 @@ local parser = require("leetcode.parser")
 local t = require("leetcode.translator")
 
 local Layout = require("leetcode-ui.layout")
-local Lines = require("leetcode-ui.component.text")
 local Group = require("leetcode-ui.component.group")
-local padding = require("leetcode-ui.component.padding")
+local Padding = require("leetcode-ui.component.padding")
 
-local NuiLine = require("nui.line")
 local NuiSplit = require("nui.split")
 
----@class lc.ui.DescriptionSplit : NuiSplit
+---@class lc.ui.Description : NuiSplit
 ---@field split NuiSplit
 ---@field parent lc.ui.Question
 ---@field layout lc-ui.Layout
 ---@field visible boolean
 ---@field images table<string, Image>
-local DescriptionSplit = NuiSplit:extend("LeetDescription")
+local Description = NuiSplit:extend("LeetDescription")
+
+-- local DescriptionSplit = Layout:extend("LeetDescription")
 
 local group_id = vim.api.nvim_create_augroup("leetcode_description", { clear = true })
 
-function DescriptionSplit:autocmds()
+function Description:autocmds()
     vim.api.nvim_create_autocmd("WinResized", {
         group = group_id,
         buffer = self.bufnr,
@@ -34,15 +34,16 @@ function DescriptionSplit:autocmds()
     })
 end
 
-function DescriptionSplit:unmount()
-    DescriptionSplit.super.unmount(self)
+function Description:unmount()
+    Description.super.unmount(self)
     self = nil
 end
 
-function DescriptionSplit:mount()
+function Description:mount()
     self.visible = true
     self:populate()
-    DescriptionSplit.super.mount(self)
+    Description.super.mount(self)
+    self.layout:set_opts({ winid = self.winid, bufnr = self.bufnr })
 
     local utils = require("leetcode-menu.utils")
     utils.set_buf_opts(self.bufnr, {
@@ -77,7 +78,7 @@ function DescriptionSplit:mount()
     return self
 end
 
-function DescriptionSplit:toggle()
+function Description:toggle()
     if self.visible then
         self:hide()
     else
@@ -87,12 +88,12 @@ function DescriptionSplit:toggle()
     self.visible = not self.visible
 end
 
-function DescriptionSplit:draw()
-    self.layout:draw(self)
+function Description:draw()
+    self.layout:draw()
     self:draw_imgs()
 end
 
-function DescriptionSplit:draw_imgs()
+function Description:draw_imgs()
     if not img_sup then return end
 
     local lines = vim.api.nvim_buf_get_lines(self.bufnr, 1, -1, false)
@@ -121,17 +122,19 @@ function DescriptionSplit:draw_imgs()
 end
 
 ---@private
-function DescriptionSplit:populate()
+function Description:populate()
     local q = self.parent.q
 
-    local group = Group({ position = "center" })
+    local group = Group({
+        position = "center",
+    })
 
     group:append(self.parent.cache.link or "", "leetcode_alt")
-    group:endgrp()
+    group:endl():endl()
 
     group:append(q.frontend_id .. ". ", "leetcode_normal")
     group:append(utils.translate(q.title, q.translated_title))
-    group:endgrp()
+    group:endl()
 
     group:append(
         t(q.difficulty),
@@ -142,11 +145,9 @@ function DescriptionSplit:populate()
         })[q.difficulty]
     )
     group:append(" | ")
-
     group:append(q.likes .. " ", "leetcode_alt")
     if not config.is_cn then group:append(" " .. q.dislikes .. " ", "leetcode_alt") end
     group:append(" | ")
-
     group:append(
         ("%s %s %s"):format(q.stats.acRate, t("of"), q.stats.totalSubmission),
         "leetcode_alt"
@@ -155,27 +156,22 @@ function DescriptionSplit:populate()
         group:append(" | ")
         group:append("󰛨 " .. t("Hints"), "leetcode_hint")
     end
+    group:endl()
 
-    -- local titlecomp = Lines:init({ titleline }, { position = "center" })
-    -- local statscomp = Lines:init({ statsline }, { position = "center" })
-    -- local linkcomp = Lines:init({ linkline }, { position = "center" })
+    -- local contents = parser:parse(utils.translate(q.content, q.translated_content))
 
-    local contents = parser:parse(utils.translate(q.content, q.translated_content))
-
-    self.layout = Layout({
-        -- linkcomp,
-        -- padding:init(1),
-        -- titlecomp,
-        -- statscomp,
+    local layout = Layout({
         group,
-        padding:init(3),
-        contents,
+        Padding(3),
+        -- contents,
     })
+
+    self.layout:set(layout)
 end
 
 ---@param parent lc.ui.Question
-function DescriptionSplit:init(parent)
-    DescriptionSplit.super.init(self, {
+function Description:init(parent)
+    Description.super.init(self, {
         relative = "editor",
         position = config.user.description.position,
         size = config.user.description.width,
@@ -184,12 +180,12 @@ function DescriptionSplit:init(parent)
     })
 
     self.parent = parent
-    self.layout = {}
     self.visible = false
+    self.layout = Layout()
     self.images = {}
 end
 
----@type fun(parent: lc.ui.Question): lc.ui.DescriptionSplit
-local LeetDescription = DescriptionSplit
+---@type fun(parent: lc.ui.Question): lc.ui.Description
+local LeetDescription = Description
 
 return LeetDescription

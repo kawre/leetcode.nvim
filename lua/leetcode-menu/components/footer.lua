@@ -2,7 +2,7 @@ local Lines = require("leetcode-ui.component.text")
 local config = require("leetcode.config")
 local t = require("leetcode.translator")
 
----@class lc-menu.Footer : lc-ui.Text
+---@class lc-menu.Footer : lc-ui.Lines
 local Footer = Lines:extend("LeetFooter")
 
 function Footer:draw(layout)

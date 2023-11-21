@@ -152,7 +152,7 @@ function cmd.menu()
 end
 
 ---@param layout layouts
-function cmd.menu_layout(layout) _Lc_Menu:set_layout(layout) end
+function cmd.menu_layout(layout) _Lc_Menu:set(layout) end
 
 function cmd.question_tabs() require("leetcode.pickers.question-tabs").pick() end
 

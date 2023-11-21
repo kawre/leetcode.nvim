@@ -23,7 +23,7 @@ return Layout({
 
     Title({}, "Sign in"),
 
-    -- buttons,
+    buttons,
 
     Footer(),
 }, {

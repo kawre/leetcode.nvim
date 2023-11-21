@@ -1,5 +1,5 @@
 local cmd = require("leetcode.command")
-local NuiLine = require("nui.line")
+local Line = require("leetcode-ui.component.line")
 
 local Title = require("leetcode-menu.components.title")
 local Footer = require("leetcode-menu.components.footer")

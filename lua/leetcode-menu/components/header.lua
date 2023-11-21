@@ -1,6 +1,6 @@
 local Lines = require("leetcode-ui.component.text")
 
----@class lc-menu.Header : lc-ui.Text
+---@class lc-menu.Header : lc-ui.Lines
 local Header = Lines:extend("LeetMenuHeader")
 
 local ascii = {

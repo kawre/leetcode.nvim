@@ -48,7 +48,12 @@ function config.load_plugins()
 
     for _, plugin in ipairs(plugins) do
         local ok, plug = pcall(require, "leetcode-plugins." .. plugin)
-        if ok then plug.load() end
+        if ok then
+            plug.load()
+        else
+            local log = require("leetcode.logger")
+            log.error(plug)
+        end
     end
 end
 

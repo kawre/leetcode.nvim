@@ -1,6 +1,6 @@
 local Popup = require("leetcode.ui.popup")
 local NuiText = require("nui.text")
-local NuiLine = require("nui.line")
+local Line = require("leetcode-ui.component.line")
 local config = require("leetcode.config")
 local utils = require("leetcode.utils")
 
@@ -19,13 +19,12 @@ local InfoPopup = Popup:extend("LeetInfoPopup")
 -- end
 
 function InfoPopup:mount()
-    log.info("mount")
     local NuiTree = require("nui.tree")
     local nodes = {}
 
     local hints = {}
     for i, hint_txt in ipairs(self.hints) do
-        local line = NuiLine()
+        local line = Line()
 
         line:append(tostring(i), "leetcode_list")
         line:append("/" .. #self.hints, "leetcode_alt")
@@ -49,7 +48,7 @@ function InfoPopup:mount()
 
     local topics = {}
     for _, topic in ipairs(self.parent.q.topic_tags) do
-        local line = NuiLine()
+        local line = Line()
 
         line:append("* ", "leetcode_list")
         line:append(topic.name)
@@ -72,7 +71,7 @@ function InfoPopup:mount()
 
     local sim_questions = {}
     for _, q in ipairs(self.parent.q.similar) do
-        local line = NuiLine()
+        local line = Line()
 
         local hl = {
             ["Easy"] = "leetcode_easy",
@@ -108,7 +107,7 @@ function InfoPopup:mount()
         bufnr = self.bufnr,
         nodes = nodes,
         prepare_node = function(node)
-            local line = NuiLine()
+            local line = Line()
             line:append(string.rep("  ", node:get_depth() - 1))
 
             if node:has_children() then
@@ -119,7 +118,7 @@ function InfoPopup:mount()
                     line:append("  ")
                     local parser = require("leetcode.parser")
                     local txt = parser:parse(node.text)
-                    if txt.lines[1] then line:append(txt.lines[1]) end
+                    if txt._lines[1] then line:append(txt._lines[1]) end
                 else
                     line:append(node.text)
                 end

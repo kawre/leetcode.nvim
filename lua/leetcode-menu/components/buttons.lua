@@ -6,7 +6,7 @@ local Buttons = Group:extend("LeetButtons")
 
 function Buttons:init(buttons, opts)
     opts = vim.tbl_deep_extend("force", {
-        padding = {
+        margin = {
             top = 1,
             bot = 2,
         },
@@ -17,8 +17,7 @@ function Buttons:init(buttons, opts)
     Buttons.super.init(self, opts)
 
     for _, btn in ipairs(buttons) do
-        self:append(btn)
-        self:endgrp()
+        self:insert(btn)
     end
 end
 

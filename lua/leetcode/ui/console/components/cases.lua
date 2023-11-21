@@ -4,10 +4,10 @@ local Group = require("leetcode-ui.component.group")
 local Text = require("leetcode-ui.component.text")
 local Case = require("leetcode.ui.console.components.case")
 
-local NuiLine = require("nui.line")
+local Line = require("leetcode-ui.component.line")
 
 ---@class lc.Cases : lc-ui.Group
----@field nav lc-ui.Text
+---@field nav lc-ui.Lines
 ---@field case lc-ui.Group
 ---@field cases table<integer, lc.Result.Case>
 ---@field keymaps table<string, function> { mode: string, key: string }
@@ -27,10 +27,11 @@ function Cases:clear()
 end
 
 function Cases:update_nav()
-    local cases = NuiLine()
+    local cases
+    Line()
 
     for i, case in ipairs(self.cases) do
-        local text = NuiLine()
+        local text = Line()
         local hl = ("%s%s"):format(self.idx == i and "focus_" or "", case.passed and "ok" or "err")
         text:append((" Case (%d) "):format(i), "leetcode_case_" .. hl)
 
@@ -41,7 +42,7 @@ function Cases:update_nav()
     end
 
     self.parent:set_keymaps(self.keymaps)
-    self.nav.lines = { cases }
+    self.nav._lines = { cases }
 end
 
 ---@param idx integer
@@ -58,7 +59,7 @@ end
 ---@param parent lc.ui.Console.ResultPopup
 ---@return lc.Cases
 function Cases:init(item, testcases, parent)
-    local group = Group:init({}, { spacing = 1 })
+    local group = Group({}, { spacing = 1 })
     self = setmetatable(group, self)
 
     self.cases = {}

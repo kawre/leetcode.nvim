@@ -24,14 +24,14 @@ end
 
 function Menu:clear_keymaps()
     for _, map in ipairs(self.maps) do
-        vim.keymap.del(map.mode, map.lhs, { buffer = self.bufnr })
+        vim.keymap.del(map.mode, map.lhs, { buffer = self._.opts.bufnr })
     end
 
     self.maps = {}
 end
 
 function Menu:apply_btn_keymaps()
-    local opts = { noremap = false, silent = true, buffer = self.bufnr, nowait = true }
+    local opts = { noremap = false, silent = true, buffer = self._.opts.bufnr, nowait = true }
 
     for _, btn in pairs(self._.buttons) do
         if not btn.opts.sc then return end
@@ -48,19 +48,19 @@ function Menu:autocmds()
 
     vim.api.nvim_create_autocmd("WinResized", {
         group = group_id,
-        buffer = self.bufnr,
+        buffer = self._.opts.bufnr,
         callback = function() self:draw() end,
     })
 
     vim.api.nvim_create_autocmd("CursorMoved", {
         group = group_id,
-        buffer = self.bufnr,
+        buffer = self._.opts.bufnr,
         callback = function() self:cursor_move() end,
     })
 end
 
 function Menu:cursor_move()
-    local curr = vim.api.nvim_win_get_cursor(self.winid)
+    local curr = vim.api.nvim_win_get_cursor(self._.opts.winid)
     local prev = self.cursor.prev
 
     local keys = tbl_keys(self._.buttons)
@@ -74,11 +74,11 @@ function Menu:cursor_move()
         end
     end
 
-    -- local row = keys[self.cursor.idx]
-    -- local col = #vim.fn.getline(row):match("^%s*")
-    --
-    -- self.cursor.prev = { row, col }
-    -- vim.api.nvim_win_set_cursor(self.winid, self.cursor.prev)
+    local row = keys[self.cursor.idx]
+    local col = #vim.fn.getline(row):match("^%s*")
+
+    self.cursor.prev = { row, col }
+    vim.api.nvim_win_set_cursor(self._.opts.winid, self.cursor.prev)
 end
 
 function Menu:cursor_reset()
@@ -86,13 +86,13 @@ function Menu:cursor_reset()
     self.cursor.prev = nil
 end
 
----@param layout_name layouts
-function Menu:set_layout(layout_name)
+---@param name layouts
+function Menu:set(name)
     self:cursor_reset()
 
-    local ok, layout = pcall(require, "leetcode-menu.layout." .. layout_name)
+    local ok, layout = pcall(require, "leetcode-menu.layout." .. name)
     if ok then
-        self._ = layout._
+        Menu.super.set(self, layout)
         self:draw()
     else
         log.error(layout)
@@ -104,30 +104,29 @@ end
 ---@private
 function Menu:keymaps()
     local press_fn = function()
-        local row = vim.api.nvim_win_get_cursor(self.winid)[1]
-        log.info(row)
+        local row = vim.api.nvim_win_get_cursor(self._.opts.winid)[1]
         self:handle_press(row)
     end
 
-    vim.keymap.set("n", "<cr>", press_fn, { buffer = self.bufnr })
-    vim.keymap.set("n", "<Tab>", press_fn, { buffer = self.bufnr })
+    vim.keymap.set("n", "<cr>", press_fn, { buffer = self._.opts.bufnr })
+    vim.keymap.set("n", "<Tab>", press_fn, { buffer = self._.opts.bufnr })
 end
 
 function Menu:handle_mount()
     if Cookie.get() then
-        self:set_layout("loading")
+        self:set("loading")
 
         local auth_api = require("leetcode.api.auth")
         auth_api.user(function(_, err)
             if err then
-                self:set_layout("signin")
+                self:set("signin")
                 return log.err(err)
             else
-                self:set_layout("menu")
+                self:set("menu")
             end
         end)
     else
-        self:set_layout("signin")
+        self:set("signin")
     end
 
     return self:mount()
@@ -140,7 +139,7 @@ function Menu:mount()
 end
 
 function Menu:init()
-    Menu.super.init(self, {
+    Menu.super.init(self, {}, {
         bufnr = vim.api.nvim_get_current_buf(),
         winid = vim.api.nvim_get_current_win(),
     })
@@ -151,11 +150,11 @@ function Menu:init()
     }
     self.maps = {}
 
-    vim.api.nvim_buf_set_name(self.bufnr, "")
-    pcall(vim.diagnostic.disable, self.bufnr)
+    vim.api.nvim_buf_set_name(self._.opts.bufnr, "")
+    pcall(vim.diagnostic.disable, self._.opts.bufnr)
 
     local utils = require("leetcode-menu.utils")
-    utils.set_buf_opts(self.bufnr, {
+    utils.set_buf_opts(self._.opts.bufnr, {
         modifiable = false,
         buflisted = false,
         matchpairs = "",
@@ -164,7 +163,7 @@ function Menu:init()
         filetype = "leetcode.nvim",
         synmaxcol = 0,
     })
-    utils.set_win_opts(self.winid, {
+    utils.set_win_opts(self._.opts.winid, {
         wrap = false,
         colorcolumn = "",
         foldlevel = 999,

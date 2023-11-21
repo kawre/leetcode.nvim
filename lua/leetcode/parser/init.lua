@@ -14,7 +14,7 @@ local Parser = {}
 ---@field value string
 
 ---@param str string
----@return lc-ui.Text
+---@return lc-ui.Lines
 function Parser:parse(str)
     local check_for_html = function()
         local parsers = require("nvim-treesitter.parsers")

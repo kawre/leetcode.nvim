@@ -4,12 +4,12 @@ local Lines = require("leetcode-ui.component.text")
 local statistics = require("leetcode.api.statistics")
 local t = require("leetcode.translator")
 
-local NuiLine = require("nui.line")
+local Line = require("leetcode-ui.component.line")
 local NuiText = require("nui.text")
 
 local log = require("leetcode.logger")
 
----@class lc-ui.Calendar : lc-ui.Text
+---@class lc-ui.Calendar : lc-ui.Lines
 ---@field curr_time integer
 ---@field calendar lc.Stats.CalendarData
 ---@field calendar_lines NuiLine[]
@@ -72,7 +72,7 @@ function Calendar:handle_res(res)
 
     self.calendar_lines = {}
     for _ = 1, 7 do
-        table.insert(self.calendar_lines, NuiLine())
+        table.insert(self.calendar_lines, Line())
     end
 
     self:handle_months()
@@ -87,7 +87,7 @@ function Calendar:handle_submissions()
         max_len = math.max(vim.api.nvim_strwidth(line:content()), max_len)
     end
 
-    local subs_line = NuiLine()
+    local subs_line = Line()
     if not config.is_cn then
         subs_line:append("" .. self.last_year_sub_count)
         subs_line:append((" %s"):format(t("submissions")), "leetcode_alt")
@@ -97,12 +97,12 @@ function Calendar:handle_submissions()
         subs_line:append(" 次", "leetcode_alt")
     end
 
-    local ad_line = NuiLine()
+    local ad_line = Line()
     ad_line:append(("%s:"):format(t("active days")), "leetcode_alt")
     ad_line:append("  ", "leetcode_list")
     ad_line:append("" .. self.calendar.total_active_days)
 
-    local streak_line = NuiLine()
+    local streak_line = Line()
     streak_line:append(("%s:"):format(t("max streak")), "leetcode_alt")
     streak_line:append(" 󰈸 ", "leetcode_list")
     streak_line:append("" .. self.calendar.streak)
@@ -112,7 +112,7 @@ function Calendar:handle_submissions()
         - vim.api.nvim_strwidth(subs_line:content() .. ad_line:content() .. streak_line:content())
     ) / 2
 
-    local sub_line = NuiLine()
+    local sub_line = Line()
     sub_line:append(subs_line)
     sub_line:append((" "):rep(padding + (padding % 2 == 0 and 1 or 0)))
     sub_line:append(ad_line)

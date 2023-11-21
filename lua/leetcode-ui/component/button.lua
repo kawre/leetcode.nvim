@@ -2,7 +2,7 @@ local Lines = require("leetcode-ui.component.text")
 local t = require("leetcode.translator")
 local log = require("leetcode.logger")
 
----@class lc-ui.Button : lc-ui.Text
+---@class lc-ui.Button : lc-ui.Lines
 local Button = Lines:extend("LeetButton")
 
 ---@class lc-ui.Button.text
@@ -23,7 +23,6 @@ function Button:press() self.opts.on_press() end
 function Button:init(text, sc, on_press, expandable)
     text.src = t(text.src)
     local opts = {
-        position = "center",
         on_press = on_press or function() end,
         sc = sc,
     }
@@ -39,7 +38,8 @@ function Button:init(text, sc, on_press, expandable)
     self:append(text.src)
     if expandable then self:append(" " .. expand, "leetcode_alt") end
 
-    local len = vim.api.nvim_strwidth(self:content()) + vim.api.nvim_strwidth(sc)
+    local len = vim.api.nvim_strwidth(self._lines[#self._lines]:content())
+        + vim.api.nvim_strwidth(sc)
     local padding = string.rep(" ", width - len)
 
     self:append(padding)

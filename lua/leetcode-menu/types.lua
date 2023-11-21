@@ -4,7 +4,7 @@
 
 ---@class lc-menu.cursor
 ---@field idx  integer
----@field prev integer[]
+---@field prev integer[]|nil
 -- -@field curr integer[]
 
 ---@alias layouts
