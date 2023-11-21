@@ -35,7 +35,7 @@ function Button:init(text, sc, on_press, expandable)
     local padding = string.rep(" ", width - len)
 
     self:append(padding)
-    self:append(sc, "leetcode_info")
+    self:append(sc, "leetcode_info"):endl()
 end
 
 ---@type fun(): lc-ui.Button

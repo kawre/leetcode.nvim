@@ -11,16 +11,13 @@ function Buttons:init(buttons, opts)
             bot = 2,
         },
         spacing = 1,
+        position = "center",
     }, opts or {})
 
     Buttons.super.init(self, opts)
 
     for _, btn in ipairs(buttons) do
-        for _, line in ipairs(btn.lines) do
-            self:append(line)
-            self:newl()
-        end
-        self:newgrp()
+        self:append(btn)
     end
 end
 

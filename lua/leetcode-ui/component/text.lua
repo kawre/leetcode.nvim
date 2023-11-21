@@ -1,5 +1,6 @@
 local NuiLine = require("nui.line")
 local utils = require("leetcode-ui.utils")
+local log = require("leetcode.logger")
 
 ---@class lc-ui.Text : NuiLine
 ---@field lines NuiLine[]
@@ -15,9 +16,13 @@ local function create_padding(val)
     return tbl
 end
 
+function Lines:set_opts(opts) --
+    self.opts = vim.tbl_deep_extend("force", self.opts, opts or {})
+end
+
 ---@param layout lc-ui.Layout
 function Lines:draw(layout)
-    if not vim.tbl_isempty(self._texts) then self:newl() end
+    if not vim.tbl_isempty(self._texts) then self:endl() end
     local lines = self.lines
 
     local padding = self.opts.padding
@@ -44,11 +49,20 @@ end
 
 function Lines:clear() self.lines = {} end
 
--- function Lines:append(content, highlight)
---     Lines.super.append(self, content, highlight)
--- end
+function Lines:append(content, highlight)
+    if content.lines then
+        for _, line in ipairs(content.lines) do
+            Lines.super.append(self, line, highlight or self.opts.hl)
+            self:endl()
+        end
+    else
+        Lines.super.append(self, content, highlight or self.opts.hl)
+    end
 
-function Lines:newl()
+    return self
+end
+
+function Lines:endl()
     table.insert(self.lines, vim.deepcopy(self))
     self._texts = {}
     return self
@@ -57,8 +71,7 @@ end
 ---@param lines table[]
 function Lines:from(lines)
     for _, line in ipairs(lines) do
-        self:append(line)
-        self:newl()
+        self:append(line):endl()
     end
 
     return self

@@ -18,8 +18,7 @@ function Padding:init(int)
     Padding.super.init(self, {})
 
     for _ = 1, int, 1 do
-        self:append("")
-        self:newl()
+        self:append(""):endl()
     end
 end
 

@@ -1,10 +1,18 @@
 local Lines = require("leetcode-ui.component.text")
 local config = require("leetcode.config")
-local NuiLine = require("nui.line")
 local t = require("leetcode.translator")
 
 ---@class lc-menu.Footer : lc-ui.Text
 local Footer = Lines:extend("LeetFooter")
+
+function Footer:draw(layout)
+    if config.auth.is_signed_in then
+        self:append(t("Signed in as") .. ": ", "leetcode_alt")
+        self:append(config.auth.name)
+    end
+
+    Footer.super.draw(self, layout)
+end
 
 ---@param opts? any
 function Footer:init(opts)
@@ -15,10 +23,7 @@ function Footer:init(opts)
 
     Footer.super.init(self, opts)
 
-    if config.auth.is_signed_in then
-        self:append(t("Signed in as") .. ": ", "leetcode_alt")
-        self:append(config.auth.name)
-    end
+    -- self:draw()
 end
 
 local LeetFooter = Footer
