@@ -24,7 +24,9 @@ function Header:init()
         },
     })
 
-    self:from(ascii)
+    for _, line in ipairs(ascii) do
+        self:append(line):endl()
+    end
 end
 
 ---@type fun(): lc-menu.Header

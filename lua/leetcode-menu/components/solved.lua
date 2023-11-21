@@ -94,6 +94,7 @@ function Solved:init()
     }
 
     Solved.super.init(self, opts)
+
     self:append(t("Loading..."))
 
     statistics.solved(function(res, err)

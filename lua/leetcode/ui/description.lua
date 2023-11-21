@@ -127,11 +127,11 @@ function DescriptionSplit:populate()
     local group = Group({ position = "center" })
 
     group:append(self.parent.cache.link or "", "leetcode_alt")
-    group:newgrp()
+    group:endgrp()
 
     group:append(q.frontend_id .. ". ", "leetcode_normal")
     group:append(utils.translate(q.title, q.translated_title))
-    group:newgrp()
+    group:endgrp()
 
     group:append(
         t(q.difficulty),

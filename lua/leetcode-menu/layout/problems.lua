@@ -25,7 +25,7 @@ return Layout({
     Title({ "Menu" }, "Problems"),
 
     -- buttons
-    Buttons:init({
+    Buttons({
         list_btn,
         random_btn,
         qot_btn,

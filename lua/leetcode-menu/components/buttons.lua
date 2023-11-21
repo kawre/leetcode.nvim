@@ -18,6 +18,7 @@ function Buttons:init(buttons, opts)
 
     for _, btn in ipairs(buttons) do
         self:append(btn)
+        self:endgrp()
     end
 end
 

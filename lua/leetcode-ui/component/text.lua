@@ -20,10 +20,18 @@ function Lines:set_opts(opts) --
     self.opts = vim.tbl_deep_extend("force", self.opts, opts or {})
 end
 
+function Lines:contents()
+    log.debug("get contents: " .. self.class.name)
+    local contents = vim.deepcopy(self.lines)
+    if not vim.tbl_isempty(self._texts) then table.insert(contents, vim.deepcopy(self)) end
+    return contents
+end
+
 ---@param layout lc-ui.Layout
 function Lines:draw(layout)
-    if not vim.tbl_isempty(self._texts) then self:endl() end
-    local lines = self.lines
+    log.debug("")
+    log.debug("[DRAW START] " .. self.class.name)
+    local lines = self:contents()
 
     local padding = self.opts.padding
     local toppad = padding and padding.top
@@ -39,19 +47,27 @@ function Lines:draw(layout)
         new_line:append(line)
 
         local line_idx = layout:get_line_idx(1)
-        new_line:render(layout._.bufnr, -1, line_idx, line_idx)
-
-        if self.opts.on_press then
-            layout:set_on_press(line_idx, self.opts.on_press, self.opts.sc)
-        end
+        new_line:render(layout.bufnr, -1, line_idx, line_idx)
+        --
+        -- if self.opts.on_press then
+        --     layout:set_on_press(line_idx, self.opts.on_press, self.opts.sc)
+        -- end
     end
+
+    log.debug("[DRAW END] " .. self.class.name)
+    log.debug("")
 end
 
-function Lines:clear() self.lines = {} end
+function Lines:clear()
+    log.debug("clear: " .. self.class.name)
+    self:endl()
+    self.lines = {}
+end
 
 function Lines:append(content, highlight)
-    if content.lines then
-        for _, line in ipairs(content.lines) do
+    local ok, contents = pcall(Lines.contents, content)
+    if ok then
+        for _, line in ipairs(contents) do
             Lines.super.append(self, line, highlight or self.opts.hl)
             self:endl()
         end
@@ -63,15 +79,18 @@ function Lines:append(content, highlight)
 end
 
 function Lines:endl()
-    table.insert(self.lines, vim.deepcopy(self))
-    self._texts = {}
+    if not vim.tbl_isempty(self._texts) then
+        table.insert(self.lines, vim.deepcopy(self))
+        self._texts = {}
+    end
+
     return self
 end
 
 ---@param lines table[]
-function Lines:from(lines)
-    for _, line in ipairs(lines) do
-        self:append(line):endl()
+function Lines:from(contents)
+    for _, content in ipairs(contents) do
+        self:append(content):endl()
     end
 
     return self
@@ -82,9 +101,10 @@ function Lines:init(opts)
 
     self.opts = opts or {}
     self.lines = {}
+    self.__is_lines = true
 end
 
----@type fun(opts?: lc-ui.Component.opts): lc-ui.Component
+---@type fun(opts?: lc-ui.Component.opts): lc-ui.Text
 local LeetLines = Lines
 
 return LeetLines

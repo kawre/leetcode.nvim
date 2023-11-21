@@ -7,8 +7,9 @@ local Footer = Lines:extend("LeetFooter")
 
 function Footer:draw(layout)
     if config.auth.is_signed_in then
+        self:clear()
         self:append(t("Signed in as") .. ": ", "leetcode_alt")
-        self:append(config.auth.name)
+        self:append(config.auth.name):endl()
     end
 
     Footer.super.draw(self, layout)
@@ -26,6 +27,7 @@ function Footer:init(opts)
     -- self:draw()
 end
 
+---@type fun(): lc-menu.Footer
 local LeetFooter = Footer
 
 return LeetFooter

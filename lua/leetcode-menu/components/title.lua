@@ -18,11 +18,11 @@ function Title:init(history, str, opts)
 
     Title.super.init(self, opts)
 
-    for _, h in ipairs(history) do
-        self:append(h, "leetcode_alt")
+    for _, hist in ipairs(history) do
+        self:append(hist, "leetcode_alt")
         self:append("  ", "leetcode_list")
     end
-    self:append(str, "Function")
+    self:append(str, "Function"):endl()
 end
 
 ---@type fun(history: string[], str: string, opts?: any): lc-menu.Title

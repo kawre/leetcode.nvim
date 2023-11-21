@@ -58,8 +58,8 @@ function leetcode.start()
     local theme = require("leetcode.theme")
     theme.setup()
 
-    local menu = require("leetcode-menu")
-    menu:init()
+    local Menu = require("leetcode-menu")
+    Menu()
 end
 
 ---@param cfg? lc.UserConfig

@@ -47,7 +47,7 @@ end
 ---@param idx integer
 function Cases:change(idx)
     if not self.cases[idx] or idx == self.idx then return end
-    self.case.groups = { self.cases[idx] }
+    self.case._items = { self.cases[idx] }
     self.idx = idx
     self:update_nav()
     self.parent:draw()

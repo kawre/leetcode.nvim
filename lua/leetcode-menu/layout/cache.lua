@@ -10,7 +10,7 @@ local update_btn = Button({ icon = "󱘴", src = "Update" }, "u", function() cmd
 
 local back_btn = Button({ icon = "", src = "Back" }, "q", function() cmd.menu_layout("menu") end)
 
-local buttons = Buttons:init({
+local buttons = Buttons({
     update_btn,
     back_btn,
 })

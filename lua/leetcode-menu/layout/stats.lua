@@ -11,16 +11,19 @@ local Buttons = require("leetcode-menu.components.buttons")
 local Button = require("leetcode-ui.component.button")
 local Title = require("leetcode-menu.components.title")
 
-local calendar = Calendar:init()
-local solved = Solved:init()
+local calendar = Calendar()
+local solved = Solved()
 
-local group = Group:init({ solved, calendar }, {
+local group = Group({
     spacing = 2,
     padding = {
         top = 4,
         bot = 2,
     },
 })
+
+group:append(calendar)
+group:append(solved)
 
 local skills = not config.is_cn and Button({ icon = "", src = "Skills" }, "s", cmd.ui_skills)
     or nil
@@ -34,14 +37,14 @@ local back = Button({ icon = "", src = "Back" }, "q", function() cmd.menu_lay
 return Layout({
     group,
 
-    Title:init({ "Menu" }, "Statistics"),
+    Title({ "Menu" }, "Statistics"),
 
-    Buttons:init({
+    Buttons({
         skills,
         languages,
         update,
         back,
     }),
 
-    Footer:init(),
+    Footer(),
 })

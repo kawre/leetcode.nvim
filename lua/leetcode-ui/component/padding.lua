@@ -1,19 +1,16 @@
 local Lines = require("leetcode-ui.component.text")
+local NuiText = require("nui.text")
 
 ---@class lc-ui.Padding: lc-ui.Text
 local Padding = Lines:extend("LeetPadding")
 
---------------------------------------------------------
---- Methods
---------------------------------------------------------
+-- function Padding:content() return "" end
 
---------------------------------------------------------
---- Constructor
---------------------------------------------------------
+-- function Padding:append(_, _) return self end
 
 ---@param int integer
 ---
----@return lc-ui.Component
+---@return lc-ui.Text
 function Padding:init(int)
     Padding.super.init(self, {})
 

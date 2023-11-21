@@ -1,8 +1,10 @@
 local Padding = require("leetcode-ui.component.padding")
 local Lines = require("leetcode-ui.component.text")
+local NuiLine = require("nui.line")
+local log = require("leetcode.logger")
 
 ---@class lc-ui.Group : lc-ui.Text
----@field groups lc-ui.Text[]
+---@field _items lc-ui.Text[]
 ---@field opts lc-ui.Group.opts
 local Group = Lines:extend("LeetGroup")
 
@@ -11,36 +13,52 @@ function Group:set_opts(opts) --
     self.opts = vim.tbl_deep_extend("force", self.opts, opts)
 end
 
--- function Group:append(content, highlight) --
---     Group.super.append(self, content, highlight)
--- end
+function Group:contents()
+    local items = vim.deepcopy(self._items)
+
+    if not vim.tbl_isempty(self.lines) or not vim.tbl_isempty(self._texts) then
+        table.insert(items, Lines():from(Group.super.contents(self)))
+    end
+
+    return items
+end
+
+function Group:append(content, highlight)
+    if content.__is_lines then
+        table.insert(self._items, content)
+    else
+        Group.super.append(self, content, highlight)
+    end
+
+    return self
+end
 
 ---@param layout lc-ui.Layout
 function Group:draw(layout)
-    if not vim.tbl_isempty(self._texts) then self:newgrp() end
-
-    local groups = vim.deepcopy(self.groups)
-    local opts = self.opts
+    log.debug("---- [DRAW GROUP START] " .. self.class.name)
 
     local padding = self.opts.padding
     local toppad = padding and padding.top
     local botpad = padding and padding.bot
-    -- self.opts.padding = {}
 
+    local items = self:contents()
     if toppad then Padding(toppad):draw(layout) end
-
-    for i, group in pairs(groups) do
-        if opts.spacing and i ~= 1 then Padding(opts.spacing):draw(layout) end
-        Group.super.draw(group, layout)
+    for _, item in ipairs(items) do
+        log.debug("drawing .. " .. self.class.name .. "item: " .. item.class.name)
+        item:draw(layout)
     end
-
     if botpad then Padding(botpad):draw(layout) end
-    -- self.opts.padding = padding
+
+    log.debug("---- [DRAW GROUP END] " .. self.class.name)
 end
 
-function Group:newgrp()
-    table.insert(self.groups, vim.deepcopy(self))
+function Group:endgrp()
+    if not vim.tbl_isempty(self.lines) or not vim.tbl_isempty(self._texts) then
+        table.insert(self._items, vim.deepcopy(self))
+    end
     self:clear()
+
+    return self
 end
 
 --@param components lc-ui.Component[]
@@ -50,7 +68,7 @@ end
 function Group:init(opts)
     Group.super.init(self, opts or {})
 
-    self.groups = {}
+    self._items = {}
 end
 
 ---@type fun(opts?: lc-ui.Group.opts): lc-ui.Group

@@ -31,7 +31,7 @@
 ---@field position? position
 
 ---@class lc-ui.Group.config
----@field components? lc-ui.Component[]
+---@field components? lc-ui.Text[]
 ---@field opts? lc-ui.Group.opts
 
 --------------------------------------------
@@ -50,5 +50,5 @@
 ---@field winid? integer
 
 ---@class lc-ui.Layout.config
----@field components? lc-ui.Component[]
+---@field components? lc-ui.Text[]
 ---@field opts? lc-ui.Layout.opts

@@ -13,7 +13,7 @@ local delete_btn = Button({ icon = "󱛪", src = "Delete / Sign out" }, "d", cmd
 
 local back_btn = Button({ icon = "", src = "Back" }, "q", function() cmd.menu_layout("menu") end)
 
-local buttons = Buttons:init({
+local buttons = Buttons({
     update_btn,
     delete_btn,
     back_btn,

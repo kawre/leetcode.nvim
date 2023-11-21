@@ -1,14 +1,14 @@
 local Line = require("nui.line")
+local log = require("leetcode.logger")
 
 local utils = {}
 
----@param lines NuiLine[]
+---@param lines lc-ui.Text[]
 function utils.longest_line(lines)
     local width = 0
 
-    for _, line in pairs(lines) do
-        local text = line:content()
-        local len = vim.api.nvim_strwidth(text)
+    for _, line in pairs(lines:contents()) do
+        local len = vim.api.nvim_strwidth(line:content())
         width = math.max(len, width)
     end
 
@@ -18,7 +18,7 @@ end
 ---@param layout lc-ui.Layout
 function utils.win_width(layout)
     -- local winid = vim.api.nvimbufget
-    return vim.api.nvim_win_get_width(layout._.winid)
+    return vim.api.nvim_win_get_width(layout.winid)
 end
 
 --@param config lc-ui.Component.config
@@ -42,12 +42,12 @@ function utils.parse_lines(lines, opts)
     return tbl
 end
 
----@param component lc-ui.Component
+---@param lines lc-ui.Text
 ---@param layout lc-ui.Layout
 ---
 ---@return string
-function utils.get_padding(component, layout)
-    local position = layout._.opts.position or component.opts.position
+function utils.get_padding(lines, layout)
+    local position = layout._.opts.position or lines.opts.position
     local padding = ""
 
     if layout._.opts.padding then
@@ -58,16 +58,15 @@ function utils.get_padding(component, layout)
         end
     end
 
-    if component.opts.padding then
-        if type(component.opts.padding.left) == "string" then
+    if lines.opts.padding then
+        if type(lines.opts.padding.left) == "string" then
             padding = padding .. layout._.opts.padding.left --[[@as string]]
-        elseif type(component.opts.padding.left) == "number" then
-            padding = padding .. string.rep(" ", component.opts.padding.left --[[@as integer]])
+        elseif type(lines.opts.padding.left) == "number" then
+            padding = padding .. string.rep(" ", lines.opts.padding.left --[[@as integer]])
         end
     end
 
     if position ~= "left" then
-        local lines = component.lines
         local longest_line = utils.longest_line(lines)
 
         if position == "center" then

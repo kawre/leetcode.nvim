@@ -103,7 +103,7 @@ function ResultLayout:handle_runtime(item) -- status code = 10
     self.group:append(item._.title, item._.hl)
     self.group:append(" | ")
     self.group:append(("%s: %s"):format(t("Runtime"), item.status_runtime), "leetcode_alt")
-    self.group:newgrp()
+    self.group:endgrp()
 
     self.cases = Cases:init(item, self.parent.testcase.testcases, self.parent.result)
     self.group:append(self.cases)
@@ -118,7 +118,7 @@ function ResultLayout:handle_submission_error(item) -- status code = 11
     self.group:append(item._.title, item._.hl)
     self.group:append(" | ")
     self.group:append(testcases_passed(item), "leetcode_alt")
-    self.group:newgrp()
+    self.group:endgrp()
 
     self.case = Case:init({
         input = item.input_formatted,
@@ -139,7 +139,7 @@ function ResultLayout:handle_limit_exceeded(item) -- status code = 12,13,14
         self.group:append(" | ")
         self.group:append(testcases_passed(item), "leetcode_alt")
     end
-    self.group:newgrp()
+    self.group:endgrp()
 
     if item._.submission then
         local last_testcase = NuiLine()
@@ -151,7 +151,7 @@ function ResultLayout:handle_limit_exceeded(item) -- status code = 12,13,14
         local last_exec = Pre:init(pre_header, { last_testcase })
 
         self.group:append(last_exec)
-        self.group:newgrp()
+        self.group:endgrp()
 
         local stdout = Stdout:init(item.std_output or "")
         if stdout then self.group:append(stdout) end
@@ -226,7 +226,7 @@ function ResultLayout:change_case(idx)
     if not self.cases[idx] then return end
 
     if self.case then
-        self.case.groups = { self.cases[idx] }
+        self.case._items = { self.cases[idx] }
         self.parent.result:draw()
     end
 end

@@ -1,12 +1,20 @@
 local Lines = require("leetcode-ui.component.text")
 local t = require("leetcode.translator")
+local log = require("leetcode.logger")
 
----@class lc-ui.Button: lc-ui.Text
+---@class lc-ui.Button : lc-ui.Text
 local Button = Lines:extend("LeetButton")
 
 ---@class lc-ui.Button.text
 ---@field icon string
 ---@field src string
+
+function Button:draw(layout)
+    layout._.buttons[layout._.line_idx] = self
+    Button.super.draw(self, layout)
+end
+
+function Button:press() self.opts.on_press() end
 
 ---@param text lc-ui.Button.text
 ---@param sc string|nil

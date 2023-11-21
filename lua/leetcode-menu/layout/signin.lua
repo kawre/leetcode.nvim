@@ -6,11 +6,11 @@ local Buttons = require("leetcode-menu.components.buttons")
 local button = require("leetcode-ui.component.button")
 
 local problems =
-    button:init({ icon = "󱛖", src = "Sign in (By Cookie)" }, "s", cmd.cookie_prompt, false)
+    button({ icon = "󱛖", src = "Sign in (By Cookie)" }, "s", cmd.cookie_prompt, false)
 
-local exit = button:init({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
+local exit = button({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
 
-local buttons = Buttons:init({
+local buttons = Buttons({
     problems,
     exit,
 })
