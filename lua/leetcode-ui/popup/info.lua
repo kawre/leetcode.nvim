@@ -1,13 +1,13 @@
 local Popup = require("leetcode-ui.popup")
 local NuiText = require("nui.text")
+local t = require("leetcode.translator")
 local Line = require("leetcode-ui.line")
+
 local config = require("leetcode.config")
 local utils = require("leetcode.utils")
-
-local t = require("leetcode.translator")
 local log = require("leetcode.logger")
 
----@class lc.ui.InfoPopup : lc.ui.Popup
+---@class lc.ui.InfoPopup : lc-ui.Popup
 ---@field popup NuiPopup
 ---@field parent lc.ui.Question
 ---@field hints table[]

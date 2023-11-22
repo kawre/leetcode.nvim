@@ -1,18 +1,16 @@
 local Popup = require("leetcode-ui.popup")
-local Line = require("leetcode-ui.line")
 local Group = require("leetcode-ui.group")
 local Lines = require("leetcode-ui.lines")
-local config = require("leetcode.config")
 local t = require("leetcode.translator")
 
+local config = require("leetcode.config")
 local stats_api = require("leetcode.api.statistics")
 local Spinner = require("leetcode.logger.spinner")
-local Layout = require("leetcode-ui.layout")
 
 local log = require("leetcode.logger")
 
 ---@class lc.ui.LanguagesPopup : lc.ui.SkillsPopup
----@field layout lc-ui.Layout
+---@field renderer lc-ui.Renderer
 local Languages = Popup:extend("LeetLanguages")
 
 function Languages:handle(lang)
@@ -41,7 +39,7 @@ function Languages:populate(res)
         group:insert(self:handle(lang))
     end
 
-    self.layout:append(group)
+    self.renderer:append(group)
 end
 
 function Languages:mount()
@@ -52,7 +50,7 @@ function Languages:mount()
         else
             self:populate(res)
             spinner:stop(nil, true, { timeout = 500 })
-            self.layout:draw(self)
+            self.renderer:draw(self)
         end
     end)
 
@@ -87,8 +85,6 @@ function Languages:init()
             readonly = false,
         },
     })
-
-    self.layout = Layout()
 end
 
 return Languages()

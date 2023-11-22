@@ -1,19 +1,19 @@
-local problemlist = require("leetcode.cache.problemlist")
-local ConsolePopup = require("leetcode.ui.console.popup")
-local ResultLayout = require("leetcode.ui.console.components.result-layout")
-
+local ConsolePopup = require("leetcode-ui.popup.console")
+local ResultLayout = require("leetcode-ui.renderer.result")
 local t = require("leetcode.translator")
+
+local problemlist = require("leetcode.cache.problemlist")
 local log = require("leetcode.logger")
 
 ---@class lc.ui.Console.ResultPopup : lc.ui.Console.Popup
----@field layout lc.ResultLayout
+---@field renderer lc.ResultLayout
 ---@field last_testcase string
 local ResultPopup = ConsolePopup:extend("LeetResultPopup")
 
 ---@param item lc.interpreter_response
 function ResultPopup:handle(item)
     self.border:set_highlight(item._.hl)
-    self.layout:handle_res(item)
+    self.renderer:handle_res(item)
 
     if item.last_testcase then self.last_testcase = item.last_testcase end
 
@@ -26,18 +26,18 @@ function ResultPopup:handle(item)
 end
 
 function ResultPopup:clear()
-    self.layout:clear()
+    self.renderer:clear()
     self.last_testcase = nil
     self.border:set_highlight("FloatBorder")
 end
 
-function ResultPopup:draw() self.layout:draw() end
+function ResultPopup:draw() self.renderer:draw() end
 
 ---@param parent lc.ui.Console
 ---
 ---@return lc.ui.Console.ResultPopup
 function ResultPopup:init(parent)
-    self.layout = ResultLayout(parent)
+    self.renderer = ResultLayout(parent)
 
     ResultPopup.super.init(self, parent, {
         border = {

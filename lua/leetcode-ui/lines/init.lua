@@ -25,7 +25,7 @@ local function create_pad(int)
     return lines
 end
 
----@param layout lc-ui.Layout
+---@param layout lc-ui.Renderer
 function Lines:draw(layout, opts)
     local lines = vim.deepcopy(self:contents())
 

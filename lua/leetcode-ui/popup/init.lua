@@ -1,11 +1,11 @@
 local NuiPopup = require("nui.popup")
-local Layout = require("leetcode-ui.layout")
+local Renderer = require("leetcode-ui.renderer")
 
 local log = require("leetcode.logger")
 
----@class lc.ui.Popup : NuiPopup
+---@class lc-ui.Popup : NuiPopup
 ---@field visible boolean
----@field layout lc-ui.Layout
+---@field renderer lc-ui.Renderer
 local Popup = NuiPopup:extend("LeetPopup")
 
 function Popup:focus()
@@ -26,32 +26,15 @@ end
 function Popup:unmount()
     Popup.super.unmount(self)
 
-    if self.layout then
-        self.layout.bufnr = nil
-        self.layout.winid = nil
-    end
+    self.renderer.bufnr = nil
+    self.renderer.winid = nil
 
     self.visible = false
 end
 
 function Popup:_buf_create()
     Popup.super._buf_create(self)
-    -- log.info({
-    --     event = "buf_create",
-    --     name = self.class.name,
-    --     bufnr = self.bufnr,
-    --     winid = self.winid,
-    -- })
-    log.info(self.layout)
-    if self.layout then
-        self.layout.bufnr = self.bufnr
-        log.info({
-            event = "buf_create",
-            layout = self.layout.class.name,
-            bufnr = self.layout.bufnr,
-            winid = self.layout.winid,
-        })
-    end
+    self.renderer.bufnr = self.bufnr
 end
 
 function Popup:_buf_destory()
@@ -62,16 +45,14 @@ function Popup:_buf_destory()
     --     bufnr = self.bufnr,
     --     winid = self.winid,
     -- })
-    if self.layout then self.layout.bufnr = nil end
+    self.renderer.bufnr = nil
 end
 
 function Popup:mount()
     Popup.super.mount(self)
 
-    if self.layout then
-        self.layout.bufnr = self.bufnr
-        self.layout.winid = self.winid
-    end
+    self.renderer.bufnr = self.bufnr
+    self.renderer.winid = self.winid
 
     self.visible = true
 end
@@ -106,7 +87,7 @@ function Popup:init(opts)
         },
     }, opts or {})
 
-    self.layout = self.layout or Layout()
+    self.renderer = self.renderer or Renderer()
     self.visible = false
 
     Popup.super.init(self, options)
@@ -118,7 +99,7 @@ function Popup:init(opts)
     self:map("n", { "q", "<Esc>" }, function() self:hide() end)
 end
 
----@type fun(opts: table): lc.ui.Popup
+---@type fun(opts: table): lc-ui.Popup
 local LeetPopup = Popup
 
 return LeetPopup

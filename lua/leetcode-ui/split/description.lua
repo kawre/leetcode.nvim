@@ -1,3 +1,9 @@
+local Group = require("leetcode-ui.group")
+local Lines = require("leetcode-ui.lines")
+local Padding = require("leetcode-ui.lines.padding")
+local NuiSplit = require("nui.split")
+local Renderer = require("leetcode-ui.renderer")
+
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 local utils = require("leetcode.utils")
@@ -8,17 +14,10 @@ local img_sup = img_ok and config.user.image_support
 local parser = require("leetcode.parser")
 local t = require("leetcode.translator")
 
-local Layout = require("leetcode-ui.layout")
-local Group = require("leetcode-ui.group")
-local Lines = require("leetcode-ui.lines")
-local Padding = require("leetcode-ui.lines.padding")
-
-local NuiSplit = require("nui.split")
-
 ---@class lc.ui.Description : NuiSplit
 ---@field split NuiSplit
 ---@field parent lc.ui.Question
----@field layout lc-ui.Layout
+---@field renderer lc-ui.Renderer
 ---@field visible boolean
 ---@field images table<string, Image>
 local Description = NuiSplit:extend("LeetDescription")
@@ -41,8 +40,8 @@ end
 function Description:mount()
     self.visible = true
     Description.super.mount(self)
-    self.layout.winid = self.winid
-    self.layout.bufnr = self.bufnr
+    self.renderer.winid = self.winid
+    self.renderer.bufnr = self.bufnr
     self:populate()
 
     local utils = require("leetcode-menu.utils")
@@ -89,7 +88,7 @@ function Description:toggle()
 end
 
 function Description:draw()
-    self.layout:draw()
+    self.renderer:draw()
     self:draw_imgs()
 end
 
@@ -162,7 +161,7 @@ function Description:populate()
 
     local contents = parser:parse(utils.translate(q.content, q.translated_content))
 
-    self.layout:replace({
+    self.renderer:replace({
         header,
         Padding(3),
         contents,
@@ -183,7 +182,7 @@ function Description:init(parent)
     self.visible = false
     self.images = {}
 
-    self.layout = Layout()
+    self.renderer = Renderer()
 
     self:map("n", { "q", "<Esc>" }, function() self:toggle() end)
 end

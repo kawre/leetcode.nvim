@@ -22,7 +22,7 @@ function Group:append(content, highlight)
     return self
 end
 
----@param layout lc-ui.Layout
+---@param layout lc-ui.Renderer
 function Group:draw(layout, opts)
     opts = vim.tbl_deep_extend("force", self._.opts, opts or {})
     local margin = opts.margin

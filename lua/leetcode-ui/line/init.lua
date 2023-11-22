@@ -1,11 +1,12 @@
 local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
+
 local log = require("leetcode.logger")
 
 ---@class lc.ui.Line : NuiLine
 local Line = NuiLine:extend("LeetLine")
 
----@param layout lc-ui.Layout
+---@param layout lc-ui.Renderer
 ---@param opts lc-ui.Layout.opts
 function Line:draw(layout, opts)
     local texts = vim.deepcopy(self._texts)

@@ -1,6 +1,6 @@
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
-local ConsolePopup = require("leetcode.ui.console.popup")
+local ConsolePopup = require("leetcode-ui.popup.console")
 local t = require("leetcode.translator")
 
 ---@class lc.ui.Console.TestcasePopup : lc.ui.Console.Popup

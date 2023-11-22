@@ -1,8 +1,9 @@
 local log = require("leetcode.logger")
 local arguments = require("leetcode.command.arguments")
 local config = require("leetcode.config")
-local t = require("leetcode.translator")
 local event = require("nui.utils.autocmd").event
+
+local t = require("leetcode.translator")
 
 ---@class lc.Commands
 local cmd = {}
@@ -147,8 +148,12 @@ function cmd.random_question()
 end
 
 function cmd.menu()
-    local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, _Lc_Menu._.opts.winid)
-    if ok then vim.api.nvim_set_current_tabpage(tabp) end
+    local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, _Lc_Menu.winid)
+    if ok then
+        vim.api.nvim_set_current_tabpage(tabp)
+    else
+        log.error(tabp)
+    end
 end
 
 ---@param page lc-menu.pages
@@ -201,12 +206,12 @@ end
 
 function cmd.ui_skills()
     if config.is_cn then return end
-    local skills = require("leetcode.ui.skills")
+    local skills = require("leetcode-ui.popup.skills")
     skills:show()
 end
 
 function cmd.ui_languages()
-    local languages = require("leetcode.ui.languages")
+    local languages = require("leetcode-ui.popup.languages")
     languages:show()
 end
 

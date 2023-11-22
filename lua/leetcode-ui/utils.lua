@@ -15,7 +15,7 @@ function utils.longest_line(lines)
     return width
 end
 
----@param layout lc-ui.Layout
+---@param layout lc-ui.Renderer
 function utils.win_width(layout)
     if not vim.api.nvim_win_is_valid(layout.winid) then return 0 end
     return vim.api.nvim_win_get_width(layout.winid)
@@ -43,7 +43,7 @@ function utils.parse_lines(lines, opts)
 end
 
 ---@param lines lc-ui.Lines
----@param layout lc-ui.Layout
+---@param layout lc-ui.Renderer
 ---
 ---@return string
 function utils.get_padding(lines, layout)

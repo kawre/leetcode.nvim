@@ -1,10 +1,11 @@
+local Description = require("leetcode-ui.split.description")
+local Console = require("leetcode-ui.layout.console")
+local Info = require("leetcode-ui.popup.info")
+
+local api_question = require("leetcode.api.question")
+local utils = require("leetcode.utils")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
-local Description = require("leetcode.ui.description")
-local api_question = require("leetcode.api.question")
-local Console = require("leetcode.ui.console")
-local utils = require("leetcode.utils")
-local Info = require("leetcode.ui.info")
 
 ---@class lc.ui.Question
 ---@field file Path

@@ -1,13 +1,13 @@
 local log = require("leetcode.logger")
 local Cookie = require("leetcode.cache.cookie")
 local utils = require("leetcode-menu.utils")
-local Layout = require("leetcode-ui.layout")
+local Renderer = require("leetcode-ui.renderer")
 
----@class lc-menu : lc-ui.Layout
+---@class lc-menu : lc-ui.Renderer
 ---@field tabpage integer
 ---@field cursor lc-menu.cursor
 ---@field maps table
-local Menu = Layout:extend("LeetMenu")
+local Menu = Renderer:extend("LeetMenu")
 
 local function tbl_keys(t)
     local keys = vim.tbl_keys(t)

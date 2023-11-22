@@ -4,12 +4,11 @@ local Lines = require("leetcode-ui.lines")
 
 local stats_api = require("leetcode.api.statistics")
 local Spinner = require("leetcode.logger.spinner")
-local Layout = require("leetcode-ui.layout")
 
 local log = require("leetcode.logger")
 
----@class lc.ui.SkillsPopup : lc.ui.Popup
----@field layout lc-ui.Layout
+---@class lc.ui.SkillsPopup : lc-ui.Popup
+---@field renderer lc-ui.Renderer
 local Skills = Popup:extend("LeetSkills")
 
 local hl = {
@@ -44,7 +43,7 @@ function Skills:populate(res)
         group:insert(self:handle(key, res[key]))
     end
 
-    self.layout:insert(group)
+    self.renderer:insert(group)
 end
 
 function Skills:mount()
@@ -55,7 +54,7 @@ function Skills:mount()
         else
             self:populate(res)
             spinner:stop(nil, true, { timeout = 200 })
-            self.layout:draw(self)
+            self.renderer:draw(self)
         end
     end)
 
@@ -90,8 +89,6 @@ function Skills:init()
             readonly = false,
         },
     })
-
-    self.layout = Layout()
 end
 
 return Skills()

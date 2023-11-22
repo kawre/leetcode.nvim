@@ -1,7 +1,7 @@
 local Popup = require("leetcode-ui.popup")
 local log = require("leetcode.logger")
 
----@class lc.ui.Console.Popup : lc.ui.Popup
+---@class lc.ui.Console.Popup : lc-ui.Popup
 ---@field console lc.ui.Console
 local ConsolePopup = Popup:extend("LeetConsolePopup")
 

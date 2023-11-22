@@ -1,11 +1,11 @@
-local Cases = require("leetcode.ui.console.components.cases")
-local Header = require("leetcode.ui.console.components.header")
+local Cases = require("leetcode.ui.cases")
+local Header = require("leetcode.ui.header")
 
-local Layout = require("leetcode-ui.layout")
-local Pre = require("leetcode.ui.console.components.pre")
+local Renderer = require("leetcode-ui.renderer")
+local Pre = require("leetcode.ui.pre")
 local Group = require("leetcode-ui.group")
-local Stdout = require("leetcode.ui.console.components.stdout")
-local Case = require("leetcode.ui.console.components.case")
+local Stdout = require("leetcode.ui.stdout")
+local Case = require("leetcode.ui.case")
 
 local Line = require("leetcode-ui.line")
 local NuiText = require("nui.text")
@@ -14,12 +14,12 @@ local config = require("leetcode.config")
 local t = require("leetcode.translator")
 local log = require("leetcode.logger")
 
----@class lc.ResultLayout : lc-ui.Layout
+---@class lc.ResultLayout : lc-ui.Renderer
 ---@field parent lc.ui.Console
 ---@field group lc-ui.Group
 ---@field cases lc.Cases
 ---@field case lc.Result.Case
-local ResultLayout = Layout:extend("LeetResultLayout")
+local ResultLayout = Renderer:extend("LeetResultLayout")
 
 function ResultLayout:handle_accepted(item)
     local function perc_hi(perc) return perc >= 50 and "leetcode_ok" or "leetcode_error" end

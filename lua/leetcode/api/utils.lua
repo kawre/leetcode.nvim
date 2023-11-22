@@ -186,7 +186,7 @@ function utils.normalize_problems(problems)
                     p.stat.question__title_slug
                 ),
                 paid_only = p.paid_only,
-                ac_rate = p.stat.total_acs * 100 / p.stat.total_submitted,
+                ac_rate = p.stat.total_acs * 100 / math.min(p.stat.total_submitted, 1),
                 difficulty = utils.lvl_to_name(p.difficulty.level),
                 starred = p.is_favor,
                 topic_tags = {},

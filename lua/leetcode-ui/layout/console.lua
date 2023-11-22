@@ -1,6 +1,7 @@
-local Testcase = require("leetcode.ui.console.testcase")
-local Result = require("leetcode.ui.console.result")
+local Testcase = require("leetcode-ui.popup.console.testcase")
+local Result = require("leetcode-ui.popup.console.result")
 local NuiLayout = require("nui.layout")
+local Layout = require("leetcode-ui.layout")
 local Popup = require("leetcode-ui.popup")
 
 local config = require("leetcode.config")
@@ -12,7 +13,7 @@ local log = require("leetcode.logger")
 ---@field testcase lc.ui.Console.TestcasePopup
 ---@field result lc.ui.Console.ResultPopup
 ---@field popups lc.ui.Console.Popup[]
-local ConsoleLayout = NuiLayout:extend("LeetConsoleLayout")
+local ConsoleLayout = Layout:extend("LeetConsoleLayout")
 
 function ConsoleLayout:unmount()
     ConsoleLayout.super.unmount(self)
