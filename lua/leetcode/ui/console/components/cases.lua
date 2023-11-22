@@ -1,56 +1,59 @@
-local log = require("leetcode.logger")
-
 local Group = require("leetcode-ui.component.group")
-local Text = require("leetcode-ui.component.text")
+local Lines = require("leetcode-ui.component.text")
+local Line = require("leetcode-ui.component.line")
 local Case = require("leetcode.ui.console.components.case")
 
-local Line = require("leetcode-ui.component.line")
+local log = require("leetcode.logger")
 
 ---@class lc.Cases : lc-ui.Group
----@field nav lc-ui.Lines
----@field case lc-ui.Group
 ---@field cases table<integer, lc.Result.Case>
 ---@field keymaps table<string, function> { mode: string, key: string }
 ---@field idx integer
 ---@field parent lc.ui.Console.ResultPopup
-local Cases = {}
-Cases.__index = Cases
-setmetatable(Cases, Group)
+local Cases = Group:extend("LeetCases")
 
 function Cases:clear()
     self.parent:clear_keymaps(self.keymaps)
     self.keymaps = {}
-    self.cases = {}
-    self.nav:clear()
-    self.case:clear()
-    Group.clear(self)
+
+    Cases.super.clear(self)
 end
 
-function Cases:update_nav()
-    local cases
-    Line()
+function Cases:make_nav()
+    local nav = Lines({ padding = { top = 1, bot = 0 } })
 
     for i, case in ipairs(self.cases) do
-        local text = Line()
-        local hl = ("%s%s"):format(self.idx == i and "focus_" or "", case.passed and "ok" or "err")
-        text:append((" Case (%d) "):format(i), "leetcode_case_" .. hl)
-
         self.keymaps[tostring(i)] = function() self:change(i) end
 
-        cases:append(text)
-        if i ~= #self.cases then cases:append(" ") end
+        local hl = "leetcode_case_"
+            .. ("%s%s"):format(self.idx == i and "focus_" or "", case.passed and "ok" or "err")
+        local msg = (" Case (%d) "):format(i)
+
+        nav:append(msg, hl)
+        if i ~= #self.cases then nav:append(" ") end
     end
 
+    return nav
+end
+
+function Cases:curr() return self.cases[self.idx] end
+
+function Cases:draw(layout)
+    self:clear()
+
+    self:insert(self:make_nav())
+    self:insert(self:curr())
+
     self.parent:set_keymaps(self.keymaps)
-    self.nav._lines = { cases }
+
+    Cases.super.draw(self, layout)
 end
 
 ---@param idx integer
 function Cases:change(idx)
     if not self.cases[idx] or idx == self.idx then return end
-    self.case._items = { self.cases[idx] }
+
     self.idx = idx
-    self:update_nav()
     self.parent:draw()
 end
 
@@ -59,15 +62,14 @@ end
 ---@param parent lc.ui.Console.ResultPopup
 ---@return lc.Cases
 function Cases:init(item, testcases, parent)
-    local group = Group({}, { spacing = 1 })
-    self = setmetatable(group, self)
+    Cases.super.init(self, { spacing = 1 })
 
     self.cases = {}
     self.parent = parent
     self.keymaps = {}
 
     for i, answer in ipairs(item.code_answer) do
-        self.cases[i] = Case:init({
+        self.cases[i] = Case({
             input = testcases[i],
             output = answer,
             expected = item.expected_code_answer[i],
@@ -75,14 +77,10 @@ function Cases:init(item, testcases, parent)
         }, item.compare_result:sub(i, i) == "1")
     end
 
-    self.nav = Text({ padding = { top = 1, bot = 0 } })
-    self:append(self.nav)
-
-    self.case = Group()
-    self:append(self.case)
     self:change(1)
-
-    return self ---@diagnostic disable-line
 end
 
-return Cases
+---@type fun(item: lc.runtime, testcases: string[], parent: lc.ui.Console.ResultPopup): lc.Cases
+local LeetCases = Cases
+
+return LeetCases

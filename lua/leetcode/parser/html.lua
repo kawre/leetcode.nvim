@@ -15,7 +15,7 @@ local Line = require("leetcode-ui.component.line")
 ---@field str string
 ---@field parser LanguageTree
 ---@field ts TreesitterModule
----@field text lc-ui.Lines
+---@field lines lc-ui.Lines
 ---@field newline_count integer
 ---@field ol_count table<integer>
 local Html = {}
@@ -84,24 +84,27 @@ function Html:get_text(node) return self.ts.get_node_text(node, self.str) end
 
 function Html:handle_entity(entity)
     if entity == "&lcnl;" then
-        if self.newline_count <= 1 then self.text:endl() end
+        if self.newline_count <= 1 then self.lines:endl() end
 
         self.newline_count = self.newline_count + 1
     elseif entity == "&lcpad;" then
-        if self.text:content() ~= "" then self.text:endl() end
+        if self.lines:content() ~= "" then self.lines:endl() end
 
         -- self.line Line()
         -- self.text:append({ NuiLine(), NuiLine(), NuiLine() })
-        self.text:append(Padding(3))
+        for i = 1, 3 do
+            self.lines:endl()
+        end
+        -- self.lines:append(Padding(3))
     elseif entity == "&lcend;" then
-        self.text:endl()
+        self.lines:endl()
     end
 
     return utils.entity(entity)
 end
 
 function Html:handle_list(tags)
-    if self.text:content() ~= "" then return end
+    if self.lines:content() ~= "" then return end
 
     local function get_list_type()
         for _, tag in ipairs(tags) do
@@ -126,14 +129,14 @@ function Html:handle_list(tags)
         text = string.format("%s%d. ", leftpad, self.ol_count[ol_c])
     end
 
-    self.text:append(text, "leetcode_list")
+    self.lines:append(text, "leetcode_list")
 end
 
 ---@param text string
 function Html:handle_indent(text)
-    if self.text:content() ~= "" then return text end
+    if self.lines:content() ~= "" then return text end
 
-    self.text:append("\t▎\t", "leetcode_indent")
+    self.lines:append("\t▎\t", "leetcode_indent")
 end
 
 ---@private
@@ -207,7 +210,7 @@ function Html:node_hl(node, tags, tag_data)
         nui_text = NuiText(text, utils.hl(tags))
     end
 
-    self.text:append(nui_text)
+    self.lines:append(nui_text)
 end
 
 ---@private
@@ -261,14 +264,14 @@ end
 
 -- Trim excessive lines
 function Html:trim()
-    local lines = self.text._lines
+    local lines = self.lines:contents()
     for i = #lines, 1, -1 do
         if lines[i]:content() ~= "" then break end
         table.remove(lines, i)
     end
-    self.text._lines = lines
+    self.lines._lines = lines
 
-    return self.text
+    return self.lines
 end
 
 ---@param html string
@@ -278,7 +281,7 @@ function Html:parse(html)
     self = setmetatable({
         str = html,
         ts = vim.treesitter,
-        text = Lines(),
+        lines = Lines(),
         newline_count = 0,
         ol_count = {},
     }, self)

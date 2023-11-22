@@ -4,26 +4,31 @@ local Group = require("leetcode-ui.component.group")
 
 local NuiText = require("nui.text")
 local Line = require("leetcode-ui.component.line")
+local Lines = require("leetcode-ui.component.text")
 
----@class lc.Result.Pre
-local pre = {}
-pre.__index = pre
+---@class lc.Result.Pre : lc-ui.Lines
+local Pre = Lines:extend("LeetPre")
 
----@param title? NuiLine|NuiText
----@param lines NuiLine[]
+---@param title? lc.ui.Line
+---@param lines lc.ui.Line[]
 ---
 ---@return lc-ui.Lines
-function pre:init(title, lines)
-    local text = Text({})
-    if title then text:append({ title, Line() }) end
+function Pre:init(title, lines)
+    Pre.super.init(self)
+
+    if title then --
+        self:append(title):endl():endl()
+    end
 
     for _, line in ipairs(lines) do
         local new_line = Line({ NuiText("\t▎\t", "leetcode_indent") })
         new_line:append(line)
-        text:append(new_line)
+        self:append(new_line):endl()
     end
-
-    return text
 end
 
-return pre
+---@alias Pre.constructor fun(title: lc.ui.Line, lines: lc.ui.Line[]): lc.Result.Pre
+---@type Pre.constructor
+local LeetPre = Pre
+
+return LeetPre

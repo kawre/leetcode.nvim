@@ -14,7 +14,7 @@ function Button:draw(layout)
     Button.super.draw(self, layout)
 end
 
-function Button:press() self.opts.on_press() end
+function Button:press() self._.opts.on_press() end
 
 ---@param text lc-ui.Button.text
 ---@param sc string|nil
@@ -38,7 +38,7 @@ function Button:init(text, sc, on_press, expandable)
     self:append(text.src)
     if expandable then self:append(" " .. expand, "leetcode_alt") end
 
-    local len = vim.api.nvim_strwidth(self._lines[#self._lines]:content())
+    local len = vim.api.nvim_strwidth(self._.lines[#self._.lines]:content())
         + vim.api.nvim_strwidth(sc)
     local padding = string.rep(" ", width - len)
 

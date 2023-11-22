@@ -37,7 +37,7 @@ logger.error = function(msg) logger.log(msg, lvls.ERROR) end
 
 ---@param err lc.err
 logger.err = function(err)
-    if not err then return end
+    if not err then return logger.error("error") end
 
     local msg = err.msg or ""
     local lvl = err.lvl or lvls.ERROR

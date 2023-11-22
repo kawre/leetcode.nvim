@@ -1,17 +1,19 @@
-local config = require("leetcode.config")
 local Pre = require("leetcode.ui.console.components.pre")
 local t = require("leetcode.translator")
-
 local Line = require("leetcode-ui.component.line")
 
-local stdout = {}
+---@class lc.Stdout : lc.Result.Pre
+local Stdout = Pre:extend("LeetStdout")
 
 ---@param output string
 ---
 ---@return lc-ui.Lines | nil
-function stdout:init(output)
+function Stdout:init(output)
     local output_list = vim.split(output or "", "\n", { trimempty = true })
-    if vim.tbl_isempty(output_list) then return end
+    if vim.tbl_isempty(output_list) then
+        Stdout.super.init(self, nil, {})
+        return
+    end
 
     local tbl = {}
     for i = 1, #output_list, 1 do
@@ -20,7 +22,12 @@ function stdout:init(output)
         table.insert(tbl, line)
     end
 
-    return Pre:init(Line():append((" %s"):format(t("Stdout")), "leetcode_alt"), tbl)
+    local title = Line():append((" %s"):format(t("Stdout")), "leetcode_alt")
+    Stdout.super.init(self, title, tbl)
 end
 
-return stdout
+---@alias lc.Stdout.constructor fun(output: string): lc.Stdout
+---@type lc.Stdout.constructor
+local LeetStdout = Stdout
+
+return LeetStdout

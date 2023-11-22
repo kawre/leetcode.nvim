@@ -10,6 +10,7 @@ local t = require("leetcode.translator")
 
 local Layout = require("leetcode-ui.layout")
 local Group = require("leetcode-ui.component.group")
+local Lines = require("leetcode-ui.component.text")
 local Padding = require("leetcode-ui.component.padding")
 
 local NuiSplit = require("nui.split")
@@ -129,14 +130,16 @@ function Description:populate()
         position = "center",
     })
 
-    group:append(self.parent.cache.link or "", "leetcode_alt")
-    group:endl():endl()
+    local header = Lines()
 
-    group:append(q.frontend_id .. ". ", "leetcode_normal")
-    group:append(utils.translate(q.title, q.translated_title))
-    group:endl()
+    header:append(self.parent.cache.link or "", "leetcode_alt")
+    header:endl():endl()
 
-    group:append(
+    header:append(q.frontend_id .. ". ", "leetcode_normal")
+    header:append(utils.translate(q.title, q.translated_title))
+    header:endl()
+
+    header:append(
         t(q.difficulty),
         ({
             ["Easy"] = "leetcode_easy",
@@ -144,26 +147,27 @@ function Description:populate()
             ["Hard"] = "leetcode_hard",
         })[q.difficulty]
     )
-    group:append(" | ")
-    group:append(q.likes .. " ", "leetcode_alt")
-    if not config.is_cn then group:append(" " .. q.dislikes .. " ", "leetcode_alt") end
-    group:append(" | ")
-    group:append(
+    header:append(" | ")
+    header:append(q.likes .. " ", "leetcode_alt")
+    if not config.is_cn then header:append(" " .. q.dislikes .. " ", "leetcode_alt") end
+    header:append(" | ")
+    header:append(
         ("%s %s %s"):format(q.stats.acRate, t("of"), q.stats.totalSubmission),
         "leetcode_alt"
     )
     if not vim.tbl_isempty(q.hints) then
-        group:append(" | ")
-        group:append("󰛨 " .. t("Hints"), "leetcode_hint")
+        header:append(" | ")
+        header:append("󰛨 " .. t("Hints"), "leetcode_hint")
     end
-    group:endl()
+    header:endl()
 
-    -- local contents = parser:parse(utils.translate(q.content, q.translated_content))
+    group:insert(header)
+    local contents = parser:parse(utils.translate(q.content, q.translated_content))
 
     local layout = Layout({
         group,
         Padding(3),
-        -- contents,
+        contents,
     })
 
     self.layout:set(layout)

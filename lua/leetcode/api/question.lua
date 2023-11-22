@@ -20,7 +20,7 @@ function question.by_title_slug(title_slug)
     local query = queries.question
 
     local res, err = utils.query(query, variables)
-    if err then return log.err(err) end
+    if not res or err then return log.err(err) end
 
     local q = res.data.question
     q.meta_data = select(2, pcall(utils.decode, q.meta_data))

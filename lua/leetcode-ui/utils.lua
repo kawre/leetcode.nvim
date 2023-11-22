@@ -47,7 +47,7 @@ end
 ---
 ---@return string
 function utils.get_padding(lines, layout)
-    local position = layout._.opts.position or lines.opts.position
+    local position = layout._.opts.position or lines._.opts.position
     local padding = ""
 
     if layout._.opts.padding then
@@ -57,14 +57,14 @@ function utils.get_padding(lines, layout)
             padding = string.rep(" ", layout._.opts.padding.left --[[@as integer]])
         end
     end
-
-    if lines.opts.padding then
-        if type(lines.opts.padding.left) == "string" then
-            padding = padding .. layout._.opts.padding.left --[[@as string]]
-        elseif type(lines.opts.padding.left) == "number" then
-            padding = padding .. string.rep(" ", lines.opts.padding.left --[[@as integer]])
-        end
-    end
+    --
+    -- if lines._.opts.padding then
+    --     if type(lines._.opts.padding.left) == "string" then
+    --         padding = padding .. layout._.opts.padding.left --[[@as string]]
+    --     elseif type(lines._.opts.padding.left) == "number" then
+    --         padding = padding .. string.rep(" ", lines._.opts.padding.left --[[@as integer]])
+    --     end
+    -- end
 
     if position ~= "left" then
         local max_len = utils.longest_line(lines)

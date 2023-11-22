@@ -42,6 +42,13 @@ function ConsoleLayout:hide()
     if not self.visible then return end
     ConsoleLayout.super.hide(self)
     self.visible = false
+
+    pcall(function()
+        local winid = vim.api.nvim_get_current_win()
+        if winid == self.parent.description.winid then
+            vim.api.nvim_set_current_win(self.parent.winid)
+        end
+    end)
 end
 
 function ConsoleLayout:toggle()

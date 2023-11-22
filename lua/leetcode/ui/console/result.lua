@@ -32,7 +32,7 @@ function ResultPopup:clear()
     self.border:set_highlight("FloatBorder")
 end
 
-function ResultPopup:draw() self.layout:draw(self) end
+function ResultPopup:draw() self.layout:draw() end
 
 ---@param parent lc.ui.ConsoleLayout
 ---
@@ -57,8 +57,7 @@ function ResultPopup:init(parent)
     })
 
     self.parent = parent
-
-    self.layout = ResultLayout:init(parent, {
+    self.layout = ResultLayout(parent, {
         winid = self.winid,
         bufnr = self.bufnr,
     })

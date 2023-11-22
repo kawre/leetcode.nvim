@@ -4,17 +4,18 @@ local Line = require("leetcode-ui.component.line")
 local utils = require("leetcode-ui.utils")
 local log = require("leetcode.logger")
 
+---@alias lines.params { lines: lc.ui.Line[], opts: lc-ui.Component.opts, line_idx: integer }
+
 ---@class lc-ui.Lines : NuiLine
----@field _lines lc.ui.Line[]
----@field opts lc-ui.Component.opts
----@field _line_idx integer
+---@field _ lines.params
 local Lines = Object("LeetLines")
 
 function Lines:set_opts(opts) --
-    self.opts = vim.tbl_deep_extend("force", self.opts, opts or {})
+    log.debug(self.class.name)
+    self._.opts = vim.tbl_deep_extend("force", self._.opts, opts or {})
 end
 
-function Lines:contents() return self._lines end
+function Lines:contents() return self._.lines end
 
 local function create_pad(int)
     local lines = {}
@@ -30,7 +31,7 @@ end
 function Lines:draw(layout)
     local lines = vim.deepcopy(self:contents())
 
-    local padding = self.opts.padding
+    local padding = self._.opts.padding
 
     local toppad = padding and padding.top
     if toppad then lines = vim.list_extend(create_pad(toppad), lines) end
@@ -50,28 +51,36 @@ function Lines:draw(layout)
 end
 
 function Lines:clear()
-    self._lines = {}
-    self._line_idx = 1
+    self._.lines = {}
+    self._.line_idx = 1
     return self
 end
 
 function Lines:append(content, highlight)
-    if not self._lines[self._line_idx] then table.insert(self._lines, Line()) end
+    if not self._.lines[self._.line_idx] then table.insert(self._.lines, Line()) end
 
-    self._lines[self._line_idx]:append(content, highlight or self.opts.hl)
+    self._.lines[self._.line_idx]:append(content, highlight or self._.opts.hl)
     return self
 end
 
 function Lines:insert(item) --
-    table.insert(self._lines, item)
-    self._line_idx = self._line_idx + 1
+    table.insert(self._.lines, item)
+    self._.line_idx = self._.line_idx + 1
     return self
 end
 
-function Lines:endl()
-    if not self._lines[self._line_idx] then table.insert(self._lines, Line()) end
+function Lines:content() --
+    return self:curr() and self:curr():content() or ""
+end
 
-    self._line_idx = self._line_idx + 1
+function Lines:curr() --
+    return self._.lines[self._.line_idx] or nil
+end
+
+function Lines:endl()
+    if not self._.lines[self._.line_idx] then table.insert(self._.lines, Line()) end
+
+    self._.line_idx = self._.line_idx + 1
     return self
 end
 
@@ -85,7 +94,10 @@ function Lines:from(contents)
 end
 
 function Lines:init(opts)
-    self.opts = opts or {}
+    self._ = {
+        opts = opts or {},
+        line_idx = 1,
+    }
     self:clear()
 end
 

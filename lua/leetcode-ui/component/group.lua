@@ -12,20 +12,19 @@ local Group = Object("LeetGroup")
 
 ---@param opts lc-ui.Group.opts
 function Group:set_opts(opts) --
-    self.opts = vim.tbl_deep_extend("force", self.opts, opts)
+    self._.opts = vim.tbl_deep_extend("force", self._.opts, opts or {})
 end
 
 function Group:contents() return self._.items end
 
 function Group:append(content, highlight)
+    if not self._.items[#self._.items] then self:insert(Lines()) end
     self._.items[#self._.items]:append(content, highlight)
     return self
 end
 
 ---@param layout lc-ui.Layout
 function Group:draw(layout)
-    log.debug("---- [DRAW GROUP START] " .. self.class.name)
-
     local opts = self._.opts
     local margin = opts.margin
     local toppad = margin and margin.top
@@ -35,14 +34,13 @@ function Group:draw(layout)
 
     local items = self:contents()
     for i, item in ipairs(items) do
+        log.debug(item.class.name)
         item:set_opts(opts)
         item:draw(layout)
         if i ~= #items then Pad(opts.spacing):draw(layout) end
     end
 
     if botpad then Pad(botpad):draw(layout) end
-
-    log.debug("---- [DRAW GROUP END] " .. self.class.name)
 end
 
 ---@param item lc-ui.Lines
@@ -53,7 +51,10 @@ function Group:insert(item) table.insert(self._.items, item) end
 --     return self
 -- end
 
-function Group:clear() self._.items = {} end
+function Group:clear()
+    self._.items = {}
+    return self
+end
 
 --@param components lc-ui.Component[]
 ---@param opts? lc-ui.Group.opts

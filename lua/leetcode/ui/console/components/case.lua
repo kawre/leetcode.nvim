@@ -15,9 +15,7 @@ local Line = require("leetcode-ui.component.line")
 ---@field passed boolean
 ---@field index integer
 ---@field body case_body
-local Case = {}
-Case.__index = Case
-setmetatable(Case, Group)
+local Case = Group:extend("LeetCase")
 
 local function get_pad(key, max_len) return (" "):rep(max_len + 1 - vim.api.nvim_strwidth(key)) end
 
@@ -67,8 +65,7 @@ end
 ---
 ---@return lc.Result.Case
 function Case:init(body, passed)
-    local group = Group:init({}, { spacing = 1 })
-    self = setmetatable(group, self)
+    Case.super.init(self, { spacing = 1 })
 
     self.body = body
 
@@ -82,15 +79,17 @@ function Case:init(body, passed)
     table.insert(tbl, self:output(body.output, body.expected))
     table.insert(tbl, self:expected(body.expected, body.output))
 
-    local pre = Pre:init(nil, tbl)
-    self:append(pre)
+    local pre = Pre(nil, tbl)
+    self:insert(pre)
 
-    local stdout = Stdout:init(body.std_output)
-    if stdout then self:append(stdout) end
+    local stdout = Stdout(body.std_output)
+    self:insert(stdout)
 
     self.passed = passed
-
-    return self
 end
 
-return Case
+---@alias lc.Result.Case.constructor fun(body: case_body, passed: boolean): lc.Result.Case
+---@type lc.Result.Case.constructor
+local LeetCase = Case
+
+return LeetCase

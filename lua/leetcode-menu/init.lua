@@ -34,11 +34,12 @@ function Menu:apply_btn_keymaps()
     local opts = { noremap = false, silent = true, buffer = self._.opts.bufnr, nowait = true }
 
     for _, btn in pairs(self._.buttons) do
-        if not btn.opts.sc then return end
+        local bopts = btn._.opts
+        if not bopts.sc then return end
 
         local mode = { "n" }
-        vim.keymap.set(mode, btn.opts.sc, btn.opts.on_press, opts)
-        table.insert(self.maps, { mode = mode, lhs = btn.opts.sc })
+        vim.keymap.set(mode, bopts.sc, bopts.on_press, opts)
+        table.insert(self.maps, { mode = mode, lhs = bopts.sc })
     end
 end
 
