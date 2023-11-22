@@ -1,6 +1,4 @@
 local path = require("plenary.path")
-local log = require("leetcode.logger")
-local async = require("plenary.async")
 
 local config = require("leetcode.config")
 
@@ -55,7 +53,12 @@ function Problemlist.populate()
 
     local noti = spinner:init("fetching problem list", "points")
     local res, err = problems_api.all()
-    assert(not err, err.msg)
+    if not res or err then
+        local msg = (err or {}).msg or "failed to fetch problem list"
+        noti:stop(msg, false)
+        error(msg)
+    end
+
     Problemlist.write(res)
     noti:stop("problems cache updated")
     return res
