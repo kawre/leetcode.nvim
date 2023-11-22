@@ -1,4 +1,4 @@
-local Popup = require("leetcode.ui.popup")
+local Popup = require("leetcode-ui.popup")
 local Group = require("leetcode-ui.group")
 local Lines = require("leetcode-ui.lines")
 

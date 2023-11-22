@@ -2,7 +2,6 @@ local Pad = require("leetcode-ui.lines.padding")
 local Object = require("nui.object")
 local Lines = require("leetcode-ui.lines")
 local Line = require("leetcode-ui.line")
-local log = require("leetcode.logger")
 
 ---@alias params { items: lc-ui.Lines[], opts: lc-ui.Group.opts, grp_idx: integer }
 
@@ -43,12 +42,16 @@ end
 
 ---@param item lc-ui.Lines
 function Group:insert(item)
+    if self._.items[self._.grp_idx] then --
+        self._.grp_idx = self._.grp_idx + 1
+    end
+
     table.insert(self._.items, item)
-    self._.grp_idx = self._.grp_idx + 1
+    return self
 end
 
 function Group:endgrp()
-    table.insert(self._.items, Line())
+    self._.grp_idx = self._.grp_idx + 1
     return self
 end
 

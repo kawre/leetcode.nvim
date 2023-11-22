@@ -6,9 +6,9 @@ local t = require("leetcode.translator")
 ---@class lc.ui.Console.TestcasePopup : lc.ui.Console.Popup
 ---@field testcases string[]
 ---@field extmarks integer[]
-local TestcasePopup = ConsolePopup:extend("LeetTestcasePopup")
+local Testcase = ConsolePopup:extend("LeetTestcasePopup")
 
-function TestcasePopup:content()
+function Testcase:content()
     self.testcases = {}
 
     local tbl = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, false)
@@ -24,9 +24,9 @@ function TestcasePopup:content()
     return testcases
 end
 
-function TestcasePopup:draw()
+function Testcase:draw()
     local tbl = {}
-    for i, case in ipairs(self.parent.parent.q.testcase_list) do
+    for i, case in ipairs(self.console.parent.q.testcase_list) do
         if i ~= 1 then table.insert(tbl, "") end
 
         table.insert(self.testcases, case:gsub("\n", " ")[1])
@@ -38,11 +38,10 @@ function TestcasePopup:draw()
 
     vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, tbl)
 
-    self:draw_extmarks()
-    return self
+    return self:draw_extmarks()
 end
 
-function TestcasePopup:clear_extmarks()
+function Testcase:clear_extmarks()
     if not config.user.console.testcase.virt_text then return end
     local ns = vim.api.nvim_create_namespace("leetcode_extmarks")
 
@@ -55,19 +54,19 @@ end
 ---@param line integer
 ---@param col integer
 ---@param opts? table<string, table>
-function TestcasePopup:add_extmark(line, col, opts)
+function Testcase:add_extmark(line, col, opts)
     local ns = vim.api.nvim_create_namespace("leetcode_extmarks")
 
     table.insert(self.extmarks, vim.api.nvim_buf_set_extmark(self.bufnr, ns, line, col, opts or {}))
 end
 
-function TestcasePopup:draw_extmarks()
+function Testcase:draw_extmarks()
     if not config.user.console.testcase.virt_text then return end
 
     self:clear_extmarks()
     local bufnr = self.bufnr
 
-    local md = self.parent.parent.q.meta_data
+    local md = self.console.parent.q.meta_data
     local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 
     if not md.params then return end
@@ -111,14 +110,16 @@ function TestcasePopup:draw_extmarks()
             j = 1
         end
     end
+
+    return self
 end
 
-function TestcasePopup:reset()
+function Testcase:reset()
     self:draw()
     log.info("Test cases have been reset")
 end
 
-function TestcasePopup:append(input)
+function Testcase:append(input)
     local s = vim.split(input, "\n", { trimempty = true })
 
     local lines = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, true)
@@ -131,16 +132,16 @@ function TestcasePopup:append(input)
     self:draw_extmarks()
 end
 
-function TestcasePopup:autocmds()
+function Testcase:autocmds()
     self:on(
         { "TextChanged", "TextChangedI", "TextChangedP", "TextChangedT" },
         function() self:draw_extmarks() end
     )
 end
 
----@param parent lc.ui.ConsoleLayout
-function TestcasePopup:init(parent)
-    TestcasePopup.super.init(self, {
+---@param parent lc.ui.Console
+function Testcase:init(parent)
+    Testcase.super.init(self, parent, {
         enter = true,
         border = {
             text = {
@@ -161,7 +162,6 @@ function TestcasePopup:init(parent)
 
     self.testcases = {}
     self.extmarks = {}
-    self.parent = parent
 
     self:on(
         { "TextChanged", "TextChangedI", "TextChangedP", "TextChangedT" },
@@ -171,7 +171,7 @@ function TestcasePopup:init(parent)
     self:draw()
 end
 
----@type fun(parent: lc.ui.ConsoleLayout): lc.ui.Console.TestcasePopup
-local LeetTestcasePopup = TestcasePopup
+---@type fun(parent: lc.ui.Console): lc.ui.Console.TestcasePopup
+local LeetTestcasePopup = Testcase
 
 return LeetTestcasePopup

@@ -1,16 +1,17 @@
-local config = require("leetcode.config")
 local Testcase = require("leetcode.ui.console.testcase")
 local Result = require("leetcode.ui.console.result")
+local NuiLayout = require("nui.layout")
+local Popup = require("leetcode-ui.popup")
+
+local config = require("leetcode.config")
 local Runner = require("leetcode.runner")
 local log = require("leetcode.logger")
-local NuiLayout = require("nui.layout")
-local Popup = require("leetcode.ui.popup")
 
----@class lc.ui.ConsoleLayout : NuiLayout
+---@class lc.ui.Console : NuiLayout
 ---@field parent lc.ui.Question
----@field layout NuiLayout
 ---@field testcase lc.ui.Console.TestcasePopup
 ---@field result lc.ui.Console.ResultPopup
+---@field popups lc.ui.Console.Popup[]
 local ConsoleLayout = NuiLayout:extend("LeetConsoleLayout")
 
 function ConsoleLayout:unmount()
@@ -18,14 +19,13 @@ function ConsoleLayout:unmount()
     self = nil
 end
 
-function ConsoleLayout:run()
-    self.result:clear()
-    Runner:init(self.parent):run()
-end
+function ConsoleLayout:run(submit)
+    if config.user.console.open_on_runcode then --
+        self:show()
+    end
 
-function ConsoleLayout:submit()
     self.result:clear()
-    Runner:init(self.parent):run(true)
+    Runner:init(self.parent):run(submit)
 end
 
 function ConsoleLayout:show()
@@ -68,6 +68,12 @@ function ConsoleLayout:use_testcase()
     end
 end
 
+function ConsoleLayout:set_keymaps(keymaps)
+    for _, popup in pairs(self.popups) do
+        popup:set_keymaps(keymaps)
+    end
+end
+
 ---@param parent lc.ui.Question
 function ConsoleLayout:init(parent)
     ConsoleLayout.super.init(self, {
@@ -84,6 +90,7 @@ function ConsoleLayout:init(parent)
 
     self.testcase = Testcase(self)
     self.result = Result(self)
+    self.popups = { self.testcase, self.result }
 
     self:update(
         {
@@ -99,32 +106,16 @@ function ConsoleLayout:init(parent)
 
     local keymaps = {
         ["R"] = function() self:run() end,
-        ["S"] = function() self:submit() end,
+        ["S"] = function() self:run(true) end,
         ["r"] = function() self.testcase:reset() end,
-        [{ "q", "<Esc>" }] = function() self:hide() end,
         ["H"] = function() self.testcase:focus() end,
         ["L"] = function() self.result:focus() end,
         ["U"] = function() self:use_testcase() end,
     }
-
-    local popups = { self.testcase, self.result }
-    for _, popup in pairs(popups) do
-        popup:set_keymaps(keymaps)
-
-        popup:on(
-            "BufLeave",
-            vim.schedule_wrap(function()
-                local curr_bufnr = vim.api.nvim_get_current_buf()
-                for _, p in pairs(popups) do
-                    if p.bufnr == curr_bufnr then return end
-                end
-                self:hide()
-            end)
-        )
-    end
+    self:set_keymaps(keymaps)
 end
 
----@type fun(parent: lc.ui.Question): lc.ui.ConsoleLayout
+---@type fun(parent: lc.ui.Question): lc.ui.Console
 local LeetConsoleLayout = ConsoleLayout
 
 return LeetConsoleLayout

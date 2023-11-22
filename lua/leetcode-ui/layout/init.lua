@@ -23,6 +23,13 @@ function Layout:draw()
     local opts = self._.opts
     local c_ok, c = pcall(vim.api.nvim_win_get_cursor, self.winid)
 
+    log.info({
+        event = "layout midifi",
+        name = self.class.name,
+        bufnr = self.bufnr,
+        winid = self.winid,
+    })
+
     self._.buttons = {}
     self._.line_idx = 1
 
@@ -52,6 +59,8 @@ end
 ---@param fn function
 function Layout:modifiable(fn)
     local bufnr = self.bufnr
+    if not (bufnr and vim.api.nvim_buf_is_valid(bufnr)) then return end
+
     local modi = vim.api.nvim_buf_get_option(bufnr, "modifiable")
     if not modi then vim.api.nvim_buf_set_option(bufnr, "modifiable", true) end
     fn()
@@ -106,9 +115,6 @@ function Layout:set(layout) self._.items = layout._.items end
 ---@param opts? lc-ui.Layout.opts
 function Layout:init(components, opts)
     local options = vim.tbl_deep_extend("force", {}, opts or {})
-
-    self.bufnr = 0
-    self.winid = 0
 
     self._ = {
         items = components or {},

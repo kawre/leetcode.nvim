@@ -1,9 +1,9 @@
-local NuiPopup = require("nui.popup")
+local Popup = require("leetcode-ui.popup")
+local log = require("leetcode.logger")
 
 ---@class lc.ui.Console.Popup : lc.ui.Popup
----@field popup NuiPopup
----@field parent lc.ui.ConsoleLayout
-local ConsolePopup = NuiPopup:extend("LeetConsolePopup")
+---@field console lc.ui.Console
+local ConsolePopup = Popup:extend("LeetConsolePopup")
 
 ---@param keymaps table<string|string[], function>
 function ConsolePopup:set_keymaps(keymaps)
@@ -19,27 +19,20 @@ function ConsolePopup:clear_keymaps(keymaps)
     end
 end
 
-function ConsolePopup:focus()
-    if not vim.api.nvim_win_is_valid(self.winid) then return end
-    vim.api.nvim_set_current_win(self.winid)
+function ConsolePopup:handle_leave()
+    vim.schedule(function()
+        local curr_bufnr = vim.api.nvim_get_current_buf()
+        for _, p in pairs(self.console.popups) do
+            if p.bufnr == curr_bufnr then return end
+        end
+        self.console:hide()
+    end)
 end
 
-function ConsolePopup:init(opts)
-    opts = vim.tbl_deep_extend("force", {
-        focusable = true,
-        border = {
-            padding = {
-                top = 1,
-                bottom = 1,
-                left = 3,
-                right = 3,
-            },
-            style = "rounded",
-        },
-    }, opts or {})
-
+function ConsolePopup:init(parent, opts)
     ConsolePopup.super.init(self, opts)
-    self:off({ "BufLeave", "WinLeave" })
+
+    self.console = parent
 end
 
 ---@type fun(opts: table): lc.ui.Console.Popup

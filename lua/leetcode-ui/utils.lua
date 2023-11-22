@@ -17,7 +17,7 @@ end
 
 ---@param layout lc-ui.Layout
 function utils.win_width(layout)
-    -- local winid = vim.api.nvimbufget
+    if not vim.api.nvim_win_is_valid(layout.winid) then return 0 end
     return vim.api.nvim_win_get_width(layout.winid)
 end
 
@@ -63,7 +63,7 @@ function utils.get_padding(lines, layout)
     end
 
     local position = opts.position
-    if position ~= "left" then
+    if position ~= "left" and vim.api.nvim_win_is_valid(layout.winid) then
         local max_len = utils.longest_line(lines)
         local win_width = utils.win_width(layout)
 

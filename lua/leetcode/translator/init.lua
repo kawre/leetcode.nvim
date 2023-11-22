@@ -94,14 +94,7 @@ local translate = {
 local function t(text)
     local keys = vim.tbl_map(function(key) return key:lower() end, vim.tbl_keys(translate))
 
-    if not vim.tbl_contains(keys, text:lower()) then
-        if config.debug then
-            local msg = ("Translation for `%s` not found"):format(text)
-            vim.notify(msg, vim.log.levels.DEBUG, { title = config.name })
-        end
-        return text
-    end
-
+    if not vim.tbl_contains(keys, text:lower()) then return text end
     return translate[text:lower()]
 end
 

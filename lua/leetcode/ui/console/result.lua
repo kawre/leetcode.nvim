@@ -12,7 +12,6 @@ local ResultPopup = ConsolePopup:extend("LeetResultPopup")
 
 ---@param item lc.interpreter_response
 function ResultPopup:handle(item)
-    self.layout:clear()
     self.border:set_highlight(item._.hl)
     self.layout:handle_res(item)
 
@@ -20,7 +19,7 @@ function ResultPopup:handle(item)
 
     if item._.submission then
         local status = item.status_code == 10 and "ac" or "notac"
-        problemlist.change_status(self.parent.parent.q.title_slug, status)
+        problemlist.change_status(self.console.parent.q.title_slug, status)
     end
 
     self:draw()
@@ -34,11 +33,13 @@ end
 
 function ResultPopup:draw() self.layout:draw() end
 
----@param parent lc.ui.ConsoleLayout
+---@param parent lc.ui.Console
 ---
 ---@return lc.ui.Console.ResultPopup
 function ResultPopup:init(parent)
-    ResultPopup.super.init(self, {
+    self.layout = ResultLayout(parent)
+
+    ResultPopup.super.init(self, parent, {
         border = {
             text = {
                 top = (" (L) %s "):format(t("Result")),
@@ -55,15 +56,9 @@ function ResultPopup:init(parent)
             winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder",
         },
     })
-
-    self.parent = parent
-    self.layout = ResultLayout(parent, {
-        winid = self.winid,
-        bufnr = self.bufnr,
-    })
 end
 
----@type fun(parent: lc.ui.ConsoleLayout): lc.ui.Console.ResultPopup
+---@type fun(parent: lc.ui.Console): lc.ui.Console.ResultPopup
 local LeetResultPopup = ResultPopup
 
 return LeetResultPopup

@@ -11,7 +11,7 @@ local Info = require("leetcode.ui.info")
 ---@field q lc.question_res
 ---@field description lc.ui.Description
 ---@field bufnr integer
----@field console lc.ui.ConsoleLayout
+---@field console lc.ui.Console
 ---@field lang string
 ---@field cache lc.cache.Question
 local Question = {}

@@ -15,7 +15,7 @@ local t = require("leetcode.translator")
 local log = require("leetcode.logger")
 
 ---@class lc.ResultLayout : lc-ui.Layout
----@field parent lc.ui.ConsoleLayout
+---@field parent lc.ui.Console
 ---@field group lc-ui.Group
 ---@field cases lc.Cases
 ---@field case lc.Result.Case
@@ -103,14 +103,13 @@ function ResultLayout:handle_submission_error(item) -- status code = 11
     local header = Header(item)
     self.group:insert(header)
 
-    self.case = Case({
+    self.group:insert(Case({ ---@diagnostic disable-line
         input = item.input_formatted,
         raw_input = item.last_testcase,
         output = item.code_output,
         expected = item.expected_output,
         std_output = item.std_output,
-    }, false)
-    self.group:insert(self.case)
+    }, false))
 end
 
 ---@private
@@ -242,17 +241,16 @@ function ResultLayout:handle_res(item)
         handlers["unknown"]()
     end
 
-    self:append(self.group)
+    self:replace({ self.group })
 end
 
 function ResultLayout:clear()
     if self.cases then self.cases:clear() end
     self.group:clear()
-    self.case = nil
     ResultLayout.super.clear(self)
 end
 
----@param parent lc.ui.ConsoleLayout
+---@param parent lc.ui.Console
 ---@param opts? lc-ui.Layout.opts
 function ResultLayout:init(parent, opts)
     ResultLayout.super.init(self, {}, opts or {})
@@ -261,7 +259,7 @@ function ResultLayout:init(parent, opts)
     self.group = Group({ spacing = 1 })
 end
 
----@type fun(parent: lc.ui.ConsoleLayout, opts?: lc-ui.Layout.opts): lc.ResultLayout
+---@type fun(parent: lc.ui.Console, opts?: lc-ui.Layout.opts): lc.ResultLayout
 local LeetResultLayout = ResultLayout
 
 return LeetResultLayout

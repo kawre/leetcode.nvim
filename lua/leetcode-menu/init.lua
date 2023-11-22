@@ -1,6 +1,6 @@
 local log = require("leetcode.logger")
 local Cookie = require("leetcode.cache.cookie")
-local utils = require("leetcode.utils")
+local utils = require("leetcode-menu.utils")
 local Layout = require("leetcode-ui.layout")
 
 ---@class lc-menu : lc-ui.Layout
@@ -114,49 +114,10 @@ function Menu:keymaps()
     vim.keymap.set("n", "<Tab>", press_fn, { buffer = self.bufnr })
 end
 
-function Menu:handle_mount()
-    if Cookie.get() then
-        self:set_page("loading")
-
-        local auth_api = require("leetcode.api.auth")
-        auth_api.user(function(_, err)
-            if err then
-                self:set_page("signin")
-                return log.err(err)
-            else
-                self:set_page("menu")
-            end
-        end)
-    else
-        self:set_page("signin")
-    end
-
-    return self:mount()
-end
-
-function Menu:mount()
-    self:keymaps()
-    self:autocmds()
-    self:draw()
-end
-
-function Menu:init()
-    self.cursor = {
-        idx = 1,
-        prev = nil,
-    }
-    self.maps = {}
-
-    Menu.super.init(self, {}, {
-        bufnr = vim.api.nvim_get_current_buf(),
-        winid = vim.api.nvim_get_current_win(),
-        position = "center",
-    })
-
+function Menu:apply_options()
     vim.api.nvim_buf_set_name(self.bufnr, "")
     pcall(vim.diagnostic.disable, self.bufnr)
 
-    local utils = require("leetcode-menu.utils")
     utils.set_buf_opts(self.bufnr, {
         modifiable = false,
         buflisted = false,
@@ -179,6 +140,48 @@ function Menu:init()
         spell = false,
         signcolumn = "no",
     })
+end
+
+function Menu:handle_mount()
+    if Cookie.get() then
+        self:set_page("loading")
+
+        local auth_api = require("leetcode.api.auth")
+        auth_api.user(function(_, err)
+            if err then
+                self:set_page("signin")
+                return log.err(err)
+            else
+                self:set_page("menu")
+            end
+        end)
+    else
+        self:set_page("signin")
+    end
+
+    return self:mount()
+end
+
+function Menu:mount()
+    self:apply_options()
+    self:keymaps()
+    self:autocmds()
+    self:draw()
+end
+
+function Menu:init()
+    Menu.super.init(self, {}, {
+        position = "center",
+    })
+
+    self.cursor = {
+        idx = 1,
+        prev = nil,
+    }
+    self.maps = {}
+
+    self.bufnr = vim.api.nvim_get_current_buf()
+    self.winid = vim.api.nvim_get_current_win()
 
     _Lc_Menu = self
     return self:handle_mount()

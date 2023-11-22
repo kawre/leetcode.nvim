@@ -23,8 +23,6 @@ local NuiSplit = require("nui.split")
 ---@field images table<string, Image>
 local Description = NuiSplit:extend("LeetDescription")
 
--- local DescriptionSplit = Layout:extend("LeetDescription")
-
 local group_id = vim.api.nvim_create_augroup("leetcode_description", { clear = true })
 
 function Description:autocmds()
@@ -42,9 +40,10 @@ end
 
 function Description:mount()
     self.visible = true
-    self:populate()
     Description.super.mount(self)
-    self.layout:set_opts({ winid = self.winid, bufnr = self.bufnr })
+    self.layout.winid = self.winid
+    self.layout.bufnr = self.bufnr
+    self:populate()
 
     local utils = require("leetcode-menu.utils")
     utils.set_buf_opts(self.bufnr, {
@@ -126,18 +125,18 @@ end
 function Description:populate()
     local q = self.parent.q
 
-    local group = Group({
+    local header = Group({
         position = "center",
     })
 
-    local header = Lines()
-
     header:append(self.parent.cache.link or "", "leetcode_alt")
-    header:endl():endl()
+    header:endgrp()
+
+    header:insert(Padding(1))
 
     header:append(q.frontend_id .. ". ", "leetcode_normal")
     header:append(utils.translate(q.title, q.translated_title))
-    header:endl()
+    header:endgrp()
 
     header:append(
         t(q.difficulty),
@@ -159,18 +158,15 @@ function Description:populate()
         header:append(" | ")
         header:append("󰛨 " .. t("Hints"), "leetcode_hint")
     end
-    header:endl()
+    header:endgrp()
 
-    group:insert(header)
     local contents = parser:parse(utils.translate(q.content, q.translated_content))
 
-    local layout = Layout({
-        group,
+    self.layout:replace({
+        header,
         Padding(3),
         contents,
     })
-
-    self.layout:set(layout)
 end
 
 ---@param parent lc.ui.Question
@@ -185,8 +181,11 @@ function Description:init(parent)
 
     self.parent = parent
     self.visible = false
-    self.layout = Layout()
     self.images = {}
+
+    self.layout = Layout()
+
+    self:map("n", { "q", "<Esc>" }, function() self:toggle() end)
 end
 
 ---@type fun(parent: lc.ui.Question): lc.ui.Description
