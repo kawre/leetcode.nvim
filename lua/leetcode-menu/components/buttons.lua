@@ -16,12 +16,13 @@ function Buttons:init(buttons, opts)
 
     Buttons.super.init(self, opts)
 
-    for _, btn in ipairs(buttons) do
-        self:insert(btn)
+    for _, button in ipairs(buttons or {}) do
+        -- button:set_opts(opts)
+        self:insert(button)
     end
 end
 
----@type fun(buttons: lc-ui.Button[], opts?: table): lc-menu.Buttons
+---@type fun(buttons?: lc-ui.Button[], opts?: table): lc-menu.Buttons
 local LeetButtons = Buttons
 
 return LeetButtons

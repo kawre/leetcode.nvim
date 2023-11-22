@@ -26,10 +26,12 @@ local function create_pad(int)
 end
 
 ---@param layout lc-ui.Layout
-function Lines:draw(layout)
+function Lines:draw(layout, opts)
     local lines = vim.deepcopy(self:contents())
 
-    local padding = self._.opts.padding
+    opts = vim.tbl_deep_extend("force", self._.opts, opts or {})
+
+    local padding = opts.padding
 
     local toppad = padding and padding.top
     if toppad then lines = vim.list_extend(create_pad(toppad), lines) end
@@ -37,14 +39,14 @@ function Lines:draw(layout)
     local botpad = padding and padding.bot
     if botpad then lines = vim.list_extend(lines, create_pad(botpad)) end
 
-    local leftpad = utils.get_padding(self, layout)
+    local cpy = vim.deepcopy(self)
+    cpy._.opts = opts
+
+    local leftpad = utils.get_padding(cpy, layout)
+    opts.padding.left = leftpad:len()
 
     for _, line in pairs(lines) do
-        line:draw(layout, {
-            padding = {
-                left = leftpad:len(),
-            },
-        })
+        line:draw(layout, opts)
     end
 end
 
@@ -92,10 +94,16 @@ function Lines:from(contents)
 end
 
 function Lines:init(opts)
+    local options = vim.tbl_deep_extend("force", {
+        padding = {},
+        position = "left",
+    }, opts or {})
+
     self._ = {
-        opts = opts or {},
+        opts = options,
         line_idx = 1,
     }
+
     self:clear()
 end
 

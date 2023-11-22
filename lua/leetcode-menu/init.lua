@@ -91,12 +91,12 @@ end
 function Menu:set(name)
     self:cursor_reset()
 
-    local ok, layout = pcall(require, "leetcode-menu.layout." .. name)
+    local ok, page = pcall(require, "leetcode-menu.page." .. name)
     if ok then
-        Menu.super.set(self, layout)
+        Menu.super.set(self, page)
         self:draw()
     else
-        log.error(layout)
+        log.error(page)
     end
 
     return self

@@ -61,7 +61,7 @@ end
 
 function ConsoleLayout:use_testcase()
     local last_testcase = self.result.last_testcase
-    if last_testcase then
+    if last_testcase and last_testcase ~= "" then
         self.testcase:append(last_testcase)
     else
         log.warn("No testcase to use")

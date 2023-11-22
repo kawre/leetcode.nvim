@@ -1,13 +1,12 @@
 local cmd = require("leetcode.command")
-local Line = require("leetcode-ui.line")
 
 local Title = require("leetcode-menu.components.title")
 local Footer = require("leetcode-menu.components.footer")
 local Header = require("leetcode-menu.components.header")
 
-local Button = require("leetcode-ui.group.button")
+local Button = require("leetcode-ui.lines.button")
 local Buttons = require("leetcode-menu.components.buttons")
-local Layout = require("leetcode-ui.layout")
+local Page = require("leetcode-menu.page")
 
 local list_btn = Button({ src = "List", icon = "" }, "p", cmd.problems)
 
@@ -17,7 +16,7 @@ local qot_btn = Button({ src = "Daily", icon = "󰃭" }, "d", cmd.qot)
 
 local back_btn = Button({ src = "Back", icon = "" }, "q", function() cmd.menu_layout("menu") end)
 
-return Layout({
+return Page({
     -- header
     Header(),
 
@@ -29,7 +28,6 @@ return Layout({
         list_btn,
         random_btn,
         qot_btn,
-        -- lang_btn,
         back_btn,
     }),
 

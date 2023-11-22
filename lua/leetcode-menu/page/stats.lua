@@ -1,20 +1,21 @@
-local cmd = require("leetcode.command")
 local Solved = require("leetcode-menu.components.solved")
 local Calendar = require("leetcode-menu.components.calendar")
 local Group = require("leetcode-ui.group")
 local Footer = require("leetcode-menu.components.footer")
+local Page = require("leetcode-menu.page")
+local Buttons = require("leetcode-menu.components.buttons")
+local Button = require("leetcode-ui.lines.button")
+local Title = require("leetcode-menu.components.title")
+
+local cmd = require("leetcode.command")
 local config = require("leetcode.config")
 
-local Layout = require("leetcode-ui.layout")
-
-local Buttons = require("leetcode-menu.components.buttons")
-local Button = require("leetcode-ui.group.button")
-local Title = require("leetcode-menu.components.title")
+local page = Page()
 
 local calendar = Calendar()
 local solved = Solved()
 
-local group = Group({
+local header = Group({
     spacing = 2,
     margin = {
         top = 4,
@@ -22,29 +23,29 @@ local group = Group({
     },
 })
 
-group:insert(solved)
-group:insert(calendar)
+header:insert(solved)
+header:insert(calendar)
 
-local skills = not config.is_cn and Button({ icon = "", src = "Skills" }, "s", cmd.ui_skills)
-    or nil
+page:insert(header)
+
+page:insert(Title({ "Menu" }, "Statistics"))
+
+local buttons = Buttons()
+
+local skills = Button({ icon = "", src = "Skills" }, "s", cmd.ui_skills)
+if not config.is_cn then buttons:insert(skills) end
 
 local languages = Button({ icon = "", src = "Languages" }, "l", cmd.ui_languages)
+buttons:insert(languages)
 
 local update = Button({ icon = "", src = "Update" }, "u", function() calendar:update() end)
+buttons:insert(update)
 
 local back = Button({ icon = "", src = "Back" }, "q", function() cmd.menu_layout("menu") end)
+buttons:insert(back)
 
-return Layout({
-    group,
+page:insert(buttons)
 
-    Title({ "Menu" }, "Statistics"),
+page:insert(Footer())
 
-    Buttons({
-        skills,
-        languages,
-        update,
-        back,
-    }),
-
-    Footer(),
-})
+return page

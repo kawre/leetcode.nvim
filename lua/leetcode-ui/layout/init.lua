@@ -18,14 +18,14 @@ local log = require("leetcode.logger")
 local Layout = Object("LeetLayout")
 
 function Layout:draw()
-    local c_ok, c = pcall(vim.api.nvim_win_get_cursor, self._.opts.winid)
+    log.info(self._.opts)
+    local opts = self._.opts
+    local c_ok, c = pcall(vim.api.nvim_win_get_cursor, opts.winid)
 
     self._.buttons = {}
     self._.line_idx = 1
 
-    local opts = self._.opts
-
-    local padding = self._.opts.padding
+    local padding = opts.padding
     local items = self._.items
 
     local toppad = padding and padding.top
@@ -39,7 +39,7 @@ function Layout:draw()
         vim.api.nvim_buf_clear_namespace(opts.bufnr, -1, 0, -1)
 
         for _, item in pairs(items) do
-            item:draw(self)
+            item:draw(self, opts)
         end
     end)
 
@@ -77,7 +77,11 @@ function Layout:handle_press(line)
     if self._.buttons[line] then self._.buttons[line]:press() end
 end
 
-function Layout:set_opts(opts) self._.opts = vim.tbl_deep_extend("force", self._.opts, opts) end
+function Layout:set_opts(opts)
+    log.info(self._.opts)
+    self._.opts = vim.tbl_deep_extend("force", self._.opts, opts or {})
+    log.info(self._.opts)
+end
 
 -- ---@param line integer
 -- ---@param fn function
@@ -102,20 +106,20 @@ function Layout:set(layout) self._.items = layout._.items end
 ---@param components lc-ui.Lines[]
 ---@param opts? lc-ui.Layout.opts
 function Layout:init(components, opts)
-    opts = vim.tbl_deep_extend("force", {
-        bufnr = 0,
-        winid = 0,
-    }, opts or {})
+    local options = vim.tbl_deep_extend("force", {}, opts or {})
+
+    self.bufnr = 0
+    self.winid = 0
 
     self._ = {
         items = components or {},
         line_idx = 1,
         buttons = {},
-        opts = opts,
+        opts = options,
     }
 end
 
----@type fun(components?: lc-ui.Lines[], opts?: lc-ui.Layout.opts): lc-ui.Layout
+---@type fun(components?: table[], opts?: lc-ui.Layout.opts): lc-ui.Layout
 local LeetLayout = Layout
 
 return LeetLayout

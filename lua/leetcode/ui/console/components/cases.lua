@@ -20,7 +20,7 @@ function Cases:clear()
 end
 
 function Cases:make_nav()
-    local nav = Lines({ padding = { top = 1, bot = 0 } })
+    local nav = Lines({ padding = { top = 1 } })
 
     for i, case in ipairs(self.cases) do
         self.keymaps[tostring(i)] = function() self:change(i) end

@@ -47,37 +47,33 @@ end
 ---
 ---@return string
 function utils.get_padding(lines, layout)
-    local position = layout._.opts.position or lines._.opts.position
+    local opts = lines._.opts
     local padding = ""
 
-    if layout._.opts.padding then
-        if type(layout._.opts.padding.left) == "string" then
-            padding = layout._.opts.padding.left --[[@as string]]
-        elseif type(layout._.opts.padding.left) == "number" then
-            padding = string.rep(" ", layout._.opts.padding.left --[[@as integer]])
-        end
-    end
-    --
-    -- if lines._.opts.padding then
-    --     if type(lines._.opts.padding.left) == "string" then
-    --         padding = padding .. layout._.opts.padding.left --[[@as string]]
-    --     elseif type(lines._.opts.padding.left) == "number" then
-    --         padding = padding .. string.rep(" ", lines._.opts.padding.left --[[@as integer]])
-    --     end
+    -- if type(opts.padding.left) == "string" then
+    --     padding = opts.padding.left
+    -- elseif type(opts.padding.left) == "number" then
+    --     padding = (" "):rep(opts.padding.left)
     -- end
 
+    if type(opts.padding.left) == "string" then
+        padding = padding .. opts.padding.left
+    elseif type(opts.padding.left) == "number" then
+        padding = padding .. (" "):rep(opts.padding.left)
+    end
+
+    local position = opts.position
     if position ~= "left" then
         local max_len = utils.longest_line(lines)
+        local win_width = utils.win_width(layout)
 
         if position == "center" then
-            local width = utils.win_width(layout)
-            local mid = (width - max_len) / 2
-            local spaces = string.rep(" ", mid)
+            local mid = (win_width - max_len) / 2
+            local spaces = (" "):rep(mid)
             padding = spaces
         elseif position == "right" then
-            local width = utils.win_width(layout)
-            local mid = width - max_len - 1
-            local spaces = string.rep(" ", mid)
+            local mid = win_width - max_len - 1
+            local spaces = (" "):rep(mid)
             padding = spaces
         end
     end

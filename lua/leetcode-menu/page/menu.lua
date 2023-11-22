@@ -1,10 +1,10 @@
-local log = require("leetcode.logger")
-local Layout = require("leetcode-ui.layout")
+local Page = require("leetcode-menu.page")
 local Title = require("leetcode-menu.components.title")
-local cmd = require("leetcode.command")
 local Buttons = require("leetcode-menu.components.buttons")
+local Button = require("leetcode-ui.lines.button")
 
-local Button = require("leetcode-ui.group.button")
+local cmd = require("leetcode.command")
+local log = require("leetcode.logger")
 
 local problems = Button(
     { icon = "", src = "Problems" },
@@ -39,7 +39,7 @@ local exit = Button({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
 local Header = require("leetcode-menu.components.header")
 local Footer = require("leetcode-menu.components.footer")
 
-return Layout({
+return Page({
     Header(),
 
     Title({}, "Menu"),

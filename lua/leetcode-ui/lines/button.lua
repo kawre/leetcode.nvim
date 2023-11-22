@@ -9,17 +9,17 @@ local Button = Lines:extend("LeetButton")
 ---@field icon string
 ---@field src string
 
-function Button:draw(layout)
+function Button:draw(layout, opts)
     layout._.buttons[layout._.line_idx] = self
-    Button.super.draw(self, layout)
+    Button.super.draw(self, layout, opts)
 end
 
 function Button:press() self._.opts.on_press() end
 
 ---@param text lc-ui.Button.text
----@param sc string|nil
----@param on_press function? optional
----@param expandable boolean? optional
+---@param sc? string
+---@param on_press? function
+---@param expandable? boolean
 function Button:init(text, sc, on_press, expandable)
     text.src = t(text.src)
     local opts = {
@@ -43,10 +43,10 @@ function Button:init(text, sc, on_press, expandable)
     local padding = string.rep(" ", width - len)
 
     self:append(padding)
-    self:append(sc, "leetcode_info"):endl()
+    self:append(sc, "leetcode_info")
 end
 
----@type fun(): lc-ui.Button
+---@type fun(text: lc-ui.Button.text, sc?: string, on_press?: function, expandable?: boolean): lc-ui.Button
 local LeetButton = Button
 
 return LeetButton

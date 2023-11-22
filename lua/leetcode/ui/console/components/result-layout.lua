@@ -100,8 +100,6 @@ end
 ---
 ---@param item lc.submission
 function ResultLayout:handle_submission_error(item) -- status code = 11
-    self.group:set_opts({ spacing = 2 })
-
     local header = Header(item)
     self.group:insert(header)
 
@@ -131,14 +129,13 @@ function ResultLayout:handle_limit_exceeded(item) -- status code = 12,13,14
 
         local last_exec = Pre(pre_header, { last_testcase })
 
-        self.group:append(last_exec)
-        -- self.group:endgrp()
+        self.group:insert(last_exec)
 
         local stdout = Stdout(item.std_output or "")
-        if stdout then self.group:append(stdout) end
+        self.group:insert(stdout)
     elseif item.std_output_list then
         local stdout = Stdout(item.std_output_list[#item.std_output_list])
-        if stdout then self.group:append(stdout) end
+        self.group:insert(stdout)
     end
 end
 
@@ -152,7 +149,7 @@ function ResultLayout:handle_runtime_error(item) -- status code = 15
     for line in vim.gsplit(item.full_runtime_error, "\n") do
         table.insert(tbl, Line():append(line, "leetcode_error"))
     end
-    self.group:append(Pre(header._.lines[1], tbl))
+    self.group:insert(Pre(header._.lines[1], tbl))
 
     if item._.submission then
         local pre_header = Line()
@@ -162,13 +159,13 @@ function ResultLayout:handle_runtime_error(item) -- status code = 15
         last_testcase:append(item.last_testcase:gsub("\n", " "), "leetcode_indent")
 
         local last_exec = Pre(pre_header, { last_testcase })
-        self.group:append(last_exec)
+        self.group:insert(last_exec)
 
         local stdout = Stdout(item.std_output or "")
-        if stdout then self.group:append(stdout) end
+        self.group:insert(stdout)
     elseif item.std_output_list then
         local stdout = Stdout(item.std_output_list[#item.std_output_list])
-        if stdout then self.group:append(stdout) end
+        self.group:insert(stdout)
     end
 end
 

@@ -1,14 +1,14 @@
-local Layout = require("leetcode-ui.layout")
+local Page = require("leetcode-menu.page")
 local Title = require("leetcode-menu.components.title")
 local cmd = require("leetcode.command")
 local Buttons = require("leetcode-menu.components.buttons")
 
-local button = require("leetcode-ui.group.button")
+local Button = require("leetcode-ui.lines.button")
 
 local problems =
-    button({ icon = "󱛖", src = "Sign in (By Cookie)" }, "s", cmd.cookie_prompt, false)
+    Button({ icon = "󱛖", src = "Sign in (By Cookie)" }, "s", cmd.cookie_prompt, false)
 
-local exit = button({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
+local exit = Button({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
 
 local buttons = Buttons({
     problems,
@@ -18,7 +18,7 @@ local buttons = Buttons({
 local Header = require("leetcode-menu.components.header")
 local Footer = require("leetcode-menu.components.footer")
 
-return Layout({
+return Page({
     Header(),
 
     Title({}, "Sign in"),
@@ -26,6 +26,4 @@ return Layout({
     buttons,
 
     Footer(),
-}, {
-    margin = 5,
 })
