@@ -1,5 +1,5 @@
-local Lines = require("leetcode-ui.component.text")
-local Line = require("leetcode-ui.component.line")
+local Lines = require("leetcode-ui.lines")
+local Line = require("leetcode-ui.line")
 local utils = require("leetcode.api.utils")
 local statistics = require("leetcode.api.statistics")
 local t = require("leetcode.translator")
@@ -33,8 +33,7 @@ end
 
 ---@param res lc.Stats.Res
 function Solved:handle_res(res)
-    self.stats = res
-    self.solved_lines = {}
+    self:clear()
 
     local subs = {}
 
@@ -42,7 +41,7 @@ function Solved:handle_res(res)
     for _, stat in ipairs(res.submit_stats.acSubmissionNum) do
         local total_count = vim.tbl_filter(
             function(c) return c.difficulty == stat.difficulty end,
-            self.stats.questions_count
+            res.questions_count
         )[1].count
 
         local solved_line = Line()
@@ -67,24 +66,29 @@ function Solved:handle_res(res)
         local stat = subs[diff]
         local diff_str = t(diff)
 
-        local line = Line()
-        line:append(diff_str, hl[diff])
+        self:append(diff_str, hl[diff])
 
         local pad1 = (" "):rep(pad_len + 2 - vim.api.nvim_strwidth(diff_str))
-        line:append(pad1)
+        self:append(pad1)
 
-        line:append(stat.line)
+        self:append(stat.line)
 
         local pad2 = (" "):rep(max_count_len + 2 - stat.line:content():len())
-        line:append(pad2)
+        self:append(pad2)
 
-        line:append(self:progress_bar(50, stat.solved, stat.total_count, diff))
+        self:append(self:progress_bar(50, stat.solved, stat.total_count, diff))
 
-        table.insert(self.solved_lines, line)
+        self:endl()
     end
 
-    self.lines = self.solved_lines
     _Lc_Menu:draw()
+end
+
+function Solved:fetch()
+    statistics.solved(function(res, err)
+        if err then return log.err(err) end
+        self:handle_res(res)
+    end)
 end
 
 function Solved:init()
@@ -96,11 +100,7 @@ function Solved:init()
     Solved.super.init(self, opts)
 
     self:append(t("Loading..."))
-
-    statistics.solved(function(res, err)
-        if err then log.err(err) end
-        self:handle_res(res)
-    end)
+    self:fetch()
 end
 
 ---@type fun(): lc-menu.Solved

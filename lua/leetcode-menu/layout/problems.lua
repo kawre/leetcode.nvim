@@ -1,11 +1,11 @@
 local cmd = require("leetcode.command")
-local Line = require("leetcode-ui.component.line")
+local Line = require("leetcode-ui.line")
 
 local Title = require("leetcode-menu.components.title")
 local Footer = require("leetcode-menu.components.footer")
 local Header = require("leetcode-menu.components.header")
 
-local Button = require("leetcode-ui.component.button")
+local Button = require("leetcode-ui.group.button")
 local Buttons = require("leetcode-menu.components.buttons")
 local Layout = require("leetcode-ui.layout")
 

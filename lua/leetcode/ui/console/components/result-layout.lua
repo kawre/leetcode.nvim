@@ -3,11 +3,11 @@ local Header = require("leetcode.ui.console.components.header")
 
 local Layout = require("leetcode-ui.layout")
 local Pre = require("leetcode.ui.console.components.pre")
-local Group = require("leetcode-ui.component.group")
+local Group = require("leetcode-ui.group")
 local Stdout = require("leetcode.ui.console.components.stdout")
 local Case = require("leetcode.ui.console.components.case")
 
-local Line = require("leetcode-ui.component.line")
+local Line = require("leetcode-ui.line")
 local NuiText = require("nui.text")
 
 local config = require("leetcode.config")

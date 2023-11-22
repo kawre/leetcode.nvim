@@ -3,7 +3,7 @@ local Title = require("leetcode-menu.components.title")
 local cmd = require("leetcode.command")
 local Buttons = require("leetcode-menu.components.buttons")
 
-local button = require("leetcode-ui.component.button")
+local button = require("leetcode-ui.group.button")
 
 local problems =
     button({ icon = "󱛖", src = "Sign in (By Cookie)" }, "s", cmd.cookie_prompt, false)

@@ -1,7 +1,7 @@
 local Popup = require("leetcode.ui.popup")
-local Line = require("leetcode-ui.component.line")
-local Group = require("leetcode-ui.component.group")
-local Text = require("leetcode-ui.component.text")
+local Line = require("leetcode-ui.line")
+local Group = require("leetcode-ui.group")
+local Lines = require("leetcode-ui.lines")
 local config = require("leetcode.config")
 local t = require("leetcode.translator")
 
@@ -16,7 +16,7 @@ local log = require("leetcode.logger")
 local Languages = Popup:extend("LeetLanguages")
 
 function Languages:handle(lang)
-    local lines = Text()
+    local lines = Lines()
 
     lines:append(lang.lang, "leetcode_code")
     lines:append(" - ", "leetcode_list")
@@ -28,38 +28,35 @@ function Languages:handle(lang)
         lines:append(" problems solved", "leetcode_alt")
     end
 
-    text:append(line)
-    return text
+    return lines
 end
 
 ---@private
 ---@param res lc.Languages.Res
 function Languages:populate(res)
-    local group = Group:init({}, { spacing = 2 })
+    local group = Group({ spacing = 1 })
 
     table.sort(res, function(a, b) return a.problems_solved > b.problems_solved end)
     for _, lang in ipairs(res) do
-        group:append(self:handle(lang))
+        group:insert(self:handle(lang))
     end
 
     self.layout:append(group)
 end
 
-function Languages:show()
-    if not self._.mounted then
-        local spinner = Spinner:init("fetching user languages", "dot")
-        stats_api.languages(function(res, err)
-            if err then
-                spinner:stop(err.msg, false)
-            else
-                self:populate(res)
-                spinner:stop(nil, true, { timeout = 200 })
-                self.layout:draw(self)
-            end
-        end)
-    end
+function Languages:mount()
+    local spinner = Spinner:init("fetching user languages", "dot")
+    stats_api.languages(function(res, err)
+        if err then
+            spinner:stop(err.msg, false)
+        else
+            self:populate(res)
+            spinner:stop(nil, true, { timeout = 500 })
+            self.layout:draw(self)
+        end
+    end)
 
-    Languages.super.show(self)
+    Languages.super.mount(self)
 end
 
 function Languages:init()

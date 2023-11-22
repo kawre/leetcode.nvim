@@ -1,6 +1,6 @@
 local Pre = require("leetcode.ui.console.components.pre")
 local t = require("leetcode.translator")
-local Line = require("leetcode-ui.component.line")
+local Line = require("leetcode-ui.line")
 
 ---@class lc.Stdout : lc.Result.Pre
 local Stdout = Pre:extend("LeetStdout")
@@ -12,6 +12,7 @@ function Stdout:init(output)
     local output_list = vim.split(output or "", "\n", { trimempty = true })
     if vim.tbl_isempty(output_list) then
         Stdout.super.init(self, nil, {})
+        self:clear()
         return
     end
 

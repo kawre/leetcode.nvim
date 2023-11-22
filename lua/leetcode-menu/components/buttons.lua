@@ -1,4 +1,4 @@
-local Group = require("leetcode-ui.component.group")
+local Group = require("leetcode-ui.group")
 local log = require("leetcode.logger")
 
 ---@class lc-menu.Buttons : lc-ui.Group

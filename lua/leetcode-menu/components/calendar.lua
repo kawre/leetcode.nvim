@@ -1,10 +1,10 @@
 local config = require("leetcode.config")
 local Spinner = require("leetcode.logger.spinner")
-local Lines = require("leetcode-ui.component.text")
+local Lines = require("leetcode-ui.lines")
 local statistics = require("leetcode.api.statistics")
 local t = require("leetcode.translator")
 
-local Line = require("leetcode-ui.component.line")
+local Line = require("leetcode-ui.line")
 local NuiText = require("nui.text")
 
 local log = require("leetcode.logger")
@@ -38,6 +38,7 @@ end
 
 ---@param res { calendar: lc.Stats.CalendarData }
 function Calendar:handle_res(res)
+    self:clear()
     self.calendar = res.calendar
 
     local time = os.date("*t") --[[@as table]]
@@ -77,7 +78,11 @@ function Calendar:handle_res(res)
 
     self:handle_months()
     self:handle_submissions()
-    self.lines = self.calendar_lines
+
+    for _, line in ipairs(self.calendar_lines) do
+        self:append(line):endl()
+    end
+
     _Lc_Menu:draw()
 end
 

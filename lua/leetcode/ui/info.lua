@@ -1,6 +1,6 @@
 local Popup = require("leetcode.ui.popup")
 local NuiText = require("nui.text")
-local Line = require("leetcode-ui.component.line")
+local Line = require("leetcode-ui.line")
 local config = require("leetcode.config")
 local utils = require("leetcode.utils")
 

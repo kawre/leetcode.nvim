@@ -1,10 +1,8 @@
-local log = require("leetcode.logger")
-local Text = require("leetcode-ui.component.text")
-local Group = require("leetcode-ui.component.group")
-
 local NuiText = require("nui.text")
-local Line = require("leetcode-ui.component.line")
-local Lines = require("leetcode-ui.component.text")
+local Line = require("leetcode-ui.line")
+local Lines = require("leetcode-ui.lines")
+
+local log = require("leetcode.logger")
 
 ---@class lc.Result.Pre : lc-ui.Lines
 local Pre = Lines:extend("LeetPre")

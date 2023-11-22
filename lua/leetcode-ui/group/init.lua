@@ -1,7 +1,7 @@
-local Pad = require("leetcode-ui.component.padding")
+local Pad = require("leetcode-ui.lines.padding")
 local Object = require("nui.object")
-local Lines = require("leetcode-ui.component.text")
-local Line = require("leetcode-ui.component.line")
+local Lines = require("leetcode-ui.lines")
+local Line = require("leetcode-ui.line")
 local log = require("leetcode.logger")
 
 ---@alias params { items: lc-ui.Lines[], opts: lc-ui.Group.opts }
@@ -34,7 +34,6 @@ function Group:draw(layout)
 
     local items = self:contents()
     for i, item in ipairs(items) do
-        log.debug(item.class.name)
         item:set_opts(opts)
         item:draw(layout)
         if i ~= #items then Pad(opts.spacing):draw(layout) end

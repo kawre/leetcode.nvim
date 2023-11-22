@@ -4,7 +4,7 @@ local Title = require("leetcode-menu.components.title")
 local cmd = require("leetcode.command")
 local Buttons = require("leetcode-menu.components.buttons")
 
-local Button = require("leetcode-ui.component.button")
+local Button = require("leetcode-ui.group.button")
 
 local problems = Button(
     { icon = "", src = "Problems" },

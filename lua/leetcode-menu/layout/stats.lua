@@ -1,14 +1,14 @@
 local cmd = require("leetcode.command")
 local Solved = require("leetcode-menu.components.solved")
 local Calendar = require("leetcode-menu.components.calendar")
-local Group = require("leetcode-ui.component.group")
+local Group = require("leetcode-ui.group")
 local Footer = require("leetcode-menu.components.footer")
 local config = require("leetcode.config")
 
 local Layout = require("leetcode-ui.layout")
 
 local Buttons = require("leetcode-menu.components.buttons")
-local Button = require("leetcode-ui.component.button")
+local Button = require("leetcode-ui.group.button")
 local Title = require("leetcode-menu.components.title")
 
 local calendar = Calendar()
@@ -16,14 +16,14 @@ local solved = Solved()
 
 local group = Group({
     spacing = 2,
-    padding = {
+    margin = {
         top = 4,
         bot = 2,
     },
 })
 
-group:append(calendar)
-group:append(solved)
+group:insert(solved)
+group:insert(calendar)
 
 local skills = not config.is_cn and Button({ icon = "", src = "Skills" }, "s", cmd.ui_skills)
     or nil

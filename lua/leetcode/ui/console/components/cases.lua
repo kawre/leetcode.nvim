@@ -1,6 +1,6 @@
-local Group = require("leetcode-ui.component.group")
-local Lines = require("leetcode-ui.component.text")
-local Line = require("leetcode-ui.component.line")
+local Group = require("leetcode-ui.group")
+local Lines = require("leetcode-ui.lines")
+local Line = require("leetcode-ui.line")
 local Case = require("leetcode.ui.console.components.case")
 
 local log = require("leetcode.logger")

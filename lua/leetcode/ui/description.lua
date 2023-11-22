@@ -9,9 +9,9 @@ local parser = require("leetcode.parser")
 local t = require("leetcode.translator")
 
 local Layout = require("leetcode-ui.layout")
-local Group = require("leetcode-ui.component.group")
-local Lines = require("leetcode-ui.component.text")
-local Padding = require("leetcode-ui.component.padding")
+local Group = require("leetcode-ui.group")
+local Lines = require("leetcode-ui.lines")
+local Padding = require("leetcode-ui.lines.padding")
 
 local NuiSplit = require("nui.split")
 

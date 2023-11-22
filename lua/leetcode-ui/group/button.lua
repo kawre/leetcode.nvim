@@ -1,4 +1,4 @@
-local Lines = require("leetcode-ui.component.text")
+local Lines = require("leetcode-ui.lines")
 local t = require("leetcode.translator")
 local log = require("leetcode.logger")
 

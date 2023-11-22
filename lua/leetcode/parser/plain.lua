@@ -1,5 +1,5 @@
-local Text = require("leetcode-ui.component.text")
-local Line = require("leetcode-ui.component.line")
+local Text = require("leetcode-ui.lines")
+local Line = require("leetcode-ui.line")
 local utils = require("leetcode.parser.utils")
 
 ---@class lc.Parser.Plain

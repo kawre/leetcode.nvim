@@ -3,9 +3,9 @@ local t = require("leetcode.translator")
 
 local Pre = require("leetcode.ui.console.components.pre")
 local Stdout = require("leetcode.ui.console.components.stdout")
-local Group = require("leetcode-ui.component.group")
+local Group = require("leetcode-ui.group")
 
-local Line = require("leetcode-ui.component.line")
+local Line = require("leetcode-ui.line")
 
 ---@alias case_body { input: string, raw_input: string, output: string, expected: string, std_output: string }
 

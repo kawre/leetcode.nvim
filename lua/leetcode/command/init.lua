@@ -147,7 +147,7 @@ function cmd.random_question()
 end
 
 function cmd.menu()
-    local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, _Lc_Menu.winid)
+    local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, _Lc_Menu._.opts.winid)
     if ok then vim.api.nvim_set_current_tabpage(tabp) end
 end
 

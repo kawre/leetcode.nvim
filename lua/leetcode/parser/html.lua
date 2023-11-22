@@ -3,13 +3,13 @@
 ---TODO: https://leetcode.com/problems/make-array-empty/
 ---TODO: 190
 
-local Lines = require("leetcode-ui.component.text")
+local Lines = require("leetcode-ui.lines")
 local utils = require("leetcode.parser.utils")
 local log = require("leetcode.logger")
 
 local NuiText = require("nui.text")
-local Padding = require("leetcode-ui.component.padding")
-local Line = require("leetcode-ui.component.line")
+local Padding = require("leetcode-ui.lines.padding")
+local Line = require("leetcode-ui.line")
 
 ---@class lc.Parser.Html
 ---@field str string

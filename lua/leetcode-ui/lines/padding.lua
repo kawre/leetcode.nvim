@@ -1,4 +1,4 @@
-local Lines = require("leetcode-ui.component.text")
+local Lines = require("leetcode-ui.lines")
 
 ---@class lc-ui.Padding: lc-ui.Lines
 ---@field times integer

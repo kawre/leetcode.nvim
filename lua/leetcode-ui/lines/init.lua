@@ -1,6 +1,5 @@
 local Object = require("nui.object")
-local Line = require("leetcode-ui.component.line")
--- local Pad = require("leetcode-ui.component.padding")
+local Line = require("leetcode-ui.line")
 local utils = require("leetcode-ui.utils")
 local log = require("leetcode.logger")
 
@@ -11,7 +10,6 @@ local log = require("leetcode.logger")
 local Lines = Object("LeetLines")
 
 function Lines:set_opts(opts) --
-    log.debug(self.class.name)
     self._.opts = vim.tbl_deep_extend("force", self._.opts, opts or {})
 end
 

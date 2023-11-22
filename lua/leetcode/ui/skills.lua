@@ -1,7 +1,6 @@
 local Popup = require("leetcode.ui.popup")
-local Line = require("leetcode-ui.component.line")
-local Group = require("leetcode-ui.component.group")
-local Text = require("leetcode-ui.component.text")
+local Group = require("leetcode-ui.group")
+local Lines = require("leetcode-ui.lines")
 
 local stats_api = require("leetcode.api.statistics")
 local Spinner = require("leetcode.logger.spinner")
@@ -20,14 +19,14 @@ local hl = {
 }
 
 function Skills:handle(name, skills)
-    local lines = Text()
+    local lines = Lines()
 
     table.sort(skills, function(a, b) return a.problems_solved > b.problems_solved end)
     lines:append("󱓻", hl[name])
     lines:append(" " .. name)
 
     for _, skill in ipairs(skills) do
-        lines:new_line()
+        lines:endl()
         lines:append(skill.tag, "leetcode_code")
         lines:append((" x%d"):format(skill.problems_solved), "leetcode_alt")
     end
@@ -38,14 +37,29 @@ end
 ---@private
 ---@param res lc.Skills.Res
 function Skills:populate(res)
-    local group = Group:init({}, { spacing = 2 })
+    local group = Group({ spacing = 1 })
 
     local order = { "advanced", "intermediate", "fundamental" }
     for _, key in ipairs(order) do
-        group:append(self:handle(key, res[key]))
+        group:insert(self:handle(key, res[key]))
     end
 
-    self.layout:append(group)
+    self.layout:insert(group)
+end
+
+function Skills:mount()
+    local spinner = Spinner:init("fetching user skills", "dot")
+    stats_api.skills(function(res, err)
+        if err then
+            spinner:stop(err.msg, false)
+        else
+            self:populate(res)
+            spinner:stop(nil, true, { timeout = 200 })
+            self.layout:draw(self)
+        end
+    end)
+
+    Skills.super.mount(self)
 end
 
 function Skills:init()
@@ -78,23 +92,6 @@ function Skills:init()
     })
 
     self.layout = Layout()
-end
-
-function Skills:show()
-    if not self._.mounted then
-        local spinner = Spinner:init("fetching user skills", "dot")
-        stats_api.skills(function(res, err)
-            if err then
-                spinner:stop(err.msg, false)
-            else
-                self:populate(res)
-                spinner:stop(nil, true, { timeout = 200 })
-                self.layout:draw(self)
-            end
-        end)
-    end
-
-    Skills.super.show(self)
 end
 
 return Skills()

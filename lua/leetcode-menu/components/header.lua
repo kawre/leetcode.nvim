@@ -1,4 +1,4 @@
-local Lines = require("leetcode-ui.component.text")
+local Lines = require("leetcode-ui.lines")
 
 ---@class lc-menu.Header : lc-ui.Lines
 local Header = Lines:extend("LeetMenuHeader")

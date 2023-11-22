@@ -1,4 +1,4 @@
-local Padding = require("leetcode-ui.component.padding")
+local Padding = require("leetcode-ui.lines.padding")
 local Object = require("nui.object")
 
 local log = require("leetcode.logger")
@@ -87,6 +87,12 @@ function Layout:set_opts(opts) self._.opts = vim.tbl_deep_extend("force", self._
 ---@param content lc-ui.Lines
 function Layout:append(content)
     table.insert(self._.items, content)
+    return self
+end
+
+---@param item any
+function Layout:insert(item)
+    table.insert(self._.items, item)
     return self
 end
 
