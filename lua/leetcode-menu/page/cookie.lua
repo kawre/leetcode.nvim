@@ -7,24 +7,22 @@ local Page = require("leetcode-menu.page")
 
 local cmd = require("leetcode.command")
 
+local page = Page()
+
+page:insert(Header())
+
+page:insert(Title({ "Menu" }, "Cookie"))
+
 local update_btn = Button({ icon = "󱛬", src = "Update" }, "u", cmd.cookie_prompt)
-
 local delete_btn = Button({ icon = "󱛪", src = "Delete / Sign out" }, "d", cmd.sign_out)
-
 local back_btn = Button({ icon = "", src = "Back" }, "q", function() cmd.menu_layout("menu") end)
 
-local buttons = Buttons({
+page:insert(Buttons({
     update_btn,
     delete_btn,
     back_btn,
-})
+}))
 
-return Page({
-    Header(),
+page:insert(Footer())
 
-    Title({ "Menu" }, "Cookie"),
-
-    buttons,
-
-    Footer(),
-})
+return page

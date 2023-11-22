@@ -1,14 +1,14 @@
-local Layout = require("leetcode-ui.layout")
+local Group = require("leetcode-ui.group")
 
 ---@class lc-menu.Page : lc-ui.Layout
-local Page = Layout:extend("LeetMenuPage")
+local Page = Group:extend("LeetMenuPage")
 
-function Page:init(components, opts) --
+function Page:init(opts) --
     local options = vim.tbl_deep_extend("force", {
         position = "center",
     }, opts or {})
 
-    Page.super.init(self, components or {}, options)
+    Page.super.init(self, options)
 end
 
 ---@type fun(): lc-menu.Page

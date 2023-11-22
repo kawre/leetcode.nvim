@@ -22,7 +22,7 @@ function Line:draw(layout, opts)
     end
 
     local line_idx = layout:get_line_idx(1)
-    NuiLine(texts):render(layout._.opts.bufnr, -1, line_idx, line_idx)
+    NuiLine(texts):render(layout.bufnr, -1, line_idx, line_idx)
 end
 
 ---@param texts? NuiText[]

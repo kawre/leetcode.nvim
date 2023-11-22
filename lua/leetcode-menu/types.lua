@@ -7,7 +7,7 @@
 ---@field prev integer[]|nil
 -- -@field curr integer[]
 
----@alias layouts
+---@alias lc-menu.pages
 ---| "menu"
 ---| "problems"
 ---| "stats"

@@ -7,21 +7,19 @@ local Page = require("leetcode-menu.page")
 
 local cmd = require("leetcode.command")
 
+local page = Page()
+
+page:insert(Header())
+
+page:insert(Title({ "Menu" }, "Cache"))
+
 local update_btn = Button({ icon = "󱘴", src = "Update" }, "u", function() cmd.cache_update() end)
-
 local back_btn = Button({ icon = "", src = "Back" }, "q", function() cmd.menu_layout("menu") end)
-
-local buttons = Buttons({
+page:insert(Buttons({
     update_btn,
     back_btn,
-})
+}))
 
-return Page({
-    Header(),
+page:insert(Footer())
 
-    Title({ "Menu" }, "Cache"),
-
-    buttons,
-
-    Footer(),
-})
+return page

@@ -8,12 +8,14 @@ local Title = require("leetcode-menu.components.title")
 
 local exit = Button({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
 
-return Page({
-    Header(),
+local page = Page()
 
-    Title({}, "Loading..."),
+page:insert(Header())
 
-    Buttons({
-        exit,
-    }),
-})
+page:insert(Title({}, "Loading..."))
+
+page:insert(Buttons({
+    exit,
+}))
+
+return page

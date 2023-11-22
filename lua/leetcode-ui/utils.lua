@@ -18,7 +18,7 @@ end
 ---@param layout lc-ui.Layout
 function utils.win_width(layout)
     -- local winid = vim.api.nvimbufget
-    return vim.api.nvim_win_get_width(layout._.opts.winid)
+    return vim.api.nvim_win_get_width(layout.winid)
 end
 
 --@param config lc-ui.Component.config

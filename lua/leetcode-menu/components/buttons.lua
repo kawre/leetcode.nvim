@@ -17,7 +17,6 @@ function Buttons:init(buttons, opts)
     Buttons.super.init(self, opts)
 
     for _, button in ipairs(buttons or {}) do
-        -- button:set_opts(opts)
         self:insert(button)
     end
 end

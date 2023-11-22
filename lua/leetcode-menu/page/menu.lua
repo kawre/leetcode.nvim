@@ -2,9 +2,16 @@ local Page = require("leetcode-menu.page")
 local Title = require("leetcode-menu.components.title")
 local Buttons = require("leetcode-menu.components.buttons")
 local Button = require("leetcode-ui.lines.button")
+local Header = require("leetcode-menu.components.header")
+local Footer = require("leetcode-menu.components.footer")
 
 local cmd = require("leetcode.command")
-local log = require("leetcode.logger")
+
+local page = Page()
+
+page:insert(Header())
+
+page:insert(Title({}, "Menu"))
 
 local problems = Button(
     { icon = "", src = "Problems" },
@@ -36,21 +43,14 @@ local cache = Button(
 
 local exit = Button({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
 
-local Header = require("leetcode-menu.components.header")
-local Footer = require("leetcode-menu.components.footer")
+page:insert(Buttons({
+    problems,
+    statistics,
+    cookie,
+    cache,
+    exit,
+}))
 
-return Page({
-    Header(),
+page:insert(Footer())
 
-    Title({}, "Menu"),
-
-    Buttons({
-        problems,
-        statistics,
-        cookie,
-        cache,
-        exit,
-    }),
-
-    Footer(),
-})
+return page

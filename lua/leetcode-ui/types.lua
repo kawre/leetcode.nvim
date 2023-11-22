@@ -46,8 +46,6 @@
 ---@class lc-ui.Layout.opts
 ---@field padding? component.padding | integer
 ---@field position? position
----@field bufnr integer
----@field winid integer
 
 ---@class lc-ui.Layout.config
 ---@field components? lc-ui.Lines[]

@@ -35,7 +35,7 @@ function Group:draw(layout, opts)
     local items = self:contents()
     for i, item in ipairs(items) do
         item:draw(layout, opts)
-        if i ~= #items then Pad(opts.spacing):draw(layout) end
+        if i ~= #items and opts.spacing then Pad(opts.spacing):draw(layout) end
     end
 
     if botpad then Pad(botpad):draw(layout) end
@@ -65,8 +65,6 @@ end
 function Group:init(opts) --
     local options = vim.tbl_deep_extend("force", {
         margin = {},
-        position = "left",
-        spacing = 0,
     }, opts or {})
 
     self._ = {

@@ -151,8 +151,8 @@ function cmd.menu()
     if ok then vim.api.nvim_set_current_tabpage(tabp) end
 end
 
----@param layout layouts
-function cmd.menu_layout(layout) _Lc_Menu:set(layout) end
+---@param page lc-menu.pages
+function cmd.menu_layout(page) _Lc_Menu:set_page(page) end
 
 function cmd.question_tabs() require("leetcode.pickers.question-tabs").pick() end
 
