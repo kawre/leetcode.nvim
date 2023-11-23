@@ -69,7 +69,7 @@ function cmd.cookie_prompt(cb)
                 log.error("Sign-in failed")
             end
 
-            if cb then cb(success) end
+            pcall(cb, success)
         end,
     })
 

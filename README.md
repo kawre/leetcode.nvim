@@ -265,6 +265,10 @@ Meaning that to launch [leetcode.nvim] you **have** to pass
 nvim leetcode.nvim
 ```
 
+### Switching between questions
+
+To switch between questions, use `Leet tabs`
+
 ### Sign In
 
 It is **required** to be **signed-in** to use [leetcode.nvim]

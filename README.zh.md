@@ -269,6 +269,10 @@ Leet list status=<status> difficulty=<difficulty>
 nvim leetcode.nvim
 ```
 
+### 切换问题
+
+要在问题之间切换，请使用 `Leet tabs`。
+
 ### 登录
 
 使用 [leetcode.nvim] 必须 **登录**
