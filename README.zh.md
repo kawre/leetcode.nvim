@@ -84,6 +84,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
 
     cn = { -- leetcode.cn
         enabled = false, ---@type boolean
+        translator = true, ---@type boolean
         translate_problems = true, ---@type boolean
     },
 
@@ -100,28 +101,28 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
     console = {
         open_on_runcode = true, ---@type boolean
 
-        dir = "row", ---@type "col" | "row"
+        dir = "row", ---@type lc.direction
 
-        size = {
-            width = "90%", ---@type string | integer
-            height = "75%", ---@type string | integer
+        size = { ---@type lc.size
+            width = "90%",
+            height = "75%",
         },
 
         result = {
-            size = "60%", ---@type string | integer
+            size = "60%", ---@type lc.size
         },
 
         testcase = {
             virt_text = true, ---@type boolean
 
-            size = "40%", ---@type string | integer
+            size = "40%", ---@type lc.size
         },
     },
 
     description = {
-        position = "left", ---@type "top" | "right" | "bottom" | "left"
+        position = "left", ---@type lc.position
 
-        width = "40%", ---@type string | integer
+        width = "40%", ---@type lc.size
     },
 
     hooks = {
@@ -162,8 +163,11 @@ lang = "cpp"
 将 [leetcode.com][leetcode] 替换为 [leetcode.cn]
 
 ```lua
----@type lc.domain
-domain = "com" -- 目前仅支持 "com"
+cn = { -- leetcode.cn
+    enabled = false, ---@type boolean
+    translator = true, ---@type boolean
+    translate_problems = true, ---@type boolean
+},
 ```
 
 ### directory

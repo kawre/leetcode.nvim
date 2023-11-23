@@ -47,8 +47,8 @@ local M = {
 
     cn = { -- leetcode.cn
         enabled = false, ---@type boolean
-        translate_problems = true, ---@type boolean
         translator = true, ---@type boolean
+        translate_problems = true, ---@type boolean
     },
 
     ---@type string

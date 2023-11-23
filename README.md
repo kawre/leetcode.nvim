@@ -80,6 +80,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
     cn = { -- leetcode.cn
         enabled = false, ---@type boolean
+        translator = true, ---@type boolean
         translate_problems = true, ---@type boolean
     },
 
@@ -96,28 +97,28 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     console = {
         open_on_runcode = true, ---@type boolean
 
-        dir = "row", ---@type "col" | "row"
+        dir = "row", ---@type lc.direction
 
-        size = {
-            width = "90%", ---@type string | integer
-            height = "75%", ---@type string | integer
+        size = { ---@type lc.size
+            width = "90%",
+            height = "75%",
         },
 
         result = {
-            size = "60%", ---@type string | integer
+            size = "60%", ---@type lc.size
         },
 
         testcase = {
             virt_text = true, ---@type boolean
 
-            size = "40%", ---@type string | integer
+            size = "40%", ---@type lc.size
         },
     },
 
     description = {
-        position = "left", ---@type "top" | "right" | "bottom" | "left"
+        position = "left", ---@type lc.position
 
-        width = "40%", ---@type string | integer
+        width = "40%", ---@type lc.size
     },
 
     hooks = {
@@ -160,6 +161,7 @@ Use [leetcode.cn] instead of [leetcode.com][leetcode]
 ```lua
 cn = { -- leetcode.cn
     enabled = false, ---@type boolean
+    translator = true, ---@type boolean
     translate_problems = true, ---@type boolean
 },
 ```
@@ -262,12 +264,6 @@ Meaning that to launch [leetcode.nvim] you **have** to pass
 ```
 nvim leetcode.nvim
 ```
-
-### Pop-ups
-
-🚨 _Do **not**_ close [leetcode.nvim] pop-ups with `:q` 🚨
-
-There are **two** shortcuts specifically designed for closing them which are `q` and `Esc`.
 
 ### Sign In
 
