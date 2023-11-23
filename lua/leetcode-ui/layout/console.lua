@@ -32,22 +32,6 @@ function ConsoleLayout:hide()
 end
 
 function ConsoleLayout:mount()
-    self.testcase = Testcase(self)
-    self.result = Result(self)
-    self.popups = { self.testcase, self.result }
-
-    self:update(
-        {
-            relative = "editor",
-            position = "50%",
-            size = config.user.console.size,
-        },
-        NuiLayout.Box({
-            NuiLayout.Box(self.testcase, { size = config.user.console.testcase.size }),
-            NuiLayout.Box(self.result, { size = config.user.console.result.size }),
-        }, { dir = config.user.console.dir })
-    )
-
     ConsoleLayout.super.mount(self)
 
     self:set_keymaps({
@@ -87,14 +71,22 @@ end
 function ConsoleLayout:init(parent)
     self.parent = parent
 
-    ConsoleLayout.super.init(self, {
-        relative = "editor",
-        position = "50%",
-        size = config.user.console.size,
-    }, NuiLayout.Box(
-        { NuiLayout.Box(Popup(), { size = 0 }) },
-        { dir = config.user.console.dir }
-    ))
+    self.testcase = Testcase(self)
+    self.result = Result(self)
+    self.popups = { self.testcase, self.result }
+
+    ConsoleLayout.super.init(
+        self,
+        {
+            relative = "editor",
+            position = "50%",
+            size = config.user.console.size,
+        },
+        NuiLayout.Box({
+            NuiLayout.Box(self.testcase, { size = config.user.console.testcase.size }),
+            NuiLayout.Box(self.result, { size = config.user.console.result.size }),
+        }, { dir = config.user.console.dir })
+    )
 end
 
 ---@type fun(parent: lc-ui.Question): lc.ui.Console

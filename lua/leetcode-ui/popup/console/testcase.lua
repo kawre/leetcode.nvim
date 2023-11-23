@@ -173,6 +173,11 @@ function Testcase:init(parent)
             winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder",
         },
     })
+
+    self.testcases = {}
+    self.extmarks = {}
+
+    self:draw()
 end
 
 ---@type fun(parent: lc.ui.Console): lc.ui.Console.TestcasePopup
