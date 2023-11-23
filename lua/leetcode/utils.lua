@@ -1,5 +1,4 @@
 local config = require("leetcode.config")
-local t = require("leetcode.translator")
 
 ---@class lc.Utils
 local utils = {}
@@ -19,9 +18,8 @@ function utils.deprecate_usr_cmd(name, new)
     end, {})
 end
 
-function utils.remove_cookie()
+function utils.remove_cookie() --
     require("leetcode.cache.cookie").delete()
-    -- require("leetcode.ui.dashboard").apply("default")
 end
 
 function utils.alpha_move_cursor_top()
@@ -74,7 +72,7 @@ function utils.detect_duplicate_question(title_slug, lang)
     end
 end
 
----@return { tabpage: integer, question: lc.ui.Question }[]
+---@return { tabpage: integer, question: lc-ui.Question }[]
 function utils.curr_question_tabs()
     local questions = {}
 
@@ -86,14 +84,14 @@ function utils.curr_question_tabs()
     return questions
 end
 
----@param q lc.ui.Question
+---@param q lc-ui.Question
 ---@return integer|nil
 function utils.question_tabp(q)
     local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, q.winid)
     if ok then return tabp end
 end
 
----@return lc.ui.Question
+---@return lc-ui.Question
 function utils.curr_question()
     local tabp = vim.api.nvim_get_current_tabpage()
     local tabs = utils.curr_question_tabs()

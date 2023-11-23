@@ -47,6 +47,8 @@ function Skills:populate(res)
 end
 
 function Skills:mount()
+    Skills.super.mount(self)
+
     local spinner = Spinner:init("fetching user skills", "dot")
     stats_api.skills(function(res, err)
         if err then
@@ -54,11 +56,9 @@ function Skills:mount()
         else
             self:populate(res)
             spinner:stop(nil, true, { timeout = 200 })
-            self.renderer:draw(self)
+            self.renderer:draw()
         end
     end)
-
-    Skills.super.mount(self)
 end
 
 function Skills:init()

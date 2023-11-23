@@ -26,7 +26,8 @@ function ResultPopup:handle(item)
 end
 
 function ResultPopup:clear()
-    self.renderer:clear()
+    ResultPopup.super.clear(self)
+
     self.last_testcase = nil
     self.border:set_highlight("FloatBorder")
 end

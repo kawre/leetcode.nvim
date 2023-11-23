@@ -2,7 +2,6 @@ local utils = require("leetcode.api.utils")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 local queries = require("leetcode.api.queries")
-local t = require("leetcode.translator")
 local urls = require("leetcode.api.urls")
 
 ---@class lc.AuthApi

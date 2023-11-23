@@ -1,8 +1,8 @@
 local log = require("leetcode.logger")
 local t = require("leetcode.translator")
 
-local Pre = require("leetcode.ui.pre")
-local Stdout = require("leetcode.ui.stdout")
+local Pre = require("leetcode-ui.lines.pre")
+local Stdout = require("leetcode-ui.lines.pre.stdout")
 local Group = require("leetcode-ui.group")
 
 local Line = require("leetcode-ui.line")

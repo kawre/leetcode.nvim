@@ -139,6 +139,20 @@ function Testcase:autocmds()
     )
 end
 
+function Testcase:mount()
+    Testcase.super.mount(self)
+
+    self.testcases = {}
+    self.extmarks = {}
+
+    self:on(
+        { "TextChanged", "TextChangedI", "TextChangedP", "TextChangedT" },
+        function() self:draw_extmarks() end
+    )
+
+    self:draw()
+end
+
 ---@param parent lc.ui.Console
 function Testcase:init(parent)
     Testcase.super.init(self, parent, {
@@ -159,16 +173,6 @@ function Testcase:init(parent)
             winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder",
         },
     })
-
-    self.testcases = {}
-    self.extmarks = {}
-
-    self:on(
-        { "TextChanged", "TextChangedI", "TextChangedP", "TextChangedT" },
-        function() self:draw_extmarks() end
-    )
-
-    self:draw()
 end
 
 ---@type fun(parent: lc.ui.Console): lc.ui.Console.TestcasePopup

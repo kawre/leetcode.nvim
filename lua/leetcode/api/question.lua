@@ -2,7 +2,6 @@ local utils = require("leetcode.api.utils")
 local log = require("leetcode.logger")
 local queries = require("leetcode.api.queries")
 local problemlist = require("leetcode.cache.problemlist")
-local t = require("leetcode.translator")
 
 local question = {}
 

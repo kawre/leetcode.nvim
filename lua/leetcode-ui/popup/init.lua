@@ -6,11 +6,23 @@ local log = require("leetcode.logger")
 ---@class lc-ui.Popup : NuiPopup
 ---@field visible boolean
 ---@field renderer lc-ui.Renderer
+---@field keymaps table<string, string>
 local Popup = NuiPopup:extend("LeetPopup")
 
 function Popup:focus()
     if not vim.api.nvim_win_is_valid(self.winid) then return end
     vim.api.nvim_set_current_win(self.winid)
+end
+
+function Popup:clear_keymaps()
+    for mode, key in pairs(self.keymaps) do
+        self:unmap(mode, key)
+    end
+    self.keymaps = {}
+end
+
+function Popup:clear() --
+    self.renderer:clear()
 end
 
 function Popup:show()
@@ -23,13 +35,14 @@ function Popup:show()
     self.visible = true
 end
 
-function Popup:unmount()
-    Popup.super.unmount(self)
-
-    self.renderer.bufnr = nil
+function Popup:_close_window()
+    Popup.super._close_window(self)
     self.renderer.winid = nil
+end
 
-    self.visible = false
+function Popup:_open_window()
+    Popup.super._open_window(self)
+    self.renderer.winid = self.winid
 end
 
 function Popup:_buf_create()
@@ -39,13 +52,17 @@ end
 
 function Popup:_buf_destory()
     Popup.super._buf_destory(self)
-    -- log.info({
-    --     event = "buf_destroy",
-    --     name = self.class.name,
-    --     bufnr = self.bufnr,
-    --     winid = self.winid,
-    -- })
     self.renderer.bufnr = nil
+end
+
+function Popup:unmount()
+    self:clear()
+    Popup.super.unmount(self)
+
+    self.renderer.bufnr = nil
+    self.renderer.winid = nil
+
+    self.visible = false
 end
 
 function Popup:mount()
@@ -53,14 +70,21 @@ function Popup:mount()
 
     self.renderer.bufnr = self.bufnr
     self.renderer.winid = self.winid
-
     self.visible = true
+
+    self:on({ "BufLeave", "WinLeave" }, function() self:handle_leave() end)
+    self:map("n", { "q", "<Esc>" }, function() self:hide() end)
 end
 
 function Popup:hide()
     if not self.visible then return end
     Popup.super.hide(self)
     self.visible = false
+end
+
+function Popup:map(mode, key, handler, opts, ___force___)
+    self.keymaps[mode] = key
+    Popup.super.map(self, mode, key, handler, opts, ___force___)
 end
 
 function Popup:toggle()
@@ -89,14 +113,9 @@ function Popup:init(opts)
 
     self.renderer = self.renderer or Renderer()
     self.visible = false
+    self.keymaps = {}
 
     Popup.super.init(self, options)
-
-    self:on("BufUnload", function() --
-        log.error("Do not close `leetcode.nvim` popups. Use `q` or `Esc` instead")
-    end)
-    self:on({ "BufLeave", "WinLeave" }, function() self:handle_leave() end)
-    self:map("n", { "q", "<Esc>" }, function() self:hide() end)
 end
 
 ---@type fun(opts: table): lc-ui.Popup

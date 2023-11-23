@@ -3,7 +3,6 @@ local log = require("leetcode.logger")
 local config = require("leetcode.config")
 local headers = require("leetcode.api.headers")
 local urls = require("leetcode.api.urls")
-local t = require("leetcode.translator")
 
 ---@class lc.Api.Utils
 local utils = {}
@@ -186,7 +185,7 @@ function utils.normalize_problems(problems)
                     p.stat.question__title_slug
                 ),
                 paid_only = p.paid_only,
-                ac_rate = p.stat.total_acs * 100 / math.min(p.stat.total_submitted, 1),
+                ac_rate = p.stat.total_acs * 100 / math.max(p.stat.total_submitted, 1),
                 difficulty = utils.lvl_to_name(p.difficulty.level),
                 starred = p.is_favor,
                 topic_tags = {},

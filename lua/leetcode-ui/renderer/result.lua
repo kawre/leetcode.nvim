@@ -1,11 +1,11 @@
-local Cases = require("leetcode.ui.cases")
-local Header = require("leetcode.ui.header")
+local Cases = require("leetcode-ui.group.cases")
+local Header = require("leetcode-ui.lines.header")
 
 local Renderer = require("leetcode-ui.renderer")
-local Pre = require("leetcode.ui.pre")
+local Pre = require("leetcode-ui.lines.pre")
 local Group = require("leetcode-ui.group")
-local Stdout = require("leetcode.ui.stdout")
-local Case = require("leetcode.ui.case")
+local Stdout = require("leetcode-ui.lines.pre.stdout")
+local Case = require("leetcode-ui.group.case")
 
 local Line = require("leetcode-ui.line")
 local NuiText = require("nui.text")

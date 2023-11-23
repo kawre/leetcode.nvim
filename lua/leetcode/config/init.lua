@@ -1,6 +1,6 @@
 local template = require("leetcode.config.template")
 
----@type lc.ui.Question[]
+---@type lc-ui.Question[]
 _Lc_questions = {}
 
 ---@type lc-menu

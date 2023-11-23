@@ -16,7 +16,7 @@ local t = require("leetcode.translator")
 
 ---@class lc.ui.Description : NuiSplit
 ---@field split NuiSplit
----@field parent lc.ui.Question
+---@field parent lc-ui.Question
 ---@field renderer lc-ui.Renderer
 ---@field visible boolean
 ---@field images table<string, Image>
@@ -168,7 +168,7 @@ function Description:populate()
     })
 end
 
----@param parent lc.ui.Question
+---@param parent lc-ui.Question
 function Description:init(parent)
     Description.super.init(self, {
         relative = "editor",
@@ -187,7 +187,7 @@ function Description:init(parent)
     self:map("n", { "q", "<Esc>" }, function() self:toggle() end)
 end
 
----@type fun(parent: lc.ui.Question): lc.ui.Description
+---@type fun(parent: lc-ui.Question): lc.ui.Description
 local LeetDescription = Description
 
 return LeetDescription

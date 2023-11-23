@@ -1,13 +1,14 @@
 local Description = require("leetcode-ui.split.description")
 local Console = require("leetcode-ui.layout.console")
 local Info = require("leetcode-ui.popup.info")
+local Object = require("nui.object")
 
 local api_question = require("leetcode.api.question")
 local utils = require("leetcode.utils")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 
----@class lc.ui.Question
+---@class lc-ui.Question
 ---@field file Path
 ---@field q lc.question_res
 ---@field description lc.ui.Description
@@ -15,8 +16,7 @@ local log = require("leetcode.logger")
 ---@field console lc.ui.Console
 ---@field lang string
 ---@field cache lc.cache.Question
-local Question = {}
-Question.__index = Question
+local Question = Object("LeetQuestion")
 
 function Question:get_snippet()
     local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
@@ -45,7 +45,7 @@ function Question:unmount()
     self = nil
 end
 
-function Question:mount()
+function Question:handle_mount()
     self:create_file()
 
     vim.api.nvim_set_current_dir(config.home:absolute())
@@ -69,40 +69,38 @@ function Question:mount()
     return self
 end
 
-function Question:handle_mount()
+function Question:mount()
+    local tabp = utils.detect_duplicate_question(self.cache.title_slug, config.lang)
+    if tabp then return pcall(vim.cmd.tabnext, tabp) end
+
+    local q = api_question.by_title_slug(self.cache.title_slug)
+    if not q or q.is_paid_only and not config.auth.is_premium then
+        return log.warn("Question is for premium users only")
+    end
+    self.q = q
+
     if self:get_snippet() then
-        self:mount()
+        self:handle_mount()
     else
         local msg = ("Snippet for `%s` not found. Select a different language"):format(self.lang)
         log.warn(msg)
 
         require("leetcode.pickers.language").pick_lang(self, function(snippet)
             self.lang = snippet.t.slug
-            self:mount()
+            self:handle_mount()
         end)
     end
+
+    return self
 end
 
 ---@param problem lc.cache.Question
 function Question:init(problem)
-    log.debug(problem)
-    log.debug("Initializing question: " .. problem.frontend_id .. ". " .. problem.title_slug)
-
-    local tabp = utils.detect_duplicate_question(problem.title_slug, config.lang)
-    if tabp then return pcall(vim.cmd.tabnext, tabp) end
-
-    local q = api_question.by_title_slug(problem.title_slug)
-    if not q or q.is_paid_only and not config.auth.is_premium then
-        return log.warn("Question is for premium users only")
-    end
-
-    self = setmetatable({
-        q = q,
-        cache = problem,
-        lang = config.lang,
-    }, self)
-
-    return self:handle_mount()
+    self.cache = problem
+    self.lang = config.lang
 end
 
-return Question
+---@type fun(question: lc.cache.Question): lc-ui.Question
+local LeetQuestion = Question
+
+return LeetQuestion

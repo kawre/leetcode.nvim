@@ -125,12 +125,12 @@ function cmd.qot()
     require("leetcode.utils").auth_guard()
 
     local problems = require("leetcode.api.problems")
-    local Question = require("leetcode.ui.question")
+    local Question = require("leetcode-ui.question")
 
     problems.question_of_today(function(qot, err)
         if err then return log.err(err) end
         local problemlist = require("leetcode.cache.problemlist")
-        Question:init(problemlist.get_by_title_slug(qot.title_slug))
+        Question(problemlist.get_by_title_slug(qot.title_slug)):mount()
     end)
 end
 
@@ -144,7 +144,8 @@ function cmd.random_question()
     if err then return log.err(err) end
 
     local item = problems.get_by_title_slug(q.title_slug) or {}
-    require("leetcode.ui.question"):init(item)
+    local Question = require("leetcode-ui.question")
+    Question(item):mount()
 end
 
 function cmd.menu()
