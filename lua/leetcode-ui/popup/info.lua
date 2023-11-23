@@ -2,70 +2,20 @@ local Popup = require("leetcode-ui.popup")
 local NuiText = require("nui.text")
 local t = require("leetcode.translator")
 local Line = require("leetcode-ui.line")
+local NuiTree = require("nui.tree")
 
 local config = require("leetcode.config")
 local utils = require("leetcode.utils")
-local log = require("leetcode.logger")
 
 ---@class lc.ui.InfoPopup : lc-ui.Popup
 ---@field popup NuiPopup
----@field parent lc-ui.Question
+---@field question lc-ui.Question
 ---@field hints table[]
 local InfoPopup = Popup:extend("LeetInfoPopup")
 
-function InfoPopup:mount()
-    local NuiTree = require("nui.tree")
-    local nodes = {}
-
-    local hints = {}
-    for i, hint_txt in ipairs(self.hints) do
-        local line = Line()
-
-        line:append(tostring(i), "leetcode_list")
-        line:append("/" .. #self.hints, "leetcode_alt")
-
-        local hint = NuiTree.Node({ text = line }, { NuiTree.Node({ text = hint_txt }) })
-        table.insert(hints, hint)
-    end
-
-    if not vim.tbl_isempty(hints) then
-        table.insert(
-            nodes,
-            NuiTree.Node({ text = NuiText(t("Hints") .. " 󰛨", "leetcode_hint") }, hints)
-        )
-    else
-        table.insert(
-            nodes,
-            NuiTree.Node({ text = NuiText(" " .. t("No hints available"), "leetcode_error") })
-        )
-    end
-    table.insert(nodes, NuiTree.Node({ text = "" }))
-
-    local topics = {}
-    for _, topic in ipairs(self.parent.q.topic_tags) do
-        local line = Line()
-
-        line:append("* ", "leetcode_list")
-        line:append(topic.name)
-
-        table.insert(topics, NuiTree.Node({ text = line }))
-    end
-
-    if not vim.tbl_isempty(topics) then
-        table.insert(
-            nodes,
-            NuiTree.Node({ text = NuiText(t("Topics") .. " ", "Number") }, topics)
-        )
-    else
-        table.insert(
-            nodes,
-            NuiTree.Node({ text = NuiText(" " .. t("No topics available"), "leetcode_error") })
-        )
-    end
-    table.insert(nodes, NuiTree.Node({ text = " " }))
-
+function InfoPopup:similar_questions_node()
     local sim_questions = {}
-    for _, q in ipairs(self.parent.q.similar) do
+    for _, q in ipairs(self.question.q.similar) do
         local line = Line()
 
         local hl = {
@@ -81,22 +31,64 @@ function InfoPopup:mount()
 
         table.insert(sim_questions, NuiTree.Node({ text = line, question = q }))
     end
+
     if not vim.tbl_isempty(sim_questions) then
-        table.insert(
-            nodes,
-            NuiTree.Node(
-                { text = NuiText(t("Similar Questions") .. " ", "leetcode_ref") },
-                sim_questions
-            )
+        return NuiTree.Node(
+            { text = NuiText(t("Similar Questions") .. " ", "leetcode_ref") },
+            sim_questions
         )
     else
-        table.insert(
-            nodes,
-            NuiTree.Node({
-                text = NuiText(" " .. t("No similar questions available"), "leetcode_error"),
-            })
-        )
+        return NuiTree.Node({
+            text = NuiText(" " .. t("No similar questions available"), "leetcode_error"),
+        })
     end
+end
+
+function InfoPopup:hints_node()
+    local hints = {}
+    for i, hint_txt in ipairs(self.hints) do
+        local line = Line()
+
+        line:append(tostring(i), "leetcode_list")
+        line:append("/" .. #self.hints, "leetcode_alt")
+
+        local hint = NuiTree.Node({ text = line }, { NuiTree.Node({ text = hint_txt }) })
+        table.insert(hints, hint)
+    end
+
+    if not vim.tbl_isempty(hints) then
+        return NuiTree.Node({ text = NuiText(t("Hints") .. " 󰛨", "leetcode_hint") }, hints)
+    else
+        return NuiTree.Node({ text = NuiText(" " .. t("No hints available"), "leetcode_error") })
+    end
+end
+
+function InfoPopup:topics_node()
+    local topics = {}
+    for _, topic in ipairs(self.question.q.topic_tags) do
+        local line = Line()
+
+        line:append("* ", "leetcode_list")
+        line:append(topic.name)
+
+        table.insert(topics, NuiTree.Node({ text = line }))
+    end
+
+    if not vim.tbl_isempty(topics) then
+        return NuiTree.Node({ text = NuiText(t("Topics") .. " ", "Number") }, topics)
+    else
+        return NuiTree.Node({ text = NuiText(" " .. t("No topics available"), "leetcode_error") })
+    end
+end
+
+function InfoPopup:populate()
+    local nodes = {
+        self:hints_node(),
+        NuiTree.Node({ text = "" }),
+        self:topics_node(),
+        NuiTree.Node({ text = " " }),
+        self:similar_questions_node(),
+    }
 
     local tree = NuiTree({
         bufnr = self.bufnr,
@@ -123,7 +115,7 @@ function InfoPopup:mount()
         end,
     })
 
-    local opts = { noremap = true, nowait = true }
+    tree:render()
 
     self:map("n", { "<Tab>", "<CR>" }, function()
         local node = tree:get_node()
@@ -144,19 +136,25 @@ function InfoPopup:mount()
         end
 
         tree:render()
-    end, opts)
+    end, { noremap = true, nowait = true })
+end
 
+function InfoPopup:mount()
     InfoPopup.super.mount(self)
+
+    self:populate()
+
     local ui_utils = require("leetcode-ui.utils")
     local winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder"
+
     ui_utils.set_win_opts(self.winid, {
         winhighlight = winhighlight,
         wrap = true,
     })
+
     ui_utils.set_win_opts(self.border.winid, {
         winhighlight = winhighlight,
     })
-    tree:render()
 
     return self
 end
@@ -191,7 +189,7 @@ function InfoPopup:init(parent)
     })
 
     self.hints = parent.q.hints
-    self.parent = parent
+    self.question = parent
 end
 
 ---@type fun(parent: lc-ui.Question): lc.ui.InfoPopup

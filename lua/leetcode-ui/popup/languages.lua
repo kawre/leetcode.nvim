@@ -7,8 +7,6 @@ local config = require("leetcode.config")
 local stats_api = require("leetcode.api.statistics")
 local Spinner = require("leetcode.logger.spinner")
 
-local log = require("leetcode.logger")
-
 ---@class lc.ui.LanguagesPopup : lc.ui.SkillsPopup
 ---@field renderer lc-ui.Renderer
 local Languages = Popup:extend("LeetLanguages")
@@ -39,7 +37,7 @@ function Languages:populate(res)
         group:insert(self:handle(lang))
     end
 
-    self.renderer:append(group)
+    self.renderer:insert(group)
 end
 
 function Languages:mount()
