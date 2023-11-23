@@ -1,5 +1,6 @@
 local log = require("leetcode.logger")
-local Cookie = require("leetcode.cache.cookie")
+local cookie = require("leetcode.cache.cookie")
+local config = require("leetcode.config")
 local utils = require("leetcode-ui.utils")
 local Renderer = require("leetcode-ui.renderer")
 
@@ -63,6 +64,8 @@ function Menu:autocmds()
 end
 
 function Menu:cursor_move()
+    if not self.winid or not vim.api.nvim_win_is_valid(self.winid) then return end
+
     local curr = vim.api.nvim_win_get_cursor(self.winid)
     local prev = self.cursor.prev
 
@@ -124,7 +127,7 @@ function Menu:apply_options()
         matchpairs = "",
         swapfile = false,
         buftype = "nofile",
-        filetype = "leetcode.nvim",
+        filetype = config.name,
         synmaxcol = 0,
     })
     utils.set_win_opts(self.winid, {
@@ -142,15 +145,15 @@ function Menu:apply_options()
     })
 end
 
-function Menu:handle_mount()
-    if Cookie.get() then
+function Menu:mount()
+    if cookie.get() then
         self:set_page("loading")
 
         local auth_api = require("leetcode.api.auth")
         auth_api.user(function(_, err)
             if err then
                 self:set_page("signin")
-                return log.err(err)
+                log.err(err)
             else
                 self:set_page("menu")
             end
@@ -159,14 +162,12 @@ function Menu:handle_mount()
         self:set_page("signin")
     end
 
-    return self:mount()
-end
-
-function Menu:mount()
     self:apply_options()
     self:keymaps()
     self:autocmds()
     self:draw()
+
+    return self
 end
 
 function Menu:init()
@@ -184,7 +185,6 @@ function Menu:init()
     self.winid = vim.api.nvim_get_current_win()
 
     _Lc_Menu = self
-    self:handle_mount()
 end
 
 ---@type fun(): lc-menu

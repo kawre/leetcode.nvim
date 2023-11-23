@@ -23,10 +23,10 @@ function Layout:hide()
 end
 
 function Layout:toggle()
-    if self.visible then
-        self:hide()
-    else
+    if not self.visible then
         self:show()
+    else
+        self:hide()
     end
 end
 

@@ -38,7 +38,7 @@ function Description:mount()
         matchpairs = "",
         swapfile = false,
         buftype = "nofile",
-        filetype = "leetcode.nvim",
+        filetype = config.name,
         synmaxcol = 0,
     })
     ui_utils.set_win_opts(self.winid, {

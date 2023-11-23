@@ -83,6 +83,7 @@ function Languages:init()
         buf_options = {
             modifiable = false,
             readonly = false,
+            filetype = config.name,
         },
     })
 end

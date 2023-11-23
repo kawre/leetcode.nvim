@@ -3,6 +3,7 @@ local Group = require("leetcode-ui.group")
 local Lines = require("leetcode-ui.lines")
 
 local stats_api = require("leetcode.api.statistics")
+local config = require("leetcode.config")
 local Spinner = require("leetcode.logger.spinner")
 
 local log = require("leetcode.logger")
@@ -87,6 +88,7 @@ function Skills:init()
         buf_options = {
             modifiable = false,
             readonly = false,
+            filetype = config.name,
         },
     })
 end

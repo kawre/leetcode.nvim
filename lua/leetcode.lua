@@ -59,7 +59,7 @@ function leetcode.start()
     theme.setup()
 
     local Menu = require("leetcode-ui.renderer.menu")
-    Menu()
+    Menu():mount()
 end
 
 ---@param cfg? lc.UserConfig

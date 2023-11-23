@@ -38,15 +38,12 @@ end
 function Popup:unmount()
     self:clear()
     Popup.super.unmount(self)
-
     self.visible = false
 end
 
 function Popup:mount()
     Popup.super.mount(self)
-
     self.visible = true
-
     self:on({ "BufLeave", "WinLeave" }, function() self:handle_leave() end)
     self:map("n", { "q", "<Esc>" }, function() self:hide() end)
 end
@@ -63,10 +60,10 @@ function Popup:map(mode, key, handler, opts, ___force___)
 end
 
 function Popup:toggle()
-    if self.visible then
-        self:hide()
-    else
+    if not self.visible then
         self:show()
+    else
+        self:hide()
     end
 end
 
