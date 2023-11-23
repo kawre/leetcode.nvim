@@ -55,10 +55,10 @@ function Cases:init(item, testcases, parent)
     self.cases = {}
     self.result = parent
 
-    for i, answer in ipairs(item.code_answer) do
+    for i = 1, item.total_testcases do
         self.cases[i] = Case({
             input = testcases[i],
-            output = answer,
+            output = item.code_answer[i],
             expected = item.expected_code_answer[i],
             std_output = item.std_output_list[i],
         }, item.compare_result:sub(i, i) == "1")

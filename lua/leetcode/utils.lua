@@ -1,4 +1,5 @@
 local config = require("leetcode.config")
+local log = require("leetcode.logger")
 
 ---@class lc.Utils
 local utils = {}
@@ -63,7 +64,7 @@ end
 ---@param title_slug string
 ---@param lang lc.lang
 function utils.detect_duplicate_question(title_slug, lang)
-    local tabs = utils.curr_question_tabs()
+    local tabs = utils.question_tabs()
 
     for _, q in ipairs(tabs) do
         if title_slug == q.question.q.title_slug and lang == q.question.lang then
@@ -73,7 +74,7 @@ function utils.detect_duplicate_question(title_slug, lang)
 end
 
 ---@return { tabpage: integer, question: lc-ui.Question }[]
-function utils.curr_question_tabs()
+function utils.question_tabs()
     local questions = {}
 
     for _, q in ipairs(_Lc_questions) do
@@ -94,13 +95,12 @@ end
 ---@return lc-ui.Question
 function utils.curr_question()
     local tabp = vim.api.nvim_get_current_tabpage()
-    local tabs = utils.curr_question_tabs()
+    local tabs = utils.question_tabs()
 
     local tab = vim.tbl_filter(function(tab) return tab.tabpage == tabp end, tabs)[1] or {}
     if tab.question then
         return tab.question, tabp
     else
-        local log = require("leetcode.logger")
         log.error("No current question found")
     end
 end
@@ -112,7 +112,6 @@ end
 
 ---@param event lc.hook
 function utils.exec_hooks(event, ...)
-    local log = require("leetcode.logger")
     local fns = config.user.hooks[event]
     if not fns then log.error("unknown hook event: " .. event) end
 

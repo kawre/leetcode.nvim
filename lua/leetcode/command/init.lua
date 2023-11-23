@@ -93,30 +93,32 @@ function cmd.delete_cookie()
     cookie.delete()
 end
 
-function cmd.q_close_all()
+cmd.q_close_all = vim.schedule_wrap(function()
     local utils = require("leetcode.utils")
-    local qs = utils.curr_question_tabs()
+    local qs = utils.question_tabs()
 
     for _, tabp in ipairs(qs) do
         tabp.question:unmount()
     end
-end
+end)
 
-function cmd.expire()
+cmd.expire = vim.schedule_wrap(function()
     local tabp = vim.api.nvim_get_current_tabpage()
     cmd.menu()
 
     cmd.cookie_prompt(function(success)
         if success then
-            if vim.api.nvim_tabpage_is_valid(tabp) then pcall(vim.cmd.tabnext, tabp) end
+            if vim.api.nvim_tabpage_is_valid(tabp) then
+                pcall(vim.api.nvim_set_current_tabpage, tabp)
+            end
             log.info("Successful re-login")
         else
             cmd.delete_cookie()
             cmd.menu_layout("signin")
-            vim.schedule(cmd.q_close_all)
+            cmd.q_close_all()
         end
     end)
-end
+end)
 
 ---Merge configurations into default configurations and set it as user configurations.
 ---

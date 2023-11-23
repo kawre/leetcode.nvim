@@ -77,9 +77,8 @@ local opts = require("telescope.themes").get_dropdown()
 
 return {
     pick = function()
-        local tabs = utils.curr_question_tabs()
+        local tabs = utils.question_tabs()
         if vim.tbl_isempty(tabs) then return log.warn("No questions opened") end
-        log.info("new tabs")
 
         pickers
             .new(opts, {
@@ -95,8 +94,9 @@ return {
                         local selection = action_state.get_selected_entry()
 
                         if not selection then return end
-                        local ok, err = pcall(vim.cmd.tabnext, selection.value.tabpage)
-                        log.info(err)
+                        local ok, err =
+                            pcall(vim.api.nvim_set_current_tabpage, selection.value.tabpage)
+                        if not ok then log.error(err) end
                     end)
                     return true
                 end,

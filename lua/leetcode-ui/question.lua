@@ -66,7 +66,7 @@ function Question:handle_mount()
     self.winid = vim.api.nvim_get_current_win()
     table.insert(_Lc_questions, self)
 
-    vim.api.nvim_create_autocmd("BufWinLeave", {
+    vim.api.nvim_create_autocmd("QuitPre", {
         buffer = self.bufnr,
         callback = function() self:unmount() end,
     })
@@ -80,7 +80,7 @@ end
 
 function Question:mount()
     local tabp = utils.detect_duplicate_question(self.cache.title_slug, config.lang)
-    if tabp then return pcall(vim.cmd.tabnext, tabp) end
+    if tabp then return pcall(vim.api.nvim_set_current_tabpage, tabp) end
 
     local q = api_question.by_title_slug(self.cache.title_slug)
     if not q or q.is_paid_only and not config.auth.is_premium then

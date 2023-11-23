@@ -123,7 +123,7 @@ M.pick = function(question)
 
                     config.lang = snippet.t.slug
                     actions.close(prompt_bufnr)
-                    Question:init(question.cache)
+                    Question(question.cache):mount()
                 end)
 
                 return true
