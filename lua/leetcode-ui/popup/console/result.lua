@@ -32,7 +32,7 @@ function ResultPopup:clear()
     self.border:set_highlight("FloatBorder")
 end
 
-function ResultPopup:draw() self.renderer:draw() end
+function ResultPopup:draw() self.renderer:draw(self) end
 
 ---@param parent lc.ui.Console
 ---

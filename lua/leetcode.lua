@@ -58,7 +58,7 @@ function leetcode.start()
     local theme = require("leetcode.theme")
     theme.setup()
 
-    local Menu = require("leetcode-menu")
+    local Menu = require("leetcode-ui.renderer.menu")
     Menu()
 end
 

@@ -1,10 +1,10 @@
-local Page = require("leetcode-menu.page")
+local Page = require("leetcode-ui.group.page")
 
-local Header = require("leetcode-menu.components.header")
-local Buttons = require("leetcode-menu.components.buttons")
+local Header = require("leetcode-ui.lines.menu-header")
+local Buttons = require("leetcode-ui.group.buttons")
 
 local Button = require("leetcode-ui.lines.button")
-local Title = require("leetcode-menu.components.title")
+local Title = require("leetcode-ui.lines.title")
 
 local exit = Button({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
 

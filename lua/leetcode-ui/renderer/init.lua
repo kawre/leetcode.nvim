@@ -19,8 +19,11 @@ local log = require("leetcode.logger")
 ---@field _ lc-ui.Layout._
 local Renderer = Object("LeetRenderer")
 
-function Renderer:draw()
+function Renderer:draw(component)
     local opts = self._.opts
+    self.bufnr = component.bufnr
+    self.winid = component.winid
+
     local c_ok, c = pcall(vim.api.nvim_win_get_cursor, self.winid)
 
     self._.buttons = {}

@@ -1,6 +1,6 @@
 local log = require("leetcode.logger")
 local Cookie = require("leetcode.cache.cookie")
-local utils = require("leetcode-menu.utils")
+local utils = require("leetcode-ui.utils")
 local Renderer = require("leetcode-ui.renderer")
 
 ---@class lc-menu : lc-ui.Renderer
@@ -18,7 +18,7 @@ end
 
 function Menu:draw()
     self:clear_keymaps()
-    Menu.super.draw(self)
+    Menu.super.draw(self, self)
     self:apply_btn_keymaps()
 
     return self
@@ -93,7 +93,7 @@ end
 function Menu:set_page(name)
     self:cursor_reset()
 
-    local ok, page = pcall(require, "leetcode-menu.page." .. name)
+    local ok, page = pcall(require, "leetcode-ui.group.page." .. name)
     if ok then
         self:replace({ page })
     else
@@ -184,7 +184,7 @@ function Menu:init()
     self.winid = vim.api.nvim_get_current_win()
 
     _Lc_Menu = self
-    return self:handle_mount()
+    self:handle_mount()
 end
 
 ---@type fun(): lc-menu

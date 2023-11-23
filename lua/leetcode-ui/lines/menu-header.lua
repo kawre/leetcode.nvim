@@ -1,7 +1,7 @@
 local Lines = require("leetcode-ui.lines")
 
 ---@class lc-menu.Header : lc-ui.Lines
-local Header = Lines:extend("LeetMenuHeader")
+local MenuHeader = Lines:extend("LeetMenuHeader")
 
 local ascii = {
     [[ /$$                          /$$     /$$$$$$                /$$         ]],
@@ -14,8 +14,8 @@ local ascii = {
     [[|________/\_______/\_______/  \___/  \______/ \______/ \_______/\_______/]],
 }
 
-function Header:init()
-    Header.super.init(self, {
+function MenuHeader:init()
+    MenuHeader.super.init(self, {
         position = "center",
         hl = "Keyword",
         padding = {
@@ -30,6 +30,6 @@ function Header:init()
 end
 
 ---@type fun(): lc-menu.Header
-local LeetMenuHeader = Header
+local LeetMenuHeader = MenuHeader
 
 return LeetMenuHeader

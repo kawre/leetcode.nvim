@@ -56,7 +56,7 @@ function Skills:mount()
         else
             self:populate(res)
             spinner:stop(nil, true, { timeout = 200 })
-            self.renderer:draw()
+            self.renderer:draw(self)
         end
     end)
 end

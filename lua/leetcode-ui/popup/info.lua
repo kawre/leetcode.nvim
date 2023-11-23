@@ -147,13 +147,13 @@ function InfoPopup:mount()
     end, opts)
 
     InfoPopup.super.mount(self)
-    local utils = require("leetcode-menu.utils")
+    local ui_utils = require("leetcode-ui.utils")
     local winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder"
-    utils.set_win_opts(self.winid, {
+    ui_utils.set_win_opts(self.winid, {
         winhighlight = winhighlight,
         wrap = true,
     })
-    utils.set_win_opts(self.border.winid, {
+    ui_utils.set_win_opts(self.border.winid, {
         winhighlight = winhighlight,
     })
     tree:render()

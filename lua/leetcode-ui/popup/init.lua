@@ -35,32 +35,9 @@ function Popup:show()
     self.visible = true
 end
 
-function Popup:_close_window()
-    Popup.super._close_window(self)
-    self.renderer.winid = nil
-end
-
-function Popup:_open_window()
-    Popup.super._open_window(self)
-    self.renderer.winid = self.winid
-end
-
-function Popup:_buf_create()
-    Popup.super._buf_create(self)
-    self.renderer.bufnr = self.bufnr
-end
-
-function Popup:_buf_destory()
-    Popup.super._buf_destory(self)
-    self.renderer.bufnr = nil
-end
-
 function Popup:unmount()
     self:clear()
     Popup.super.unmount(self)
-
-    self.renderer.bufnr = nil
-    self.renderer.winid = nil
 
     self.visible = false
 end
@@ -68,8 +45,6 @@ end
 function Popup:mount()
     Popup.super.mount(self)
 
-    self.renderer.bufnr = self.bufnr
-    self.renderer.winid = self.winid
     self.visible = true
 
     self:on({ "BufLeave", "WinLeave" }, function() self:handle_leave() end)
@@ -96,6 +71,8 @@ function Popup:toggle()
 end
 
 function Popup:handle_leave() self:hide() end
+
+function Popup:draw() self.renderer:draw(self) end
 
 function Popup:init(opts)
     local options = vim.tbl_deep_extend("force", {

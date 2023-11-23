@@ -1,26 +1,21 @@
-local Group = require("leetcode-ui.group")
-local Lines = require("leetcode-ui.lines")
-local Padding = require("leetcode-ui.lines.padding")
-local NuiSplit = require("nui.split")
-local Renderer = require("leetcode-ui.renderer")
-
 local config = require("leetcode.config")
-local log = require("leetcode.logger")
-local utils = require("leetcode.utils")
-
 local img_ok, image_api = pcall(require, "image")
 local img_sup = img_ok and config.user.image_support
+
+local Group = require("leetcode-ui.group")
+local Padding = require("leetcode-ui.lines.padding")
+local Split = require("leetcode-ui.split")
+
+local log = require("leetcode.logger")
+local utils = require("leetcode.utils")
 
 local parser = require("leetcode.parser")
 local t = require("leetcode.translator")
 
----@class lc.ui.Description : NuiSplit
----@field split NuiSplit
----@field parent lc-ui.Question
----@field renderer lc-ui.Renderer
----@field visible boolean
+---@class lc.ui.Description : lc-ui.Split
+---@field question lc-ui.Question
 ---@field images table<string, Image>
-local Description = NuiSplit:extend("LeetDescription")
+local Description = Split:extend("LeetDescription")
 
 local group_id = vim.api.nvim_create_augroup("leetcode_description", { clear = true })
 
@@ -32,20 +27,12 @@ function Description:autocmds()
     })
 end
 
-function Description:unmount()
-    Description.super.unmount(self)
-    self = nil
-end
-
 function Description:mount()
-    self.visible = true
     Description.super.mount(self)
-    self.renderer.winid = self.winid
-    self.renderer.bufnr = self.bufnr
     self:populate()
 
-    local utils = require("leetcode-menu.utils")
-    utils.set_buf_opts(self.bufnr, {
+    local ui_utils = require("leetcode-ui.utils")
+    ui_utils.set_buf_opts(self.bufnr, {
         modifiable = false,
         buflisted = false,
         matchpairs = "",
@@ -54,7 +41,7 @@ function Description:mount()
         filetype = "leetcode.nvim",
         synmaxcol = 0,
     })
-    utils.set_win_opts(self.winid, {
+    ui_utils.set_win_opts(self.winid, {
         winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
         wrap = not img_sup,
         colorcolumn = "",
@@ -77,18 +64,8 @@ function Description:mount()
     return self
 end
 
-function Description:toggle()
-    if self.visible then
-        self:hide()
-    else
-        self:show()
-    end
-
-    self.visible = not self.visible
-end
-
 function Description:draw()
-    self.renderer:draw()
+    Description.super.draw(self)
     self:draw_imgs()
 end
 
@@ -122,13 +99,13 @@ end
 
 ---@private
 function Description:populate()
-    local q = self.parent.q
+    local q = self.question.q
 
     local header = Group({
         position = "center",
     })
 
-    header:append(self.parent.cache.link or "", "leetcode_alt")
+    header:append(self.question.cache.link or "", "leetcode_alt")
     header:endgrp()
 
     header:insert(Padding(1))
@@ -178,13 +155,8 @@ function Description:init(parent)
         focusable = true,
     })
 
-    self.parent = parent
-    self.visible = false
+    self.question = parent
     self.images = {}
-
-    self.renderer = Renderer()
-
-    self:map("n", { "q", "<Esc>" }, function() self:toggle() end)
 end
 
 ---@type fun(parent: lc-ui.Question): lc.ui.Description

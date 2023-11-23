@@ -1,9 +1,9 @@
-local Header = require("leetcode-menu.components.header")
-local Title = require("leetcode-menu.components.title")
+local Header = require("leetcode-ui.lines.menu-header")
+local Title = require("leetcode-ui.lines.title")
 local Button = require("leetcode-ui.lines.button")
-local Footer = require("leetcode-menu.components.footer")
-local Buttons = require("leetcode-menu.components.buttons")
-local Page = require("leetcode-menu.page")
+local Footer = require("leetcode-ui.lines.footer")
+local Buttons = require("leetcode-ui.group.buttons")
+local Page = require("leetcode-ui.group.page")
 
 local cmd = require("leetcode.command")
 
