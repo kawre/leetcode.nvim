@@ -79,6 +79,7 @@ return {
     pick = function()
         local tabs = utils.curr_question_tabs()
         if vim.tbl_isempty(tabs) then return log.warn("No questions opened") end
+        log.info("new tabs")
 
         pickers
             .new(opts, {
@@ -94,7 +95,8 @@ return {
                         local selection = action_state.get_selected_entry()
 
                         if not selection then return end
-                        pcall(vim.cmd.tabnext, selection.value.tabpage)
+                        local ok, err = pcall(vim.cmd.tabnext, selection.value.tabpage)
+                        log.info(err)
                     end)
                     return true
                 end,
