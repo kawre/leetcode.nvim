@@ -7,7 +7,9 @@ local config = require("leetcode.config")
 local spinner = require("leetcode.logger.spinner")
 
 ---@class lc.Interpreter
-local interpreter = {}
+local interpreter = {
+    running = false,
+}
 
 local check_state = {
     ["PENDING"] = "Pending…",
@@ -85,18 +87,29 @@ end
 ---@param callback function
 function interpreter.interpret_solution(title_slug, body, callback)
     local url = urls.interpret:format(title_slug)
-    local res, err = interpreter.fetch(url, body)
-    if err then return log.err(err) end
 
-    interpreter.listener(res.interpret_id, callback)
+    interpreter.fetch(url, {
+        body = body,
+        callback = function(res, success)
+            callback(success)
+            if success then interpreter.listener(res.interpret_id, callback) end
+        end,
+    })
 end
 
+---@param title_slug string
+---@param body lc.Interpret.body
+---@param callback function
 function interpreter.submit(title_slug, body, callback)
     local url = urls.submit:format(title_slug)
-    local res, err = interpreter.fetch(url, body)
-    if err then return log.err(err) end
 
-    interpreter.listener(res.submission_id, callback)
+    interpreter.fetch(url, {
+        body = body,
+        callback = function(res, success)
+            callback(success)
+            if success then interpreter.listener(res.submission_id, callback) end
+        end,
+    })
 end
 
 ---@param id string
@@ -108,16 +121,21 @@ function interpreter.check(id, cb)
     utils.get(url, cb)
 end
 
-function interpreter.fetch(url, body)
-    local res, err = utils.post(url, body)
-    if err then
-        if err.status == 429 then
-            err.msg = "You have attempted to run code too soon"
-            err.lvl = vim.log.levels.WARN
-        end
-        return nil, err
-    end
-    return res
+function interpreter.fetch(url, opts)
+    utils.post(url, {
+        body = opts.body,
+        callback = function(res, err)
+            if err then
+                if err.status == 429 then
+                    err.msg = "You have attempted to run code too soon"
+                    err.lvl = vim.log.levels.WARN
+                end
+                opts.callback(log.err(err), false)
+            else
+                opts.callback(res, true)
+            end
+        end,
+    })
 end
 
 return interpreter

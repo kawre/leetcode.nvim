@@ -8,10 +8,11 @@ local urls = require("leetcode.api.urls")
 local utils = {}
 
 ---@param endpoint string
-function utils.post(endpoint, body)
+function utils.post(endpoint, opts)
     return utils.curl("post", {
         endpoint = endpoint,
-        body = body,
+        body = opts.body,
+        callback = opts.callback,
     })
 end
 

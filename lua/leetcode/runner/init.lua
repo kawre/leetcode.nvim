@@ -7,10 +7,14 @@ local config = require("leetcode.config")
 local runner = {}
 runner.__index = runner
 
+runner.running = false
+
 ---@param submit? boolean
 function runner:run(submit)
+    if runner.running then return log.warn("Runner is busy") end
+    runner.running = true
+
     local question = self.question
-    if config.user.console.open_on_runcode then question.console:show() end
 
     vim.schedule(function()
         local tc_lines = vim.api.nvim_buf_get_lines(question.bufnr, 0, -1, false)
@@ -22,7 +26,18 @@ function runner:run(submit)
             question_id = question.q.id,
         }
 
-        local function callback(item) self:callback(item) end
+        local function callback(item)
+            if type(item) == "boolean" then
+                if item == true then
+                    question.console.result:clear()
+                else
+                    runner.running = false
+                end
+            else
+                self:callback(item)
+                runner.running = false
+            end
+        end
 
         if not submit then
             local di_lines = question.console.testcase:content()

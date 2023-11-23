@@ -9,7 +9,7 @@ local Runner = require("leetcode.runner")
 local log = require("leetcode.logger")
 
 ---@class lc.ui.Console : NuiLayout
----@field parent lc-ui.Question
+---@field question lc-ui.Question
 ---@field testcase lc.ui.Console.TestcasePopup
 ---@field result lc.ui.Console.ResultPopup
 ---@field popups lc.ui.Console.Popup[]
@@ -17,7 +17,10 @@ local ConsoleLayout = Layout:extend("LeetConsoleLayout")
 
 function ConsoleLayout:unmount() --
     ConsoleLayout.super.unmount(self)
-    self.popups = {}
+
+    self.testcase = Testcase(self)
+    self.result = Result(self)
+    self.popups = { self.testcase, self.result }
 end
 
 function ConsoleLayout:hide()
@@ -25,13 +28,18 @@ function ConsoleLayout:hide()
 
     pcall(function()
         local winid = vim.api.nvim_get_current_win()
-        if winid == self.parent.description.winid then
-            vim.api.nvim_set_current_win(self.parent.winid)
+        if winid == self.question.description.winid then
+            vim.api.nvim_set_current_win(self.question.winid)
         end
     end)
 end
 
 function ConsoleLayout:mount()
+    self:update(NuiLayout.Box({
+        NuiLayout.Box(self.testcase, { size = config.user.console.testcase.size }),
+        NuiLayout.Box(self.result, { size = config.user.console.result.size }),
+    }, { dir = config.user.console.dir }))
+
     ConsoleLayout.super.mount(self)
 
     self:set_keymaps({
@@ -46,8 +54,7 @@ end
 
 function ConsoleLayout:run(submit)
     if config.user.console.open_on_runcode then self:show() end
-    self.result:clear()
-    Runner:init(self.parent):run(submit)
+    Runner:init(self.question):run(submit)
 end
 
 function ConsoleLayout:use_testcase()
@@ -69,7 +76,7 @@ end
 
 ---@param parent lc-ui.Question
 function ConsoleLayout:init(parent)
-    self.parent = parent
+    self.question = parent
 
     self.testcase = Testcase(self)
     self.result = Result(self)

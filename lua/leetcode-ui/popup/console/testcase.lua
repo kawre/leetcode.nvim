@@ -26,7 +26,7 @@ end
 
 function Testcase:draw()
     local tbl = {}
-    for i, case in ipairs(self.console.parent.q.testcase_list) do
+    for i, case in ipairs(self.console.question.q.testcase_list) do
         if i ~= 1 then table.insert(tbl, "") end
 
         table.insert(self.testcases, case:gsub("\n", " ")[1])
@@ -66,7 +66,7 @@ function Testcase:draw_extmarks()
     self:clear_extmarks()
     local bufnr = self.bufnr
 
-    local md = self.console.parent.q.meta_data
+    local md = self.console.question.q.meta_data
     local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 
     if not md.params then return end
