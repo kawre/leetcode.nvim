@@ -1,5 +1,6 @@
 local NuiPopup = require("nui.popup")
 local Renderer = require("leetcode-ui.renderer")
+local config = require("leetcode.config")
 
 local log = require("leetcode.logger")
 
@@ -82,6 +83,9 @@ function Popup:init(opts)
                 right = 3,
             },
             style = "rounded",
+        },
+        buf_options = {
+            filetype = config.name,
         },
     }, opts or {})
 
