@@ -123,6 +123,8 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/309088c9-4ff7-4dff-ab61-a
         position = "left", ---@type lc.position
 
         width = "40%", ---@type lc.size
+
+        show_stats = true, ---@type boolean
     },
 
     hooks = {
@@ -240,6 +242,8 @@ image_support = false, -- 将此设置为 `true` 将禁用问题描述的换行
 - `desc` 切换问题描述
 
   - `toggle` 与 `Leet desc` 相同
+
+  - `stats` 切换描述统计可见性
 
 - `cookie`
 

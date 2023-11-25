@@ -97,6 +97,12 @@ function Description:draw_imgs()
     end
 end
 
+function Description:toggle_stats()
+    self.show_stats = not self.show_stats
+    self:populate()
+    self:draw()
+end
+
 ---@private
 function Description:populate()
     local q = self.question.q
@@ -114,22 +120,27 @@ function Description:populate()
     header:append(utils.translate(q.title, q.translated_title))
     header:endgrp()
 
-    header:append(
-        t(q.difficulty),
-        ({
-            ["Easy"] = "leetcode_easy",
-            ["Medium"] = "leetcode_medium",
-            ["Hard"] = "leetcode_hard",
-        })[q.difficulty]
-    )
+    local show_stats = self.show_stats
+
+    if show_stats then
+        header:append(t(q.difficulty), "leetcode_" .. q.difficulty:lower())
+    else
+        header:append("????", "leetcode_list")
+    end
+
     header:append(" | ")
-    header:append(q.likes .. " ", "leetcode_alt")
-    if not config.is_cn then header:append(" " .. q.dislikes .. " ", "leetcode_alt") end
+
+    local likes = show_stats and q.likes or "___"
+    header:append(likes .. " ", "leetcode_alt")
+
+    local dislikes = show_stats and q.dislikes or "___"
+    if not config.is_cn then header:append((" %s "):format(dislikes), "leetcode_alt") end
+
     header:append(" | ")
-    header:append(
-        ("%s %s %s"):format(q.stats.acRate, t("of"), q.stats.totalSubmission),
-        "leetcode_alt"
-    )
+
+    local ac_rate = show_stats and q.stats.acRate or "__%"
+    local total_sub = show_stats and q.stats.totalSubmission or "__"
+    header:append(("%s %s %s"):format(ac_rate, t("of"), total_sub), "leetcode_alt")
     if not vim.tbl_isempty(q.hints) then
         header:append(" | ")
         header:append("󰛨 " .. t("Hints"), "leetcode_hint")
@@ -156,6 +167,7 @@ function Description:init(parent)
     })
 
     self.question = parent
+    self.show_stats = config.user.description.show_stats
     self.images = {}
 end
 

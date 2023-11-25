@@ -119,6 +119,8 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         position = "left", ---@type lc.position
 
         width = "40%", ---@type lc.size
+
+        show_stats = true, ---@type boolean
     },
 
     hooks = {
@@ -236,6 +238,8 @@ image_support = false, -- setting this to `true` will disable question descripti
 - `desc` toggle question description
 
   - `toggle` same as `Leet desc`
+
+  - `stats` toggle description stats visibility
 
 - `cookie`
 

@@ -176,6 +176,12 @@ function cmd.desc_toggle()
     if q then q.description:toggle() end
 end
 
+function cmd.desc_toggle_stats()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if q then q.description:toggle_stats() end
+end
+
 function cmd.console()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
@@ -352,6 +358,8 @@ cmd.commands = {
 
     desc = {
         cmd.desc_toggle,
+
+        stats = { cmd.desc_toggle_stats },
 
         toggle = { cmd.desc_toggle },
     },
