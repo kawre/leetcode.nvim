@@ -60,16 +60,16 @@ function cmd.cookie_prompt(cb)
     local input = NuiInput(popup_options, {
         prompt = " 󰆘 ",
         on_submit = function(value)
-            local success = cookie.set(value)
+            local err = cookie.set(value)
 
-            if success then
+            if not err then
                 log.info("Sign-in successful")
                 cmd.menu_layout("menu")
             else
-                log.error("Sign-in failed")
+                log.error("Sign-in failed: " .. err)
             end
 
-            pcall(cb, success)
+            pcall(cb, err and false or true)
         end,
     })
 
@@ -365,7 +365,7 @@ cmd.commands = {
         update = { cmd.cache_update },
     },
 
-    --deprecated
+    ---@deprecated
     hints = { cmd.hints },
 }
 

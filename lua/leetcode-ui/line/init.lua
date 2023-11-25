@@ -1,8 +1,6 @@
 local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
 
-local log = require("leetcode.logger")
-
 ---@class lc.ui.Line : NuiLine
 local Line = NuiLine:extend("LeetLine")
 

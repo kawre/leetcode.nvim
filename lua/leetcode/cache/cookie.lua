@@ -17,23 +17,19 @@ local Cookie = {}
 
 ---@param str string
 ---
----@return boolean
+---@return string|nil
 function Cookie.set(str)
     local _, cerr = Cookie.parse(str)
-    if cerr then
-        log.error(cerr)
-        return false
-    end
+    if cerr then return cerr end
 
     file:write(str, "w")
     local auth_api = require("leetcode.api.auth")
     local _, aerr = auth_api.user()
 
     if aerr then
-        require("leetcode.command").delete_cookie()
-        return false
+        return aerr.msg
     else
-        return true
+        return nil
     end
 end
 

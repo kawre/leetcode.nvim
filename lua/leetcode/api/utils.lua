@@ -100,7 +100,7 @@ function utils.handle_res(out)
             code = 0,
             status = out.status,
             response = out,
-            msg = "http error",
+            msg = "http error " .. out.status,
             out = out.body,
         }
     else
