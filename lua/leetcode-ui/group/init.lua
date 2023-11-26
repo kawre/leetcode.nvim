@@ -1,7 +1,6 @@
 local Pad = require("leetcode-ui.lines.padding")
 local Object = require("nui.object")
 local Lines = require("leetcode-ui.lines")
-local Line = require("leetcode-ui.line")
 
 ---@alias params { items: lc-ui.Lines[], opts: lc-ui.Group.opts, grp_idx: integer }
 

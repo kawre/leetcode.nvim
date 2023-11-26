@@ -1,9 +1,11 @@
 local log = require("leetcode.logger")
 local t = require("leetcode.translator")
+local utils = require("leetcode.utils")
 
 local Pre = require("leetcode-ui.lines.pre")
 local Stdout = require("leetcode-ui.lines.pre.stdout")
 local Group = require("leetcode-ui.group")
+local Lines = require("leetcode-ui.lines")
 
 local Line = require("leetcode-ui.line")
 
@@ -15,49 +17,55 @@ local Line = require("leetcode-ui.line")
 ---@field passed boolean
 ---@field index integer
 ---@field body case_body
+---@field question lc-ui.Question
 local Case = Group:extend("LeetCase")
-
-local function get_pad(key, max_len) return (" "):rep(max_len + 1 - vim.api.nvim_strwidth(key)) end
 
 ---@private
 ---@param input string
----@return NuiLine
 function Case:input(input)
     local key = t("Input")
 
-    local line = Line()
-    line:append(("%s:%s"):format(key, get_pad(key, self.max_len)))
-    line:append(input, "leetcode_alt")
+    local group = Group({ spacing = 1 })
+    local s = vim.split(input, " ")
+    for i = 1, #s do
+        local lines = Lines()
 
-    return line
+        local ok, param = pcall(function() return self.question.q.meta_data.params[i].name end)
+
+        if ok then lines:append(param .. " =", "leetcode_normal"):endl() end
+        lines:append(s[i])
+
+        group:insert(lines)
+    end
+
+    local title = Line():append(key, "leetcode_normal")
+    local pre = Pre(title, group)
+
+    return pre
 end
 
 ---@private
 ---@param output string
 ---@param expected string
----@return NuiLine
 function Case:output(output, expected)
     local key = t("Output")
 
-    local line = Line()
-    line:append(("%s:%s"):format(key, get_pad(key, self.max_len)))
-    line:append(output, "leetcode_alt")
+    local title = Line():append(key, "leetcode_normal")
+    local pre = Pre(title, Line():append(output))
 
-    return line
+    return pre
 end
 
 ---@private
 ---@param expected string
 ---@param output string
----@return NuiLine
 function Case:expected(expected, output)
     local key = t("Expected")
+    local title = Line():append(key, "leetcode_normal")
 
-    local line = Line()
-    line:append(("%s:%s"):format(key, get_pad(key, self.max_len)))
-    line:append(expected, "leetcode_alt")
+    local pre = Pre(title, Line():append(expected))
 
-    return line
+    return pre
 end
 
 ---@param body case_body
@@ -68,19 +76,16 @@ function Case:init(body, passed)
     Case.super.init(self, { spacing = 1 })
 
     self.body = body
+    self.question = utils.curr_question()
 
     self.max_len = 0
     for _, key in ipairs({ "Input", "Output", "Expected" }) do
         self.max_len = math.max(self.max_len, vim.api.nvim_strwidth(t(key)))
     end
 
-    local tbl = {}
-    table.insert(tbl, self:input(body.input))
-    table.insert(tbl, self:output(body.output, body.expected))
-    table.insert(tbl, self:expected(body.expected, body.output))
-
-    local pre = Pre(nil, tbl)
-    self:insert(pre)
+    self:insert(self:input(body.input))
+    self:insert(self:output(body.output, body.expected))
+    self:insert(self:expected(body.expected, body.output))
 
     local stdout = Stdout(body.std_output)
     self:insert(stdout)

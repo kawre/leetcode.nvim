@@ -61,7 +61,7 @@ function Cases:init(item, testcases, parent)
             output = item.code_answer[i],
             expected = item.expected_code_answer[i],
             std_output = item.std_output_list[i],
-        }, item.compare_result:sub(i, i) == "1")
+        }, item.compare_result:sub(i, i) == "1", parent)
     end
 
     self:change(1)

@@ -9,6 +9,7 @@ local Stdout = require("leetcode-ui.lines.pre.stdout")
 local Case = require("leetcode-ui.group.case")
 
 local Line = require("leetcode-ui.line")
+local Lines = require("leetcode-ui.lines")
 local NuiText = require("nui.text")
 
 local config = require("leetcode.config")
@@ -29,13 +30,12 @@ function ResultLayout:handle_accepted(item)
     local header = Header(item)
     self.group:insert(header)
 
-    -- runtime
-    local status_runtime = Line()
+    local runtime = Lines()
     local runtime_ms = item.display_runtime or vim.split(item.status_runtime, " ")[1] or "NIL"
-    status_runtime:append(runtime_ms):append(" ms", "leetcode_alt")
+    runtime:append(runtime_ms):append(" ms", "leetcode_alt")
+    runtime:endl()
 
-    local perc_runtime = Line()
-    perc_runtime:append(
+    runtime:append(
         ("%s %.2f%% "):format(t("Beats"), item.runtime_percentile),
         perc_hi(item.runtime_percentile)
     )
@@ -45,47 +45,39 @@ function ResultLayout:handle_accepted(item)
     if lang then lang_text = { lang.icon .. " " .. lang.lang, lang.hl or "Structure" } end
 
     if config.translator then
-        perc_runtime
+        runtime
             :append("使用 ", "leetcode_normal")
             :append(unpack(lang_text))
             :append(" 的用户", "leetcode_normal")
     else
-        perc_runtime:append("of users with ", "leetcode_normal"):append(unpack(lang_text))
+        runtime:append("of users with ", "leetcode_normal"):append(unpack(lang_text))
     end
 
     local runtime_title = Line():append("󰓅 " .. t("Runtime"))
-    local runtime = Pre(runtime_title, {
-        status_runtime,
-        perc_runtime,
-    })
-    self.group:insert(runtime)
+    self.group:insert(Pre(runtime_title, runtime))
 
     -- memory
-    local status_memory = Line()
+    local memory = Lines()
     item.status_memory = item.status_memory:gsub("(%d+)%s*(%a+)", "%1 %2")
     local s_mem = vim.split(item.status_memory, " ")
-    status_memory:append(s_mem[1] .. " "):append(s_mem[2], "leetcode_alt")
+    memory:append(s_mem[1] .. " "):append(s_mem[2], "leetcode_alt")
+    memory:endl()
 
-    local perc_mem = Line()
-    perc_mem:append(
+    memory:append(
         ("%s %.2f%% "):format(t("Beats"), item.memory_percentile),
         perc_hi(item.memory_percentile)
     )
     if config.translator then
-        perc_mem
+        memory
             :append("使用 ", "leetcode_normal")
             :append(unpack(lang_text))
             :append(" 的用户", "leetcode_normal")
     else
-        perc_mem:append("of users with ", "leetcode_normal"):append(unpack(lang_text))
+        memory:append("of users with ", "leetcode_normal"):append(unpack(lang_text))
     end
 
     local memory_title = Line():append("󰍛 " .. t("Memory"))
-    local memory = Pre(memory_title, {
-        status_memory,
-        perc_mem,
-    })
-    self.group:insert(memory)
+    self.group:insert(Pre(memory_title, memory))
 end
 
 ---@private
@@ -131,7 +123,7 @@ function ResultLayout:handle_limit_exceeded(item) -- status code = 12,13,14
         local pre_header = Line()
         pre_header:append((" %s"):format(t("Last Executed Input")), "leetcode_normal")
 
-        local last_exec = Pre(pre_header, { last_testcase })
+        local last_exec = Pre(pre_header, last_testcase)
 
         self.group:insert(last_exec)
 
@@ -162,7 +154,7 @@ function ResultLayout:handle_runtime_error(item) -- status code = 15
         local last_testcase = Line()
         last_testcase:append(item.last_testcase:gsub("\n", " "), "leetcode_indent")
 
-        local last_exec = Pre(pre_header, { last_testcase })
+        local last_exec = Pre(pre_header, last_testcase)
         self.group:insert(last_exec)
 
         local stdout = Stdout(item.std_output or "")
@@ -184,12 +176,12 @@ end
 function ResultLayout:handle_compile_error(item) -- status code = 20
     local header = Header(item)
 
-    local tbl = {}
+    local lines = Lines()
     for line in vim.gsplit(item.full_compile_error, "\n") do
-        table.insert(tbl, Line():append(line, "leetcode_error"))
+        lines:append(line, "leetcode_error"):endl()
     end
 
-    local pre = Pre(header._.lines[1], tbl)
+    local pre = Pre(header._.lines[1], lines)
     self.group:insert(pre)
 end
 

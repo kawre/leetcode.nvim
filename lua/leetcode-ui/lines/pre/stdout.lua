@@ -1,6 +1,7 @@
 local Pre = require("leetcode-ui.lines.pre")
 local t = require("leetcode.translator")
 local Line = require("leetcode-ui.line")
+local Lines = require("leetcode-ui.lines")
 
 ---@class lc.Stdout : lc.Result.Pre
 local Stdout = Pre:extend("LeetStdout")
@@ -11,20 +12,18 @@ local Stdout = Pre:extend("LeetStdout")
 function Stdout:init(output)
     local output_list = vim.split(output or "", "\n", { trimempty = true })
     if vim.tbl_isempty(output_list) then
-        Stdout.super.init(self, nil, {})
+        Stdout.super.init(self)
         self:clear()
         return
     end
 
-    local tbl = {}
+    local lines = Lines()
     for i = 1, #output_list, 1 do
-        local line = Line()
-        line:append(output_list[i])
-        table.insert(tbl, line)
+        lines:append(output_list[i]):endl()
     end
 
     local title = Line():append((" %s"):format(t("Stdout")), "leetcode_alt")
-    Stdout.super.init(self, title, tbl)
+    Stdout.super.init(self, title, lines)
 end
 
 ---@alias lc.Stdout.constructor fun(output: string): lc.Stdout
