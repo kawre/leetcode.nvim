@@ -103,6 +103,21 @@ function Question:mount()
     return self
 end
 
+---@param lang lc.lang
+Question.change_lang = vim.schedule_wrap(function(self, lang)
+    self.lang = lang
+    self:create_file()
+
+    vim.api.nvim_set_current_dir(config.home:absolute())
+    local new_buf = vim.fn.bufadd(self.file:absolute())
+
+    if new_buf then
+        vim.api.nvim_win_set_buf(self.winid, new_buf)
+    else
+        log.error("Changing language failed")
+    end
+end)
+
 ---@param problem lc.cache.Question
 function Question:init(problem)
     self.cache = problem
