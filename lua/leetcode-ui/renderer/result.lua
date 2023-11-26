@@ -1,5 +1,6 @@
 local Cases = require("leetcode-ui.group.cases")
 local Header = require("leetcode-ui.lines.header")
+local utils = require("leetcode.utils")
 
 local Renderer = require("leetcode-ui.renderer")
 local Pre = require("leetcode-ui.lines.pre")
@@ -31,24 +32,29 @@ function ResultLayout:handle_accepted(item)
     -- runtime
     local status_runtime = Line()
     local runtime_ms = item.display_runtime or vim.split(item.status_runtime, " ")[1] or "NIL"
-    status_runtime:append(runtime_ms)
-    status_runtime:append(" ms", "leetcode_alt")
+    status_runtime:append(runtime_ms):append(" ms", "leetcode_alt")
 
     local perc_runtime = Line()
     perc_runtime:append(
         ("%s %.2f%% "):format(t("Beats"), item.runtime_percentile),
         perc_hi(item.runtime_percentile)
     )
+
+    local lang = utils.get_lang_by_name(item.pretty_lang)
+    local lang_text = { item.pretty_lang, "Structure" }
+    if lang then lang_text = { lang.icon .. " " .. lang.lang, lang.hl or "Structure" } end
+
     if config.translator then
-        perc_runtime:append("使用 ")
-        perc_runtime:append(item.pretty_lang, "Structure")
-        perc_runtime:append(" 的用户")
+        perc_runtime
+            :append("使用 ", "leetcode_normal")
+            :append(unpack(lang_text))
+            :append(" 的用户", "leetcode_normal")
     else
-        perc_runtime:append("of users with ")
-        perc_runtime:append(item.pretty_lang, "Structure")
+        perc_runtime:append("of users with ", "leetcode_normal"):append(unpack(lang_text))
     end
 
-    local runtime = Pre(NuiText(("󰓅 %s"):format(t("Runtime")), "leetcode_normal"), {
+    local runtime_title = Line():append("󰓅 " .. t("Runtime"))
+    local runtime = Pre(runtime_title, {
         status_runtime,
         perc_runtime,
     })
@@ -56,11 +62,9 @@ function ResultLayout:handle_accepted(item)
 
     -- memory
     local status_memory = Line()
-    -- if item.status_memory == "0B" then item.status_memory = "0 MB" end
     item.status_memory = item.status_memory:gsub("(%d+)%s*(%a+)", "%1 %2")
     local s_mem = vim.split(item.status_memory, " ")
-    status_memory:append(s_mem[1] .. " ")
-    status_memory:append(s_mem[2], "leetcode_alt")
+    status_memory:append(s_mem[1] .. " "):append(s_mem[2], "leetcode_alt")
 
     local perc_mem = Line()
     perc_mem:append(
@@ -68,15 +72,16 @@ function ResultLayout:handle_accepted(item)
         perc_hi(item.memory_percentile)
     )
     if config.translator then
-        perc_mem:append("使用 ")
-        perc_mem:append(item.pretty_lang, "Structure")
-        perc_mem:append(" 的用户")
+        perc_mem
+            :append("使用 ", "leetcode_normal")
+            :append(unpack(lang_text))
+            :append(" 的用户", "leetcode_normal")
     else
-        perc_mem:append("of users with ")
-        perc_mem:append(item.pretty_lang, "Structure")
+        perc_mem:append("of users with ", "leetcode_normal"):append(unpack(lang_text))
     end
 
-    local memory = Pre(NuiText(("󰍛 %s"):format(t("Memory")), "leetcode_normal"), {
+    local memory_title = Line():append("󰍛 " .. t("Memory"))
+    local memory = Pre(memory_title, {
         status_memory,
         perc_mem,
     })

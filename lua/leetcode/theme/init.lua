@@ -40,6 +40,7 @@ local highlights = {
 }
 
 function theme.load_devicons()
+    ---@param l lc.language
     vim.tbl_map(function(l)
         local icon, color = devicons.get_icon_color(l.ft)
 
@@ -59,10 +60,15 @@ function theme.load()
     end
 
     if devicons_ok then theme.load_devicons() end
-    for _, lang in ipairs(config.langs) do
+
+    ---@param lang lc.language
+    vim.tbl_map(function(lang)
         local name = "leetcode_lang_" .. lang.slug
         vim.api.nvim_set_hl(0, name, { fg = lang.color })
-    end
+        lang.hl = name
+
+        return lang
+    end, config.langs)
 
     theme.load_dynamic(defaults)
 end

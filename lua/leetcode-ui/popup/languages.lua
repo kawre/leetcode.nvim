@@ -3,6 +3,7 @@ local Group = require("leetcode-ui.group")
 local Lines = require("leetcode-ui.lines")
 local t = require("leetcode.translator")
 
+local utils = require("leetcode.utils")
 local config = require("leetcode.config")
 local stats_api = require("leetcode.api.statistics")
 local Spinner = require("leetcode.logger.spinner")
@@ -11,16 +12,24 @@ local Spinner = require("leetcode.logger.spinner")
 ---@field renderer lc-ui.Renderer
 local Languages = Popup:extend("LeetLanguages")
 
-function Languages:handle(lang)
+function Languages:handle(res)
     local lines = Lines()
 
-    lines:append(lang.lang, "leetcode_code")
-    lines:append(" - ", "leetcode_list")
-    if config.is_cn then
-        lines:append("解题数", "leetcode_alt")
-        lines:append(" " .. lang.problems_solved)
+    local lang = utils.get_lang_by_name(res.lang)
+
+    if lang then
+        lines:append(lang.icon .. " " .. lang.lang, lang.hl or "leetcode_code")
     else
-        lines:append("" .. lang.problems_solved)
+        lines:append(res.lang, "leetcode_code")
+    end
+
+    lines:append(" - ", "leetcode_list")
+
+    if config.translator then
+        lines:append("解题数", "leetcode_alt")
+        lines:append(" " .. res.problems_solved)
+    else
+        lines:append("" .. res.problems_solved)
         lines:append(" problems solved", "leetcode_alt")
     end
 

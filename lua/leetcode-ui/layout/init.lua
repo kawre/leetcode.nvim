@@ -42,6 +42,7 @@ end
 
 function Layout:init(options, box) --
     Layout.super.init(self, options, box)
+
     self.visible = false
 end
 

@@ -24,8 +24,15 @@ function Line:draw(layout, opts)
     NuiLine(texts):render(layout.bufnr, -1, line_idx, line_idx)
 end
 
+function Line:append(content, highlight)
+    Line.super.append(self, content, highlight)
+    return self
+end
+
 ---@param texts? NuiText[]
-function Line:init(texts) Line.super.init(self, texts) end
+function Line:init(texts) --
+    Line.super.init(self, texts)
+end
 
 ---@type fun(texts?: NuiText[]): lc.ui.Line
 local LeetLine = Line

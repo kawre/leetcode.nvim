@@ -61,7 +61,14 @@ end
 
 ---@return lc.language
 function utils.get_lang(slug)
+    ---@param l lc.language
     return vim.tbl_filter(function(l) return l.slug == slug end, config.langs)[1]
+end
+
+---@return lc.language
+function utils.get_lang_by_name(name)
+    ---@param l lc.language
+    return vim.tbl_filter(function(l) return l.lang == name end, config.langs)[1]
 end
 
 ---@param event lc.hook

@@ -4,6 +4,7 @@
 ---@field icon string
 ---@field color string
 ---@field short string
+---@field hl? string
 ---@field sql boolean|nil
 ---@field ft string
 
