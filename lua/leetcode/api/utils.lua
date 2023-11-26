@@ -9,18 +9,21 @@ local utils = {}
 
 ---@param endpoint string
 function utils.post(endpoint, opts)
-    return utils.curl("post", {
+    local options = vim.tbl_deep_extend("force", {
         endpoint = endpoint,
-        body = opts.body,
-        callback = opts.callback,
-    })
+    }, opts or {})
+
+    return utils.curl("post", options)
 end
 
-function utils.get(endpoint, cb)
-    return utils.curl("get", {
+---@param endpoint string
+---@param opts? table
+function utils.get(endpoint, opts)
+    local options = vim.tbl_deep_extend("force", {
         endpoint = endpoint,
-        callback = cb,
-    })
+    }, opts or {})
+
+    return utils.curl("get", options)
 end
 
 ---@param query string

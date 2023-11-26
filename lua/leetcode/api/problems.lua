@@ -2,32 +2,47 @@ local utils = require("leetcode.api.utils")
 local queries = require("leetcode.api.queries")
 local config = require("leetcode.config")
 local urls = require("leetcode.api.urls")
+local Spinner = require("leetcode.logger.spinner")
 
 local log = require("leetcode.logger")
 
 ---@class lc.ProblemsApi
 local Problems = {}
 
+---@param cb? function
+---@param noti? boolean
+---
 ---@return lc.cache.Question[], lc.err
-function Problems.all(cb)
+function Problems.all(cb, noti)
     local endpoint = urls.problems:format("algorithms")
 
+    local spinner
+    if noti then spinner = Spinner:init("fetching problemlist", "points") end
+
     if cb then
-        utils.get(endpoint, function(res, err)
-            if err then return cb(nil, err) end
+        utils.get(endpoint, {
+            callback = function(res, err)
+                if err then
+                    if spinner then spinner:stop(err.msg, false) end
+                    return cb(nil, err)
+                end
 
-            local problems = utils.normalize_problems(res.stat_status_pairs)
+                local problems = utils.normalize_problems(res.stat_status_pairs)
 
-            if config.is_cn then
-                Problems.translated_titles(function(titles, terr)
-                    if terr then return cb(nil, terr) end
-                    problems = utils.translate_titles(problems, titles)
+                if config.is_cn then
+                    if spinner then spinner:update("fetching title translations") end
+                    Problems.translated_titles(function(titles, terr)
+                        if terr then return cb(nil, terr) end
+                        problems = utils.translate_titles(problems, titles)
+                        cb(problems)
+                        if spinner then spinner:stop("problems cache updated") end
+                    end)
+                else
                     cb(problems)
-                end)
-            else
-                cb(problems)
-            end
-        end)
+                    if spinner then spinner:stop("problems cache updated") end
+                end
+            end,
+        })
     else
         local res, err = utils.get(endpoint)
         if err then return nil, err end

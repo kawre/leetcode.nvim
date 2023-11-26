@@ -118,7 +118,7 @@ end
 ---@return lc.Interpreter.Response
 function interpreter.check(id, cb)
     local url = urls.check:format(id)
-    utils.get(url, cb)
+    utils.get(url, { callback = cb })
 end
 
 function interpreter.fetch(url, opts)
