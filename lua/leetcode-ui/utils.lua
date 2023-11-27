@@ -22,27 +22,6 @@ function utils.win_width(layout)
     return vim.api.nvim_win_get_width(layout.winid)
 end
 
---@param config lc-ui.Component.config
----
----@return NuiLine[]
-function utils.parse_lines(lines, opts)
-    local tbl = {}
-
-    if type(lines) == "table" then
-        for _, line in pairs(lines) do
-            if type(line) == "string" then
-                local nui_line = Line()
-                nui_line:append(line, opts and opts.hl or nil)
-                table.insert(tbl, nui_line)
-            else
-                table.insert(tbl, line)
-            end
-        end
-    end
-
-    return tbl
-end
-
 ---@param lines lc-ui.Lines
 ---@param layout lc-ui.Renderer
 ---

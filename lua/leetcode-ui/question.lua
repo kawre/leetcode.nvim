@@ -51,8 +51,6 @@ end
 
 function Question:handle_mount()
     self:create_file()
-
-    vim.api.nvim_set_current_dir(config.home:absolute())
     vim.cmd("$tabe " .. self.file:absolute())
 
     utils.exec_hooks("LeetQuestionNew", {
@@ -108,9 +106,7 @@ Question.change_lang = vim.schedule_wrap(function(self, lang)
     self.lang = lang
     self:create_file()
 
-    vim.api.nvim_set_current_dir(config.home:absolute())
     local new_buf = vim.fn.bufadd(self.file:absolute())
-
     if new_buf then
         vim.api.nvim_win_set_buf(self.winid, new_buf)
     else

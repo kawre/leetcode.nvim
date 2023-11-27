@@ -141,11 +141,11 @@ end
 function ResultLayout:handle_runtime_error(item) -- status code = 15
     local header = Header(item)
 
-    local tbl = {}
+    local lines = Lines()
     for line in vim.gsplit(item.full_runtime_error, "\n") do
-        table.insert(tbl, Line():append(line, "leetcode_error"))
+        lines:append(line, "leetcode_error"):endl()
     end
-    self.group:insert(Pre(header._.lines[1], tbl))
+    self.group:insert(Pre(header._.lines[1], lines))
 
     if item._.submission then
         local pre_header = Line()
