@@ -14,9 +14,12 @@ function Title:init(history, str, opts)
 
     opts = vim.tbl_deep_extend("force", {
         position = "center",
+        padding = {
+            top = 1,
+        },
     }, opts or {})
 
-    Title.super.init(self, opts)
+    Title.super.init(self, {}, opts)
 
     for _, hist in ipairs(history) do
         self:append(hist, "leetcode_alt")

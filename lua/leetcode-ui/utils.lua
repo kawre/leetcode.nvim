@@ -4,16 +4,16 @@ local log = require("leetcode.logger")
 ---@class lc-ui.Utils
 local utils = {}
 
----@param lines lc-ui.Lines
-function utils.longest_line(lines)
-    local width = 0
+---@param item lc-ui.Lines
+function utils.longest_line(item)
+    if item.class.name == "LeetLine" then return vim.api.nvim_strwidth(item:content()) end
 
-    for _, line in pairs(lines:contents()) do
-        local len = vim.api.nvim_strwidth(line:content())
-        width = math.max(len, width)
+    local max_len = 0
+    for _, line in pairs(item:contents()) do
+        max_len = math.max(utils.longest_line(line), max_len)
     end
 
-    return width
+    return max_len
 end
 
 ---@param layout lc-ui.Renderer

@@ -4,8 +4,7 @@ local config = require("leetcode.config")
 local utils = require("leetcode-ui.utils")
 local Renderer = require("leetcode-ui.renderer")
 
----@class lc-menu : lc-ui.Renderer
----@field tabpage integer
+---@class lc-menu : lc-ui.Renderer @field tabpage integer
 ---@field cursor lc-menu.cursor
 ---@field maps table
 local Menu = Renderer:extend("LeetMenu")

@@ -11,7 +11,7 @@ local log = require("leetcode.logger")
 local Cases = Group:extend("LeetCases")
 
 function Cases:make_nav()
-    local nav = Lines({ padding = { top = 1 } })
+    local nav = Lines({}, { padding = { top = 1 } })
 
     for i, case in ipairs(self.cases) do
         self.result:map("n", tostring(i), function() self:change(i) end)
@@ -50,7 +50,7 @@ end
 ---@param parent lc.ui.Console.ResultPopup
 ---@return lc.Cases
 function Cases:init(item, testcases, parent)
-    Cases.super.init(self, { spacing = 1 })
+    Cases.super.init(self, {}, { spacing = 1 })
 
     self.cases = {}
     self.result = parent

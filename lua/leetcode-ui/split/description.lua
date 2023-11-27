@@ -107,7 +107,7 @@ end
 function Description:populate()
     local q = self.question.q
 
-    local header = Group({
+    local header = Group({}, {
         position = "center",
     })
 

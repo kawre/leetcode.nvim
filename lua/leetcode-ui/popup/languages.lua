@@ -39,7 +39,7 @@ end
 ---@private
 ---@param res lc.Languages.Res
 function Languages:populate(res)
-    local group = Group({ spacing = 1 })
+    local group = Group({}, { spacing = 1 })
 
     table.sort(res, function(a, b) return a.problems_solved > b.problems_solved end)
     for _, lang in ipairs(res) do

@@ -1,32 +1,30 @@
 local Pad = require("leetcode-ui.lines.padding")
-local Object = require("nui.object")
 local Lines = require("leetcode-ui.lines")
+local log = require("leetcode.logger")
 
----@alias params { items: lc-ui.Lines[], opts: lc-ui.Group.opts, grp_idx: integer }
+---@alias lc.ui.Group.params { items: lc-ui.Lines[], opts: lc-ui.Group.opts }
 
----@class lc-ui.Group
----@field _ params
-local Group = Object("LeetGroup")
+---@class lc-ui.Group : lc-ui.Lines
+---@field _ lc.ui.Group.params | lines.params
+local Group = Lines:extend("LeetGroup")
 
----@param opts lc-ui.Group.opts
-function Group:set_opts(opts) --
-    self._.opts = vim.tbl_deep_extend("force", self._.opts, opts or {})
-end
+function Group:contents()
+    local items = vim.deepcopy(self._.items)
 
-function Group:contents() return self._.items end
+    if not vim.tbl_isempty(Group.super.contents(self)) then --
+        table.insert(items, Lines(Group.super.contents(self)))
+    end
 
-function Group:append(content, highlight)
-    if not self._.items[self._.grp_idx] then table.insert(self._.items, Lines()) end
-    self._.items[self._.grp_idx]:append(content, highlight)
-    return self
+    return items
 end
 
 ---@param layout lc-ui.Renderer
 function Group:draw(layout, opts)
     opts = vim.tbl_deep_extend("force", self._.opts, opts or {})
-    local margin = opts.margin
-    local toppad = margin and margin.top
-    local botpad = margin and margin.bot
+    local padding = vim.deepcopy(opts.padding)
+    local toppad = padding and padding.top
+    local botpad = padding and padding.bot
+    opts.padding = {}
 
     if toppad then Pad(toppad):draw(layout) end
 
@@ -41,22 +39,24 @@ end
 
 ---@param item lc-ui.Lines
 function Group:insert(item)
-    if self._.items[self._.grp_idx] then --
-        self._.grp_idx = self._.grp_idx + 1
-    end
+    if not vim.tbl_isempty(Group.super.contents(self)) then self:endgrp() end
 
     table.insert(self._.items, item)
     return self
 end
 
 function Group:endgrp()
-    self._.grp_idx = self._.grp_idx + 1
+    local lines = Lines(Group.super.contents(self))
+    Group.super.clear(self)
+    self:insert(lines)
+
     return self
 end
 
 function Group:clear()
+    Group.super.clear(self)
     self._.items = {}
-    self._.grp_idx = 1
+
     return self
 end
 
@@ -64,19 +64,17 @@ end
 ---@param opts? lc-ui.Group.opts
 ---
 ---@return lc-ui.Group
-function Group:init(opts) --
+function Group:init(items, opts) --
     local options = vim.tbl_deep_extend("force", {
         margin = {},
     }, opts or {})
 
-    self._ = {
-        items = {},
-        opts = options,
-        grp_idx = 1,
-    }
+    Group.super.init(self, {}, options)
+
+    self._.items = items or {}
 end
 
----@type fun(opts?: lc-ui.Group.opts): lc-ui.Group
+---@type fun(items: table, opts?: lc-ui.Group.opts): lc-ui.Group
 local LeetGroup = Group
 
 return LeetGroup

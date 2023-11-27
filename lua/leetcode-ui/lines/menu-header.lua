@@ -15,13 +15,8 @@ local ascii = {
 }
 
 function MenuHeader:init()
-    MenuHeader.super.init(self, {
-        position = "center",
+    MenuHeader.super.init(self, {}, {
         hl = "Keyword",
-        padding = {
-            top = 4,
-            bot = 2,
-        },
     })
 
     for _, line in ipairs(ascii) do

@@ -8,7 +8,7 @@ local Padding = Lines:extend("LeetPadding")
 ---
 ---@return lc-ui.Lines
 function Padding:init(int)
-    Padding.super.init(self, {})
+    Padding.super.init(self)
 
     for _ = 1, int do
         self:append(""):endl()

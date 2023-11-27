@@ -15,10 +15,9 @@ local page = Page()
 local calendar = Calendar()
 local solved = Solved()
 
-local header = Group({
+local header = Group({}, {
     spacing = 2,
     margin = {
-        top = 4,
         bot = 2,
     },
 })

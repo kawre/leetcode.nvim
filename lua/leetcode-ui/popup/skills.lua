@@ -37,7 +37,7 @@ end
 ---@private
 ---@param res lc.Skills.Res
 function Skills:populate(res)
-    local group = Group({ spacing = 1 })
+    local group = Group({}, { spacing = 1 })
 
     local order = { "advanced", "intermediate", "fundamental" }
     for _, key in ipairs(order) do

@@ -23,6 +23,7 @@ function Stdout:init(output)
     end
 
     local title = Line():append((" %s"):format(t("Stdout")), "leetcode_alt")
+
     Stdout.super.init(self, title, lines)
 end
 

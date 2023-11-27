@@ -3,17 +3,21 @@ local Line = require("leetcode-ui.line")
 local utils = require("leetcode-ui.utils")
 local log = require("leetcode.logger")
 
----@alias lines.params { lines: lc.ui.Line[], opts: lc-ui.Component.opts, line_idx: integer }
+---@alias lines.params { lines: lc.ui.Line[], opts: lc-ui.Component.opts }
 
----@class lc-ui.Lines : NuiLine
+---@class lc-ui.Lines : lc.ui.Line
 ---@field _ lines.params
-local Lines = Object("LeetLines")
+local Lines = Line:extend("LeetLines")
 
-function Lines:set_opts(opts) --
-    self._.opts = vim.tbl_deep_extend("force", self._.opts, opts or {})
+function Lines:contents()
+    local lines = vim.deepcopy(self._.lines)
+
+    if not vim.tbl_isempty(Lines.super.contents(self)) then
+        table.insert(lines, Line(Lines.super.contents(self)))
+    end
+
+    return lines
 end
-
-function Lines:contents() return self._.lines end
 
 local function create_pad(int)
     local lines = {}
@@ -27,7 +31,7 @@ end
 
 ---@param layout lc-ui.Renderer
 function Lines:draw(layout, opts)
-    local lines = vim.deepcopy(self:contents())
+    local lines = self:contents()
 
     opts = vim.tbl_deep_extend("force", self._.opts, opts or {})
 
@@ -51,63 +55,39 @@ function Lines:draw(layout, opts)
 end
 
 function Lines:clear()
+    Lines.super.clear(self)
+
     self._.lines = {}
-    self._.line_idx = 1
-    return self
-end
-
-function Lines:append(content, highlight)
-    if not self._.lines[self._.line_idx] then table.insert(self._.lines, Line()) end
-
-    self._.lines[self._.line_idx]:append(content, highlight or self._.opts.hl)
     return self
 end
 
 function Lines:insert(item) --
+    if not vim.tbl_isempty(self._texts) then self:endl() end
+
     table.insert(self._.lines, item)
-    self._.line_idx = self._.line_idx + 1
     return self
-end
-
-function Lines:content() --
-    return self:curr() and self:curr():content() or ""
-end
-
-function Lines:curr() --
-    return self._.lines[self._.line_idx] or nil
 end
 
 function Lines:endl()
-    if not self._.lines[self._.line_idx] then table.insert(self._.lines, Line()) end
-
-    self._.line_idx = self._.line_idx + 1
-    return self
-end
-
----@param lines table[]
-function Lines:from(contents)
-    for _, content in ipairs(contents) do
-        self:append(content):endl()
-    end
+    local line = Line(Lines.super.contents(self))
+    Lines.super.clear(self)
+    self:insert(line)
 
     return self
 end
 
-function Lines:init(opts)
+function Lines:init(lines, opts)
     local options = vim.tbl_deep_extend("force", {
         padding = {},
         position = "left",
     }, opts or {})
 
-    self._ = {
-        opts = options,
-        line_idx = 1,
-    }
+    Lines.super.init(self, {}, options)
 
-    self:clear()
+    self._.lines = lines or {}
 end
 
----@type fun(opts?: lc-ui.Component.opts): lc-ui.Lines
+---@type fun(lines: lc.ui.Line[],opts?: lc-ui.Component.opts): lc-ui.Lines
 local LeetLines = Lines
 
 return LeetLines

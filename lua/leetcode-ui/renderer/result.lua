@@ -253,7 +253,7 @@ function ResultLayout:init(parent, opts)
     ResultLayout.super.init(self, {}, opts or {})
 
     self.parent = parent
-    self.group = Group({ spacing = 1 })
+    self.group = Group({}, { spacing = 1 })
 end
 
 ---@type fun(parent: lc.ui.Console, opts?: lc-ui.Layout.opts): lc.ResultLayout

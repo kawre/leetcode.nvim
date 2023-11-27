@@ -197,7 +197,7 @@ function Calendar:init()
         hl = "Keyword",
     }
 
-    Calendar.super.init(self, opts)
+    Calendar.super.init(self, {}, opts)
 
     self:append(t("Loading..."))
     self:fetch()

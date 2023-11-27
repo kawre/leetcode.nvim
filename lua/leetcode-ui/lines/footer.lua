@@ -22,7 +22,7 @@ function Footer:init(opts)
         hl = "Number",
     }, opts or {})
 
-    Footer.super.init(self, opts)
+    Footer.super.init(self, {}, opts)
 
     -- self:draw()
 end

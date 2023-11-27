@@ -97,7 +97,7 @@ function Solved:init()
         hl = "Keyword",
     }
 
-    Solved.super.init(self, opts)
+    Solved.super.init(self, {}, opts)
 
     self:append(t("Loading..."))
     self:fetch()

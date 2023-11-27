@@ -25,7 +25,7 @@ local Case = Group:extend("LeetCase")
 function Case:input(input)
     local key = t("Input")
 
-    local group = Group({ spacing = 1 })
+    local group = Group({}, { spacing = 1 })
     local s = vim.split(input, " ")
     for i = 1, #s do
         local lines = Lines()
@@ -73,7 +73,7 @@ end
 ---
 ---@return lc.Result.Case
 function Case:init(body, passed)
-    Case.super.init(self, { spacing = 1 })
+    Case.super.init(self, {}, { spacing = 1 })
 
     self.body = body
     self.question = utils.curr_question()

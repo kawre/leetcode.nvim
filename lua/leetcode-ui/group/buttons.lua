@@ -6,19 +6,17 @@ local Buttons = Group:extend("LeetButtons")
 
 function Buttons:init(buttons, opts)
     opts = vim.tbl_deep_extend("force", {
-        margin = {
-            top = 1,
-            bot = 2,
+        padding = {
+            bot = 1,
         },
         spacing = 1,
-        position = "center",
     }, opts or {})
 
-    Buttons.super.init(self, opts)
+    Buttons.super.init(self, buttons, opts)
 
-    for _, button in ipairs(buttons or {}) do
-        self:insert(button)
-    end
+    -- for _, button in ipairs(buttons or {}) do
+    --     self:insert(button)
+    -- end
 end
 
 ---@type fun(buttons?: lc-ui.Button[], opts?: table): lc-menu.Buttons

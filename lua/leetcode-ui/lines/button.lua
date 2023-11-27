@@ -28,7 +28,7 @@ function Button:init(text, sc, on_press, expandable)
     }
     sc = sc or ""
 
-    Button.super.init(self, opts)
+    Button.super.init(self, {}, opts)
 
     local width = 50
     local expand = ""
@@ -38,9 +38,8 @@ function Button:init(text, sc, on_press, expandable)
     self:append(text.src)
     if expandable then self:append(" " .. expand, "leetcode_alt") end
 
-    local len = vim.api.nvim_strwidth(self._.lines[#self._.lines]:content())
-        + vim.api.nvim_strwidth(sc)
-    local padding = string.rep(" ", width - len)
+    local len = vim.api.nvim_strwidth(self:content()) + vim.api.nvim_strwidth(sc)
+    local padding = (" "):rep(width - len)
 
     self:append(padding)
     self:append(sc, "leetcode_info")
