@@ -1,5 +1,5 @@
-local Object = require("nui.object")
 local Line = require("leetcode-ui.line")
+local Opts = require("leetcode-ui.opts")
 local utils = require("leetcode-ui.utils")
 local log = require("leetcode.logger")
 
@@ -10,7 +10,7 @@ local log = require("leetcode.logger")
 local Lines = Line:extend("LeetLines")
 
 function Lines:contents()
-    local lines = vim.deepcopy(self._.lines)
+    local lines = self._.lines
 
     if not vim.tbl_isempty(Lines.super.contents(self)) then
         table.insert(lines, Line(Lines.super.contents(self)))
@@ -31,11 +31,10 @@ end
 
 ---@param layout lc-ui.Renderer
 function Lines:draw(layout, opts)
-    local lines = self:contents()
+    local options = Opts(self._.opts):merge(opts)
+    local lines = vim.deepcopy(self:contents())
 
-    opts = vim.tbl_deep_extend("force", self._.opts, opts or {})
-
-    local padding = opts.padding
+    local padding = options:get_padding()
 
     local toppad = padding and padding.top
     if toppad then lines = vim.list_extend(create_pad(toppad), lines) end
@@ -43,28 +42,34 @@ function Lines:draw(layout, opts)
     local botpad = padding and padding.bot
     if botpad then lines = vim.list_extend(lines, create_pad(botpad)) end
 
-    local cpy = vim.deepcopy(self)
-    cpy._.opts = opts
+    local copy = vim.deepcopy(self)
+    copy._.opts = options:get()
 
-    local leftpad = utils.get_padding(cpy, layout)
-    opts.padding.left = leftpad:len()
+    local leftpad = utils.get_padding(copy, layout)
+    options:set({ padding = { left = leftpad:len() } })
 
     for _, line in pairs(lines) do
-        line:draw(layout, opts)
+        line:draw(layout, options:get())
     end
+end
+
+function Lines:append(content, highlight)
+    Lines.super.append(self, content, highlight)
+
+    return self
 end
 
 function Lines:clear()
     Lines.super.clear(self)
-
     self._.lines = {}
+
     return self
 end
 
 function Lines:insert(item) --
-    if not vim.tbl_isempty(self._texts) then self:endl() end
-
+    if not vim.tbl_isempty(Lines.super.contents(self)) then self:endl() end
     table.insert(self._.lines, item)
+
     return self
 end
 
@@ -81,13 +86,12 @@ function Lines:init(lines, opts)
         padding = {},
         position = "left",
     }, opts or {})
-
     Lines.super.init(self, {}, options)
 
     self._.lines = lines or {}
 end
 
----@type fun(lines: lc.ui.Line[],opts?: lc-ui.Component.opts): lc-ui.Lines
+---@type fun(lines?: lc.ui.Line[], opts?: lc-ui.Component.opts): lc-ui.Lines
 local LeetLines = Lines
 
 return LeetLines

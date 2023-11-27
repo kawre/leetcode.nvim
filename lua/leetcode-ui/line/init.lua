@@ -1,19 +1,20 @@
 local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
+local Opts = require("leetcode-ui.opts")
 local log = require("leetcode.logger")
 
 ---@class lc.ui.Line : NuiLine
 local Line = NuiLine:extend("LeetLine")
 
-function Line:contents() return vim.deepcopy(self._texts) end
+function Line:contents() return self._texts end
 
 ---@param layout lc-ui.Renderer
 ---@param opts lc-ui.Layout.opts
 function Line:draw(layout, opts)
-    local texts = self:contents()
+    local texts = vim.deepcopy(self:contents())
 
-    opts = vim.tbl_deep_extend("force", self._.opts, opts)
-    local pad = opts.padding
+    local options = Opts(self._.opts):merge(opts)
+    local pad = options:get_padding()
 
     if pad then
         if pad.left then --
@@ -35,6 +36,7 @@ end
 
 function Line:append(content, highlight)
     Line.super.append(self, content, highlight or self._.opts.hl)
+
     return self
 end
 

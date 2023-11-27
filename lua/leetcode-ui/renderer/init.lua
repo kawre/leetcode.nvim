@@ -1,5 +1,6 @@
 local Padding = require("leetcode-ui.lines.padding")
 local Object = require("nui.object")
+local Opts = require("leetcode-ui.opts")
 
 local log = require("leetcode.logger")
 
@@ -20,7 +21,7 @@ local log = require("leetcode.logger")
 local Renderer = Object("LeetRenderer")
 
 function Renderer:draw(component)
-    local opts = self._.opts
+    local options = Opts(self._.opts)
     self.bufnr = component.bufnr
     self.winid = component.winid
 
@@ -29,7 +30,7 @@ function Renderer:draw(component)
     self._.buttons = {}
     self._.line_idx = 1
 
-    local padding = opts.padding
+    local padding = options:get_padding()
     local items = self._.items
 
     local toppad = padding and padding.top
@@ -43,7 +44,7 @@ function Renderer:draw(component)
         vim.api.nvim_buf_clear_namespace(self.bufnr, -1, 0, -1)
 
         for _, item in pairs(items) do
-            item:draw(self, opts)
+            item:draw(self, options:get())
         end
     end)
 

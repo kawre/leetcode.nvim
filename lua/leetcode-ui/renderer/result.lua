@@ -3,14 +3,13 @@ local Header = require("leetcode-ui.lines.header")
 local utils = require("leetcode.utils")
 
 local Renderer = require("leetcode-ui.renderer")
-local Pre = require("leetcode-ui.lines.pre")
+local Pre = require("leetcode-ui.group.pre")
 local Group = require("leetcode-ui.group")
-local Stdout = require("leetcode-ui.lines.pre.stdout")
+local Stdout = require("leetcode-ui.group.pre.stdout")
 local Case = require("leetcode-ui.group.case")
 
 local Line = require("leetcode-ui.line")
 local Lines = require("leetcode-ui.lines")
-local NuiText = require("nui.text")
 
 local config = require("leetcode.config")
 local t = require("leetcode.translator")

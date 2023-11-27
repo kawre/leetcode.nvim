@@ -13,10 +13,6 @@ function Buttons:init(buttons, opts)
     }, opts or {})
 
     Buttons.super.init(self, buttons, opts)
-
-    -- for _, button in ipairs(buttons or {}) do
-    --     self:insert(button)
-    -- end
 end
 
 ---@type fun(buttons?: lc-ui.Button[], opts?: table): lc-menu.Buttons

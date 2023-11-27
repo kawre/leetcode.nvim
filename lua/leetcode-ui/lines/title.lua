@@ -13,7 +13,6 @@ function Title:init(history, str, opts)
     str = t(str)
 
     opts = vim.tbl_deep_extend("force", {
-        position = "center",
         padding = {
             top = 1,
         },

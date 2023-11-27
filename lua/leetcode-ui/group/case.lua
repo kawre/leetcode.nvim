@@ -2,8 +2,8 @@ local log = require("leetcode.logger")
 local t = require("leetcode.translator")
 local utils = require("leetcode.utils")
 
-local Pre = require("leetcode-ui.lines.pre")
-local Stdout = require("leetcode-ui.lines.pre.stdout")
+local Pre = require("leetcode-ui.group.pre")
+local Stdout = require("leetcode-ui.group.pre.stdout")
 local Group = require("leetcode-ui.group")
 local Lines = require("leetcode-ui.lines")
 
@@ -28,14 +28,12 @@ function Case:input(input)
     local group = Group({}, { spacing = 1 })
     local s = vim.split(input, " ")
     for i = 1, #s do
-        local lines = Lines()
-
         local ok, param = pcall(function() return self.question.q.meta_data.params[i].name end)
 
-        if ok then lines:append(param .. " =", "leetcode_normal"):endl() end
-        lines:append(s[i])
+        if ok then group:append(param .. " =", "leetcode_normal"):endl() end
+        group:append(s[i])
 
-        group:insert(lines)
+        group:endgrp()
     end
 
     local title = Line():append(key, "leetcode_normal")
@@ -77,11 +75,6 @@ function Case:init(body, passed)
 
     self.body = body
     self.question = utils.curr_question()
-
-    self.max_len = 0
-    for _, key in ipairs({ "Input", "Output", "Expected" }) do
-        self.max_len = math.max(self.max_len, vim.api.nvim_strwidth(t(key)))
-    end
 
     self:insert(self:input(body.input))
     self:insert(self:output(body.output, body.expected))

@@ -1,4 +1,4 @@
-local Pre = require("leetcode-ui.lines.pre")
+local Pre = require("leetcode-ui.group.pre")
 local t = require("leetcode.translator")
 local Line = require("leetcode-ui.line")
 local Lines = require("leetcode-ui.lines")
@@ -18,12 +18,11 @@ function Stdout:init(output)
     end
 
     local lines = Lines()
-    for i = 1, #output_list, 1 do
+    for i = 1, #output_list do
         lines:append(output_list[i]):endl()
     end
 
     local title = Line():append((" %s"):format(t("Stdout")), "leetcode_alt")
-
     Stdout.super.init(self, title, lines)
 end
 
