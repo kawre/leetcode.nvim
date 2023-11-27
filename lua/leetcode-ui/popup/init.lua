@@ -44,6 +44,7 @@ end
 
 function Popup:mount()
     Popup.super.mount(self)
+    log.info(self.winid)
     self.visible = true
     self:on({ "BufLeave", "WinLeave" }, function() self:handle_leave() end)
     self:map("n", { "q", "<Esc>" }, function() self:hide() end)

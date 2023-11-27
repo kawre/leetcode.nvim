@@ -24,8 +24,10 @@ function Renderer:draw(component)
     local options = Opts(self._.opts)
     self.bufnr = component.bufnr
     self.winid = component.winid
+    log.info({ bufnr = self.bufnr, winid = self.winid })
 
     local c_ok, c = pcall(vim.api.nvim_win_get_cursor, self.winid)
+    log.info(c)
 
     self._.buttons = {}
     self._.line_idx = 1

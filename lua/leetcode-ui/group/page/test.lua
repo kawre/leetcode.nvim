@@ -6,54 +6,18 @@ local Lines = require("leetcode-ui.lines")
 
 local page = Page()
 
-local group = Group({}, { spacing = 1 })
-
-group:append("fasdfasdf")
-group:append("fasdfasdf")
-group:append("fasdfasdf")
-group:append("fasdfasdf")
-group:append("fasdfasdf")
-group:append("fasdfasdf")
-group:append("fasdfasdf")
-group:append("fasdfasdf")
-group:append("fasdfasdf")
-group:append("fasdfasdf")
-group:endl()
-group:append("asdfasdf")
-group:endgrp()
-
-group:append("123123")
-group:append("fasdf123123")
-group:append("123123"):endl()
-group:endgrp()
-
-local title = Line():append("title")
-local pre = Pre(title, group)
-
-page:insert(pre)
-
-local grp = Group({}, { position = "left", spacing = 2 })
-
-grp:append("fasdf")
-grp:append("fasdf")
-grp:append("fasdf")
-grp:append("fasdf")
-grp:append("fasdf"):endl()
-grp:append("fasdf")
-grp:append("fasdf")
-
-page:insert(grp)
-
 local lines = Lines()
 
 lines:append("fasdfaf")
 lines:append("fasdfaf")
-lines:append("fasdfaf"):endl()
-lines:append("fasdfaf"):endl()
-lines:append("fasdfaf"):endl()
-lines:append("fasdfaf")
-lines:append("fasdfaf"):endl():endl():endl():append("fasd")
+-- lines:append("fasdfaf"):endl()
+-- lines:append("fasdfaf"):endl()
+-- lines:append("fasdfaf"):endl()
+-- lines:append("fasdfaf")
+-- lines:append("fasdfaf"):endl():endl():endl():append("fasd")
 
-page:insert(lines)
+local pre = Pre(Line():append("lol"), lines)
+
+page:insert(pre)
 
 return page
