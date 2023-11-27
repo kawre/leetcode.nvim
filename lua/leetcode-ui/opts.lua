@@ -22,7 +22,7 @@ function Opts:get_spacing() --
 end
 
 function Opts:merge(opts) --
-    self.opts = vim.tbl_deep_extend("force", self.opts, opts or {})
+    self.opts = vim.tbl_deep_extend("keep", self.opts, opts or {})
 
     return self
 end

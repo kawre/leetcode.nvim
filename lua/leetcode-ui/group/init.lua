@@ -10,12 +10,10 @@ local log = require("leetcode.logger")
 local Group = Lines:extend("LeetGroup")
 
 function Group:contents()
-    local items = self._.items
+    local items = { table.unpack(self._.items) }
 
     local contents = Group.super.contents(self)
-    if not vim.tbl_isempty(contents) then --
-        table.insert(items, Lines(contents))
-    end
+    if not vim.tbl_isempty(contents) then table.insert(items, Lines(contents)) end
 
     return items
 end
@@ -23,6 +21,7 @@ end
 ---@param layout lc-ui.Renderer
 function Group:draw(layout, opts)
     local options = Opts(self._.opts):merge(opts)
+
     local padding = options:get_padding()
     local spacing = options:get_spacing()
 
@@ -48,16 +47,16 @@ function Group:insert(item)
     return self
 end
 
-function Group:append(content, highlight)
-    Group.super.append(self, content, highlight)
-
-    return self
-end
-
 function Group:endgrp()
-    local lines = Lines(Group.super.contents(self))
-    Group.super.clear(self)
-    self:insert(lines)
+    Group.super.endl(self)
+
+    local contents = Group.super.contents(self)
+    if not vim.tbl_isempty(contents) then
+        table.insert(self._.items, Lines(contents))
+        Group.super.clear(self)
+    else
+        Group.super.clear(self)
+    end
 
     return self
 end

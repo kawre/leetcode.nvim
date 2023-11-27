@@ -29,11 +29,8 @@ function Case:input(input)
     local s = vim.split(input, " ")
     for i = 1, #s do
         local ok, param = pcall(function() return self.question.q.meta_data.params[i].name end)
-
         if ok then group:append(param .. " =", "leetcode_normal"):endl() end
-        group:append(s[i])
-
-        group:endgrp()
+        group:append(s[i]):endgrp()
     end
 
     local title = Line():append(key, "leetcode_normal")

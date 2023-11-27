@@ -92,7 +92,7 @@ function Html:handle_entity(entity)
 
         -- self.line Line()
         -- self.text:append({ NuiLine(), NuiLine(), NuiLine() })
-        for i = 1, 3 do
+        for _ = 1, 3 do
             self.lines:endl()
         end
         -- self.lines:append(Padding(3))

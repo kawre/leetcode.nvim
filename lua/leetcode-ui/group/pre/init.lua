@@ -20,7 +20,7 @@ end
 ---@param title? lc.ui.Line
 ---@param item lc-ui.Lines
 function Pre:init(title, item)
-    Pre.super.init(self, {}, { spacing = 1 })
+    Pre.super.init(self, {}, { spacing = 1, position = "left" })
 
     if title then --
         self:insert(title)

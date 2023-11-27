@@ -10,11 +10,10 @@ local log = require("leetcode.logger")
 local Lines = Line:extend("LeetLines")
 
 function Lines:contents()
-    local lines = self._.lines
+    local lines = { table.unpack(self._.lines) }
 
-    if not vim.tbl_isempty(Lines.super.contents(self)) then
-        table.insert(lines, Line(Lines.super.contents(self)))
-    end
+    local contents = Lines.super.contents(self)
+    if not vim.tbl_isempty(contents) then table.insert(lines, Line(contents)) end
 
     return lines
 end
@@ -74,9 +73,13 @@ function Lines:insert(item) --
 end
 
 function Lines:endl()
-    local line = Line(Lines.super.contents(self))
+    local contents = Lines.super.contents(self)
+    if not vim.tbl_isempty(contents) then
+        table.insert(self._.lines, Line(contents))
+    else
+        table.insert(self._.lines, Line())
+    end
     Lines.super.clear(self)
-    self:insert(line)
 
     return self
 end
@@ -84,7 +87,6 @@ end
 function Lines:init(lines, opts)
     local options = vim.tbl_deep_extend("force", {
         padding = {},
-        position = "left",
     }, opts or {})
     Lines.super.init(self, {}, options)
 

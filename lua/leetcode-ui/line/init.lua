@@ -6,7 +6,7 @@ local log = require("leetcode.logger")
 ---@class lc.ui.Line : NuiLine
 local Line = NuiLine:extend("LeetLine")
 
-function Line:contents() return self._texts end
+function Line:contents() return { table.unpack(self._texts) } end
 
 ---@param layout lc-ui.Renderer
 ---@param opts lc-ui.Layout.opts

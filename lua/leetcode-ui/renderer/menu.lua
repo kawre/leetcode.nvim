@@ -11,7 +11,7 @@ local Menu = Renderer:extend("LeetMenu")
 
 local function tbl_keys(t)
     local keys = vim.tbl_keys(t)
-    if not keys then return end
+    if vim.tbl_isempty(keys) then return end
     table.sort(keys)
     return keys
 end
@@ -145,6 +145,7 @@ function Menu:apply_options()
 end
 
 function Menu:mount()
+    -- self:set_page("test")
     if cookie.get() then
         self:set_page("loading")
 
