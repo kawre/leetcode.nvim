@@ -1,6 +1,6 @@
 local Padding = require("leetcode-ui.lines.padding")
-local Object = require("nui.object")
 local Opts = require("leetcode-ui.opts")
+local Group = require("leetcode-ui.group")
 
 local log = require("leetcode.logger")
 
@@ -9,47 +9,30 @@ local log = require("leetcode.logger")
 ---@field sc string
 
 ---@class lc-ui.Layout._
----@field items lc-ui.Lines[]
 ---@field line_idx integer
 ---@field buttons lc-ui.Button[]
 ---@field opts lc-ui.Layout.opts
 
----@class lc-ui.Renderer
+---@class lc-ui.Renderer : lc-ui.Group
 ---@field bufnr integer
 ---@field winid integer
----@field _ lc-ui.Layout._
-local Renderer = Object("LeetRenderer")
+---@field _ lc-ui.Layout._ | lc.ui.Group.params
+local Renderer = Group:extend("LeetRenderer")
 
 function Renderer:draw(component)
-    local options = Opts(self._.opts)
     self.bufnr = component.bufnr
     self.winid = component.winid
-    log.info({ bufnr = self.bufnr, winid = self.winid })
-
-    local c_ok, c = pcall(vim.api.nvim_win_get_cursor, self.winid)
-    log.info(c)
 
     self._.buttons = {}
     self._.line_idx = 1
 
-    local padding = options:get_padding()
-    local items = self._.items
-
-    local toppad = padding and padding.top
-    local botpad = padding and padding.bot
-
-    if toppad then table.insert(items, 1, Padding(toppad)) end
-    if botpad then table.insert(items, Padding(botpad)) end
-
+    local c_ok, c = pcall(vim.api.nvim_win_get_cursor, self.winid)
     self:modifiable(function()
         vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
         vim.api.nvim_buf_clear_namespace(self.bufnr, -1, 0, -1)
 
-        for _, item in pairs(items) do
-            item:draw(self, options:get())
-        end
+        Renderer.super.draw(self, self, self._.opts)
     end)
-
     if c_ok then pcall(vim.api.nvim_win_set_cursor, self.winid, c) end
 end
 
@@ -67,10 +50,10 @@ function Renderer:modifiable(fn)
 end
 
 function Renderer:clear()
-    self._.items = {}
+    Renderer.super.clear(self)
+
     self._.line_idx = 1
     self._.buttons = {}
-
     self:modifiable(function() vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {}) end)
 end
 
@@ -86,24 +69,10 @@ function Renderer:handle_press(line)
     if self._.buttons[line] then self._.buttons[line]:press() end
 end
 
-function Renderer:set_opts(opts) self._.opts = vim.tbl_deep_extend("force", self._.opts, opts or {}) end
-
 -- ---@param line integer
 -- ---@param fn function
 -- ---@param sc string shortcut
 -- function Layout:set_on_press(line, fn, sc) self._.buttons[line] = { fn = fn, sc = sc } end
-
----@param content lc-ui.Lines
-function Renderer:append(content)
-    table.insert(self._.items, content)
-    return self
-end
-
----@param item any
-function Renderer:insert(item)
-    table.insert(self._.items, item)
-    return self
-end
 
 function Renderer:replace(items) self._.items = items end
 
@@ -113,14 +82,10 @@ function Renderer:set(layout) self._.items = layout._.items end
 ---@param components lc-ui.Lines[]
 ---@param opts? lc-ui.Layout.opts
 function Renderer:init(components, opts)
-    local options = vim.tbl_deep_extend("force", {}, opts or {})
+    Renderer.super.init(self, components or {}, opts or {})
 
-    self._ = {
-        items = components or {},
-        line_idx = 1,
-        buttons = {},
-        opts = options,
-    }
+    self._.line_idx = 1
+    self._.buttons = {}
 end
 
 ---@type fun(components?: table[], opts?: lc-ui.Layout.opts): lc-ui.Renderer

@@ -14,7 +14,7 @@ function Cases:make_nav()
     local nav = Lines({}, { padding = { top = 1 } })
 
     for i, case in ipairs(self.cases) do
-        self.result:map("n", tostring(i), function() self:change(i) end)
+        self.result:map("n", tostring(i), function() self:change(i) end, { clear = true })
         local hl = "leetcode_case_"
             .. ("%s%s"):format(self.idx == i and "focus_" or "", case.passed and "ok" or "err")
         local msg = (" Case (%d) "):format(i)
@@ -61,7 +61,7 @@ function Cases:init(item, testcases, parent)
             output = item.code_answer[i],
             expected = item.expected_code_answer[i],
             std_output = item.std_output_list[i],
-        }, item.compare_result:sub(i, i) == "1", parent)
+        }, item.compare_result:sub(i, i) == "1")
     end
 
     self:change(1)

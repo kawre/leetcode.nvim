@@ -59,7 +59,7 @@ function Languages:mount()
         else
             self:populate(res)
             spinner:stop(nil, true, { timeout = 500 })
-            self.renderer:draw(self)
+            Languages.super.draw(self)
         end
     end)
 end

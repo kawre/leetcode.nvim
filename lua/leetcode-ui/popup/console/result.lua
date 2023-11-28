@@ -32,11 +32,7 @@ function ResultPopup:clear()
     self.border:set_highlight("FloatBorder")
 end
 
-function ResultPopup:draw() self.renderer:draw(self) end
-
 ---@param parent lc.ui.Console
----
----@return lc.ui.Console.ResultPopup
 function ResultPopup:init(parent)
     self.renderer = ResultLayout(parent)
 

@@ -7,7 +7,7 @@ local log = require("leetcode.logger")
 ---@class lc-ui.Popup : NuiPopup
 ---@field visible boolean
 ---@field renderer lc-ui.Renderer
----@field keymaps table<string, string>
+---@field keymaps { key: string|string[], mode: string }[]
 local Popup = NuiPopup:extend("LeetPopup")
 
 function Popup:focus()
@@ -16,13 +16,15 @@ function Popup:focus()
 end
 
 function Popup:clear_keymaps()
-    for mode, key in pairs(self.keymaps) do
-        self:unmap(mode, key)
+    log.info(self.keymaps)
+    for _, map in ipairs(self.keymaps) do
+        self:unmap(map.mode, map.key)
     end
     self.keymaps = {}
 end
 
 function Popup:clear() --
+    -- self:clear_keymaps()
     self.renderer:clear()
 end
 
@@ -44,7 +46,6 @@ end
 
 function Popup:mount()
     Popup.super.mount(self)
-    log.info(self.winid)
     self.visible = true
     self:on({ "BufLeave", "WinLeave" }, function() self:handle_leave() end)
     self:map("n", { "q", "<Esc>" }, function() self:hide() end)
@@ -57,7 +58,11 @@ function Popup:hide()
 end
 
 function Popup:map(mode, key, handler, opts, ___force___)
-    self.keymaps[mode] = key
+    if opts and opts.clear == true then --
+        table.insert(self.keymaps, { key = key, mode = mode })
+        opts.clear = nil
+    end
+
     Popup.super.map(self, mode, key, handler, opts, ___force___)
 end
 
@@ -71,9 +76,13 @@ end
 
 function Popup:handle_leave() self:hide() end
 
-function Popup:draw() self.renderer:draw(self) end
+function Popup:draw() --
+    self.renderer:draw(self)
+end
 
 function Popup:init(opts)
+    self.keymaps = {}
+
     local options = vim.tbl_deep_extend("force", {
         focusable = true,
         border = {
@@ -89,12 +98,10 @@ function Popup:init(opts)
             filetype = config.name,
         },
     }, opts or {})
+    Popup.super.init(self, options)
 
     self.renderer = self.renderer or Renderer()
     self.visible = false
-    self.keymaps = {}
-
-    Popup.super.init(self, options)
 end
 
 ---@type fun(opts: table): lc-ui.Popup

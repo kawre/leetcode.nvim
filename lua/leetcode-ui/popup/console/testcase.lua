@@ -24,7 +24,7 @@ function Testcase:content()
     return testcases
 end
 
-function Testcase:draw()
+function Testcase:populate()
     local tbl = {}
     for i, case in ipairs(self.console.question.q.testcase_list) do
         if i ~= 1 then table.insert(tbl, "") end
@@ -115,7 +115,7 @@ function Testcase:draw_extmarks()
 end
 
 function Testcase:reset()
-    self:draw()
+    self:populate()
     log.info("Test cases have been reset")
 end
 
@@ -145,12 +145,8 @@ function Testcase:mount()
     self.testcases = {}
     self.extmarks = {}
 
-    self:on(
-        { "TextChanged", "TextChangedI", "TextChangedP", "TextChangedT" },
-        function() self:draw_extmarks() end
-    )
-
-    self:draw()
+    self:autocmds()
+    self:populate()
 end
 
 ---@param parent lc.ui.Console
@@ -177,7 +173,7 @@ function Testcase:init(parent)
     self.testcases = {}
     self.extmarks = {}
 
-    self:draw()
+    self:populate()
 end
 
 ---@type fun(parent: lc.ui.Console): lc.ui.Console.TestcasePopup

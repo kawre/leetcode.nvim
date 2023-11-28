@@ -77,7 +77,6 @@ end
 ---@param parent lc-ui.Question
 function ConsoleLayout:init(parent)
     self.question = parent
-
     self.testcase = Testcase(self)
     self.result = Result(self)
     self.popups = { self.testcase, self.result }

@@ -43,7 +43,7 @@ function utils.get_padding(lines, layout)
     end
 
     local position = opts.position
-    if position ~= "left" and vim.api.nvim_win_is_valid(layout.winid) then
+    if position ~= "left" and vim.api.nvim_win_is_valid(layout.winid or -1) then
         local max_len = utils.longest_line(lines)
         local win_width = utils.win_width(layout)
 

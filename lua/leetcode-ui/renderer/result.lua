@@ -24,10 +24,10 @@ local ResultLayout = Renderer:extend("LeetResultLayout")
 
 function ResultLayout:handle_accepted(item)
     local function perc_hi(perc) return perc >= 50 and "leetcode_ok" or "leetcode_error" end
-    self.group:set_opts({ spacing = 2 })
+    self:set_opts({ spacing = 2 })
 
     local header = Header(item)
-    self.group:insert(header)
+    self:insert(header)
 
     local runtime = Lines()
     local runtime_ms = item.display_runtime or vim.split(item.status_runtime, " ")[1] or "NIL"
@@ -53,7 +53,7 @@ function ResultLayout:handle_accepted(item)
     end
 
     local runtime_title = Line():append("󰓅 " .. t("Runtime"))
-    self.group:insert(Pre(runtime_title, runtime))
+    self:insert(Pre(runtime_title, runtime))
 
     -- memory
     local memory = Lines()
@@ -76,7 +76,7 @@ function ResultLayout:handle_accepted(item)
     end
 
     local memory_title = Line():append("󰍛 " .. t("Memory"))
-    self.group:insert(Pre(memory_title, memory))
+    self:insert(Pre(memory_title, memory))
 end
 
 ---@private
@@ -86,10 +86,10 @@ function ResultLayout:handle_runtime(item) -- status code = 10
     if item._.submission then return self:handle_accepted(item) end
 
     local header = Header(item)
-    self.group:insert(header)
+    self:insert(header)
 
-    self.cases = Cases(item, self.parent.testcase.testcases, self.parent.result)
-    self.group:insert(self.cases)
+    local cases = Cases(item, self.parent.testcase.testcases, self.parent.result)
+    self:insert(cases)
 end
 
 ---@private
@@ -97,9 +97,9 @@ end
 ---@param item lc.submission
 function ResultLayout:handle_submission_error(item) -- status code = 11
     local header = Header(item)
-    self.group:insert(header)
+    self:insert(header)
 
-    self.group:insert(Case({ ---@diagnostic disable-line
+    self:insert(Case({ ---@diagnostic disable-line
         input = item.input_formatted,
         raw_input = item.last_testcase,
         output = item.code_output,
@@ -113,7 +113,7 @@ end
 ---@param item lc.limit_exceeded_error
 function ResultLayout:handle_limit_exceeded(item) -- status code = 12,13,14
     local header = Header(item)
-    self.group:insert(header)
+    self:insert(header)
 
     if item._.submission then
         local last_testcase = Line()
@@ -124,13 +124,13 @@ function ResultLayout:handle_limit_exceeded(item) -- status code = 12,13,14
 
         local last_exec = Pre(pre_header, last_testcase)
 
-        self.group:insert(last_exec)
+        self:insert(last_exec)
 
         local stdout = Stdout(item.std_output or "")
-        self.group:insert(stdout)
+        self:insert(stdout)
     elseif item.std_output_list then
         local stdout = Stdout(item.std_output_list[#item.std_output_list])
-        self.group:insert(stdout)
+        self:insert(stdout)
     end
 end
 
@@ -144,7 +144,7 @@ function ResultLayout:handle_runtime_error(item) -- status code = 15
     for line in vim.gsplit(item.full_runtime_error, "\n") do
         lines:append(line, "leetcode_error"):endl()
     end
-    self.group:insert(Pre(header._.lines[1], lines))
+    self:insert(Pre(header, lines))
 
     if item._.submission then
         local pre_header = Line()
@@ -154,19 +154,19 @@ function ResultLayout:handle_runtime_error(item) -- status code = 15
         last_testcase:append(item.last_testcase:gsub("\n", " "), "leetcode_indent")
 
         local last_exec = Pre(pre_header, last_testcase)
-        self.group:insert(last_exec)
+        self:insert(last_exec)
 
         local stdout = Stdout(item.std_output or "")
-        self.group:insert(stdout)
+        self:insert(stdout)
     elseif item.std_output_list then
         local stdout = Stdout(item.std_output_list[#item.std_output_list])
-        self.group:insert(stdout)
+        self:insert(stdout)
     end
 end
 
 function ResultLayout:handle_internal_error(item) -- status code = 16
     local header = Header(item)
-    self.group:insert(header)
+    self:insert(header)
 end
 
 ---@private
@@ -180,14 +180,14 @@ function ResultLayout:handle_compile_error(item) -- status code = 20
         lines:append(line, "leetcode_error"):endl()
     end
 
-    local pre = Pre(header._.lines[1], lines)
-    self.group:insert(pre)
+    local pre = Pre(header, lines)
+    self:insert(pre)
 end
 
 ---@param item lc.interpreter_response
 function ResultLayout:handle_res(item)
-    self.group:set_opts({ spacing = 1 })
     self:clear()
+    self:set_opts({ spacing = 1 })
 
     local handlers = {
         -- runtime
@@ -231,31 +231,21 @@ function ResultLayout:handle_res(item)
     }
 
     local handler = handlers[item.status_code]
-    if handlers then
+    if handler then
         handler()
     else
         handlers["unknown"]()
     end
-
-    self:replace({ self.group })
-end
-
-function ResultLayout:clear()
-    if self.cases then self.cases:clear() end
-    self.group:clear()
-    ResultLayout.super.clear(self)
 end
 
 ---@param parent lc.ui.Console
----@param opts? lc-ui.Layout.opts
-function ResultLayout:init(parent, opts)
-    ResultLayout.super.init(self, {}, opts or {})
+function ResultLayout:init(parent)
+    ResultLayout.super.init(self, {}, { spacing = 1 })
 
     self.parent = parent
-    self.group = Group({}, { spacing = 1 })
 end
 
----@type fun(parent: lc.ui.Console, opts?: lc-ui.Layout.opts): lc.ResultLayout
+---@type fun(parent: lc.ui.Console): lc.ResultLayout
 local LeetResultLayout = ResultLayout
 
 return LeetResultLayout
