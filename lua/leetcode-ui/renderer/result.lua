@@ -23,8 +23,17 @@ local log = require("leetcode.logger")
 local ResultLayout = Renderer:extend("LeetResultLayout")
 
 function ResultLayout:handle_accepted(item)
-    local function perc_hi(perc) return perc >= 50 and "leetcode_ok" or "leetcode_error" end
     self:set_opts({ spacing = 2 })
+
+    local function perc_hi(perc) --
+        if perc >= 50 then
+            return "leetcode_ok"
+        elseif perc >= 10 then
+            return nil
+        elseif perc >= 0 then
+            return "leetcode_error"
+        end
+    end
 
     local header = Header(item)
     self:insert(header)

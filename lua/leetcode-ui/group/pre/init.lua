@@ -7,11 +7,6 @@ local log = require("leetcode.logger")
 local Pre = Group:extend("LeetPre")
 
 function Pre:add_margin(item)
-    log.info({
-        txt = item:content(),
-        name = item.class.name,
-    })
-
     if item.class.name == "LeetLine" then
         table.insert(item._texts, 1, NuiText("\t▎\t", "leetcode_indent"))
         return
