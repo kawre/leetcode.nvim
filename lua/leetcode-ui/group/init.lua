@@ -48,7 +48,7 @@ function Group:insert(item)
 end
 
 function Group:endgrp()
-    Group.super.endl(self)
+    -- Group.super.endl(self)
 
     local contents = Group.super.contents(self)
     if not vim.tbl_isempty(contents) then

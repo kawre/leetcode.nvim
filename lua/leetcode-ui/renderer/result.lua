@@ -53,6 +53,7 @@ function ResultLayout:handle_accepted(item)
     end
 
     local runtime_title = Line():append("󰓅 " .. t("Runtime"))
+    runtime:endl()
     self:insert(Pre(runtime_title, runtime))
 
     -- memory
@@ -88,8 +89,8 @@ function ResultLayout:handle_runtime(item) -- status code = 10
     local header = Header(item)
     self:insert(header)
 
-    self.cases = Cases(item, self.parent)
-    self:insert(self.cases)
+    local cases = Cases(item, self.parent)
+    self:insert(cases)
 end
 
 ---@private
@@ -182,12 +183,6 @@ function ResultLayout:handle_compile_error(item) -- status code = 20
 
     local pre = Pre(header, lines)
     self:insert(pre)
-end
-
-function ResultLayout:clear()
-    ResultLayout.super.clear(self)
-
-    if self.cases then self.cases:clear() end
 end
 
 ---@param item lc.interpreter_response

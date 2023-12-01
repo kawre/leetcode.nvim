@@ -7,7 +7,7 @@ local log = require("leetcode.logger")
 ---@class lc-ui.Popup : NuiPopup
 ---@field visible boolean
 ---@field renderer lc-ui.Renderer
----@field keymaps { key: string|string[], mode: string }[]
+---@field keymaps table<string|string[], string>
 local Popup = NuiPopup:extend("LeetPopup")
 
 function Popup:focus()
@@ -16,14 +16,14 @@ function Popup:focus()
 end
 
 function Popup:clear_keymaps()
-    for _, map in ipairs(self.keymaps) do
-        self:unmap(map.mode, map.key)
+    for key, mode in pairs(self.keymaps) do
+        self:unmap(mode, key)
     end
     self.keymaps = {}
 end
 
 function Popup:clear() --
-    -- self:clear_keymaps()
+    self:clear_keymaps()
     self.renderer:clear()
 end
 
@@ -57,8 +57,8 @@ function Popup:hide()
 end
 
 function Popup:map(mode, key, handler, opts, ___force___)
-    if opts and opts.clear == true then --
-        table.insert(self.keymaps, { key = key, mode = mode })
+    if opts and opts.clear == true then
+        self.keymaps[key] = mode
         opts.clear = nil
     end
 
@@ -75,9 +75,7 @@ end
 
 function Popup:handle_leave() self:hide() end
 
-function Popup:draw() --
-    self.renderer:draw(self)
-end
+function Popup:draw() self.renderer:draw(self) end
 
 function Popup:init(opts)
     self.keymaps = {}
@@ -101,6 +99,7 @@ function Popup:init(opts)
 
     self.renderer = self.renderer or Renderer()
     self.visible = false
+    self.keymaps = {}
 end
 
 ---@type fun(opts: table): lc-ui.Popup

@@ -10,13 +10,25 @@ local lines = Lines()
 
 lines:append("fasdfaf")
 lines:append("fasdfaf")
--- lines:append("fasdfaf"):endl()
+lines:append("fasdfaf"):endl()
 -- lines:append("fasdfaf"):endl()
 -- lines:append("fasdfaf"):endl()
 -- lines:append("fasdfaf")
 -- lines:append("fasdfaf"):endl():endl():endl():append("fasd")
 
-local pre = Pre(Line():append("lol"), lines)
+local group = Group({}, { spacing = 1 })
+
+group:append("fasdf")
+group:append("fasdf")
+group:append("fasdf"):endl()
+group:endgrp()
+
+group:append("fasdf")
+group:append("fasdf")
+group:append("fasdf"):endl()
+-- group:append("fasdf"):endl()
+
+local pre = Pre(Line():append("lol"), group)
 
 page:insert(pre)
 
