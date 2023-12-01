@@ -31,7 +31,7 @@ end
 ---@param layout lc-ui.Renderer
 function Lines:draw(layout, opts)
     local options = Opts(self._.opts):merge(opts)
-    local lines = vim.deepcopy(self:contents())
+    local lines = self:contents()
 
     local padding = options:get_padding()
 

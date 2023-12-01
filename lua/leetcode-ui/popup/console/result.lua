@@ -34,8 +34,6 @@ end
 
 ---@param parent lc.ui.Console
 function ResultPopup:init(parent)
-    self.renderer = ResultLayout(parent)
-
     ResultPopup.super.init(self, parent, {
         border = {
             text = {
@@ -53,6 +51,8 @@ function ResultPopup:init(parent)
             winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder",
         },
     })
+
+    self.renderer = ResultLayout(parent)
 end
 
 ---@type fun(parent: lc.ui.Console): lc.ui.Console.ResultPopup

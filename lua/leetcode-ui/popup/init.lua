@@ -16,7 +16,6 @@ function Popup:focus()
 end
 
 function Popup:clear_keymaps()
-    log.info(self.keymaps)
     for _, map in ipairs(self.keymaps) do
         self:unmap(map.mode, map.key)
     end

@@ -7,14 +7,15 @@ local log = require("leetcode.logger")
 ---@class lc.Cases : lc-ui.Group
 ---@field cases table<integer, lc.Result.Case>
 ---@field idx integer
----@field result lc.ui.Console.ResultPopup
+---@field console lc.ui.Console
 local Cases = Group:extend("LeetCases")
 
 function Cases:make_nav()
     local nav = Lines({}, { padding = { top = 1 } })
 
     for i, case in ipairs(self.cases) do
-        self.result:map("n", tostring(i), function() self:change(i) end, { clear = true })
+        self.console.result:map("n", tostring(i), function() self:change(i) end, { clear = true })
+
         local hl = "leetcode_case_"
             .. ("%s%s"):format(self.idx == i and "focus_" or "", case.passed and "ok" or "err")
         local msg = (" Case (%d) "):format(i)
@@ -42,22 +43,21 @@ function Cases:change(idx)
     if not self.cases[idx] or idx == self.idx then return end
 
     self.idx = idx
-    self.result:draw()
+    self.console.result:draw()
 end
 
 ---@param item lc.runtime
----@param testcases string[]
----@param parent lc.ui.Console.ResultPopup
+---@param parent lc.ui.Console
 ---@return lc.Cases
-function Cases:init(item, testcases, parent)
+function Cases:init(item, parent)
     Cases.super.init(self, {}, { spacing = 1 })
 
     self.cases = {}
-    self.result = parent
+    self.console = parent
 
     for i = 1, item.total_testcases do
         self.cases[i] = Case({
-            input = testcases[i],
+            input = self.console.testcase.testcases[i],
             output = item.code_answer[i],
             expected = item.expected_code_answer[i],
             std_output = item.std_output_list[i],
@@ -67,7 +67,7 @@ function Cases:init(item, testcases, parent)
     self:change(1)
 end
 
----@type fun(item: lc.runtime, testcases: string[], parent: lc.ui.Console.ResultPopup): lc.Cases
+---@type fun(item: lc.runtime, parent: lc.ui.Console): lc.Cases
 local LeetCases = Cases
 
 return LeetCases

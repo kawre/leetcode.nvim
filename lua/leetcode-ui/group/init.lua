@@ -30,7 +30,7 @@ function Group:draw(layout, opts)
 
     if toppad then Pad(toppad):draw(layout) end
 
-    local items = vim.deepcopy(self:contents())
+    local items = self:contents()
     for i, item in ipairs(items) do
         item:draw(layout, options:get())
         if i ~= #items and spacing then Pad(spacing):draw(layout) end

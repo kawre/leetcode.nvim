@@ -88,8 +88,8 @@ function ResultLayout:handle_runtime(item) -- status code = 10
     local header = Header(item)
     self:insert(header)
 
-    local cases = Cases(item, self.parent.testcase.testcases, self.parent.result)
-    self:insert(cases)
+    self.cases = Cases(item, self.parent)
+    self:insert(self.cases)
 end
 
 ---@private
@@ -182,6 +182,12 @@ function ResultLayout:handle_compile_error(item) -- status code = 20
 
     local pre = Pre(header, lines)
     self:insert(pre)
+end
+
+function ResultLayout:clear()
+    ResultLayout.super.clear(self)
+
+    if self.cases then self.cases:clear() end
 end
 
 ---@param item lc.interpreter_response

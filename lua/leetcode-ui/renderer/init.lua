@@ -26,6 +26,11 @@ function Renderer:draw(component)
     self._.buttons = {}
     self._.line_idx = 1
 
+    log.debug(debug.traceback(vim.inspect({
+        bufnr = self.bufnr,
+        winid = self.winid,
+    })))
+
     local c_ok, c = pcall(vim.api.nvim_win_get_cursor, self.winid)
     self:modifiable(function()
         vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
