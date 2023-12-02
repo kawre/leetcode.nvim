@@ -4,7 +4,7 @@ local log = require("leetcode.logger")
 ---@class lc-ui.Utils
 local utils = {}
 
----@param item lc-ui.Lines
+---@param item lc.ui.Lines
 function utils.longest_line(item)
     if item.class.name == "LeetLine" then return vim.api.nvim_strwidth(item:content()) end
 
@@ -22,7 +22,7 @@ function utils.win_width(layout)
     return vim.api.nvim_win_get_width(layout.winid)
 end
 
----@param lines lc-ui.Lines
+---@param lines lc.ui.Lines
 ---@param layout lc-ui.Renderer
 ---
 ---@return string

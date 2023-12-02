@@ -159,7 +159,7 @@ function cmd.menu()
     end
 end
 
----@param page lc-menu.pages
+---@param page lc-menu.page
 function cmd.menu_layout(page) _Lc_Menu:set_page(page) end
 
 function cmd.question_tabs() require("leetcode.pickers.question-tabs").pick() end

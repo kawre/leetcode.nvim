@@ -3,9 +3,9 @@ local Opts = require("leetcode-ui.opts")
 local utils = require("leetcode-ui.utils")
 local log = require("leetcode.logger")
 
----@alias lines.params { lines: lc.ui.Line[], opts: lc-ui.Component.opts }
+---@alias lines.params { lines: lc.ui.Line[], opts: lc.ui.opts }
 
----@class lc-ui.Lines : lc.ui.Line
+---@class lc.ui.Lines : lc.ui.Line
 ---@field _ lines.params
 local Lines = Line:extend("LeetLines")
 
@@ -28,6 +28,23 @@ local function create_pad(int)
     return lines
 end
 
+function Lines:get_leftpad(renderer, opts) --
+    local padding = (opts.padding or {}).left or 0
+
+    local position = opts.position
+    if position ~= "left" and vim.api.nvim_win_is_valid(renderer.winid or -1) then
+        local max_len, win_width = self:longest(), utils.win_width(renderer)
+
+        if position == "center" then
+            padding = (win_width - max_len) / 2
+        elseif position == "right" then
+            padding = win_width - max_len - 1
+        end
+    end
+
+    return math.floor(padding)
+end
+
 ---@param layout lc-ui.Renderer
 function Lines:draw(layout, opts)
     local options = Opts(self._.opts):merge(opts)
@@ -35,17 +52,14 @@ function Lines:draw(layout, opts)
 
     local padding = options:get_padding()
 
+    local leftpad = self:get_leftpad(layout, options:get())
+    options:set({ padding = { left = leftpad } })
+
     local toppad = padding and padding.top
     if toppad then lines = vim.list_extend(create_pad(toppad), lines) end
 
     local botpad = padding and padding.bot
     if botpad then lines = vim.list_extend(lines, create_pad(botpad)) end
-
-    local copy = vim.deepcopy(self)
-    copy._.opts = options:get()
-
-    local leftpad = utils.get_padding(copy, layout)
-    options:set({ padding = { left = leftpad:len() } })
 
     for _, line in pairs(lines) do
         line:draw(layout, options:get())
@@ -93,7 +107,7 @@ function Lines:init(lines, opts)
     self._.lines = lines or {}
 end
 
----@type fun(lines?: lc.ui.Line[], opts?: lc-ui.Component.opts): lc-ui.Lines
+---@type fun(lines?: lc.ui.Line[], opts?: lc.ui.opts): lc.ui.Lines
 local LeetLines = Lines
 
 return LeetLines

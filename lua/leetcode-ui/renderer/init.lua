@@ -10,8 +10,9 @@ local log = require("leetcode.logger")
 
 ---@class lc-ui.Layout._
 ---@field line_idx integer
----@field buttons lc-ui.Button[]
----@field opts lc-ui.Layout.opts
+---@field buttons lc.ui.Button[]
+---@field opts lc.ui.opts
+---@field keymaps table[]
 
 ---@class lc-ui.Renderer : lc-ui.Group
 ---@field bufnr integer
@@ -23,13 +24,11 @@ function Renderer:draw(component)
     self.bufnr = component.bufnr
     self.winid = component.winid
 
+    self:map("n", "<cr>", function() self:handle_press() end)
+
+    self:clear_keymaps()
     self._.buttons = {}
     self._.line_idx = 1
-
-    log.debug(debug.traceback(vim.inspect({
-        bufnr = self.bufnr,
-        winid = self.winid,
-    })))
 
     local c_ok, c = pcall(vim.api.nvim_win_get_cursor, self.winid)
     self:modifiable(function()
@@ -54,11 +53,43 @@ function Renderer:modifiable(fn)
     if not modi then vim.api.nvim_buf_set_option(bufnr, "modifiable", false) end
 end
 
+function Renderer:map(mode, key, handler, opts) --
+    if type(key) == "table" then
+        for _, k in ipairs(key) do
+            self:map(mode, k, handler, opts)
+        end
+    elseif type(key) == "string" then
+        local options =
+            vim.tbl_deep_extend("force", { buffer = self.bufnr, clearable = false }, opts or {})
+
+        local clearable = options.clearable
+        options.clearable = nil
+
+        if clearable then
+            for _, map in ipairs(self._.keymaps) do
+                if vim.deep_equal(options, map.opts) and map.key == key then return end
+            end
+
+            table.insert(self._.keymaps, { key = key, mode = mode, opts = options })
+        end
+
+        vim.keymap.set(mode, key, handler, options)
+    end
+end
+
+function Renderer:clear_keymaps()
+    for _, map in ipairs(self._.keymaps) do
+        vim.keymap.del(map.mode, map.key, map.opts)
+    end
+    self._.keymaps = {}
+end
+
 function Renderer:clear()
     Renderer.super.clear(self)
 
     self._.line_idx = 1
     self._.buttons = {}
+    self:clear_keymaps()
     self:modifiable(function() vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {}) end)
 end
 
@@ -69,9 +100,18 @@ function Renderer:get_line_idx(val)
     return line_idx
 end
 
----@param line integer The line that the click happened
-function Renderer:handle_press(line)
-    if self._.buttons[line] then self._.buttons[line]:press() end
+---@param line_idx? integer The line that the press happened
+function Renderer:handle_press(line_idx)
+    if
+        not self.bufnr
+        or not self.winid
+        or not pcall(function()
+            line_idx = line_idx or vim.api.nvim_win_get_cursor(self.winid)[1]
+            self._.buttons[line_idx]:press()
+        end)
+    then
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<cr>", true, false, true), "n", true)
+    end
 end
 
 -- ---@param line integer
@@ -84,16 +124,17 @@ function Renderer:replace(items) self._.items = items end
 ---@param layout lc-ui.Renderer
 function Renderer:set(layout) self._.items = layout._.items end
 
----@param components lc-ui.Lines[]
----@param opts? lc-ui.Layout.opts
+---@param components lc.ui.Lines[]
+---@param opts? lc.ui.opts
 function Renderer:init(components, opts)
     Renderer.super.init(self, components or {}, opts or {})
 
     self._.line_idx = 1
     self._.buttons = {}
+    self._.keymaps = {}
 end
 
----@type fun(components?: table[], opts?: lc-ui.Layout.opts): lc-ui.Renderer
+---@type fun(components?: table[], opts?: lc.ui.opts): lc-ui.Renderer
 local LeetRenderer = Renderer
 
 return LeetRenderer

@@ -43,8 +43,6 @@ function ConsoleLayout:mount()
     ConsoleLayout.super.mount(self)
 
     self:set_keymaps({
-        ["R"] = function() self:run() end,
-        ["S"] = function() self:run(true) end,
         ["r"] = function() self.testcase:reset() end,
         ["H"] = function() self.testcase:focus() end,
         ["L"] = function() self.result:focus() end,

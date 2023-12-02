@@ -68,8 +68,9 @@ end
 ---@return lc.cache.Question
 function Problemlist.get_by_title_slug(title_slug)
     local problems = Problemlist.get()
+
     local problem = vim.tbl_filter(function(e) return e.title_slug == title_slug end, problems)[1]
-        or nil
+
     assert(problem, ("Problem `%s` not found. Try updating cache?"):format(title_slug))
     return problem
 end

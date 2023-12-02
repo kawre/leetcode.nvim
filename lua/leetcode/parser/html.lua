@@ -15,7 +15,7 @@ local Line = require("leetcode-ui.line")
 ---@field str string
 ---@field parser LanguageTree
 ---@field ts TreesitterModule
----@field lines lc-ui.Lines
+---@field lines lc.ui.Lines
 ---@field newline_count integer
 ---@field ol_count table<integer>
 local Html = {}
@@ -276,7 +276,7 @@ end
 
 ---@param html string
 ---
----@return lc-ui.Lines
+---@return lc.ui.Lines
 function Html:parse(html)
     self = setmetatable({
         str = html,

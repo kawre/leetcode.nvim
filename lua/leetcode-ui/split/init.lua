@@ -39,6 +39,8 @@ function Split:mount()
     self:map("n", { "q", "<Esc>" }, function() self:toggle() end)
 end
 
+function Split:map(...) self.renderer:map(...) end
+
 function Split:unmount()
     Split.super.unmount(self)
 

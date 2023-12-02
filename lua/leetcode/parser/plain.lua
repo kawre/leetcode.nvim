@@ -4,7 +4,7 @@ local utils = require("leetcode.parser.utils")
 
 ---@class lc.Parser.Plain
 ---@field str string
----@field lines lc-ui.Lines
+---@field lines lc.ui.Lines
 local Plain = {}
 Plain.__index = Plain
 

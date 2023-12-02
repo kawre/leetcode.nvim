@@ -8,8 +8,19 @@ local Line = NuiLine:extend("LeetLine")
 
 function Line:contents() return self._texts end
 
+function Line:longest()
+    if self.class.name == "LeetLine" then return vim.api.nvim_strwidth(self:content()) end
+
+    local max_len = 0
+    for _, item in pairs(self:contents()) do
+        max_len = math.max(Line.longest(item), max_len)
+    end
+
+    return max_len
+end
+
 ---@param layout lc-ui.Renderer
----@param opts lc-ui.Layout.opts
+---@param opts lc.ui.opts
 function Line:draw(layout, opts)
     local texts = { table.unpack(self:contents()) }
 
@@ -40,7 +51,7 @@ function Line:append(content, highlight)
     return self
 end
 
----@param opts lc-ui.Group.opts
+---@param opts lc.ui.opts
 function Line:set_opts(opts) --
     self._.opts = vim.tbl_deep_extend("force", self._.opts or {}, opts or {})
 end

@@ -15,7 +15,7 @@ function Buttons:init(buttons, opts)
     Buttons.super.init(self, buttons, opts)
 end
 
----@type fun(buttons?: lc-ui.Button[], opts?: table): lc-menu.Buttons
+---@type fun(buttons?: lc.ui.Button[], opts?: table): lc-menu.Buttons
 local LeetButtons = Buttons
 
 return LeetButtons

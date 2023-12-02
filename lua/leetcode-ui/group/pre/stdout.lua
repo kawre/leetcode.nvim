@@ -8,7 +8,7 @@ local Stdout = Pre:extend("LeetStdout")
 
 ---@param output string
 ---
----@return lc-ui.Lines | nil
+---@return lc.ui.Lines | nil
 function Stdout:init(output)
     local output_list = vim.split(output or "", "\n", { trimempty = true })
     if vim.tbl_isempty(output_list) then

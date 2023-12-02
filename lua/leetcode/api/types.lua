@@ -273,7 +273,7 @@
 ---@field stats question_stats
 ---@field topic_tags lc.topic_tag[]
 ---@field hints table[]
----@field similar lc.QuestionResponse.similar
+---@field similar lc.QuestionResponse.similar[]
 
 ---@alias lc.question_res lc.QuestionResponse
 

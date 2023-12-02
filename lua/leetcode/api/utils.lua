@@ -65,6 +65,7 @@ function utils.curl(method, params)
             local res, err = utils.handle_res(out)
 
             if should_retry(err) then
+                log.debug("retry " .. tries)
                 params_cpy.retry = tries - 1
                 utils.curl(method, params_cpy)
             else
@@ -78,6 +79,7 @@ function utils.curl(method, params)
         local res, err = utils.handle_res(out)
 
         if should_retry(err) then
+            log.debug("retry " .. tries)
             params_cpy.retry = tries - 1
             utils.curl(method, params_cpy)
         else

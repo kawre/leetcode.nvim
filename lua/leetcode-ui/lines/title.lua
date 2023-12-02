@@ -1,8 +1,8 @@
 local Lines = require("leetcode-ui.lines")
 local t = require("leetcode.translator")
 
----@class lc-menu.Title : lc-ui.Lines
----@field text lc-ui.Lines
+---@class lc-menu.Title : lc.ui.Lines
+---@field text lc.ui.Lines
 local Title = Lines:extend("LeetMenuTitle")
 
 ---@param history string[]

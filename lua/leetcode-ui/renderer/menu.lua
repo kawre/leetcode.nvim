@@ -17,33 +17,31 @@ local function tbl_keys(t)
 end
 
 function Menu:draw()
-    self:clear_keymaps()
     Menu.super.draw(self, self)
-    self:apply_btn_keymaps()
-
+    -- self:apply_btn_keymaps()
     return self
 end
 
-function Menu:clear_keymaps()
-    for _, map in ipairs(self.maps) do
-        vim.keymap.del(map.mode, map.lhs, { buffer = self.bufnr })
-    end
+-- function Menu:clear_keymaps()
+--     for _, map in ipairs(self.maps) do
+--         vim.keymap.del(map.mode, map.lhs, { buffer = self.bufnr })
+--     end
+--
+--     self.maps = {}
+-- end
 
-    self.maps = {}
-end
-
-function Menu:apply_btn_keymaps()
-    local opts = { noremap = false, silent = true, buffer = self.bufnr, nowait = true }
-
-    for _, btn in pairs(self._.buttons) do
-        local bopts = btn._.opts
-        if not bopts.sc then return end
-
-        local mode = { "n" }
-        vim.keymap.set(mode, bopts.sc, bopts.on_press, opts)
-        table.insert(self.maps, { mode = mode, lhs = bopts.sc })
-    end
-end
+-- function Menu:apply_btn_keymaps()
+--     local opts = { noremap = false, silent = true, buffer = self.bufnr, nowait = true }
+--
+--     for _, btn in pairs(self._.buttons) do
+--         local bopts = btn._.opts
+--         if not bopts.sc then return end
+--
+--         local mode = { "n" }
+--         vim.keymap.set(mode, bopts.sc, bopts.on_press, opts)
+--         table.insert(self.maps, { mode = mode, lhs = bopts.sc })
+--     end
+-- end
 
 ---@private
 function Menu:autocmds()
@@ -91,7 +89,7 @@ function Menu:cursor_reset()
     self.cursor.prev = nil
 end
 
----@param name lc-menu.pages
+---@param name lc-menu.page
 function Menu:set_page(name)
     self:cursor_reset()
 
@@ -103,17 +101,6 @@ function Menu:set_page(name)
     end
 
     return self:draw()
-end
-
----@private
-function Menu:keymaps()
-    local press_fn = function()
-        local row = vim.api.nvim_win_get_cursor(self.winid)[1]
-        self:handle_press(row)
-    end
-
-    vim.keymap.set("n", "<cr>", press_fn, { buffer = self.bufnr })
-    vim.keymap.set("n", "<Tab>", press_fn, { buffer = self.bufnr })
 end
 
 function Menu:apply_options()
@@ -163,7 +150,6 @@ function Menu:mount()
     end
 
     self:apply_options()
-    self:keymaps()
     self:autocmds()
     self:draw()
 

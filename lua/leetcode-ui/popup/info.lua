@@ -3,9 +3,11 @@ local NuiText = require("nui.text")
 local t = require("leetcode.translator")
 local Line = require("leetcode-ui.line")
 local NuiTree = require("nui.tree")
+local SimilarQuestions = require("leetcode-ui.group.similar-questions")
 
 local config = require("leetcode.config")
 local utils = require("leetcode.utils")
+local log = require("leetcode.logger")
 
 ---@class lc.ui.InfoPopup : lc-ui.Popup
 ---@field popup NuiPopup
@@ -14,28 +16,17 @@ local utils = require("leetcode.utils")
 local InfoPopup = Popup:extend("LeetInfoPopup")
 
 function InfoPopup:similar_questions_node()
-    local sim_questions = {}
-    for _, q in ipairs(self.question.q.similar) do
-        local line = Line()
+    local sim_questions = SimilarQuestions(self.question.q.similar)
 
-        local hl = {
-            ["Easy"] = "leetcode_easy",
-            ["Medium"] = "leetcode_medium",
-            ["Hard"] = "leetcode_hard",
-        }
-        line:append("󱓻 ", hl[q.difficulty])
-        line:append(utils.translate(q.title, q.translated_title))
-
-        local lock = not config.auth.is_premium and q.paid_only and "  " .. t("Premium") or ""
-        line:append(lock, "leetcode_medium")
-
-        table.insert(sim_questions, NuiTree.Node({ text = line, question = q }))
+    local tbl = {}
+    for _, sim in ipairs(sim_questions:contents()) do
+        table.insert(tbl, NuiTree.Node({ text = sim, question = sim._.q }))
     end
 
-    if not vim.tbl_isempty(sim_questions) then
+    if not vim.tbl_isempty(tbl) then
         return NuiTree.Node(
             { text = NuiText(t("Similar Questions") .. " ", "leetcode_ref") },
-            sim_questions
+            tbl
         )
     else
         return NuiTree.Node({

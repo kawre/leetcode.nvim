@@ -1,9 +1,11 @@
 local Page = require("leetcode-ui.group.page")
 local Title = require("leetcode-ui.lines.title")
 local Buttons = require("leetcode-ui.group.buttons")
-local Button = require("leetcode-ui.lines.button")
 local Header = require("leetcode-ui.lines.menu-header")
 local Footer = require("leetcode-ui.lines.footer")
+
+local Button = require("leetcode-ui.lines.button.menu")
+local ExitButton = require("leetcode-ui.lines.button.menu.exit")
 
 local cmd = require("leetcode.command")
 
@@ -13,35 +15,31 @@ page:insert(Header())
 
 page:insert(Title({}, "Menu"))
 
-local problems = Button(
-    { icon = "", src = "Problems" },
-    "p",
-    function() cmd.menu_layout("problems") end,
-    true
-)
+local problems = Button("Problems", {
+    icon = "",
+    sc = "p",
+    on_press = function() cmd.menu_layout("problems") end,
+})
 
-local statistics = Button(
-    { icon = "󰄪", src = "Statistics" },
-    "s",
-    function() cmd.menu_layout("stats") end,
-    true
-)
+local statistics = Button("Statistics", {
+    icon = "󰄪",
+    sc = "s",
+    on_press = function() cmd.menu_layout("stats") end,
+})
 
-local cookie = Button(
-    { src = "Cookie", icon = "󰆘" },
-    "i",
-    function() cmd.menu_layout("cookie") end,
-    true
-)
+local cookie = Button("Cookie", {
+    icon = "󰆘",
+    sc = "i",
+    on_press = function() cmd.menu_layout("cookie") end,
+})
 
-local cache = Button(
-    { src = "Cache", icon = "" },
-    "c",
-    function() cmd.menu_layout("cache") end,
-    true
-)
+local cache = Button("Cache", {
+    icon = "",
+    sc = "c",
+    on_press = function() cmd.menu_layout("cache") end,
+})
 
-local exit = Button({ src = "Exit", icon = "󰩈" }, "q", vim.cmd.quitall)
+local exit = ExitButton()
 
 page:insert(Buttons({
     problems,

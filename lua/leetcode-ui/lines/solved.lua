@@ -12,7 +12,7 @@ local hl = {
     ["Hard"] = "leetcode_hard",
 }
 
----@class lc-menu.Solved : lc-ui.Lines
+---@class lc-menu.Solved : lc.ui.Lines
 local Solved = Lines:extend("LeetSolved")
 
 ---@return NuiLine

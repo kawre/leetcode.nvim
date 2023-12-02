@@ -1,9 +1,12 @@
 local Object = require("nui.object")
 
 ---@class lc.ui.opts
----@field padding padding
----@field spacing integer
----@field position position
+---@field padding? lc.ui.padding
+---@field spacing? integer
+---@field position? lc.ui.position
+---@field hl? string
+---@field on_press? function
+---@field sc? string
 
 ---@class lc.ui.Opts
 ---@field opts lc.ui.opts

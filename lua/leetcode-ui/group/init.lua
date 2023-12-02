@@ -3,9 +3,9 @@ local Lines = require("leetcode-ui.lines")
 local Opts = require("leetcode-ui.opts")
 local log = require("leetcode.logger")
 
----@alias lc.ui.Group.params { items: lc-ui.Lines[], opts: lc-ui.Group.opts }
+---@alias lc.ui.Group.params { items: lc.ui.Lines[], opts: lc-ui.Group.opts }
 
----@class lc-ui.Group : lc-ui.Lines
+---@class lc-ui.Group : lc.ui.Lines
 ---@field _ lc.ui.Group.params | lines.params
 local Group = Lines:extend("LeetGroup")
 
@@ -39,7 +39,7 @@ function Group:draw(layout, opts)
     if botpad then Pad(botpad):draw(layout) end
 end
 
----@param item lc-ui.Lines
+---@param item lc.ui.Lines
 function Group:insert(item)
     if not vim.tbl_isempty(Group.super.contents(self)) then self:endgrp() end
     table.insert(self._.items, item)

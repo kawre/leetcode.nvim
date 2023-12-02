@@ -4,7 +4,8 @@ local Group = require("leetcode-ui.group")
 local Footer = require("leetcode-ui.lines.footer")
 local Page = require("leetcode-ui.group.page")
 local Buttons = require("leetcode-ui.group.buttons")
-local Button = require("leetcode-ui.lines.button")
+local Button = require("leetcode-ui.lines.button.menu")
+local BackButton = require("leetcode-ui.lines.button.menu.back")
 local Title = require("leetcode-ui.lines.title")
 
 local cmd = require("leetcode.command")
@@ -29,19 +30,32 @@ page:insert(header)
 
 page:insert(Title({ "Menu" }, "Statistics"))
 
-local buttons = Buttons()
+local skills = Button("Skills", {
+    icon = "",
+    sc = "s",
+    on_press = cmd.ui_skills,
+})
 
-local skills = Button({ icon = "", src = "Skills" }, "s", cmd.ui_skills)
-if not config.is_cn then buttons:insert(skills) end
+local languages = Button("Languages", {
+    icon = "",
+    sc = "l",
+    on_press = cmd.ui_languages,
+})
 
-local languages = Button({ icon = "", src = "Languages" }, "l", cmd.ui_languages)
-buttons:insert(languages)
+local update = Button("Update", {
+    icon = "",
+    sc = "u",
+    on_press = function() calendar:update() end,
+})
 
-local update = Button({ icon = "", src = "Update" }, "u", function() calendar:update() end)
-buttons:insert(update)
+local back = BackButton("menu")
 
-local back = Button({ icon = "", src = "Back" }, "q", function() cmd.menu_layout("menu") end)
-buttons:insert(back)
+local buttons = Buttons({
+    config.is_cn and nil or skills,
+    languages,
+    update,
+    back,
+})
 
 page:insert(buttons)
 

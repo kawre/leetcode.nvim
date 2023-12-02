@@ -1,6 +1,7 @@
 local Cases = require("leetcode-ui.group.cases")
 local Header = require("leetcode-ui.lines.header")
 local utils = require("leetcode.utils")
+local SimilarQuestions = require("leetcode-ui.group.similar-questions")
 
 local Renderer = require("leetcode-ui.renderer")
 local Pre = require("leetcode-ui.group.pre")
@@ -38,6 +39,9 @@ function ResultLayout:handle_accepted(item)
     local header = Header(item)
     self:insert(header)
 
+    --------------------------------------------
+    --- Runtime
+    --------------------------------------------
     local runtime = Lines()
     local runtime_ms = item.display_runtime or vim.split(item.status_runtime, " ")[1] or "NIL"
     runtime:append(runtime_ms):append(" ms", "leetcode_alt")
@@ -62,10 +66,11 @@ function ResultLayout:handle_accepted(item)
     end
 
     local runtime_title = Line():append("󰓅 " .. t("Runtime"))
-    runtime:endl()
     self:insert(Pre(runtime_title, runtime))
 
-    -- memory
+    --------------------------------------------
+    --- Memory
+    --------------------------------------------
     local memory = Lines()
     item.status_memory = item.status_memory:gsub("(%d+)%s*(%a+)", "%1 %2")
     local s_mem = vim.split(item.status_memory, " ")
@@ -87,6 +92,13 @@ function ResultLayout:handle_accepted(item)
 
     local memory_title = Line():append("󰍛 " .. t("Memory"))
     self:insert(Pre(memory_title, memory))
+
+    --------------------------------------------
+    --- More challenges
+    --------------------------------------------
+    local more_title = Line():append("More challenges")
+    local similar = SimilarQuestions(self.parent.question.q.similar)
+    self:insert(Pre(more_title, similar))
 end
 
 ---@private

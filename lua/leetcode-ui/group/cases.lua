@@ -14,7 +14,12 @@ function Cases:make_nav()
     local nav = Lines({}, { padding = { top = 1 } })
 
     for i, case in ipairs(self.cases) do
-        self.console.result:map("n", tostring(i), function() self:change(i) end, { clear = true })
+        self.console.result:map(
+            "n",
+            tostring(i),
+            function() self:change(i) end,
+            { clearable = true }
+        )
 
         local hl = "leetcode_case_"
             .. ("%s%s"):format(self.idx == i and "focus_" or "", case.passed and "ok" or "err")

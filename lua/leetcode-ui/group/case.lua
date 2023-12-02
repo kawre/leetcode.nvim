@@ -12,8 +12,8 @@ local Line = require("leetcode-ui.line")
 ---@alias case_body { input: string, raw_input: string, output: string, expected: string, std_output: string }
 
 ---@class lc.Result.Case : lc-ui.Group
----@field pre lc-ui.Lines
----@field stdout lc-ui.Lines
+---@field pre lc.ui.Lines
+---@field stdout lc.ui.Lines
 ---@field passed boolean
 ---@field index integer
 ---@field body case_body

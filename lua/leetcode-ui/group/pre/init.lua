@@ -18,7 +18,7 @@ function Pre:add_margin(item)
 end
 
 ---@param title? lc.ui.Line
----@param item lc-ui.Lines
+---@param item lc.ui.Lines
 function Pre:init(title, item)
     Pre.super.init(self, {}, { spacing = 1, position = "left" })
 
