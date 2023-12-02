@@ -32,28 +32,43 @@ function Problems.all(cb, noti)
                 if config.is_cn then
                     if spinner then spinner:update("fetching title translations") end
                     Problems.translated_titles(function(titles, terr)
-                        if terr then return cb(nil, terr) end
+                        if terr then
+                            if spinner then spinner:stop(terr.msg, false) end
+                            return cb(nil, terr)
+                        end
+
                         problems = utils.translate_titles(problems, titles)
-                        cb(problems)
                         if spinner then spinner:stop("problems cache updated") end
+
+                        cb(problems)
                     end)
                 else
-                    cb(problems)
                     if spinner then spinner:stop("problems cache updated") end
+
+                    cb(problems)
                 end
             end,
         })
     else
         local res, err = utils.get(endpoint)
-        if err then return nil, err end
+        if err then
+            if spinner then spinner:stop(err.msg, false) end
+            return nil, err
+        end
 
         local problems = utils.normalize_problems(res.stat_status_pairs)
 
         if config.is_cn then
             local titles, terr = Problems.translated_titles()
-            if terr then return nil, terr end
+            if terr then
+                if spinner then spinner:stop(terr.msg, false) end
+                return nil, terr
+            end
+
+            if spinner then spinner:stop("problems cache updated") end
             return utils.translate_titles(problems, titles)
         else
+            if spinner then spinner:stop("problems cache updated") end
             return problems
         end
     end
