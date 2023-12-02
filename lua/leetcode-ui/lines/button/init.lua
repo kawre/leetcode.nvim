@@ -14,12 +14,14 @@ function Button:draw(renderer, opts)
     end
 
     local options = self._.opts
-    renderer:map("n", options.sc, options.on_press, {
-        noremap = false,
-        silent = true,
-        nowait = true,
-        clearable = true,
-    })
+    if options.on_press then
+        renderer:map("n", options.sc, options.on_press, {
+            noremap = false,
+            silent = true,
+            nowait = true,
+            clearable = true,
+        })
+    end
 
     Button.super.draw(self, renderer, opts)
 end
@@ -29,10 +31,14 @@ function Button:press() self._.opts.on_press() end
 ---@param lines lc.ui.Line[]
 ---@param opts lc.ui.Button.opts
 function Button:init(lines, opts) --
-    Button.super.init(self, lines, opts)
+    local options = vim.tbl_deep_extend("force", {
+        on_press = function() end,
+    }, opts or {})
+
+    Button.super.init(self, lines, options)
 end
 
----@type fun(lines: lc.ui.Line[], opts: lc.ui.Button.opts): lc.ui.Button
+---@type fun(lines?: lc.ui.Line[], opts?: lc.ui.Button.opts): lc.ui.Button
 local LeetButton = Button
 
 return LeetButton

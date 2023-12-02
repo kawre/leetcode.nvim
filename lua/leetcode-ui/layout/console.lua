@@ -44,9 +44,9 @@ function ConsoleLayout:mount()
 
     self:set_keymaps({
         ["r"] = function() self.testcase:reset() end,
+        ["U"] = function() self:use_testcase() end,
         ["H"] = function() self.testcase:focus() end,
         ["L"] = function() self.result:focus() end,
-        ["U"] = function() self:use_testcase() end,
     })
 end
 

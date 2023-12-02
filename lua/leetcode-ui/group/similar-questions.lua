@@ -1,12 +1,12 @@
+local Button = require("leetcode-ui.lines.button")
+local Group = require("leetcode-ui.group")
+local NuiTree = require("nui.tree")
+
+local problemlist = require("leetcode.cache.problemlist")
 local config = require("leetcode.config")
 local utils = require("leetcode.utils")
-local Button = require("leetcode-ui.lines.button")
-local Line = require("leetcode-ui.line")
-local problemlist = require("leetcode.cache.problemlist")
-local Group = require("leetcode-ui.group")
 
 local t = require("leetcode.translator")
-local log = require("leetcode.logger")
 
 ---@class lc.ui.SimilarQuestions : lc.ui.Lines
 local SimilarQuestions = Group:extend("LeetSimilarQuestions")
@@ -27,22 +27,42 @@ function SimilarQuestions:init(questions)
         local ok, p = pcall(problemlist.get_by_title_slug, q.title_slug)
 
         if ok then
-            -- local button = Button()
-            --
-            -- line:append("󱓻 ", hl[p.difficulty])
-            -- line:append(utils.translate(p.title, p.title_cn))
-            --
-            -- if not config.auth.is_premium and q.paid_only then
-            --     line:append("  " .. t("Premium"), "leetcode_medium")
-            -- end
-            --
-            -- line._.q = q
-            -- self:insert(line)
+            local button = Button({}, {
+                on_press = function()
+                    local Question = require("leetcode-ui.question")
+                    Question(p):mount()
+                end,
+            })
+
+            local fid = p.frontend_id .. "."
+            fid = fid .. (" "):rep(5 - vim.api.nvim_strwidth(fid))
+
+            button:append("󱓻 ", hl[p.difficulty])
+            button:append(fid .. " ", "leetcode_normal")
+            button:append(utils.translate(p.title, p.title_cn))
+
+            if not config.auth.is_premium and q.paid_only then
+                button:append("  " .. t("Premium"), "leetcode_medium")
+            end
+
+            button._.q = q
+            self:insert(button)
         end
     end
 end
 
 ---@type fun(questions: lc.QuestionResponse.similar): lc-ui.Padding
 local LeetSimilarQuestions = SimilarQuestions
+
+function SimilarQuestions.static:to_nodes(questions) --
+    local sim = LeetSimilarQuestions(questions)
+
+    local tbl = {}
+    for _, s in ipairs(sim:contents()) do
+        table.insert(tbl, NuiTree.Node({ text = s, question = s._.q }))
+    end
+
+    return tbl
+end
 
 return LeetSimilarQuestions

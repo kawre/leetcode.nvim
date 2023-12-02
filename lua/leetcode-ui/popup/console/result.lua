@@ -39,7 +39,7 @@ function ResultPopup:init(parent)
             text = {
                 top = (" (L) %s "):format(t("Result")),
                 top_align = "center",
-                bottom = (" (R) %s | (S) %s "):format(t("Run"), t("Submit")),
+                bottom = (" (U) %s "):format(t("Use Testcase")),
                 bottom_align = "center",
             },
         },

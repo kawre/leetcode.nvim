@@ -7,7 +7,6 @@ local log = require("leetcode.logger")
 ---@class lc-ui.Popup : NuiPopup
 ---@field visible boolean
 ---@field renderer lc-ui.Renderer
----@field keymaps table<string|string[], string>
 local Popup = NuiPopup:extend("LeetPopup")
 
 function Popup:focus()
@@ -15,16 +14,9 @@ function Popup:focus()
     vim.api.nvim_set_current_win(self.winid)
 end
 
-function Popup:clear_keymaps()
-    for key, mode in pairs(self.keymaps) do
-        self:unmap(mode, key)
-    end
-    self.keymaps = {}
-end
-
 function Popup:clear() --
-    self:clear_keymaps()
     self.renderer:clear()
+    self:update_renderer()
 end
 
 function Popup:show()
@@ -34,40 +26,37 @@ function Popup:show()
         Popup.super.show(self)
     end
 
+    self:update_renderer()
     self.visible = true
 end
 
 function Popup:unmount()
     self:clear()
     Popup.super.unmount(self)
+
     self.visible = false
+    self:update_renderer()
 end
 
 function Popup:map(...) self.renderer:map(...) end
 
 function Popup:mount()
     Popup.super.mount(self)
+
     self.visible = true
+    self:update_renderer()
+
     self:on({ "BufLeave", "WinLeave" }, function() self:handle_leave() end)
     self:map("n", { "q", "<Esc>" }, function() self:hide() end)
-
-    self.renderer:map()
 end
 
 function Popup:hide()
     if not self.visible then return end
     Popup.super.hide(self)
+
+    self:update_renderer()
     self.visible = false
 end
-
--- function Popup:map(mode, key, handler, opts, ___force___)
---     if opts and opts.clear == true then
---         self.keymaps[key] = mode
---         opts.clear = nil
---     end
---
---     Popup.super.map(self, mode, key, handler, opts, ___force___)
--- end
 
 function Popup:toggle()
     if not self.visible then
@@ -75,15 +64,23 @@ function Popup:toggle()
     else
         self:hide()
     end
+
+    self:update_renderer()
 end
 
 function Popup:handle_leave() self:hide() end
 
-function Popup:draw() self.renderer:draw(self) end
+function Popup:draw()
+    self:update_renderer()
+    self.renderer:draw(self)
+end
+
+function Popup:update_renderer()
+    self.renderer.bufnr = self.bufnr
+    self.renderer.winid = self.winid
+end
 
 function Popup:init(opts)
-    self.keymaps = {}
-
     local options = vim.tbl_deep_extend("force", {
         focusable = true,
         border = {
@@ -102,8 +99,8 @@ function Popup:init(opts)
     Popup.super.init(self, options)
 
     self.renderer = self.renderer or Renderer()
+    self:update_renderer()
     self.visible = false
-    self.keymaps = {}
 end
 
 ---@type fun(opts: table): lc-ui.Popup

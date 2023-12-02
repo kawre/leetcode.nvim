@@ -14,6 +14,8 @@ function Split:toggle()
     else
         self:hide()
     end
+
+    self:update_renderer()
 end
 
 function Split:show()
@@ -23,12 +25,15 @@ function Split:show()
         Split.super.show(self)
     end
 
+    self:update_renderer()
     self.visible = true
 end
 
 function Split:hide()
     if not self.visible then return end
     Split.super.hide(self)
+
+    self:update_renderer()
     self.visible = false
 end
 
@@ -36,6 +41,8 @@ function Split:mount()
     Split.super.mount(self)
 
     self.visible = true
+    self:update_renderer()
+
     self:map("n", { "q", "<Esc>" }, function() self:toggle() end)
 end
 
@@ -44,12 +51,24 @@ function Split:map(...) self.renderer:map(...) end
 function Split:unmount()
     Split.super.unmount(self)
 
+    self:update_renderer()
     self.visible = false
 end
 
-function Split:draw() self.renderer:draw(self) end
+function Split:draw()
+    self:update_renderer()
+    self.renderer:draw(self)
+end
 
-function Split:clear() self.renderer:clear() end
+function Split:clear()
+    self.renderer:clear()
+    self:update_renderer()
+end
+
+function Split:update_renderer()
+    self.renderer.bufnr = self.bufnr
+    self.renderer.winid = self.winid
+end
 
 function Split:init(opts) --
     local options = vim.tbl_deep_extend("force", {

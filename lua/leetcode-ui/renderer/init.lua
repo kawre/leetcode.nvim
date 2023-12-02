@@ -54,6 +54,8 @@ function Renderer:modifiable(fn)
 end
 
 function Renderer:map(mode, key, handler, opts) --
+    if not self.bufnr then return end
+
     if type(key) == "table" then
         for _, k in ipairs(key) do
             self:map(mode, k, handler, opts)
@@ -102,16 +104,19 @@ end
 
 ---@param line_idx? integer The line that the press happened
 function Renderer:handle_press(line_idx)
-    if
-        not self.bufnr
-        or not self.winid
-        or not pcall(function()
-            line_idx = line_idx or vim.api.nvim_win_get_cursor(self.winid)[1]
-            self._.buttons[line_idx]:press()
-        end)
-    then
+    local function feedenter()
         vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<cr>", true, false, true), "n", true)
     end
+
+    if not self.bufnr or not self.winid then feedenter() end
+    if not line_idx and not vim.api.nvim_win_is_valid(self.winid) then return feedenter() end
+
+    line_idx = line_idx or vim.api.nvim_win_get_cursor(self.winid)[1]
+
+    if not self._.buttons[line_idx] then return feedenter() end
+
+    local ok, err = pcall(function() self._.buttons[line_idx]:press() end)
+    if not ok then log.error(err) end
 end
 
 -- ---@param line integer

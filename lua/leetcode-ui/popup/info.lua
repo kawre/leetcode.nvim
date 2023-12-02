@@ -16,17 +16,12 @@ local log = require("leetcode.logger")
 local InfoPopup = Popup:extend("LeetInfoPopup")
 
 function InfoPopup:similar_questions_node()
-    local sim_questions = SimilarQuestions(self.question.q.similar)
+    local nodes = SimilarQuestions:to_nodes(self.question.q.similar)
 
-    local tbl = {}
-    for _, sim in ipairs(sim_questions:contents()) do
-        table.insert(tbl, NuiTree.Node({ text = sim, question = sim._.q }))
-    end
-
-    if not vim.tbl_isempty(tbl) then
+    if not vim.tbl_isempty(nodes) then
         return NuiTree.Node(
             { text = NuiText(t("Similar Questions") .. " ", "leetcode_ref") },
-            tbl
+            nodes
         )
     else
         return NuiTree.Node({

@@ -157,7 +157,7 @@ function Testcase:init(parent)
             text = {
                 top = (" (H) %s "):format(t("Testcases")),
                 top_align = "center",
-                bottom = (" (r) %s | (U) %s "):format(t("Reset"), t("Use Testcase")),
+                bottom = (" (r) %s "):format(t("Reset")),
                 bottom_align = "center",
             },
         },

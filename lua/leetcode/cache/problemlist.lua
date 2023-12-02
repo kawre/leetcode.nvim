@@ -95,14 +95,14 @@ end
 
 ---@param title_slug string
 ---@param status "ac" | "notac"
-function Problemlist.change_status(title_slug, status)
+Problemlist.change_status = vim.schedule_wrap(function(title_slug, status)
     local problist = Problemlist.get()
 
     Problemlist.write(vim.tbl_map(function(p)
         if p.title_slug == title_slug then p.status = status end
         return p
     end, problist))
-end
+end)
 
 function Problemlist.delete()
     if not file:exists() then return false end
