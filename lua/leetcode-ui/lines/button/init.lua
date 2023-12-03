@@ -6,7 +6,7 @@ local Button = Lines:extend("LeetButton")
 
 ---@alias lc.ui.Button.opts { sc?: string, on_press?: function } | lc.ui.opts
 
----@param renderer lc-ui.Renderer
+---@param renderer lc.ui.Renderer
 ---@param opts lc.ui.opts
 function Button:draw(renderer, opts)
     for i = 1, #self:contents() do

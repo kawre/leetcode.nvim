@@ -1,6 +1,6 @@
 local Lines = require("leetcode-ui.lines")
 
----@class lc-ui.Padding: lc.ui.Lines
+---@class lc.ui.Padding: lc.ui.Lines
 ---@field times integer
 local Padding = Lines:extend("LeetPadding")
 
@@ -15,7 +15,7 @@ function Padding:init(int)
     end
 end
 
----@type fun(int: integer): lc-ui.Padding
+---@type fun(int: integer): lc.ui.Padding
 local LeetPadding = Padding
 
 return LeetPadding

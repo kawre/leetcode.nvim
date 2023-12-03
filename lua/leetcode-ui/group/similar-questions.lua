@@ -46,15 +46,15 @@ function SimilarQuestions:init(questions)
     end
 end
 
----@type fun(questions: lc.QuestionResponse.similar): lc-ui.Padding
+---@type fun(questions: lc.QuestionResponse.similar): lc.ui.Padding
 local LeetSimilarQuestions = SimilarQuestions
 
 function SimilarQuestions.static:to_nodes(questions) --
     local sim = LeetSimilarQuestions(questions)
 
     local tbl = {}
-    for _, s in ipairs(sim:contents()) do
-        table.insert(tbl, NuiTree.Node({ text = s, question = s._.q }))
+    for _, btn in ipairs(sim:contents()) do
+        table.insert(tbl, NuiTree.Node({ text = btn }))
     end
 
     return tbl

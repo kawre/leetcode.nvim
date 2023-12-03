@@ -2,7 +2,7 @@ local Lines = require("leetcode-ui.lines")
 local config = require("leetcode.config")
 local t = require("leetcode.translator")
 
----@class lc-menu.Footer : lc.ui.Lines
+---@class lc.ui.menu.Footer : lc.ui.Lines
 local Footer = Lines:extend("LeetFooter")
 
 function Footer:draw(layout, opts)
@@ -24,7 +24,7 @@ function Footer:init(opts)
     Footer.super.init(self, {}, opts)
 end
 
----@type fun(): lc-menu.Footer
+---@type fun(): lc.ui.menu.Footer
 local LeetFooter = Footer
 
 return LeetFooter

@@ -16,7 +16,7 @@ local config = require("leetcode.config")
 local t = require("leetcode.translator")
 local log = require("leetcode.logger")
 
----@class lc.ResultLayout : lc-ui.Renderer
+---@class lc.ui.Result : lc.ui.Renderer
 ---@field parent lc.ui.Console
 ---@field group lc.ui.Group
 ---@field cases lc.ui.Cases
@@ -268,7 +268,7 @@ function ResultLayout:init(parent)
     self.parent = parent
 end
 
----@type fun(parent: lc.ui.Console): lc.ResultLayout
+---@type fun(parent: lc.ui.Console): lc.ui.Result
 local LeetResultLayout = ResultLayout
 
 return LeetResultLayout

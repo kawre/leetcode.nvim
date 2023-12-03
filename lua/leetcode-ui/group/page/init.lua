@@ -1,6 +1,6 @@
 local Group = require("leetcode-ui.group")
 
----@class lc.ui.Page : lc.ui.Group
+---@class lc.ui.menu.Page : lc.ui.Group
 local Page = Group:extend("LeetMenuPage")
 
 function Page:init(opts) --
@@ -15,7 +15,7 @@ function Page:init(opts) --
     Page.super.init(self, {}, options)
 end
 
----@type fun(): lc.ui.Page
+---@type fun(): lc.ui.menu.Page
 local LeetMenuPage = Page
 
 return LeetMenuPage

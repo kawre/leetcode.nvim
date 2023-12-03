@@ -91,7 +91,7 @@ function InfoPopup:populate()
                     line:append("  ")
                     local parser = require("leetcode.parser")
                     local txt = parser:parse(node.text)
-                    if txt._lines[1] then line:append(txt._lines[1]) end
+                    if txt:contents()[1] then line:append(txt:contents()[1]) end
                 else
                     line:append(node.text)
                 end
@@ -107,13 +107,7 @@ function InfoPopup:populate()
         local node = tree:get_node()
         if not node then return end
 
-        if node.question then
-            local problemlist = require("leetcode.cache.problemlist")
-            local problem = problemlist.get_by_title_slug(node.question.title_slug)
-
-            local Question = require("leetcode-ui.question")
-            Question(problem):mount()
-        end
+        if node.text and node.text.press then node.text:press() end
 
         if not node:is_expanded() then
             node:expand()

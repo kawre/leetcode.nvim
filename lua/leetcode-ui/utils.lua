@@ -45,14 +45,14 @@ function utils.diff_to_hl(diff)
     return hl[diff:lower()] or ""
 end
 
----@param layout lc-ui.Renderer
+---@param layout lc.ui.Renderer
 function utils.win_width(layout)
     if not vim.api.nvim_win_is_valid(layout.winid) then return 0 end
     return vim.api.nvim_win_get_width(layout.winid)
 end
 
 ---@param lines lc.ui.Lines
----@param layout lc-ui.Renderer
+---@param layout lc.ui.Renderer
 ---
 ---@return string
 function utils.get_padding(lines, layout)

@@ -3,7 +3,7 @@ local template = require("leetcode.config.template")
 ---@type lc-ui.Question[]
 _Lc_questions = {}
 
----@type lc-menu
+---@type lc.ui.menu
 _Lc_Menu = {} ---@diagnostic disable-line
 
 ---@class lc.Settings

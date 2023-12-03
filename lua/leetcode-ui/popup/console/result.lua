@@ -6,7 +6,7 @@ local problemlist = require("leetcode.cache.problemlist")
 local log = require("leetcode.logger")
 
 ---@class lc.ui.Console.ResultPopup : lc.ui.Console.Popup
----@field renderer lc.ResultLayout
+---@field renderer lc.ui.Result
 ---@field last_testcase string
 local ResultPopup = ConsolePopup:extend("LeetResultPopup")
 

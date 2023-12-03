@@ -14,7 +14,7 @@ local log = require("leetcode.logger")
 ---@field opts lc.ui.opts
 ---@field keymaps table[]
 
----@class lc-ui.Renderer : lc.ui.Group
+---@class lc.ui.Renderer : lc.ui.Group
 ---@field bufnr integer
 ---@field winid integer
 ---@field _ lc-ui.Layout._ | lc.ui.Group.params
@@ -127,7 +127,7 @@ end
 
 function Renderer:replace(items) self._.items = items end
 
----@param layout lc-ui.Renderer
+---@param layout lc.ui.Renderer
 function Renderer:set(layout) self._.items = layout._.items end
 
 ---@param components lc.ui.Lines[]
@@ -140,7 +140,7 @@ function Renderer:init(components, opts)
     self._.keymaps = {}
 end
 
----@type fun(components?: table[], opts?: lc.ui.opts): lc-ui.Renderer
+---@type fun(components?: table[], opts?: lc.ui.opts): lc.ui.Renderer
 local LeetRenderer = Renderer
 
 return LeetRenderer

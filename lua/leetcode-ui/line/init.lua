@@ -20,7 +20,7 @@ function Line:longest()
     return max_len
 end
 
----@param layout lc-ui.Renderer
+---@param layout lc.ui.Renderer
 ---@param opts lc.ui.opts
 function Line:draw(layout, opts)
     local texts = utils.shallowcopy(self:contents())

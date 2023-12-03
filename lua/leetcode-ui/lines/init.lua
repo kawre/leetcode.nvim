@@ -45,7 +45,7 @@ function Lines:get_leftpad(renderer, opts) --
     return math.floor(padding)
 end
 
----@param layout lc-ui.Renderer
+---@param layout lc.ui.Renderer
 function Lines:draw(layout, opts)
     local options = Opts(self._.opts):merge(opts)
     local lines = self:contents()

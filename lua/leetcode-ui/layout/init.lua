@@ -2,7 +2,7 @@ local NuiLayout = require("nui.layout")
 
 local log = require("leetcode.logger")
 
----@class lc-ui.Layout : NuiLayout
+---@class lc.ui.Layout : NuiLayout
 ---@field visible boolean
 local Layout = NuiLayout:extend("LeetLayout")
 
@@ -46,7 +46,7 @@ function Layout:init(options, box) --
     self.visible = false
 end
 
----@type fun(options: table, box: table): lc-ui.Renderer
+---@type fun(options: table, box: table): lc.ui.Renderer
 local LeetLayout = Layout
 
 return LeetLayout

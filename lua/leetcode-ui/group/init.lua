@@ -19,7 +19,7 @@ function Group:contents()
     return items
 end
 
----@param layout lc-ui.Renderer
+---@param layout lc.ui.Renderer
 function Group:draw(layout, opts)
     local options = Opts(self._.opts):merge(opts)
 

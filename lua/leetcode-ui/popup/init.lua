@@ -6,7 +6,7 @@ local log = require("leetcode.logger")
 
 ---@class lc-ui.Popup : NuiPopup
 ---@field visible boolean
----@field renderer lc-ui.Renderer
+---@field renderer lc.ui.Renderer
 local Popup = NuiPopup:extend("LeetPopup")
 
 function Popup:focus()

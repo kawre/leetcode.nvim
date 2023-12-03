@@ -9,7 +9,7 @@ local NuiText = require("nui.text")
 
 local log = require("leetcode.logger")
 
----@class lc-ui.Calendar : lc.ui.Lines
+---@class lc.ui.Calendar : lc.ui.Lines
 ---@field curr_time integer
 ---@field calendar lc.Stats.CalendarData
 ---@field calendar_lines NuiLine[]
@@ -203,7 +203,7 @@ function Calendar:init()
     self:fetch()
 end
 
----@type fun(): lc-ui.Calendar
+---@type fun(): lc.ui.Calendar
 local LeetCalendar = Calendar
 
 return LeetCalendar

@@ -8,7 +8,7 @@ local config = require("leetcode.config")
 local Runner = require("leetcode.runner")
 local log = require("leetcode.logger")
 
----@class lc.ui.Console : lc-ui.Layout
+---@class lc.ui.Console : lc.ui.Layout
 ---@field question lc-ui.Question
 ---@field testcase lc.ui.Console.TestcasePopup
 ---@field result lc.ui.Console.ResultPopup

@@ -4,7 +4,7 @@ local NuiSplit = require("nui.split")
 local log = require("leetcode.logger")
 
 ---@class lc-ui.Split : NuiSplit
----@field renderer lc-ui.Renderer
+---@field renderer lc.ui.Renderer
 ---@field visible boolean
 local Split = NuiSplit:extend("LeetSplit")
 

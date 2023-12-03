@@ -10,7 +10,7 @@ local utils = require("leetcode-ui.utils")
 local log = require("leetcode.logger")
 
 ---@class lc.ui.SkillsPopup : lc-ui.Popup
----@field renderer lc-ui.Renderer
+---@field renderer lc.ui.Renderer
 local Skills = Popup:extend("LeetSkills")
 
 function Skills:handle(name, skills)

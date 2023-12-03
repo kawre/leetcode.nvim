@@ -11,7 +11,7 @@ local stats_api = require("leetcode.api.statistics")
 local Spinner = require("leetcode.logger.spinner")
 
 ---@class lc.ui.LanguagesPopup : lc.ui.SkillsPopup
----@field renderer lc-ui.Renderer
+---@field renderer lc.ui.Renderer
 local Languages = Popup:extend("LeetLanguages")
 
 function Languages:handle(res)
