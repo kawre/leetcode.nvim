@@ -96,7 +96,8 @@ function ResultLayout:handle_accepted(item)
     --------------------------------------------
     --- More challenges
     --------------------------------------------
-    local more_title = Line():append(" More challenges", "leetcode_normal")
+    local title_txt = (" %s"):format(t("More challenges"))
+    local more_title = Line():append(title_txt, "leetcode_normal")
     local similar = SimilarQuestions(self.parent.question.q.similar)
     self:insert(Pre(more_title, similar))
 end

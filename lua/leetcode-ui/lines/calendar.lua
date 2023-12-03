@@ -38,7 +38,6 @@ end
 
 ---@param res { calendar: lc.Stats.CalendarData }
 function Calendar:handle_res(res)
-    log.info(res)
     self:clear()
     self.calendar = res.calendar
 

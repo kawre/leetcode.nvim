@@ -62,6 +62,7 @@ local translate = {
     ["submissions"] = "过去一年共提交",
     ["active days"] = "累计提交天数",
     ["max streak"] = "连续提交",
+    ["more challenges"] = "更多挑战",
 
     -- difficulty
     ["all"] = "所有",
