@@ -10,7 +10,7 @@ local log = require("leetcode.logger")
 local Lines = Line:extend("LeetLines")
 
 function Lines:contents()
-    local lines = utils.tbl_unpack(self._.lines)
+    local lines = utils.shallowcopy(self._.lines)
 
     local contents = Lines.super.contents(self)
     if not vim.tbl_isempty(contents) then table.insert(lines, Line(contents)) end

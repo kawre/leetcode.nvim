@@ -5,7 +5,7 @@ local log = require("leetcode.logger")
 local utils = {}
 
 ---@param tbl table
-function utils.tbl_unpack(tbl)
+function utils.shallowcopy(tbl)
     local new_tbl = {}
 
     for _, value in ipairs(tbl) do

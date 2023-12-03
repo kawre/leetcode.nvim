@@ -11,7 +11,7 @@ local log = require("leetcode.logger")
 local Group = Lines:extend("LeetGroup")
 
 function Group:contents()
-    local items = utils.tbl_unpack(self._.items)
+    local items = utils.shallowcopy(self._.items)
 
     local contents = Group.super.contents(self)
     if not vim.tbl_isempty(contents) then table.insert(items, Lines(contents)) end
