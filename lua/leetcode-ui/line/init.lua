@@ -1,6 +1,7 @@
 local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
 local Opts = require("leetcode-ui.opts")
+local utils = require("leetcode-ui.utils")
 local log = require("leetcode.logger")
 
 ---@class lc.ui.Line : NuiLine
@@ -22,7 +23,7 @@ end
 ---@param layout lc-ui.Renderer
 ---@param opts lc.ui.opts
 function Line:draw(layout, opts)
-    local texts = { table.unpack(self:contents()) }
+    local texts = utils.tbl_unpack(self:contents())
 
     local options = Opts(self._.opts):merge(opts)
     local pad = options:get_padding()

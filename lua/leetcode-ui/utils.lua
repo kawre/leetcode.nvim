@@ -4,6 +4,17 @@ local log = require("leetcode.logger")
 ---@class lc-ui.Utils
 local utils = {}
 
+---@param tbl table
+function utils.tbl_unpack(tbl)
+    local new_tbl = {}
+
+    for _, value in ipairs(tbl) do
+        table.insert(new_tbl, value)
+    end
+
+    return new_tbl
+end
+
 ---@param item lc.ui.Lines
 function utils.longest_line(item)
     if item.class.name == "LeetLine" then return vim.api.nvim_strwidth(item:content()) end

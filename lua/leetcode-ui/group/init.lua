@@ -1,6 +1,7 @@
 local Pad = require("leetcode-ui.lines.padding")
 local Lines = require("leetcode-ui.lines")
 local Opts = require("leetcode-ui.opts")
+local utils = require("leetcode-ui.utils")
 local log = require("leetcode.logger")
 
 ---@alias lc.ui.Group.params { items: lc.ui.Lines[], opts: lc-ui.Group.opts }
@@ -10,7 +11,7 @@ local log = require("leetcode.logger")
 local Group = Lines:extend("LeetGroup")
 
 function Group:contents()
-    local items = { table.unpack(self._.items) }
+    local items = utils.tbl_unpack(self._.items)
 
     local contents = Group.super.contents(self)
     if not vim.tbl_isempty(contents) then table.insert(items, Lines(contents)) end
