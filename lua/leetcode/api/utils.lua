@@ -130,9 +130,10 @@ function utils.check_err(err)
 end
 
 function utils.decode(str)
-    local ok, res = pcall(vim.json.decode, str)
-    assert(ok, str)
-    return res
+    return vim.json.decode(str)
+    -- local ok, res = pcall(vim.json.decode, str)
+    -- assert(ok, str)
+    -- return res
 end
 
 function utils.normalize_similar_cn(s)

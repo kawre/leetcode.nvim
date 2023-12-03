@@ -13,6 +13,7 @@ local MenuButton = Button:extend("LeetMenuButton")
 ---@param text string
 ---@param opts lc.ui.Button.Menu.opts
 function MenuButton:init(text, opts)
+    text = t(text)
     opts = vim.tbl_deep_extend("force", {
         expandable = true,
         expand_icon = "",

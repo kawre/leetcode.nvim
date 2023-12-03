@@ -1,6 +1,8 @@
 local Popup = require("leetcode-ui.popup")
 local Group = require("leetcode-ui.group")
 local Lines = require("leetcode-ui.lines")
+
+local log = require("leetcode.logger")
 local t = require("leetcode.translator")
 
 local utils = require("leetcode.utils")
@@ -40,6 +42,7 @@ end
 ---@param res lc.Languages.Res
 function Languages:populate(res)
     local group = Group({}, { spacing = 1 })
+    if res == vim.NIL then return end
 
     table.sort(res, function(a, b) return a.problems_solved > b.problems_solved end)
     for _, lang in ipairs(res) do

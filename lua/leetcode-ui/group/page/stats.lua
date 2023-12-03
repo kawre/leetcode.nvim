@@ -30,32 +30,31 @@ page:insert(header)
 
 page:insert(Title({ "Menu" }, "Statistics"))
 
+local buttons = Buttons({})
+
 local skills = Button("Skills", {
     icon = "",
     sc = "s",
     on_press = cmd.ui_skills,
 })
+if not config.is_cn then buttons:insert(skills) end
 
 local languages = Button("Languages", {
     icon = "",
     sc = "l",
     on_press = cmd.ui_languages,
 })
+buttons:insert(languages)
 
 local update = Button("Update", {
     icon = "",
     sc = "u",
     on_press = function() calendar:update() end,
 })
+buttons:insert(update)
 
 local back = BackButton("menu")
-
-local buttons = Buttons({
-    config.is_cn and nil or skills,
-    languages,
-    update,
-    back,
-})
+buttons:insert(back)
 
 page:insert(buttons)
 

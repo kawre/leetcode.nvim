@@ -38,6 +38,7 @@ end
 
 ---@param res { calendar: lc.Stats.CalendarData }
 function Calendar:handle_res(res)
+    log.info(res)
     self:clear()
     self.calendar = res.calendar
 
@@ -155,7 +156,7 @@ function Calendar:handle_weeks(m)
 end
 
 local function square_hl(count, max_count)
-    local perc = (count / max_count) * 100
+    local perc = (count / math.max(max_count, 1)) * 100
     local num = math.ceil(perc / 10) * 10
     return ("leetcode_calendar_%d"):format(num)
 end
