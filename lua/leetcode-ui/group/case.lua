@@ -11,7 +11,7 @@ local Line = require("leetcode-ui.line")
 
 ---@alias case_body { input: string, raw_input: string, output: string, expected: string, std_output: string }
 
----@class lc.Result.Case : lc-ui.Group
+---@class lc.ui.Case : lc.ui.Group
 ---@field pre lc.ui.Lines
 ---@field stdout lc.ui.Lines
 ---@field passed boolean
@@ -66,7 +66,7 @@ end
 ---@param body case_body
 ---@param passed boolean
 ---
----@return lc.Result.Case
+---@return lc.ui.Case
 function Case:init(body, passed)
     Case.super.init(self, {}, { spacing = 1 })
 
@@ -83,7 +83,7 @@ function Case:init(body, passed)
     self.passed = passed
 end
 
----@alias lc.Result.Case.constructor fun(body: case_body, passed: boolean): lc.Result.Case
+---@alias lc.Result.Case.constructor fun(body: case_body, passed: boolean): lc.ui.Case
 ---@type lc.Result.Case.constructor
 local LeetCase = Case
 

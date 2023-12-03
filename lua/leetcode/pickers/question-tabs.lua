@@ -1,5 +1,6 @@
 local log = require("leetcode.logger")
 local utils = require("leetcode.utils")
+local ui_utils = require("leetcode-ui.utils")
 local t = require("leetcode.translator")
 
 local pickers = require("telescope.pickers")
@@ -32,13 +33,9 @@ end
 
 ---@param question lc.QuestionResponse
 local function display_question(question)
-    local hl = {
-        ["Easy"] = "leetcode_easy",
-        ["Medium"] = "leetcode_medium",
-        ["Hard"] = "leetcode_hard",
-    }
+    local hl = ui_utils.diff_to_hl(question.difficulty)
 
-    local index = { question.frontend_id .. ".", hl[question.difficulty] }
+    local index = { question.frontend_id .. ".", hl }
     local title = { utils.translate(question.title, question.translated_title) }
 
     return unpack({ index, title })

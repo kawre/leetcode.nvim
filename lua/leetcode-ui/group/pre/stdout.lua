@@ -3,7 +3,7 @@ local t = require("leetcode.translator")
 local Line = require("leetcode-ui.line")
 local Lines = require("leetcode-ui.lines")
 
----@class lc.Stdout : lc.Result.Pre
+---@class lc.ui.Stdout : lc.ui.Pre
 local Stdout = Pre:extend("LeetStdout")
 
 ---@param output string
@@ -26,7 +26,7 @@ function Stdout:init(output)
     Stdout.super.init(self, title, lines)
 end
 
----@alias lc.Stdout.constructor fun(output: string): lc.Stdout
+---@alias lc.Stdout.constructor fun(output: string): lc.ui.Stdout
 ---@type lc.Stdout.constructor
 local LeetStdout = Stdout
 

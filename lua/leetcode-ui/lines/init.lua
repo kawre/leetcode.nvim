@@ -86,6 +86,13 @@ function Lines:insert(item) --
     return self
 end
 
+function Lines:replace(lines)
+    Lines.super.clear(self)
+    self._.lines = lines
+
+    return self
+end
+
 function Lines:endl()
     local contents = Lines.super.contents(self)
     if not vim.tbl_isempty(contents) then

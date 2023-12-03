@@ -27,6 +27,24 @@ function utils.longest_line(item)
     return max_len
 end
 
+---@param diff string
+function utils.diff_to_hl(diff)
+    local hl = {
+        all = "leetcode_all",
+
+        easy = "leetcode_easy",
+        fundamental = "leetcode_easy",
+
+        medium = "leetcode_medium",
+        intermediate = "leetcode_medium",
+
+        hard = "leetcode_hard",
+        advanced = "leetcode_hard",
+    }
+
+    return hl[diff:lower()] or ""
+end
+
 ---@param layout lc-ui.Renderer
 function utils.win_width(layout)
     if not vim.api.nvim_win_is_valid(layout.winid) then return 0 end

@@ -4,25 +4,25 @@ local Case = require("leetcode-ui.group.case")
 
 local log = require("leetcode.logger")
 
----@class lc.Cases : lc-ui.Group
----@field cases table<integer, lc.Result.Case>
+---@class lc.ui.Cases : lc.ui.Group
+---@field cases table<integer, lc.ui.Case>
 ---@field idx integer
 ---@field console lc.ui.Console
 local Cases = Group:extend("LeetCases")
+
+function Cases:nav_case_hl(case, i) --
+    return "leetcode_case_" --
+        .. (self.idx == i and "focus_" or "")
+        .. (case.passed and "ok" or "err")
+end
 
 function Cases:make_nav()
     local nav = Lines({}, { padding = { top = 1 } })
 
     for i, case in ipairs(self.cases) do
-        self.console.result:map(
-            "n",
-            tostring(i),
-            function() self:change(i) end,
-            { clearable = true }
-        )
+        self.console.result:map("n", i, function() self:change(i) end, { clearable = true })
 
-        local hl = "leetcode_case_"
-            .. ("%s%s"):format(self.idx == i and "focus_" or "", case.passed and "ok" or "err")
+        local hl = self:nav_case_hl(case, i)
         local msg = (" Case (%d) "):format(i)
 
         nav:append(msg, hl)
@@ -32,13 +32,11 @@ function Cases:make_nav()
     return nav
 end
 
-function Cases:curr() return self.cases[self.idx] end
-
 function Cases:draw(layout)
-    self:clear()
-
-    self:insert(self:make_nav())
-    self:insert(self:curr())
+    self:replace({
+        self:make_nav(),
+        self.cases[self.idx],
+    })
 
     Cases.super.draw(self, layout)
 end
@@ -53,7 +51,7 @@ end
 
 ---@param item lc.runtime
 ---@param parent lc.ui.Console
----@return lc.Cases
+---@return lc.ui.Cases
 function Cases:init(item, parent)
     Cases.super.init(self, {}, { spacing = 1 })
 
@@ -72,7 +70,7 @@ function Cases:init(item, parent)
     self:change(1)
 end
 
----@type fun(item: lc.runtime, parent: lc.ui.Console): lc.Cases
+---@type fun(item: lc.runtime, parent: lc.ui.Console): lc.ui.Cases
 local LeetCases = Cases
 
 return LeetCases

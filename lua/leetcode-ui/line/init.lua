@@ -46,6 +46,12 @@ function Line:clear() --
     return self
 end
 
+function Line:replace(texts)
+    self._texts = texts
+
+    return self
+end
+
 function Line:append(content, highlight)
     Line.super.append(self, content, highlight or self._.opts.hl)
 

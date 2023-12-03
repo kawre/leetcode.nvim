@@ -6,7 +6,7 @@ local log = require("leetcode.logger")
 
 ---@alias lc.ui.Group.params { items: lc.ui.Lines[], opts: lc-ui.Group.opts }
 
----@class lc-ui.Group : lc.ui.Lines
+---@class lc.ui.Group : lc.ui.Lines
 ---@field _ lc.ui.Group.params | lines.params
 local Group = Lines:extend("LeetGroup")
 
@@ -69,10 +69,17 @@ function Group:clear()
     return self
 end
 
+function Group:replace(items)
+    Group.super.clear(self)
+    self._.items = items
+
+    return self
+end
+
 --@param components lc-ui.Component[]
 ---@param opts? lc-ui.Group.opts
 ---
----@return lc-ui.Group
+---@return lc.ui.Group
 function Group:init(items, opts) --
     local options = vim.tbl_deep_extend("force", {}, opts or {})
 
@@ -81,7 +88,7 @@ function Group:init(items, opts) --
     self._.items = items or {}
 end
 
----@type fun(items?: table, opts?: lc-ui.Group.opts): lc-ui.Group
+---@type fun(items?: table, opts?: lc-ui.Group.opts): lc.ui.Group
 local LeetGroup = Group
 
 return LeetGroup

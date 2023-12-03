@@ -18,9 +18,9 @@ local log = require("leetcode.logger")
 
 ---@class lc.ResultLayout : lc-ui.Renderer
 ---@field parent lc.ui.Console
----@field group lc-ui.Group
----@field cases lc.Cases
----@field case lc.Result.Case
+---@field group lc.ui.Group
+---@field cases lc.ui.Cases
+---@field case lc.ui.Case
 local ResultLayout = Renderer:extend("LeetResultLayout")
 
 function ResultLayout:handle_accepted(item)

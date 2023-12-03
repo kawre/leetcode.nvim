@@ -1,6 +1,7 @@
 local log = require("leetcode.logger")
 local t = require("leetcode.translator")
 local utils = require("leetcode.utils")
+local ui_utils = require("leetcode-ui.utils")
 
 local Question = require("leetcode-ui.question")
 
@@ -27,13 +28,8 @@ end
 
 ---@param question lc.cache.Question
 local function display_difficulty(question)
-    local hl = {
-        ["Easy"] = "leetcode_easy",
-        ["Medium"] = "leetcode_medium",
-        ["Hard"] = "leetcode_hard",
-    }
-
-    return { "󱓻", hl[question.difficulty] or "" }
+    local hl = ui_utils.diff_to_hl(question.difficulty)
+    return { "󱓻", hl }
 end
 
 ---@param question lc.cache.Question

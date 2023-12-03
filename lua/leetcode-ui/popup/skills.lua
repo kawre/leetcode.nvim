@@ -5,6 +5,7 @@ local Lines = require("leetcode-ui.lines")
 local stats_api = require("leetcode.api.statistics")
 local config = require("leetcode.config")
 local Spinner = require("leetcode.logger.spinner")
+local utils = require("leetcode-ui.utils")
 
 local log = require("leetcode.logger")
 
@@ -12,17 +13,11 @@ local log = require("leetcode.logger")
 ---@field renderer lc-ui.Renderer
 local Skills = Popup:extend("LeetSkills")
 
-local hl = {
-    advanced = "leetcode_hard",
-    intermediate = "leetcode_medium",
-    fundamental = "leetcode_easy",
-}
-
 function Skills:handle(name, skills)
     local lines = Lines()
 
     table.sort(skills, function(a, b) return a.problems_solved > b.problems_solved end)
-    lines:append("󱓻", hl[name])
+    lines:append("󱓻", utils.diff_to_hl(name))
     lines:append(" " .. name)
 
     for _, skill in ipairs(skills) do

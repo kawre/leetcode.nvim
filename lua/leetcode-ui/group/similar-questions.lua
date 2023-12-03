@@ -5,17 +5,12 @@ local NuiTree = require("nui.tree")
 local problemlist = require("leetcode.cache.problemlist")
 local config = require("leetcode.config")
 local utils = require("leetcode.utils")
+local ui_utils = require("leetcode-ui.utils")
 
 local t = require("leetcode.translator")
 
 ---@class lc.ui.SimilarQuestions : lc.ui.Lines
 local SimilarQuestions = Group:extend("LeetSimilarQuestions")
-
-local hl = {
-    ["Easy"] = "leetcode_easy",
-    ["Medium"] = "leetcode_medium",
-    ["Hard"] = "leetcode_hard",
-}
 
 ---@param questions lc.QuestionResponse.similar
 ---
@@ -37,7 +32,7 @@ function SimilarQuestions:init(questions)
             local fid = p.frontend_id .. "."
             fid = fid .. (" "):rep(5 - vim.api.nvim_strwidth(fid))
 
-            button:append("󱓻 ", hl[p.difficulty])
+            button:append("󱓻 ", ui_utils.diff_to_hl(p.difficulty))
             button:append(fid .. " ", "leetcode_normal")
             button:append(utils.translate(p.title, p.title_cn))
 

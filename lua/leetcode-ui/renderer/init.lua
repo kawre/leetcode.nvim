@@ -14,7 +14,7 @@ local log = require("leetcode.logger")
 ---@field opts lc.ui.opts
 ---@field keymaps table[]
 
----@class lc-ui.Renderer : lc-ui.Group
+---@class lc-ui.Renderer : lc.ui.Group
 ---@field bufnr integer
 ---@field winid integer
 ---@field _ lc-ui.Layout._ | lc.ui.Group.params
@@ -55,6 +55,7 @@ end
 
 function Renderer:map(mode, key, handler, opts) --
     if not self.bufnr then return end
+    if type(key) == "number" then key = tostring(key) end
 
     if type(key) == "table" then
         for _, k in ipairs(key) do

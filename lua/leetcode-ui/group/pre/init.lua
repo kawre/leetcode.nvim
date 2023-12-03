@@ -3,7 +3,7 @@ local Group = require("leetcode-ui.group")
 
 local log = require("leetcode.logger")
 
----@class lc.Result.Pre : lc-ui.Group
+---@class lc.ui.Pre : lc.ui.Group
 local Pre = Group:extend("LeetPre")
 
 function Pre:add_margin(item)
@@ -32,7 +32,7 @@ function Pre:init(title, item)
     end
 end
 
----@alias Pre.constructor fun(title: lc.ui.Line, lines: any): lc.Result.Pre
+---@alias Pre.constructor fun(title: lc.ui.Line, lines: any): lc.ui.Pre
 ---@type Pre.constructor
 local LeetPre = Pre
 

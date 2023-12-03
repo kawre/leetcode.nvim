@@ -1,16 +1,10 @@
 local Lines = require("leetcode-ui.lines")
 local Line = require("leetcode-ui.line")
-local utils = require("leetcode.api.utils")
+local utils = require("leetcode-ui.utils")
 local statistics = require("leetcode.api.statistics")
 local t = require("leetcode.translator")
 
 local log = require("leetcode.logger")
-local hl = {
-    ["All"] = "leetcode_all",
-    ["Easy"] = "leetcode_easy",
-    ["Medium"] = "leetcode_medium",
-    ["Hard"] = "leetcode_hard",
-}
 
 ---@class lc-menu.Solved : lc.ui.Lines
 local Solved = Lines:extend("LeetSolved")
@@ -21,11 +15,11 @@ function Solved:progress_bar(width, solved, total_count, difficulty)
     local solved_len = math.ceil(width * (solved / total_count))
 
     for _ = 1, solved_len do
-        line:append("󰝤", hl[difficulty])
+        line:append("󰝤", utils.diff_to_hl(difficulty))
     end
 
     for _ = solved_len, width do
-        line:append("󰝤", hl[difficulty] .. "_alt")
+        line:append("󰝤", utils.diff_to_hl(difficulty) .. "_alt")
     end
 
     return line
@@ -66,7 +60,7 @@ function Solved:handle_res(res)
         local stat = subs[diff]
         local diff_str = t(diff)
 
-        self:append(diff_str, hl[diff])
+        self:append(diff_str, utils.diff_to_hl(diff))
 
         local pad1 = (" "):rep(pad_len + 2 - vim.api.nvim_strwidth(diff_str))
         self:append(pad1)
