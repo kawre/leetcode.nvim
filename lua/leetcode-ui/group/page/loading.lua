@@ -1,7 +1,7 @@
 local Page = require("leetcode-ui.group.page")
 
 local Header = require("leetcode-ui.lines.menu-header")
-local Buttons = require("leetcode-ui.group.buttons")
+local Buttons = require("leetcode-ui.group.buttons.menu")
 
 local ExitButton = require("leetcode-ui.lines.button.menu.exit")
 local Title = require("leetcode-ui.lines.title")

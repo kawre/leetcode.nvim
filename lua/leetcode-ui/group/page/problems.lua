@@ -6,7 +6,7 @@ local Header = require("leetcode-ui.lines.menu-header")
 
 local Button = require("leetcode-ui.lines.button.menu")
 local BackButton = require("leetcode-ui.lines.button.menu.back")
-local Buttons = require("leetcode-ui.group.buttons")
+local Buttons = require("leetcode-ui.group.buttons.menu")
 local Page = require("leetcode-ui.group.page")
 
 local page = Page()
