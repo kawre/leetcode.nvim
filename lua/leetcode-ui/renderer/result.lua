@@ -96,10 +96,12 @@ function ResultLayout:handle_accepted(item)
     --------------------------------------------
     --- More challenges
     --------------------------------------------
-    local title_txt = (" %s"):format(t("More challenges"))
-    local more_title = Line():append(title_txt, "leetcode_normal")
-    local similar = SimilarQuestions(self.parent.question.q.similar)
-    self:insert(Pre(more_title, similar))
+    if not vim.tbl_isempty(self.parent.question.q.similar or {}) then
+        local title_txt = (" %s"):format(t("More challenges"))
+        local more_title = Line():append(title_txt, "leetcode_normal")
+        local similar = SimilarQuestions(self.parent.question.q.similar)
+        self:insert(Pre(more_title, similar))
+    end
 end
 
 ---@private
