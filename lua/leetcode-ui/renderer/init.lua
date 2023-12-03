@@ -129,8 +129,6 @@ function Renderer:apply_button(button) --
     end
 end
 
-function Renderer:replace(items) self._.items = items end
-
 ---@param layout lc.ui.Renderer
 function Renderer:set(layout) self._.items = layout._.items end
 

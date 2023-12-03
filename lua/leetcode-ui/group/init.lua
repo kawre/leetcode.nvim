@@ -70,7 +70,7 @@ function Group:clear()
 end
 
 function Group:replace(items)
-    Group.super.clear(self)
+    self:clear()
     self._.items = items
 
     return self

@@ -87,7 +87,7 @@ function Lines:insert(item) --
 end
 
 function Lines:replace(lines)
-    Lines.super.clear(self)
+    self:clear()
     self._.lines = lines
 
     return self
