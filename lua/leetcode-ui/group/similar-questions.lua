@@ -40,7 +40,6 @@ function SimilarQuestions:init(questions)
                 button:append("  " .. t("Premium"), "leetcode_medium")
             end
 
-            button._.q = q
             self:insert(button)
         end
     end

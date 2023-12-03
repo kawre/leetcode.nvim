@@ -9,7 +9,7 @@ local config = require("leetcode.config")
 local utils = require("leetcode.utils")
 local log = require("leetcode.logger")
 
----@class lc.ui.InfoPopup : lc-ui.Popup
+---@class lc.ui.InfoPopup : lc.ui.Popup
 ---@field popup NuiPopup
 ---@field question lc-ui.Question
 ---@field hints table[]

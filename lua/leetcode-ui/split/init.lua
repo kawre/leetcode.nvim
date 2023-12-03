@@ -8,14 +8,32 @@ local log = require("leetcode.logger")
 ---@field visible boolean
 local Split = NuiSplit:extend("LeetSplit")
 
+function Split:_open_window()
+    Split.super._open_window(self)
+    self:update_renderer()
+end
+
+function Split:_close_window()
+    Split.super._close_window(self)
+    self:update_renderer()
+end
+
+function Split:_buf_create()
+    Split.super._buf_create(self)
+    self:update_renderer()
+end
+
+function Split:_buf_destory()
+    Split.super._buf_destory(self)
+    self:update_renderer()
+end
+
 function Split:toggle()
     if not self.visible then
         self:show()
     else
         self:hide()
     end
-
-    self:update_renderer()
 end
 
 function Split:show()
@@ -25,7 +43,6 @@ function Split:show()
         Split.super.show(self)
     end
 
-    self:update_renderer()
     self.visible = true
 end
 
@@ -33,7 +50,6 @@ function Split:hide()
     if not self.visible then return end
     Split.super.hide(self)
 
-    self:update_renderer()
     self.visible = false
 end
 
@@ -41,7 +57,6 @@ function Split:mount()
     Split.super.mount(self)
 
     self.visible = true
-    self:update_renderer()
 
     self:map("n", { "q", "<Esc>" }, function() self:toggle() end)
 end
@@ -51,19 +66,12 @@ function Split:map(...) self.renderer:map(...) end
 function Split:unmount()
     Split.super.unmount(self)
 
-    self:update_renderer()
     self.visible = false
 end
 
-function Split:draw()
-    self:update_renderer()
-    self.renderer:draw(self)
-end
+function Split:draw() self.renderer:draw(self) end
 
-function Split:clear()
-    self.renderer:clear()
-    self:update_renderer()
-end
+function Split:clear() self.renderer:clear() end
 
 function Split:update_renderer()
     self.renderer.bufnr = self.bufnr

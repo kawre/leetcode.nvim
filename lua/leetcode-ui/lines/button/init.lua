@@ -9,9 +9,7 @@ local Button = Lines:extend("LeetButton")
 ---@param renderer lc.ui.Renderer
 ---@param opts lc.ui.opts
 function Button:draw(renderer, opts)
-    for i = 1, #self:contents() do
-        renderer._.buttons[renderer._.line_idx + i - 1] = self
-    end
+    renderer:apply_button(self)
 
     local options = self._.opts
     if options.on_press then

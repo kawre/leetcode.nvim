@@ -4,7 +4,7 @@ local Opts = require("leetcode-ui.opts")
 local utils = require("leetcode-ui.utils")
 local log = require("leetcode.logger")
 
----@alias lc.ui.Group.params { items: lc.ui.Lines[], opts: lc-ui.Group.opts }
+---@alias lc.ui.Group.params { items: lc.ui.Lines[], opts: lc.ui.opts }
 
 ---@class lc.ui.Group : lc.ui.Lines
 ---@field _ lc.ui.Group.params | lines.params

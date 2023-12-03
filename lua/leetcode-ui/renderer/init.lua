@@ -24,7 +24,7 @@ function Renderer:draw(component)
     self.bufnr = component.bufnr
     self.winid = component.winid
 
-    self:map("n", "<cr>", function() self:handle_press() end)
+    self:map("n", "<CR>", function() self:handle_press() end)
 
     self:clear_keymaps()
     self._.buttons = {}
@@ -68,22 +68,22 @@ function Renderer:map(mode, key, handler, opts) --
         local clearable = options.clearable
         options.clearable = nil
 
-        if clearable then
-            for _, map in ipairs(self._.keymaps) do
-                if vim.deep_equal(options, map.opts) and map.key == key then return end
-            end
-
-            table.insert(self._.keymaps, { key = key, mode = mode, opts = options })
-        end
-
+        if clearable then self._.keymaps[key] = mode end
+        vim.keymap.set(mode, key, handler, options)
         vim.keymap.set(mode, key, handler, options)
     end
 end
 
+function Renderer:unmap(mode, key) --
+    local ok, err = pcall(vim.api.nvim_buf_del_keymap, self.bufnr, mode, key)
+    if not ok then log.error(err) end
+end
+
 function Renderer:clear_keymaps()
-    for _, map in ipairs(self._.keymaps) do
-        vim.keymap.del(map.mode, map.key, map.opts)
+    for key, mode in pairs(self._.keymaps) do
+        self:unmap(mode, key)
     end
+
     self._.keymaps = {}
 end
 
@@ -120,10 +120,14 @@ function Renderer:handle_press(line_idx)
     if not ok then log.error(err) end
 end
 
--- ---@param line integer
--- ---@param fn function
--- ---@param sc string shortcut
--- function Layout:set_on_press(line, fn, sc) self._.buttons[line] = { fn = fn, sc = sc } end
+---@param button lc.ui.Button
+function Renderer:apply_button(button) --
+    local line_idx = self._.line_idx
+
+    for i = 1, #button:contents() do
+        self._.buttons[line_idx + i - 1] = button
+    end
+end
 
 function Renderer:replace(items) self._.items = items end
 

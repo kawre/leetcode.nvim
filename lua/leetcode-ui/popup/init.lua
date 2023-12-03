@@ -4,10 +4,30 @@ local config = require("leetcode.config")
 
 local log = require("leetcode.logger")
 
----@class lc-ui.Popup : NuiPopup
+---@class lc.ui.Popup : NuiPopup
 ---@field visible boolean
 ---@field renderer lc.ui.Renderer
 local Popup = NuiPopup:extend("LeetPopup")
+
+function Popup:_open_window()
+    Popup.super._open_window(self)
+    self:update_renderer()
+end
+
+function Popup:_close_window()
+    Popup.super._close_window(self)
+    self:update_renderer()
+end
+
+function Popup:_buf_create()
+    Popup.super._buf_create(self)
+    self:update_renderer()
+end
+
+function Popup:_buf_destory()
+    Popup.super._buf_destory(self)
+    self:update_renderer()
+end
 
 function Popup:focus()
     if not vim.api.nvim_win_is_valid(self.winid) then return end
@@ -16,7 +36,6 @@ end
 
 function Popup:clear() --
     self.renderer:clear()
-    self:update_renderer()
 end
 
 function Popup:show()
@@ -26,7 +45,6 @@ function Popup:show()
         Popup.super.show(self)
     end
 
-    self:update_renderer()
     self.visible = true
 end
 
@@ -35,7 +53,6 @@ function Popup:unmount()
     Popup.super.unmount(self)
 
     self.visible = false
-    self:update_renderer()
 end
 
 function Popup:map(...) self.renderer:map(...) end
@@ -44,7 +61,6 @@ function Popup:mount()
     Popup.super.mount(self)
 
     self.visible = true
-    self:update_renderer()
 
     self:on({ "BufLeave", "WinLeave" }, function() self:handle_leave() end)
     self:map("n", { "q", "<Esc>" }, function() self:hide() end)
@@ -54,7 +70,6 @@ function Popup:hide()
     if not self.visible then return end
     Popup.super.hide(self)
 
-    self:update_renderer()
     self.visible = false
 end
 
@@ -64,16 +79,11 @@ function Popup:toggle()
     else
         self:hide()
     end
-
-    self:update_renderer()
 end
 
 function Popup:handle_leave() self:hide() end
 
-function Popup:draw()
-    self:update_renderer()
-    self.renderer:draw(self)
-end
+function Popup:draw() self.renderer:draw(self) end
 
 function Popup:update_renderer()
     self.renderer.bufnr = self.bufnr
@@ -96,14 +106,14 @@ function Popup:init(opts)
             filetype = config.name,
         },
     }, opts or {})
-    Popup.super.init(self, options)
 
     self.renderer = self.renderer or Renderer()
-    self:update_renderer()
     self.visible = false
+
+    Popup.super.init(self, options)
 end
 
----@type fun(opts: table): lc-ui.Popup
+---@type fun(opts: table): lc.ui.Popup
 local LeetPopup = Popup
 
 return LeetPopup
