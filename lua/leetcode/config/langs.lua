@@ -5,6 +5,7 @@
 ---@field color string
 ---@field short string
 ---@field hl? string
+---@field comment string
 ---@field sql boolean|nil
 ---@field ft string
 
@@ -17,6 +18,7 @@ return {
         color = "#00599C",
         short = "cpp",
         ft = "cpp",
+        comment = "//",
     },
     {
         lang = "Java",
@@ -25,6 +27,7 @@ return {
         color = "#E76F00",
         short = "java",
         ft = "java",
+        comment = "//",
     },
     {
         lang = "Python",
@@ -33,6 +36,7 @@ return {
         color = "#306998",
         short = "pythn",
         ft = "py",
+        comment = "#",
     },
     {
         lang = "Python3",
@@ -41,6 +45,7 @@ return {
         color = "#306998",
         short = "pyth3",
         ft = "py",
+        comment = "#",
     },
     {
         lang = "C",
@@ -49,6 +54,7 @@ return {
         color = "#555555",
         short = "clang",
         ft = "c",
+        comment = "//",
     },
     {
         lang = "C#",
@@ -57,6 +63,7 @@ return {
         color = "#68217A",
         short = "cshrp",
         ft = "cs",
+        comment = "//",
     },
     {
         lang = "JavaScript",
@@ -65,6 +72,7 @@ return {
         color = "#F0DB4F",
         short = "js",
         ft = "js",
+        comment = "//",
     },
     {
         lang = "TypeScript",
@@ -73,6 +81,7 @@ return {
         color = "#3178C6",
         short = "ts",
         ft = "ts",
+        comment = "//",
     },
     {
         lang = "PHP",
@@ -81,6 +90,7 @@ return {
         color = "#777BB4",
         short = "php",
         ft = "php",
+        comment = "//",
     },
     {
         lang = "Swift",
@@ -89,6 +99,7 @@ return {
         color = "#FFAC45",
         short = "swift",
         ft = "swift",
+        comment = "//",
     },
     {
         lang = "Kotlin",
@@ -97,6 +108,7 @@ return {
         color = "#7F52FF",
         short = "ktlin",
         ft = "kt",
+        comment = "//",
     },
     {
         lang = "Dart",
@@ -105,6 +117,7 @@ return {
         color = "#1057A7",
         short = "dart",
         ft = "dart",
+        comment = "//",
     },
     {
         lang = "Go",
@@ -113,6 +126,7 @@ return {
         color = "#00ADD8",
         short = "golng",
         ft = "go",
+        comment = "//",
     },
     {
         lang = "Ruby",
@@ -121,6 +135,7 @@ return {
         color = "#CC342D",
         short = "ruby",
         ft = "rb",
+        comment = "#",
     },
     {
         lang = "Scala",
@@ -129,6 +144,7 @@ return {
         color = "#DC322F",
         short = "scala",
         ft = "scala",
+        comment = "//",
     },
     {
         lang = "Rust",
@@ -137,6 +153,7 @@ return {
         color = "#DEA584",
         short = "rust",
         ft = "rs",
+        comment = "//",
     },
     {
         lang = "Racket",
@@ -145,6 +162,7 @@ return {
         color = "#22228F",
         short = "rcket",
         ft = "rkt",
+        comment = ";;",
     },
     {
         lang = "Erlang",
@@ -153,6 +171,7 @@ return {
         color = "#A90533",
         short = "erlng",
         ft = "erl",
+        comment = "%",
     },
     {
         lang = "Elixir",
@@ -161,6 +180,7 @@ return {
         color = "#6E4A7E",
         short = "elixr",
         ft = "ex",
+        comment = "#",
     },
     {
         lang = "Bash",
@@ -169,15 +189,17 @@ return {
         color = "#000000",
         short = "bash",
         ft = "sh",
+        comment = "#",
     },
-    {
-        lang = "HTML",
-        slug = "html",
-        icon = "",
-        color = "#E44D26",
-        short = "html",
-        ft = "html",
-    },
+    -- {
+    --     lang = "HTML",
+    --     slug = "html",
+    --     icon = "",
+    --     color = "#E44D26",
+    --     short = "html",
+    --     ft = "html",
+    --     comment = "<!--",
+    -- },
     {
         lang = "Python ML",
         slug = "pythonml",
@@ -185,6 +207,7 @@ return {
         color = "#306998",
         short = "pyml",
         ft = "py",
+        comment = "#",
     },
     {
         lang = "React",
@@ -193,6 +216,7 @@ return {
         color = "#61DAFB",
         short = "ract",
         ft = "jsx",
+        comment = "//",
     },
     {
         lang = "Vanilla JS",
@@ -201,5 +225,6 @@ return {
         color = "#F7DF1E",
         short = "vjs",
         ft = "js",
+        comment = "//",
     },
 }

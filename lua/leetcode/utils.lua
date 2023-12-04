@@ -27,7 +27,7 @@ function utils.detect_duplicate_question(title_slug, lang)
     end
 end
 
----@return { tabpage: integer, question: lc-ui.Question }[]
+---@return { tabpage: integer, question: lc.ui.Question }[]
 function utils.question_tabs()
     local questions = {}
 
@@ -39,14 +39,14 @@ function utils.question_tabs()
     return questions
 end
 
----@param q lc-ui.Question
+---@param q lc.ui.Question
 ---@return integer|nil
 function utils.question_tabp(q)
     local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, q.winid)
     if ok then return tabp end
 end
 
----@return lc-ui.Question
+---@return lc.ui.Question
 function utils.curr_question()
     local tabp = vim.api.nvim_get_current_tabpage()
     local tabs = utils.question_tabs()

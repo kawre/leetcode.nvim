@@ -13,7 +13,7 @@ local parser = require("leetcode.parser")
 local t = require("leetcode.translator")
 
 ---@class lc.ui.Description : lc-ui.Split
----@field question lc-ui.Question
+---@field question lc.ui.Question
 ---@field images table<string, Image>
 local Description = Split:extend("LeetDescription")
 
@@ -156,7 +156,7 @@ function Description:populate()
     })
 end
 
----@param parent lc-ui.Question
+---@param parent lc.ui.Question
 function Description:init(parent)
     Description.super.init(self, {
         relative = "editor",
@@ -171,7 +171,7 @@ function Description:init(parent)
     self.images = {}
 end
 
----@type fun(parent: lc-ui.Question): lc.ui.Description
+---@type fun(parent: lc.ui.Question): lc.ui.Description
 local LeetDescription = Description
 
 return LeetDescription

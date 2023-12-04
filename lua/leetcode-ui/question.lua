@@ -8,7 +8,7 @@ local utils = require("leetcode.utils")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 
----@class lc-ui.Question
+---@class lc.ui.Question
 ---@field file Path
 ---@field q lc.question_res
 ---@field description lc.ui.Description
@@ -20,7 +20,11 @@ local Question = Object("LeetQuestion")
 
 function Question:get_snippet()
     local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
-    return vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
+    local snip = vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
+    if not snip then return end
+
+    local lang = utils.get_lang(self.lang)
+    return ("%s @leet start\n%s\n%s @leet end"):format(lang.comment, snip.code, lang.comment)
 end
 
 ---@private
@@ -29,7 +33,7 @@ function Question:create_file()
     local fn = ("%s.%s-%s.%s"):format(self.q.frontend_id, self.q.title_slug, lang.slug, lang.ft)
 
     self.file = config.home:joinpath(fn)
-    if not self.file:exists() then self.file:write(self:get_snippet().code, "w") end
+    if not self.file:exists() then self.file:write(self:get_snippet(), "w") end
 end
 
 Question.unmount = vim.schedule_wrap(function(self)
@@ -99,6 +103,22 @@ function Question:mount()
     return self
 end
 
+---@return string
+function Question:lines()
+    local lines = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, false)
+    local start_i, end_i = 1, #lines
+
+    for i, line in ipairs(lines) do
+        if line:match("@leet start") then
+            start_i = i + 1
+        else
+            if line:match("@leet end") then end_i = i - 1 end
+        end
+    end
+
+    return table.concat(lines, "\n", start_i, end_i)
+end
+
 ---@param lang lc.lang
 Question.change_lang = vim.schedule_wrap(function(self, lang)
     self.lang = lang
@@ -119,7 +139,7 @@ function Question:init(problem)
     self.lang = config.lang
 end
 
----@type fun(question: lc.cache.Question): lc-ui.Question
+---@type fun(question: lc.cache.Question): lc.ui.Question
 local LeetQuestion = Question
 
 return LeetQuestion

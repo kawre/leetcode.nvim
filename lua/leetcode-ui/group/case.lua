@@ -17,7 +17,7 @@ local Line = require("leetcode-ui.line")
 ---@field passed boolean
 ---@field index integer
 ---@field body case_body
----@field question lc-ui.Question
+---@field question lc.ui.Question
 local Case = Group:extend("LeetCase")
 
 ---@private

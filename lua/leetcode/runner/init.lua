@@ -3,25 +3,23 @@ local interpreter = require("leetcode.api.interpreter")
 local config = require("leetcode.config")
 
 ---@class lc.Runner
----@field question lc-ui.Question
-local runner = {}
-runner.__index = runner
+---@field question lc.ui.Question
+local Runner = {}
+Runner.__index = Runner
 
-runner.running = false
+Runner.running = false
 
+---@param self lc.Runner
 ---@param submit boolean
-runner.run = vim.schedule_wrap(function(self, submit)
-    if runner.running then return log.warn("Runner is busy") end
-    runner.running = true
+Runner.run = vim.schedule_wrap(function(self, submit)
+    if Runner.running then return log.warn("Runner is busy") end
+    Runner.running = true
 
     local question = self.question
 
-    local tc_lines = vim.api.nvim_buf_get_lines(question.bufnr, 0, -1, false)
-    local typed_code = table.concat(tc_lines, "\n")
-
     local body = {
         lang = question.lang,
-        typed_code = typed_code,
+        typed_code = self.question:lines(),
         question_id = question.q.id,
     }
 
@@ -30,11 +28,11 @@ runner.run = vim.schedule_wrap(function(self, submit)
             if item == true then
                 question.console.result:clear()
             else
-                runner.running = false
+                Runner.running = false
             end
         else
             self:callback(item)
-            runner.running = false
+            Runner.running = false
         end
     end
 
@@ -51,9 +49,9 @@ end)
 
 ---@private
 ---@param item lc.interpreter_response
-function runner:callback(item) self.question.console.result:handle(item) end
+function Runner:callback(item) self.question.console.result:handle(item) end
 
----@param question lc-ui.Question
-function runner:init(question) return setmetatable({ question = question }, self) end
+---@param question lc.ui.Question
+function Runner:init(question) return setmetatable({ question = question }, self) end
 
-return runner
+return Runner

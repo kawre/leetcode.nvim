@@ -11,7 +11,7 @@ local log = require("leetcode.logger")
 
 ---@class lc.ui.InfoPopup : lc.ui.Popup
 ---@field popup NuiPopup
----@field question lc-ui.Question
+---@field question lc.ui.Question
 ---@field hints table[]
 local InfoPopup = Popup:extend("LeetInfoPopup")
 
@@ -139,7 +139,7 @@ function InfoPopup:mount()
     return self
 end
 
----@param parent lc-ui.Question
+---@param parent lc.ui.Question
 function InfoPopup:init(parent)
     InfoPopup.super.init(self, {
         position = "50%",
@@ -172,7 +172,7 @@ function InfoPopup:init(parent)
     self.question = parent
 end
 
----@type fun(parent: lc-ui.Question): lc.ui.InfoPopup
+---@type fun(parent: lc.ui.Question): lc.ui.InfoPopup
 local LeetInfoPopup = InfoPopup
 
 return LeetInfoPopup

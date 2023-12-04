@@ -66,7 +66,7 @@ end
 
 local opts = require("telescope.themes").get_dropdown()
 
----@param question lc-ui.Question
+---@param question lc.ui.Question
 M.pick_lang = function(question, callback)
     pickers
         .new(opts, {
@@ -99,7 +99,7 @@ M.pick_lang = function(question, callback)
         :find()
 end
 
----@param question lc-ui.Question
+---@param question lc.ui.Question
 M.pick = function(question)
     pickers
         .new(opts, {

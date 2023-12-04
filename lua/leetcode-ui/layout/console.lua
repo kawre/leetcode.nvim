@@ -9,7 +9,7 @@ local Runner = require("leetcode.runner")
 local log = require("leetcode.logger")
 
 ---@class lc.ui.Console : lc.ui.Layout
----@field question lc-ui.Question
+---@field question lc.ui.Question
 ---@field testcase lc.ui.Console.TestcasePopup
 ---@field result lc.ui.Console.ResultPopup
 ---@field popups lc.ui.Console.Popup[]
@@ -72,7 +72,7 @@ function ConsoleLayout:set_keymaps(keymaps)
     end
 end
 
----@param parent lc-ui.Question
+---@param parent lc.ui.Question
 function ConsoleLayout:init(parent)
     self.question = parent
     self.testcase = Testcase(self)
@@ -93,7 +93,7 @@ function ConsoleLayout:init(parent)
     )
 end
 
----@type fun(parent: lc-ui.Question): lc.ui.Console
+---@type fun(parent: lc.ui.Question): lc.ui.Console
 local LeetConsoleLayout = ConsoleLayout
 
 return LeetConsoleLayout
