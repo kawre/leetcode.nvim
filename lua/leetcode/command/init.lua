@@ -107,7 +107,6 @@ cmd.expire = vim.schedule_wrap(function()
     cmd.menu()
 
     cmd.cookie_prompt(function(success)
-        log.info(success)
         if success then
             if vim.api.nvim_tabpage_is_valid(tabp) then vim.api.nvim_set_current_tabpage(tabp) end
             log.info("Successful re-login")
