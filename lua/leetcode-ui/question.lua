@@ -107,6 +107,7 @@ Question.change_lang = vim.schedule_wrap(function(self, lang)
     local new_buf = vim.fn.bufadd(self.file:absolute())
     if new_buf then
         vim.api.nvim_win_set_buf(self.winid, new_buf)
+        self.bufnr = new_buf
     else
         log.error("Changing language failed")
     end
