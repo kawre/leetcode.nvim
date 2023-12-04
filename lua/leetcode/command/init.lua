@@ -65,11 +65,11 @@ function cmd.cookie_prompt(cb)
             if not err then
                 log.info("Sign-in successful")
                 cmd.menu_layout("menu")
+                pcall(cb, true)
             else
                 log.error("Sign-in failed: " .. err)
+                pcall(cb, false)
             end
-
-            pcall(cb, err and false or true)
         end,
     })
 
@@ -107,10 +107,9 @@ cmd.expire = vim.schedule_wrap(function()
     cmd.menu()
 
     cmd.cookie_prompt(function(success)
+        log.info(success)
         if success then
-            if vim.api.nvim_tabpage_is_valid(tabp) then
-                pcall(vim.api.nvim_set_current_tabpage, tabp)
-            end
+            if vim.api.nvim_tabpage_is_valid(tabp) then vim.api.nvim_set_current_tabpage(tabp) end
             log.info("Successful re-login")
         else
             cmd.delete_cookie()

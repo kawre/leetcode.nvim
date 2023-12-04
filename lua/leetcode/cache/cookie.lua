@@ -26,11 +26,7 @@ function Cookie.set(str)
     local auth_api = require("leetcode.api.auth")
     local _, aerr = auth_api.user()
 
-    if aerr then
-        return aerr.msg
-    else
-        return nil
-    end
+    if aerr then return aerr.msg end
 end
 
 ---@return boolean
