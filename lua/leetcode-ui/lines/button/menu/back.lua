@@ -10,7 +10,6 @@ function MenuBackButton:init(page)
         icon = "",
         sc = "q",
         on_press = function() cmd.menu_layout(page) end,
-        expandable = false,
     })
 end
 

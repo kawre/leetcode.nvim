@@ -19,24 +19,28 @@ local problems = Button("Problems", {
     icon = "",
     sc = "p",
     on_press = function() cmd.menu_layout("problems") end,
+    expandable = true,
 })
 
 local statistics = Button("Statistics", {
     icon = "󰄪",
     sc = "s",
     on_press = function() cmd.menu_layout("stats") end,
+    expandable = true,
 })
 
 local cookie = Button("Cookie", {
     icon = "󰆘",
     sc = "i",
     on_press = function() cmd.menu_layout("cookie") end,
+    expandable = true,
 })
 
 local cache = Button("Cache", {
     icon = "",
     sc = "c",
     on_press = function() cmd.menu_layout("cache") end,
+    expandable = true,
 })
 
 local exit = ExitButton()

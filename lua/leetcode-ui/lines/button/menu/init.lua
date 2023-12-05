@@ -15,7 +15,7 @@ local MenuButton = Button:extend("LeetMenuButton")
 function MenuButton:init(text, opts)
     text = t(text)
     opts = vim.tbl_deep_extend("force", {
-        expandable = true,
+        expandable = false,
         expand_icon = "",
         width = 50,
     }, opts or {})

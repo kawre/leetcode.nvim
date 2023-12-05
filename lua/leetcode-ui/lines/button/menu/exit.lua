@@ -9,7 +9,6 @@ function MenuExitButton:init()
         icon = "󰩈",
         sc = "q",
         on_press = vim.cmd.quitall,
-        expandable = false,
     })
 end
 

@@ -19,7 +19,6 @@ local problems = Button("Sign in (By Cookie)", {
     icon = "󱛖",
     sc = "s",
     on_press = cmd.cookie_prompt,
-    expandable = false,
 })
 
 local exit = ExitButton()
