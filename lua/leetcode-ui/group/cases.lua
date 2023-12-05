@@ -58,7 +58,8 @@ function Cases:init(item, parent)
     self.cases = {}
     self.console = parent
 
-    for i = 1, item.total_testcases do
+    local total = item.total_testcases ~= vim.NIL and item.total_testcases or 0
+    for i = 1, total do
         self.cases[i] = Case({
             input = self.console.testcase.testcases[i],
             output = item.code_answer[i],
