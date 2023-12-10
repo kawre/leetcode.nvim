@@ -37,25 +37,24 @@ function question.random()
     local query = queries.random_question
 
     local config = require("leetcode.config")
-    local res, err = utils.query(query, variables)
-    if err then return nil, err end
+    repeat
+        local res, err = utils.query(query, variables)
+        if err then return nil, err end
 
-    local q = res.data.randomQuestion
-    if config.is_cn then
-        q = {
-            title_slug = q,
-            paid_only = problemlist.get_by_title_slug(q).paid_only,
-        }
-    end
+        local q = res.data.randomQuestion
+        if config.is_cn then
+            q = {
+                title_slug = q,
+                paid_only = problemlist.get_by_title_slug(q).paid_only,
+            }
+        end
 
-    if not config.auth.is_premium and q.paid_only then
-        err = err or {}
-        err.msg = "Drawn question is for premium users only. Please try again"
-        err.lvl = vim.log.levels.WARN
-        return nil, err
-    end
-
-    return q
+        if not config.auth.is_premium and q.paid_only then
+            vim.notify("Drawn question is for premium users only. Reattempting to get another question.")
+        else
+            return q
+        end
+    until false
 end
 
 return question
