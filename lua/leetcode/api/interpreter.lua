@@ -83,7 +83,7 @@ end
 ---@field data_input string
 
 ---@param title_slug string
----@param body lc.Interpret.body
+---@param body lc.Interpret.body|string
 ---@param callback function
 function interpreter.interpret_solution(title_slug, body, callback)
     local url = urls.interpret:format(title_slug)
@@ -98,7 +98,7 @@ function interpreter.interpret_solution(title_slug, body, callback)
 end
 
 ---@param title_slug string
----@param body lc.Interpret.body
+---@param body lc.Interpret.body|string
 ---@param callback function
 function interpreter.submit(title_slug, body, callback)
     local url = urls.submit:format(title_slug)

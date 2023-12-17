@@ -269,7 +269,7 @@ function Html:trim()
         if lines[i]:content() ~= "" then break end
         table.remove(lines, i)
     end
-    self.lines._lines = lines
+    self.lines:replace(lines)
 
     return self.lines
 end

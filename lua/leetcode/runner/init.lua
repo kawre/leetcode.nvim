@@ -2,6 +2,10 @@ local log = require("leetcode.logger")
 local interpreter = require("leetcode.api.interpreter")
 local config = require("leetcode.config")
 
+---@type Path
+local leetbody = config.home:joinpath(".leetbody")
+leetbody:touch()
+
 ---@class lc.Runner
 ---@field question lc.ui.Question
 local Runner = {}
@@ -13,8 +17,14 @@ Runner.running = false
 ---@param submit boolean
 Runner.run = vim.schedule_wrap(function(self, submit)
     if Runner.running then return log.warn("Runner is busy") end
-    Runner.running = true
 
+    Runner.running = true
+    local ok, err = pcall(Runner.handle, self, submit)
+    if not ok then log.error(err) end
+    Runner.running = false
+end)
+
+function Runner:handle(submit)
     local question = self.question
 
     local body = {
@@ -24,15 +34,10 @@ Runner.run = vim.schedule_wrap(function(self, submit)
     }
 
     local function callback(item)
-        if type(item) == "boolean" then
-            if item == true then
-                question.console.result:clear()
-            else
-                Runner.running = false
-            end
+        if type(item) == "boolean" and item == true then
+            question.console.result:clear()
         else
             self:callback(item)
-            Runner.running = false
         end
     end
 
@@ -41,13 +46,13 @@ Runner.run = vim.schedule_wrap(function(self, submit)
         local data_input = table.concat(di_lines, "\n")
         body.data_input = data_input
 
-        interpreter.interpret_solution(question.q.title_slug, body, callback)
+        leetbody:write(vim.json.encode(body), "w")
+        interpreter.interpret_solution(question.q.title_slug, leetbody:absolute(), callback)
     else
         interpreter.submit(question.q.title_slug, body, callback)
     end
-end)
+end
 
----@private
 ---@param item lc.interpreter_response
 function Runner:callback(item) self.question.console.result:handle(item) end
 
