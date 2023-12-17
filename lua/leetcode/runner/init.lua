@@ -18,13 +18,15 @@ Runner.running = false
 Runner.run = vim.schedule_wrap(function(self, submit)
     if Runner.running then return log.warn("Runner is busy") end
 
-    Runner.running = true
     local ok, err = pcall(Runner.handle, self, submit)
-    if not ok then log.error(err) end
-    Runner.running = false
+    if not ok then
+        Runner.running = false
+        log.error(err)
+    end
 end)
 
 function Runner:handle(submit)
+    Runner.running = true
     local question = self.question
 
     local body = {
@@ -34,8 +36,12 @@ function Runner:handle(submit)
     }
 
     local function callback(item)
-        if type(item) == "boolean" and item == true then
-            question.console.result:clear()
+        if type(item) == "boolean" then
+            if item then
+                question.console.result:clear()
+            else
+                Runner.running = false
+            end
         else
             self:callback(item)
         end
@@ -54,7 +60,10 @@ function Runner:handle(submit)
 end
 
 ---@param item lc.interpreter_response
-function Runner:callback(item) self.question.console.result:handle(item) end
+function Runner:callback(item)
+    Runner.running = false
+    self.question.console.result:handle(item)
+end
 
 ---@param question lc.ui.Question
 function Runner:init(question) return setmetatable({ question = question }, self) end

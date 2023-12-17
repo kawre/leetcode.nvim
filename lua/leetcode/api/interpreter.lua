@@ -1,10 +1,10 @@
 local log = require("leetcode.logger")
-local t = require("leetcode.translator")
 local urls = require("leetcode.api.urls")
 
 local utils = require("leetcode.api.utils")
-local config = require("leetcode.config")
 local spinner = require("leetcode.logger.spinner")
+
+local t = require("leetcode.translator")
 
 ---@class lc.Interpreter
 local interpreter = {
