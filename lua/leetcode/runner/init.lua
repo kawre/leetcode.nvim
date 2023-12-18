@@ -33,6 +33,7 @@ function Runner:handle(submit)
         lang = question.lang,
         typed_code = self.question:lines(),
         question_id = question.q.id,
+        data_input = not submit and table.concat(question.console.testcase:content(), "\n") or nil,
     }
 
     local function callback(item)
@@ -47,15 +48,11 @@ function Runner:handle(submit)
         end
     end
 
+    leetbody:write(vim.json.encode(body), "w")
     if not submit then
-        local di_lines = question.console.testcase:content()
-        local data_input = table.concat(di_lines, "\n")
-        body.data_input = data_input
-
-        leetbody:write(vim.json.encode(body), "w")
         interpreter.interpret_solution(question.q.title_slug, leetbody:absolute(), callback)
     else
-        interpreter.submit(question.q.title_slug, body, callback)
+        interpreter.submit(question.q.title_slug, leetbody:absolute(), callback)
     end
 end
 
