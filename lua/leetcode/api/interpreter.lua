@@ -7,9 +7,7 @@ local spinner = require("leetcode.logger.spinner")
 local t = require("leetcode.translator")
 
 ---@class lc.Interpreter
-local interpreter = {
-    running = false,
-}
+local interpreter = {}
 
 local check_state = {
     ["PENDING"] = "Pending…",

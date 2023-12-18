@@ -24,6 +24,7 @@ function Question:get_snippet()
     if not snip then return end
 
     local lang = utils.get_lang(self.lang)
+    snip.code = (snip.code or ""):gsub("\r\n", "\n")
     return ("%s @leet start\n%s\n%s @leet end"):format(lang.comment, snip.code, lang.comment)
 end
 
