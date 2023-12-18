@@ -92,7 +92,7 @@ function Problemlist.write(problems)
     }
 
     file:write(vim.json.encode(payload), "w")
-    table.insert(hist, { at = os.time(), data = problems })
+    hist = {}
 end
 
 ---@param str string
