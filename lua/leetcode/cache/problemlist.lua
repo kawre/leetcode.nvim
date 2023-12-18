@@ -29,22 +29,26 @@ local Problemlist = {}
 function Problemlist.get()
     if not file:exists() then return Problemlist.populate() end
 
-    local fstats = file:_stat()
-    local ftime = fstats.mtime.sec
-    local curr_time = os.time()
-
-    if (curr_time - ftime) > config.user.cache.update_interval then Problemlist.update() end
-
-    local hproblem = hist[ftime]
-    if hproblem then return hproblem end
-
     local contents = file:read()
     if not contents or type(contents) ~= "string" then return Problemlist.populate() end
 
     local cached = Problemlist.parse(contents)
-    if not cached or cached.version ~= config.version then return Problemlist.populate() end
+    if --
+        not cached
+        or cached.version ~= config.version
+        or cached.username ~= config.auth.name
+    then
+        return Problemlist.populate()
+    end
 
-    hist[ftime] = cached.data
+    if (os.time() - cached.updated_at) > config.user.cache.update_interval then
+        Problemlist.update()
+    end
+
+    local hproblem = hist[cached.updated_at]
+    if hproblem then return hproblem end
+
+    hist[cached.updated_at] = cached.data
     return cached.data
 end
 
@@ -77,18 +81,20 @@ end
 
 ---@param problems table
 function Problemlist.write(problems)
-    local encoded = vim.json.encode({
+    local payload = {
         version = config.version,
+        updated_at = os.time(),
+        username = config.auth.name,
         data = problems,
-    })
+    }
 
-    file:write(encoded, "w")
-    hist[file:_stat().mtime.sec] = problems
+    file:write(vim.json.encode(payload), "w")
+    hist[payload.updated_at] = problems
 end
 
 ---@param str string
 ---
----@return { version: string, data: lc.cache.Question[] }
+---@return { version: string, data: lc.cache.Question[], updated_at: integer, username: string }
 function Problemlist.parse(str)
     return vim.json.decode(str) ---@diagnostic disable-line
 end
