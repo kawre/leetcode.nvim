@@ -24,9 +24,7 @@ end
 function cmd.problems(options)
     require("leetcode.utils").auth_guard()
 
-    local curr_time = os.clock()
     local p = require("leetcode.cache.problemlist").get()
-    log.info(os.clock() - curr_time)
     require("leetcode.pickers.question").pick(p, options)
 end
 
