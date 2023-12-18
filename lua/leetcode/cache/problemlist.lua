@@ -1,13 +1,14 @@
 local path = require("plenary.path")
+local problems_api = require("leetcode.api.problems")
 
+local log = require("leetcode.logger")
 local config = require("leetcode.config")
 
 ---@type Path
 local file = config.home:joinpath((".problemlist%s"):format(config.is_cn and "_cn" or ""))
 
+---@type { at: integer, data: lc.cache.Question[] }[]
 local hist = {}
-
-local problems_api = require("leetcode.api.problems")
 
 ---@class lc.cache.Question
 ---@field id integer
@@ -29,6 +30,11 @@ local Problemlist = {}
 function Problemlist.get()
     if not file:exists() then return Problemlist.populate() end
 
+    local hdata = hist[#hist]
+    if hdata and (os.time() - hdata.at) <= math.min(60 * 10, config.user.cache.update_interval) then
+        return hdata.data
+    end
+
     local contents = file:read()
     if not contents or type(contents) ~= "string" then return Problemlist.populate() end
 
@@ -45,10 +51,7 @@ function Problemlist.get()
         Problemlist.update()
     end
 
-    local hproblem = hist[cached.updated_at]
-    if hproblem then return hproblem end
-
-    hist[cached.updated_at] = cached.data
+    table.insert(hist, { at = os.time(), data = cached.data })
     return cached.data
 end
 
@@ -89,7 +92,7 @@ function Problemlist.write(problems)
     }
 
     file:write(vim.json.encode(payload), "w")
-    hist[payload.updated_at] = problems
+    table.insert(hist, { at = os.time(), data = problems })
 end
 
 ---@param str string
