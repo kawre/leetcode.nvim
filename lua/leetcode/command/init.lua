@@ -303,10 +303,8 @@ function cmd.exec(args)
     for s in vim.gsplit(args.args, "%s+", { trimempty = true }) do
         local opt = vim.split(s, "=")
         if opt[2] then
-            options[opt[1]] = vim.tbl_map(
-                function(str) return str:lower() end,
-                vim.split(opt[2], ",", { trimempty = true })
-            )
+            options[opt[1]] =
+                vim.tbl_map(string.lower, vim.split(opt[2], ",", { trimempty = true }))
         elseif tbl then
             tbl = tbl[s]
         else

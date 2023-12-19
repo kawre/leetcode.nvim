@@ -62,8 +62,9 @@ queries.question = [[
 queries.random_question = [[
         query problemsetRandomFilteredQuestion(
             $categorySlug: String!
+            $filters: QuestionListFilterInput
         ) {
-            randomQuestion: problemsetRandomFilteredQuestion(categorySlug: $categorySlug, filters: {  })
+            randomQuestion: problemsetRandomFilteredQuestion(categorySlug: $categorySlug, filters: $filters)
         }
     ]]
 
