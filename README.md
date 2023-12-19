@@ -8,6 +8,8 @@ ______________________________________________________________________
 
 🔥 Solve [LeetCode] problems within [Neovim] 🔥
 
+🇺🇸 English, 🇨🇳 <a href="README.zh.md">简体中文</a>
+
 </div>
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-123cb32b7563

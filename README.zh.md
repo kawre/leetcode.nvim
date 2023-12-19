@@ -8,6 +8,8 @@ ______________________________________________________________________
 
 🔥 在 [Neovim] 中解决 [LeetCode] 问题 🔥
 
+🇺🇸 <a href="README.md">English</a>, 🇨🇳 简体中文
+
 </div>
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-123cb32b7563
@@ -60,6 +62,9 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     },
     opts = {
         -- 配置放在这里
+        cn = {
+            enabled = true,
+        },
     },
 }
 ```
