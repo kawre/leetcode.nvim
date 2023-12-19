@@ -17,7 +17,7 @@ function Problems.all(cb, noti)
     local endpoint = urls.problems:format("algorithms")
 
     local spinner
-    if noti then spinner = Spinner:init("fetching problemlist", "points") end
+    if noti then spinner = Spinner:init("updating problemlist cache...", "points") end
 
     if cb then
         utils.get(endpoint, {
@@ -38,12 +38,12 @@ function Problems.all(cb, noti)
                         end
 
                         problems = utils.translate_titles(problems, titles)
-                        if spinner then spinner:stop("problems cache updated") end
+                        if spinner then spinner:stop("cache updated") end
 
                         cb(problems)
                     end)
                 else
-                    if spinner then spinner:stop("problems cache updated") end
+                    if spinner then spinner:stop("cache updated") end
 
                     cb(problems)
                 end

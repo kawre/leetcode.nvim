@@ -3,12 +3,13 @@ local problems_api = require("leetcode.api.problems")
 
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
+local interval = config.user.cache.update_interval
 
 ---@type Path
 local file = config.home:joinpath((".problemlist%s"):format(config.is_cn and "_cn" or ""))
 
----@type { at: integer, data: lc.cache.Question[] }[]
-local hist = {}
+---@type { at: integer, payload: lc.cache.payload }
+local hist = nil
 
 ---@class lc.cache.Question
 ---@field id integer
@@ -27,48 +28,46 @@ local hist = {}
 local Problemlist = {}
 
 ---@return lc.cache.Question[]
-function Problemlist.get()
+function Problemlist.get() return Problemlist.read().data end
+
+---@return lc.cache.payload
+function Problemlist.read()
     if not file:exists() then return Problemlist.populate() end
 
-    local hdata = hist[#hist]
-    if hdata and (os.time() - hdata.at) <= math.min(60 * 10, config.user.cache.update_interval) then
-        return hdata.data
-    end
+    local time = os.time()
+    if hist and (time - hist.at) <= math.min(60, interval) then return hist.payload end
 
     local contents = file:read()
     if not contents or type(contents) ~= "string" then return Problemlist.populate() end
 
     local cached = Problemlist.parse(contents)
-    if --
-        not cached
-        or cached.version ~= config.version
-        or cached.username ~= config.auth.name
-    then
+
+    if not cached or (cached.version ~= config.version or cached.username ~= config.auth.name) then
         return Problemlist.populate()
     end
 
-    if (os.time() - cached.updated_at) > config.user.cache.update_interval then
-        Problemlist.update()
-    end
+    hist = { at = time, payload = cached }
+    if (time - cached.updated_at) > interval then Problemlist.update() end
 
-    table.insert(hist, { at = os.time(), data = cached.data })
-    return cached.data
+    return cached
 end
 
+---@return lc.cache.payload
 function Problemlist.populate()
     local res, err = problems_api.all(nil, true)
+
     if not res or err then
         local msg = (err or {}).msg or "failed to fetch problem list"
         error(msg)
     end
 
-    Problemlist.write(res)
-    return res
+    Problemlist.write({ data = res })
+    return hist.payload
 end
 
 function Problemlist.update()
     problems_api.all(function(res, err)
-        if not err then Problemlist.write(res) end
+        if not err then Problemlist.write({ data = res }) end
     end, true)
 end
 
@@ -82,35 +81,38 @@ function Problemlist.get_by_title_slug(title_slug)
     return problem
 end
 
----@param problems table
-function Problemlist.write(problems)
-    local payload = {
+---@param payload? lc.cache.payload
+function Problemlist.write(payload)
+    payload = vim.tbl_deep_extend("force", {
         version = config.version,
         updated_at = os.time(),
         username = config.auth.name,
-        data = problems,
-    }
+    }, payload)
+
+    if not payload.data then payload.data = Problemlist.get() end
 
     file:write(vim.json.encode(payload), "w")
-    hist = {}
+    hist = { at = os.time(), payload = payload }
 end
+
+---@alias lc.cache.payload { version: string, data: lc.cache.Question[], updated_at: integer, username: string }
 
 ---@param str string
 ---
----@return { version: string, data: lc.cache.Question[], updated_at: integer, username: string }
-function Problemlist.parse(str)
-    return vim.json.decode(str) ---@diagnostic disable-line
-end
+---@return lc.cache.payload
+function Problemlist.parse(str) return vim.json.decode(str) end
 
 ---@param title_slug string
 ---@param status "ac" | "notac"
 Problemlist.change_status = vim.schedule_wrap(function(title_slug, status)
-    local problist = Problemlist.get()
+    local cached = Problemlist.read()
 
-    Problemlist.write(vim.tbl_map(function(p)
+    cached.data = vim.tbl_map(function(p)
         if p.title_slug == title_slug then p.status = status end
         return p
-    end, problist))
+    end, cached.data)
+
+    Problemlist.write(cached)
 end)
 
 function Problemlist.delete()
