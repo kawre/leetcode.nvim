@@ -129,13 +129,13 @@ function cmd.qot()
     end)
 end
 
-function cmd.random_question()
+function cmd.random_question(opts)
     require("leetcode.utils").auth_guard()
 
     local problems = require("leetcode.cache.problemlist")
     local question = require("leetcode.api.question")
 
-    local q, err = question.random()
+    local q, err = question.random(opts)
     if err then return log.err(err) end
 
     local item = problems.get_by_title_slug(q.title_slug) or {}
@@ -303,7 +303,10 @@ function cmd.exec(args)
     for s in vim.gsplit(args.args, "%s+", { trimempty = true }) do
         local opt = vim.split(s, "=")
         if opt[2] then
-            options[opt[1]] = vim.split(opt[2], ",", { trimempty = true })
+            options[opt[1]] = vim.tbl_map(
+                function(str) return str:lower() end,
+                vim.split(opt[2], ",", { trimempty = true })
+            )
         elseif tbl then
             tbl = tbl[s]
         else
@@ -339,7 +342,6 @@ cmd.commands = {
     run = { cmd.q_run },
     test = { cmd.q_run },
     submit = { cmd.q_submit },
-    random = { cmd.random_question },
     daily = { cmd.qot },
     fix = { cmd.fix },
 
@@ -347,6 +349,12 @@ cmd.commands = {
         cmd.problems,
 
         _args = arguments.list,
+    },
+
+    random = {
+        cmd.random_question,
+
+        _args = arguments.random,
     },
 
     desc = {

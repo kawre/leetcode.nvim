@@ -75,11 +75,14 @@ local topics = {
 }
 
 arguments.list = {
-    -- sortBy = { "status", "title", "acceptance", "difficulty" },
-    -- orderBy = { "desc", "asc" },
-    difficulty = { "Easy", "Medium", "Hard" },
+    difficulty = { "easy", "medium", "hard" },
     status = { "ac", "notac", "todo" },
     -- topics = topics,
+}
+
+arguments.random = {
+    difficulty = { "easy", "medium", "hard" },
+    tags = topics,
 }
 
 return arguments

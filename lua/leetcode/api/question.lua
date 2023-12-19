@@ -29,9 +29,13 @@ function question.by_title_slug(title_slug)
     return q
 end
 
-function question.random()
+---@param filters? table
+function question.random(filters)
+    if filters and filters.difficulty then filters.difficulty = filters.difficulty[1]:upper() end
+
     local variables = {
         categorySlug = "algorithms",
+        filters = filters or vim.empty_dict(),
     }
 
     local query = queries.random_question

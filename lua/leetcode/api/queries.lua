@@ -63,8 +63,8 @@ queries.question = [[
     ]]
 
 queries.random_question = [[
-        query randomQuestion($categorySlug: String) {
-            randomQuestion(categorySlug: $categorySlug, filters: {  }) {
+        query randomQuestion($categorySlug: String, $filters: QuestionListFilterInput) {
+            randomQuestion(categorySlug: $categorySlug, filters: $filters) {
                 title_slug: titleSlug
                 paid_only: isPaidOnly
             }
