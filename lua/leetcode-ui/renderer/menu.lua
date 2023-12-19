@@ -18,30 +18,8 @@ end
 
 function Menu:draw()
     Menu.super.draw(self, self)
-    -- self:apply_btn_keymaps()
     return self
 end
-
--- function Menu:clear_keymaps()
---     for _, map in ipairs(self.maps) do
---         vim.keymap.del(map.mode, map.lhs, { buffer = self.bufnr })
---     end
---
---     self.maps = {}
--- end
-
--- function Menu:apply_btn_keymaps()
---     local opts = { noremap = false, silent = true, buffer = self.bufnr, nowait = true }
---
---     for _, btn in pairs(self._.buttons) do
---         local bopts = btn._.opts
---         if not bopts.sc then return end
---
---         local mode = { "n" }
---         vim.keymap.set(mode, bopts.sc, bopts.on_press, opts)
---         table.insert(self.maps, { mode = mode, lhs = bopts.sc })
---     end
--- end
 
 ---@private
 function Menu:autocmds()
@@ -132,7 +110,6 @@ function Menu:apply_options()
 end
 
 function Menu:mount()
-    -- self:set_page("test")
     if cookie.get() then
         self:set_page("loading")
 
