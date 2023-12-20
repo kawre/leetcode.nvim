@@ -1,6 +1,7 @@
 local Lines = require("leetcode-ui.lines")
 local Line = require("leetcode-ui.line")
 local utils = require("leetcode-ui.utils")
+local Spinner = require("leetcode.logger.spinner")
 local statistics = require("leetcode.api.statistics")
 local t = require("leetcode.translator")
 
@@ -76,6 +77,18 @@ function Solved:handle_res(res)
     end
 
     _Lc_Menu:draw()
+end
+
+function Solved:update()
+    local spinner = Spinner:init("updating solved problems...")
+    statistics.solved(function(res, err)
+        if err then
+            spinner:stop(err.msg, false)
+        else
+            spinner:stop("solved problems updated", true, { timeout = 200 })
+            self:handle_res(res)
+        end
+    end)
 end
 
 function Solved:fetch()

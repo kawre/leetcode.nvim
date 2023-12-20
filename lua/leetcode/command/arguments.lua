@@ -77,7 +77,6 @@ local topics = {
 arguments.list = {
     difficulty = { "easy", "medium", "hard" },
     status = { "ac", "notac", "todo" },
-    -- topics = topics,
 }
 
 arguments.random = {

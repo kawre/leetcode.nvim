@@ -1,4 +1,4 @@
----@lc.plugins.cn
+---@class lc.plugins.cn
 local cn = {}
 
 function cn.load()

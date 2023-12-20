@@ -49,7 +49,10 @@ buttons:insert(languages)
 local update = Button("Update", {
     icon = "",
     sc = "u",
-    on_press = function() calendar:update() end,
+    on_press = function()
+        calendar:update()
+        solved:update()
+    end,
 })
 buttons:insert(update)
 
