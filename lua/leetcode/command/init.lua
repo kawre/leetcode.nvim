@@ -135,6 +135,8 @@ function cmd.random_question(opts)
     local problems = require("leetcode.cache.problemlist")
     local question = require("leetcode.api.question")
 
+    if opts and opts.difficulty then opts.difficulty = opts.difficulty[1]:upper() end
+
     local q, err = question.random(opts)
     if err then return log.err(err) end
 

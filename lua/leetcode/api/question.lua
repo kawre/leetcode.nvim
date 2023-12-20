@@ -31,8 +31,6 @@ end
 
 ---@param filters? table
 function question.random(filters)
-    if filters and filters.difficulty then filters.difficulty = filters.difficulty[1]:upper() end
-
     local variables = {
         categorySlug = "algorithms",
         filters = filters or vim.empty_dict(),
@@ -45,6 +43,15 @@ function question.random(filters)
     if err then return nil, err end
 
     local q = res.data.randomQuestion
+
+    if q == vim.NIL then
+        local msg = "Random question fetch responded with `null`"
+
+        if filters then msg = msg .. ".\n\nMaybe invalid filters?\n" .. vim.inspect(filters) end
+
+        return nil, { msg = msg, lvl = vim.log.levels.ERROR }
+    end
+
     if config.is_cn then
         q = {
             title_slug = q,
