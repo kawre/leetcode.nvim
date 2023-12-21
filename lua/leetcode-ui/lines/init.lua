@@ -1,5 +1,6 @@
 local Line = require("leetcode-ui.line")
 local Opts = require("leetcode-ui.opts")
+local O = require("nui.object")
 local utils = require("leetcode-ui.utils")
 local log = require("leetcode.logger")
 
@@ -67,7 +68,16 @@ function Lines:draw(layout, opts)
 end
 
 function Lines:append(content, highlight)
-    Lines.super.append(self, content, highlight)
+    if type(content) == "table" and O.is_instance(content, Lines) then --
+        local lines = content:contents()
+
+        for i, line in ipairs(lines) do
+            Lines.super.append(self, line)
+            if i ~= #lines then self:endl() end
+        end
+    else
+        Lines.super.append(self, content, highlight)
+    end
 
     return self
 end

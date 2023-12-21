@@ -1,6 +1,7 @@
 local Pad = require("leetcode-ui.lines.padding")
 local Lines = require("leetcode-ui.lines")
 local Opts = require("leetcode-ui.opts")
+local O = require("nui.object")
 local utils = require("leetcode-ui.utils")
 local log = require("leetcode.logger")
 
@@ -48,10 +49,23 @@ function Group:insert(item)
     return self
 end
 
-function Group:endgrp()
-    -- Group.super.endl(self)
+function Group:append(content, highlight)
+    if type(content) == "table" and O.is_instance(content, Group) then --
+        local items = content:contents()
 
+        for _, item in ipairs(items) do
+            Group.super.append(self, item, highlight)
+        end
+    else
+        Group.super.append(self, content, highlight)
+    end
+
+    return self
+end
+
+function Group:endgrp()
     local contents = Group.super.contents(self)
+
     if not vim.tbl_isempty(contents) then
         table.insert(self._.items, Lines(contents))
         Group.super.clear(self)

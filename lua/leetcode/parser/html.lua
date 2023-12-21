@@ -3,50 +3,21 @@
 ---TODO: https://leetcode.com/problems/make-array-empty/
 ---TODO: 190
 
-local Lines = require("leetcode-ui.lines")
 local utils = require("leetcode.parser.utils")
 local log = require("leetcode.logger")
 
-local NuiText = require("nui.text")
-local Padding = require("leetcode-ui.lines.padding")
-local Line = require("leetcode-ui.line")
+local Tag = require("leetcode-ui.group.tag")
 
----@class lc.Parser.Html
----@field str string
----@field parser LanguageTree
----@field ts TreesitterModule
----@field lines lc.ui.Lines
----@field newline_count integer
----@field ol_count table<integer>
-local Html = {}
-Html.__index = Html
+local Object = require("nui.object")
 
----@private
----
+local ts = vim.treesitter
+
+---@class lc.Parser.Html : lc.Parser
+local Html = Object("LeetParserHtml")
+
+function Html:get_text(node) return ts.get_node_text(node, self.text) end
+
 ---@param node TSNode
----
----@return lc.Parser.Tag.Attr
-function Html:get_attr(node)
-    local attr = {}
-
-    for child in node:iter_children() do
-        local ntype = child:type()
-
-        if ntype == "attribute_name" and child:named() then
-            attr.name = self:get_text(child)
-        elseif ntype == "quoted_attribute_value" and child:named() then
-            attr.value = self:get_text(child):gsub("\"", "")
-        end
-    end
-
-    return attr
-end
-
----@private
----
----@param node TSNode
----
----@return lc.Parser.Tag | nil
 function Html:get_tag_data(node)
     if node:type() ~= "element" then return end
 
@@ -64,177 +35,81 @@ function Html:get_tag_data(node)
     for child in start_tag:iter_children() do
         local ntype = child:type()
 
-        if ntype == "tag_name" then
-            tag = self:get_text(child)
-        elseif ntype == "attribute" then
-            table.insert(attrs, self:get_attr(child))
-        end
+        if ntype == "tag_name" then tag = self:get_text(child) end
     end
 
     local res = { tag = tag, attrs = attrs }
     return tag and res or nil
 end
 
----@private
----
----@param node TSNode
----
----@return string
-function Html:get_text(node) return self.ts.get_node_text(node, self.str) end
-
-function Html:handle_entity(entity)
-    if entity == "&lcnl;" then
-        if self.newline_count <= 1 then self.lines:endl() end
-
-        self.newline_count = self.newline_count + 1
-    elseif entity == "&lcpad;" then
-        if self.lines:content() ~= "" then self.lines:endl() end
-
-        -- self.line Line()
-        -- self.text:append({ NuiLine(), NuiLine(), NuiLine() })
-        for _ = 1, 3 do
-            self.lines:endl()
-        end
-        -- self.lines:append(Padding(3))
-    elseif entity == "&lcend;" then
-        self.lines:endl()
-    end
-
-    return utils.entity(entity)
-end
-
-function Html:handle_list(tags)
-    if self.lines:content() ~= "" then return end
-
-    local function get_list_type()
-        for _, tag in ipairs(tags) do
-            if tag == "ul" or tag == "ol" then return tag end
-        end
-    end
-
-    local li_type = get_list_type()
-    local li_count = vim.fn.count(tags, "li")
-    local leftpad = string.rep("\t", li_count)
-    -- local li_icons = { "", "", "" }
-    local li_icons = { "*", "-", "+" }
-
-    local text
-    if li_type == "ul" then
-        local li_icon = li_icons[math.max(1, li_count % (#li_icons + 1))]
-        text = string.format("%s%s ", leftpad, li_icon)
-    else
-        local ol_c = vim.fn.count(tags, "ol")
-
-        self.ol_count[ol_c] = (self.ol_count[ol_c] or 0) + 1
-        text = string.format("%s%d. ", leftpad, self.ol_count[ol_c])
-    end
-
-    self.lines:append(text, "leetcode_list")
-end
-
----@param text string
-function Html:handle_indent(text)
-    if self.lines:content() ~= "" then return text end
-
-    self.lines:append("\t▎\t", "leetcode_indent")
-end
-
----@private
----
----@param text string
----@param tag_data lc.Parser.Tag|nil
----
----@return NuiLine
-function Html:handle_link(text, tag_data)
-    if not tag_data then return Line() end
-
-    local tag = tag_data.tag
-    local link = ""
-
-    if tag == "a" then
-        local href = vim.tbl_filter(function(attr)
-            if attr.name == "href" then return attr end
-        end, tag_data.attrs)[1] or {}
-
-        link = href.value or ""
-    elseif tag == "img" then
-        local alt = vim.tbl_filter(function(attr)
-            if attr.name == "alt" then return attr end
-        end, tag_data.attrs)[1] or {}
-        text = alt.value ~= "" and alt.value or "img"
-
-        local src = vim.tbl_filter(function(attr)
-            if attr.name == "src" then return attr end
-        end, tag_data.attrs)[1] or {}
-        link = src.value or ""
-    end
-
-    local line = Line()
-    line:append(text, "leetcode_ref")
-    line:append("->(", "leetcode_normal")
-    line:append(link, "leetcode_link")
-    line:append(")", "leetcode_normal")
-
-    return line
-end
-
----@private
----
----@param node TSNode
----@param tags string[]
----@param tag_data lc.Parser.Tag|nil
-function Html:node_hl(node, tags, tag_data)
-    local text = self:get_text(node)
-    local tag = tags[1]
-
-    if vim.tbl_contains(tags, "pre") or vim.tbl_contains(tags, "blockquote") then
-        self:handle_indent(text)
-    end
-    if not vim.tbl_contains(tags, "ol") then self.ol_count = {} end
-
-    if node:type() == "entity" then
-        if vim.tbl_contains(tags, "li") and text ~= "&lcnl;" then self:handle_list(tags) end
-        text = self:handle_entity(text)
-    else
-        if vim.tbl_contains(tags, "li") then self:handle_list(tags) end
-        self.newline_count = 0
-    end
-
-    if tag == "sup" then text = "^" .. text end
-    if tag == "sub" then text = "_" .. text end
-
-    local nui_text
-    if tag == "a" or tag == "img" then
-        nui_text = self:handle_link(text, tag_data)
-    else
-        nui_text = NuiText(text, utils.hl(tags))
-    end
-
-    self.lines:append(nui_text)
-end
-
----@private
----
----@param node TSNode
----@param tags table
-function Html:rec_parse(node, tags)
-    local tag_data = self:get_tag_data(node)
-
-    for child in node:iter_children() do
+function Html:parse_helper() --
+    ---@param child TSNode
+    for child in self.node:iter_children() do
         local ntype = child:type()
 
-        if tag_data then table.insert(tags, 1, tag_data.tag) end
-        if ntype == "text" or ntype == "entity" then self:node_hl(child, tags, tag_data) end
-        self:rec_parse(child, tags)
-        if tag_data then table.remove(tags, 1) end
+        if ntype == "text" then
+            self.curr:append(self:get_text(child))
+        elseif ntype == "element" then
+            self.curr:append(Html:from(self, child))
+        elseif ntype == "entity" then
+            local text = self:get_text(child)
+
+            if text == "&lcnl;" then
+                self.curr:endl()
+            elseif text == "&lcpad;" then
+                self.curr:endgrp()
+            else
+                self.curr:append(utils.entity(text))
+            end
+        end
     end
 end
 
-function Html:normalize()
-    log.debug(self.str)
+-- function Html.normalize(text)
+--     log.debug(text)
+--
+--     local xd = text
+--         :gsub("​", "")
+--         :gsub("\r\n", "\n")
+--         :gsub("\t*<(/?li)>", "<%1>")
+--         :gsub("\t*<(/?ul)>", "<%1>")
+--         :gsub("\t*<(/?ol)>", "<%1>")
+--         :gsub("<strong>(Input:?%s*)</strong>", "<input>%1</input>")
+--         :gsub("<strong>(Output:?%s*)</strong>", "<output>%1</output>")
+--         :gsub("<strong>(Explanation:?%s*)</strong>", "<explanation>%1</explanation>")
+--         :gsub("<strong>(Follow-up:%s*)</strong>", "<followup>%1</followup>")
+--         :gsub("<strong>(Note:%s*)</strong>", "<followup>%1</followup>")
+--         :gsub(
+--             "<p><strong[^>]*>(Example%s*%d*:?)%s*</strong></p>\n*",
+--             "\n\n<example>󰛨 %1</example>\n"
+--         )
+--         :gsub(
+--             "<p><strong[^>]*>(Constraints:?)%s*</strong></p>\n*",
+--             "\n<constraints> %1</constraints>\n"
+--         )
+--         -- :gsub("<(img[^>]*)/>\n*", "<%1>img</img>")
+--         -- :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
+--         -- :gsub(
+--         --     "</([^>]*)>\n*",
+--         --     "</%1>"
+--         -- )
+--         :gsub(
+--             "\n*<p>&nbsp;</p>\n*",
+--             "&lcpad;"
+--         )
+--         :gsub("\n", "&lcnl;")
+--         :gsub("\t", "&lctab;")
+--         :gsub("%s", "&nbsp;")
+--         :gsub("<a[^>]*>(.-)</a>", function(match) return match:gsub("&#?%w+;", utils.entity) end)
+--         :gsub("<[^>]*>", function(match) return match:gsub("&nbsp;", " ") end)
+--
+--     log.debug(xd:gsub("&lcnl;", "&lcnl;\n"), false)
+--
+--     return xd
+-- end
 
-    self.str = self.str
-        :gsub("​", "")
+function Html.normalize(text)
+    local norm = text:gsub("​", "")
         :gsub("\r\n", "\n")
         :gsub("\t*<(/?li)>", "<%1>")
         :gsub("\t*<(/?ul)>", "<%1>")
@@ -260,40 +135,51 @@ function Html:normalize()
         :gsub("%s", "&nbsp;")
         :gsub("<[^>]*>", function(match) return match:gsub("&nbsp;", " ") end)
         :gsub("<a[^>]*>(.-)</a>", function(match) return match:gsub("&#?%w+;", utils.entity) end) .. "&lcend;"
+
+    log.debug(text)
+    log.debug(norm:gsub("&lcnl;", "&lcnl;\n"), false)
+
+    return norm
 end
 
--- Trim excessive lines
-function Html:trim()
-    local lines = self.lines:contents()
-    for i = #lines, 1, -1 do
-        if lines[i]:content() ~= "" then break end
-        table.remove(lines, i)
-    end
-    self.lines:replace(lines)
+function Html:init(text, tags, node, curr)
+    self.text = text
+    self.node = node
+    self.curr = curr
+    self.tags = tags
 
-    return self.lines
+    self:parse_helper()
 end
 
----@param html string
----
----@return lc.ui.Lines
-function Html:parse(html)
-    self = setmetatable({
-        str = html,
-        ts = vim.treesitter,
-        lines = Lines(),
-        newline_count = 0,
-        ol_count = {},
-    }, self)
+---@type fun(text: string, tags: string[], node: TSNode, curr: lc.ui.Tag): lc.Parser.Html
+local LeetParserHtml = Html
 
-    self:normalize()
-    local ok, parser = pcall(self.ts.get_string_parser, self.str, "html")
+---@param html lc.Parser.Html
+---@param node TSNode
+function Html.static:from(html, node)
+    local tag = html:get_tag_data(node) or {}
+
+    -- log.debug({
+    --     tag = tag.tag,
+    --     text = html:get_text(node),
+    -- })
+
+    table.insert(html.tags, tag.tag)
+    local parsed = LeetParserHtml(html.text, html.tags, node, Tag:from(html.tags, node))
+    table.remove(html.tags)
+
+    return parsed.curr
+end
+
+---@param text string
+function Html.static:parse(text) --
+    text = Html.normalize(text)
+
+    local ok, parser = pcall(ts.get_string_parser, text, "html")
     assert(ok, parser)
-
     local root = parser:parse()[1]:root()
-    self:rec_parse(root, {})
 
-    return self:trim()
+    return LeetParserHtml(text, {}, root, Tag({ spacing = 3 })).curr
 end
 
-return Html
+return LeetParserHtml

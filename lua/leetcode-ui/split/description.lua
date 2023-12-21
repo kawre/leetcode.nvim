@@ -5,11 +5,11 @@ local img_sup = img_ok and config.user.image_support
 local Group = require("leetcode-ui.group")
 local Padding = require("leetcode-ui.lines.padding")
 local Split = require("leetcode-ui.split")
+local Parser = require("leetcode.parser")
 
 local log = require("leetcode.logger")
 local utils = require("leetcode.utils")
 
-local parser = require("leetcode.parser")
 local t = require("leetcode.translator")
 
 ---@class lc.ui.Description : lc-ui.Split
@@ -148,7 +148,7 @@ function Description:populate()
     end
     header:endgrp()
 
-    local contents = parser:parse(utils.translate(q.content, q.translated_content))
+    local contents = Parser:parse(utils.translate(q.content, q.translated_content))
 
     self.renderer:replace({
         header,
