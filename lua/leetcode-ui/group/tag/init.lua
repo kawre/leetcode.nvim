@@ -16,6 +16,47 @@ local log = require("leetcode.logger")
 ---@field text string
 local Tag = Group:extend("LeetTag")
 
+---@param text string
+function Tag.normalize(text)
+    local norm = text
+        :gsub("​", "")
+        :gsub("\r\n", "\n")
+        :gsub("<br />", "\n")
+        :gsub("(\n+)(\t+)", "%1")
+        :gsub("<(/?li)>\n*", "<%1>\n\n")
+        :gsub("\n*(<ul[^>]*>)\n*", "\n\n%1\n")
+        :gsub("\n*(<ol[^>]*>)\n*", "\n\n%1\n")
+        :gsub("\n*(<pre[^>]*>)", "\n\n%1\n")
+        :gsub("<strong>(Input:?%s*)</strong>", "<input>%1</input>")
+        :gsub("<strong>(Output:?%s*)</strong>", "<output>%1</output>")
+        :gsub("<strong>(Explanation:?%s*)</strong>", "<explanation>%1</explanation>")
+        :gsub("<strong>(Follow-up:%s*)</strong>", "<followup>%1</followup>")
+        :gsub("<strong>(Note:%s*)</strong>", "<followup>%1</followup>")
+        :gsub("<strong>(Note:%s*)</strong>", "<followup>%1</followup>")
+        :gsub(
+            "\n*<p><strong[^>]*>(Example%s*%d*:?)%s*</strong></p>\n*",
+            "\n\n<example>󰛨 %1</example>\n\n"
+        )
+        :gsub(
+            "\n*<p><strong[^>]*>(Constraints:?)%s*</strong></p>\n*",
+            "\n\n<constraints> %1</constraints>\n\n"
+        )
+        :gsub("\n*<(img[^>]*)/>\n*", "\n\n<%1>img</img>\n\n")
+        -- :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
+        :gsub("\n*<pre>", "\n\n<pre>")
+        :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
+        :gsub("\n", "&lcnl;")
+        :gsub("\t", "&lctab;")
+        :gsub("%s", "&nbsp;")
+        :gsub("<[^>]*>", function(match) return match:gsub("&nbsp;", " ") end)
+    -- :gsub("<a[^>]*>(.-)</a>", function(match) return match:gsub("&#?%w+;", utils.entity) end)
+
+    log.debug(text)
+    log.debug(norm:gsub("&lcnl;", "&lcnl;\n"), false)
+
+    return norm
+end
+
 function Tag:add_indent(item)
     if item.class and item.class.name == "LeetLine" then
         table.insert(item._texts, 1, Indent("\t", "leetcode_indent"))
@@ -102,7 +143,6 @@ function Tag:parse_helper() --
     end
 end
 
--- 701
 function Tag.trim(lines) --
     if not lines or vim.tbl_isempty(lines) then return {} end
 
@@ -176,11 +216,17 @@ local LeetTag = Tag
 
 ---@param text string
 function Tag.static:parse(text) --
-    local ok, parser = pcall(ts.get_string_parser, text, "html")
-    assert(ok, parser)
-    local root = parser:parse()[1]:root()
+    local normalized = Tag.normalize(text)
 
-    return LeetTag(text, { spacing = 3, hl = "leetcode_normal" }, root, {})
+    local ok, parser = pcall(ts.get_string_parser, normalized, "html")
+
+    if not ok then --
+        local Plain = require("leetcode.parser.plain")
+        return Plain:parse(text)
+    end
+
+    local root = parser:parse()[1]:root()
+    return LeetTag(normalized, { spacing = 3, hl = "leetcode_normal" }, root, {})
 end
 
 return LeetTag

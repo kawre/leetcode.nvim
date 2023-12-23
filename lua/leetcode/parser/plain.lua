@@ -1,42 +1,29 @@
-local Lines = require("leetcode-ui.lines")
+local Group = require("leetcode-ui.group")
+local Tag = require("leetcode-ui.group.tag")
 local Line = require("leetcode-ui.line")
-local utils = require("leetcode-ui.group.parser.utils")
+local u = require("leetcode.parser.utils")
 
----@class lc.Parser.Plain
----@field str string
----@field lines lc.ui.Lines
-local Plain = {}
-Plain.__index = Plain
+---@class lc.Parser.Plain : lc.ui.Group
+---@field text string
+local Plain = Group:extend("LeetParserPlain")
 
-function Plain:normalize() self.str = self.str:gsub("<[^>]+>", "") end
+function Plain.normalize(text) return text:gsub("<[^>]+>", "") end
 
-function Plain:trim()
-    local lines = self.lines._.lines
-    for i = #lines, 1, -1 do
-        if lines[i]:content() ~= "" then break end
-        table.remove(lines, i)
+---@param text string
+function Plain:init(text)
+    Plain.super.init(self)
+
+    for s in vim.gsplit(Plain.normalize(text), "\n") do
+        s = s:gsub("&[%a%d#]+;", u.entity)
+        self:append(s)
+        self:endl()
     end
-    self.lines._.lines = lines
-
-    return self.lines
 end
 
----@param html string
-function Plain:parse(html)
-    self = setmetatable({
-        str = html,
-        lines = Lines(),
-    }, self)
+---@type fun(text: string)
+local LeetParserPlain = Plain
 
-    self:normalize()
-    for s in vim.gsplit(self.str, "\n") do
-        s = s:gsub("&[%a%d#]+;", function(match) return utils.entity(match) end)
-        local line = Line()
-        line:append(s)
-        self.lines:insert(line)
-    end
+---@param text string
+function Plain.static:parse(text) return LeetParserPlain(text) end
 
-    return self:trim()
-end
-
-return Plain
+return LeetParserPlain
