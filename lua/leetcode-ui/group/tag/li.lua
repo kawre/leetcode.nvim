@@ -29,10 +29,7 @@ function Li:init(text, opts, node, tags)
     end
 
     local parent = self.tags[r]
-
     if parent then
-        if parent.name == "ol" then log.debug(parent) end
-
         if parent.order then
             self.pre = parent.order .. ". "
             parent.order = parent.order + 1

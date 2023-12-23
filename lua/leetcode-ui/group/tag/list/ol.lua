@@ -8,7 +8,6 @@ local Ol = List:extend("LeetTagOl")
 
 function Ol:init(text, opts, node, tags)
     self.order = 1
-    log.info("ol")
 
     Ol.super.init(self, text, opts, node, tags)
 end

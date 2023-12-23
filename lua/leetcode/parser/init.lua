@@ -8,6 +8,7 @@ local log = require("leetcode.logger")
 ---@class lc.Parser
 local Parser = Object("LeetParser")
 
+---@param text string
 function Parser.normalize(text)
     local norm = text
         :gsub("​", "")
@@ -15,13 +16,10 @@ function Parser.normalize(text)
         :gsub("<br />", "\n")
         :gsub("(\n+)(\t+)", "%1")
         :gsub("<(/?li)>\n*", "<%1>\n\n")
-        -- :gsub("\t*<(/?ul)>\n*", "<%1>")
-        -- :gsub("\t*<(/?ol)>\n*", "<%1>")
-        -- :gsub("<(/?pre)>\n*", "<%1>")
-        :gsub(
-            "<strong>(Input:?%s*)</strong>",
-            "<input>%1</input>"
-        )
+        :gsub("\n*(<ul[^>]*>)\n*", "\n\n%1\n")
+        :gsub("\n*(<ol[^>]*>)\n*", "\n\n%1\n")
+        :gsub("\n*(<pre[^>]*>)", "\n\n%1\n")
+        :gsub("<strong>(Input:?%s*)</strong>", "<input>%1</input>")
         :gsub("<strong>(Output:?%s*)</strong>", "<output>%1</output>")
         :gsub("<strong>(Explanation:?%s*)</strong>", "<explanation>%1</explanation>")
         :gsub("<strong>(Follow-up:%s*)</strong>", "<followup>%1</followup>")
