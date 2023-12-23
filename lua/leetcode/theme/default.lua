@@ -60,6 +60,7 @@ M.get = function()
         link = { fg = hl("Function").fg, underline = true },
         list = { fg = hl("SpecialChar").fg },
         ref = { fg = hl("Tag").fg },
+        su = { fg = hl("Number").fg },
 
         -- calendar
         calendar_0 = { fg = "#45475b" },

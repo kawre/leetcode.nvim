@@ -26,6 +26,9 @@ local highlights = {
     explanation = "header",
     followup = "followup",
 
+    sup = "su",
+    sub = "su",
+
     -- pre = "",
     -- span = "",
     -- p = "",
@@ -33,8 +36,6 @@ local highlights = {
     -- ol = "",
     -- li = "",
     -- font = "",
-    sup = "header",
-    sub = "header",
     -- small = "",
     -- div = "",
 }

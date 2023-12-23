@@ -11,6 +11,27 @@ local log = require("leetcode.logger")
 ---@field _ lc.ui.Group.params | lines.params
 local Group = Lines:extend("LeetGroup")
 
+function Group:lines()
+    local tbl = {}
+    for _, item in ipairs(self:contents()) do
+        self:lines_helper(item, tbl)
+    end
+    return tbl
+end
+
+---@private
+---@param tbl table
+function Group:lines_helper(item, tbl) --
+    if item.class and item.class.name == "LeetLine" then
+        table.insert(tbl, item)
+        return
+    end
+
+    for _, c in ipairs(item:contents()) do
+        self:lines_helper(c, tbl)
+    end
+end
+
 function Group:contents()
     local items = utils.shallowcopy(self._.items)
 

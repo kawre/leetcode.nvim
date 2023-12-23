@@ -4,6 +4,7 @@ local t = require("leetcode.translator")
 local Line = require("leetcode-ui.line")
 local NuiTree = require("nui.tree")
 local SimilarQuestions = require("leetcode-ui.group.similar-questions")
+local Parser = require("leetcode.parser")
 
 local config = require("leetcode.config")
 local utils = require("leetcode.utils")
@@ -13,9 +14,9 @@ local log = require("leetcode.logger")
 ---@field popup NuiPopup
 ---@field question lc.ui.Question
 ---@field hints table[]
-local InfoPopup = Popup:extend("LeetInfoPopup")
+local Info = Popup:extend("LeetInfoPopup")
 
-function InfoPopup:similar_questions_node()
+function Info:similar_questions_node()
     local nodes = SimilarQuestions:to_nodes(self.question.q.similar)
 
     if not vim.tbl_isempty(nodes) then
@@ -30,9 +31,10 @@ function InfoPopup:similar_questions_node()
     end
 end
 
-function InfoPopup:hints_node()
+function Info:hints_node()
     local hints = {}
     for i, hint_txt in ipairs(self.hints) do
+        log.info(self.hints)
         local line = Line()
 
         line:append(tostring(i), "leetcode_list")
@@ -49,7 +51,7 @@ function InfoPopup:hints_node()
     end
 end
 
-function InfoPopup:topics_node()
+function Info:topics_node()
     local topics = {}
     for _, topic in ipairs(self.question.q.topic_tags) do
         local line = Line()
@@ -67,7 +69,7 @@ function InfoPopup:topics_node()
     end
 end
 
-function InfoPopup:populate()
+function Info:populate()
     local nodes = {
         self:hints_node(),
         NuiTree.Node({ text = "" }),
@@ -89,9 +91,8 @@ function InfoPopup:populate()
             else
                 if type(node.text) == "string" then
                     line:append("  ")
-                    local parser = require("leetcode.parser")
-                    local txt = parser:parse(node.text)
-                    if txt:contents()[1] then line:append(txt:contents()[1]) end
+                    local txt = Parser:parse(node.text)
+                    if txt:lines()[1] then line:append(txt:lines()[1]) end
                 else
                     line:append(node.text)
                 end
@@ -119,8 +120,8 @@ function InfoPopup:populate()
     end, { noremap = true, nowait = true })
 end
 
-function InfoPopup:mount()
-    InfoPopup.super.mount(self)
+function Info:mount()
+    Info.super.mount(self)
 
     self:populate()
 
@@ -140,8 +141,8 @@ function InfoPopup:mount()
 end
 
 ---@param parent lc.ui.Question
-function InfoPopup:init(parent)
-    InfoPopup.super.init(self, {
+function Info:init(parent)
+    Info.super.init(self, {
         position = "50%",
         size = {
             width = "50%",
@@ -173,6 +174,6 @@ function InfoPopup:init(parent)
 end
 
 ---@type fun(parent: lc.ui.Question): lc.ui.InfoPopup
-local LeetInfoPopup = InfoPopup
+local LeetInfoPopup = Info
 
 return LeetInfoPopup
