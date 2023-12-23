@@ -1,4 +1,4 @@
-local Line = require("nui.line")
+local O = require("nui.object")
 local log = require("leetcode.logger")
 
 ---@class lc-ui.Utils
@@ -119,6 +119,10 @@ function utils.set_win_opts(winid, options)
             pcall(vim.api.nvim_set_option_value, opt, value, { win = winid, scope = "local" })
         if not ok then log.error(err) end
     end
+end
+
+function utils.is_instance(instance, class)
+    return type(instance) == "table" and O.is_instance(instance, class)
 end
 
 return utils

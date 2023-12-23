@@ -58,12 +58,13 @@ function Line:append(content, highlight)
     return self
 end
 
----@param opts lc.ui.opts
+---@param opts? lc.ui.opts
 function Line:set_opts(opts) --
     self._.opts = vim.tbl_deep_extend("force", self._.opts or {}, opts or {})
 end
 
 ---@param texts? NuiText[]
+---@param opts? lc.ui.opts
 function Line:init(texts, opts) --
     self._ = {}
     self:set_opts(opts)
@@ -71,7 +72,7 @@ function Line:init(texts, opts) --
     Line.super.init(self, texts)
 end
 
----@type fun(texts?: NuiText[]): lc.ui.Line
+---@type fun(texts?: NuiText[], opts?: lc.ui.opts): lc.ui.Line
 local LeetLine = Line
 
 return LeetLine

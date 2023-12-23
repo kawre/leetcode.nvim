@@ -12,6 +12,7 @@ local entities = {
     ["&ne;"] = "!=",
     ["&minus;"] = "-",
     ["&plus;"] = "+",
+    ["&oplus;"] = "⊕",
     ["&plusmn;"] = "±",
     ["&cup;"] = "∪",
     ["&times;"] = "×",

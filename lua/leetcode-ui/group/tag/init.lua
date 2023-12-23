@@ -9,6 +9,7 @@ local ts = vim.treesitter
 local log = require("leetcode.logger")
 
 ---@class lc.ui.Tag : lc.ui.Group
+---@field name string
 ---@field tags string[]
 ---@field node TSNode
 ---@field text string
@@ -17,28 +18,54 @@ local Tag = Group:extend("LeetTag")
 function Tag:get_text(node) return ts.get_node_text(node, self.text) end
 
 ---@param node TSNode
+---
+---@return lc.Parser.Tag.Attr
+function Tag:get_attr(node)
+    local attr = {}
+
+    for child in node:iter_children() do
+        local ntype = child:type()
+
+        if ntype == "attribute_name" and child:named() then
+            attr.name = self:get_text(child)
+        elseif ntype == "quoted_attribute_value" and child:named() then
+            attr.value = self:get_text(child):gsub("\"", "")
+        end
+    end
+
+    return attr
+end
+
+-- 1206
+---@param node TSNode
 function Tag:get_el_data(node)
-    if node:type() ~= "element" then return end
+    if node:type() ~= "element" then return {} end
 
     local start_tag
     for child in node:iter_children() do
         local ctype = child:type()
+
         if ctype == "start_tag" or ctype == "self_closing_tag" then
             start_tag = child
             break
         end
     end
-    if not start_tag then return end
+
+    if not start_tag then return {} end
 
     local tag, attrs = nil, {}
     for child in start_tag:iter_children() do
         local ntype = child:type()
-
-        if ntype == "tag_name" then tag = self:get_text(child) end
+        if ntype == "tag_name" then
+            tag = self:get_text(child)
+        elseif ntype == "attribute" then
+            local attr = self:get_attr(child)
+            attrs[attr.name] = attr.value
+        end
     end
 
-    local res = { tag = tag, attrs = attrs }
-    return tag and res or nil
+    -- local res = { tag = tag, attrs = attrs }
+    return { tag = tag, attrs = attrs }
 end
 
 function Tag:parse_helper() --
@@ -95,68 +122,25 @@ function Tag:contents()
     return items
 end
 
--- function Tag:draw(layout, opts)
---     Tag.super.draw(self, layout, opts)
---
---     log.info(self._.opts)
--- end
-
-function Tag.normalize(text)
-    local norm = text
-        :gsub("​", "")
-        :gsub("\r\n", "\n")
-        :gsub("(\n+)(\t+)", "%1")
-        -- :gsub("\t*<(/?li)>", "<%1>\n")
-        -- :gsub("\t*<(/?ul)>\n*", "<%1>")
-        -- :gsub("\t*<(/?ol)>\n*", "<%1>")
-        -- :gsub("<(/?pre)>\n*", "<%1>")
-        :gsub(
-            "<strong>(Input:?%s*)</strong>",
-            "<input>%1</input>"
-        )
-        :gsub("<strong>(Output:?%s*)</strong>", "<output>%1</output>")
-        :gsub("<strong>(Explanation:?%s*)</strong>", "<explanation>%1</explanation>")
-        :gsub("<strong>(Follow-up:%s*)</strong>", "<followup>%1</followup>")
-        :gsub("<strong>(Note:%s*)</strong>", "<followup>%1</followup>")
-        :gsub("<strong>(Note:%s*)</strong>", "<followup>%1</followup>")
-        :gsub(
-            "<p><strong[^>]*>(Example%s*%d*:?)%s*</strong></p>\n*",
-            "<example>󰛨 %1</example>\n\n"
-        )
-        :gsub(
-            "<p><strong[^>]*>(Constraints:?)%s*</strong></p>\n*",
-            "<constraints> %1</constraints>\n\n"
-        )
-        :gsub("\n*<(img[^>]*)/>\n*", "\n\n<%1>img</img>\n\n")
-        -- :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
-        :gsub("\n*<pre>", "\n\n<pre>")
-        :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
-        :gsub("\n", "&lcnl;")
-        :gsub("\t", "&lctab;")
-        :gsub("%s", "&nbsp;")
-        :gsub("<[^>]*>", function(match) return match:gsub("&nbsp;", " ") end)
-    -- :gsub("<a[^>]*>(.-)</a>", function(match) return match:gsub("&#?%w+;", utils.entity) end)
-
-    log.debug(text)
-    log.debug(norm:gsub("&lcnl;", "&lcnl;\n"), false)
-
-    return norm
-end
-
+---@param text string
 ---@param opts lc.ui.opts
----@param tags string[]
 ---@param node TSNode
-function Tag:init(text, opts, node, tags) --
+---@param tags string[]
+---@param tag string
+function Tag:init(text, opts, node, tags, tag) --
     Tag.super.init(self, {}, opts or {})
 
     self.text = text
     self.node = node
     self.tags = tags
+    self.name = tag
+
+    log.info(tag)
 
     self:parse_helper()
 end
 
----@type fun(text: string, opts: lc.ui.opts, node?: TSNode, tags: string[]): lc.ui.Tag
+---@type fun(text: string, opts: lc.ui.opts, node?: TSNode, tags: string[], tag?: string): lc.ui.Tag
 local LeetTag = Tag
 
 ---@param tag lc.ui.Tag
@@ -167,17 +151,18 @@ function Tag.static:from(tag, node)
         ul = req_tag("ul"),
         ol = req_tag("ol"),
         img = req_tag("img"),
+        a = req_tag("a"),
     }
 
-    local el = tag:get_el_data(node) or {}
+    local el = tag:get_el_data(node)
     local tags = tag.tags
 
-    table.insert(tags, el.tag)
-    local opts = { hl = theme.get_dynamic(tags) }
-    -- local parsed = (t[tags[#tags]] or LeetTag)(tag.text, opts, tags, node)
+    -- log.info(tag.name)
 
-    -- local parsed = (LeetTag)(tag.text, opts, node, tags)
-    local parsed = (t[tags[#tags]] or LeetTag)(tag.text, opts, node, tags)
+    table.insert(tags, el.tag)
+
+    local opts = { hl = theme.get_dynamic(tags) }
+    local parsed = (t[tags[#tags]] or LeetTag)(tag.text, opts, node, tags, el.tag)
 
     table.remove(tags)
 
@@ -186,13 +171,11 @@ end
 
 ---@param text string
 function Tag.static:parse(text) --
-    text = Tag.normalize(text)
-
     local ok, parser = pcall(ts.get_string_parser, text, "html")
     assert(ok, parser)
     local root = parser:parse()[1]:root()
 
-    return LeetTag(text, { spacing = 3 }, root, {})
+    return LeetTag(text, { spacing = 3, hl = "leetcode_normal" }, root, {}, nil)
 end
 
 return LeetTag
