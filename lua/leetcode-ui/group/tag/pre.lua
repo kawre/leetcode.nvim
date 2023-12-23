@@ -10,11 +10,8 @@ local Pre = Tag:extend("LeetTagPre")
 function Pre:contents()
     local items = Pre.super.contents(self)
 
-    for _, value in ipairs(items) do
-        for _, line in ipairs(value:contents()) do
-            local indent = Line():append("\t▎\t", "leetcode_indent")
-            table.insert(line._texts, 1, indent)
-        end
+    for _, item in ipairs(items) do
+        self:add_indent(item, "\t▎\t")
     end
 
     return items

@@ -59,14 +59,14 @@ function Tag.normalize(text)
     return norm
 end
 
-function Tag:add_indent(item)
+function Tag:add_indent(item, text)
     if item.class and item.class.name == "LeetLine" then
-        table.insert(item._texts, 1, Indent("\t", "leetcode_indent"))
+        table.insert(item._texts, 1, Indent(text or "\t", "leetcode_indent"))
         return
     end
 
     for _, c in ipairs(item:contents()) do
-        self:add_indent(c)
+        self:add_indent(c, text)
     end
 end
 
@@ -122,7 +122,7 @@ function Tag:get_el_data(node)
     return { tag = tag, attrs = attrs }
 end
 
-function Tag:parse_helper() --
+function Tag:parse_node() --
     ---@param child TSNode
     for child in self.node:iter_children() do
         local ntype = child:type()
@@ -212,7 +212,7 @@ function Tag:init(text, opts, node, tags) --
 
     Tag.super.init(self, {}, opts)
 
-    self:parse_helper()
+    self:parse_node()
 end
 
 ---@type fun(text: string, opts: lc.ui.opts, node: TSNode, tags: lc.ui.Tag[]): lc.ui.Tag

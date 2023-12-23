@@ -1,18 +1,15 @@
 local Tag = require("leetcode-ui.group.tag")
+local Line = require("leetcode-ui.line")
 
 local log = require("leetcode.logger")
 
 ---@class lc.ui.Tag.sup : lc.ui.Tag
 local Sup = Tag:extend("LeetTagSup")
 
-function Sup:contents()
-    local Group = require("leetcode-ui.group")
-    local grp = Group()
+function Sup:parse_node()
+    self:append("^")
 
-    grp:append("^", "leetcode_alt")
-    grp:append(self:content(), "Number")
-
-    return grp:contents()
+    Sup.super.parse_node(self)
 end
 
 ---@type fun(): lc.ui.Tag.sup

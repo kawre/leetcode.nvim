@@ -33,8 +33,8 @@ local highlights = {
     -- ol = "",
     -- li = "",
     -- font = "",
-    -- sup = "",
-    -- sub = "",
+    sup = "header",
+    sub = "header",
     -- small = "",
     -- div = "",
 }

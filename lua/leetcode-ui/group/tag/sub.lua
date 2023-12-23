@@ -5,14 +5,10 @@ local log = require("leetcode.logger")
 ---@class lc.ui.Tag.sub : lc.ui.Tag
 local Sub = Tag:extend("LeetTagSub")
 
-function Sub:contents()
-    local Group = require("leetcode-ui.group")
-    local grp = Group()
+function Sub:parse_node()
+    self:append("_")
 
-    grp:append("_", "leetcode_alt")
-    grp:append(self:content(), "Number")
-
-    return grp:contents()
+    Sub.super.parse_node(self)
 end
 
 ---@type fun(): lc.ui.Tag.sub

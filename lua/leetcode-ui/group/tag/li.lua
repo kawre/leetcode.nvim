@@ -29,6 +29,7 @@ function Li:init(text, opts, node, tags)
     end
 
     local parent = self.tags[r]
+
     if parent then
         if parent.order then
             self.pre = parent.order .. ". "
