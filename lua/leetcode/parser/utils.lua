@@ -53,8 +53,18 @@ function utils.entity(entity)
     end
 end
 
----@param tags string[]
+---@param tag lc.ui.Tag
 ---@return string
-function utils.hl(tags) return theme.get_dynamic(vim.deepcopy(tags)) end
+function utils.hl(tag) --
+    local tag_names = {}
+
+    for _, v in ipairs(tag.tags) do
+        if v.name then table.insert(tag_names, v.name) end
+    end
+
+    if tag.name then table.insert(tag_names, tag.name) end
+
+    return theme.get_dynamic(tag_names)
+end
 
 return utils

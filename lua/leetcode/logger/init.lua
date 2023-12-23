@@ -10,11 +10,14 @@ local logger = {}
 
 local function normalize(msg) return type(msg) == "string" and t(msg) or vim.inspect(msg) end
 
----@private
----@param msg any
----@param lvl? integer
----@return any
-logger.log = vim.schedule_wrap(function(msg, lvl)
+-- ---@private
+-- ---@param msg any
+-- ---@param lvl? integer
+-- ---@return any
+-- logger.log = vim.schedule_wrap(function(msg, lvl)
+-- end)
+
+function logger.log(msg, lvl)
     if not config.user.logging then return end
 
     local title = config.name
@@ -24,7 +27,7 @@ logger.log = vim.schedule_wrap(function(msg, lvl)
     if lvl == lvls.DEBUG then msg = debug.traceback(msg .. "\n") end
 
     vim.notify(msg, lvl, { title = title })
-end)
+end
 
 ---@param msg any
 logger.info = function(msg) logger.log(msg) end

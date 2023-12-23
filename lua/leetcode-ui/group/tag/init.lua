@@ -1,8 +1,9 @@
 local theme = require("leetcode.theme")
+local u = require("leetcode-ui.utils")
 
 local utils = require("leetcode.parser.utils")
 local Group = require("leetcode-ui.group")
-local Lines = require("leetcode-ui.lines")
+local Indent = require("nui.text")
 
 local ts = vim.treesitter
 
@@ -10,10 +11,21 @@ local log = require("leetcode.logger")
 
 ---@class lc.ui.Tag : lc.ui.Group
 ---@field name string
----@field tags string[]
+---@field tags lc.ui.Tag[]
 ---@field node TSNode
 ---@field text string
 local Tag = Group:extend("LeetTag")
+
+function Tag:add_indent(item)
+    if item.class and item.class.name == "LeetLine" then
+        table.insert(item._texts, 1, Indent("\t", "leetcode_indent"))
+        return
+    end
+
+    for _, c in ipairs(item:contents()) do
+        self:add_indent(c)
+    end
+end
 
 function Tag:get_text(node) return ts.get_node_text(node, self.text) end
 
@@ -64,7 +76,6 @@ function Tag:get_el_data(node)
         end
     end
 
-    -- local res = { tag = tag, attrs = attrs }
     return { tag = tag, attrs = attrs }
 end
 
@@ -76,7 +87,7 @@ function Tag:parse_helper() --
         if ntype == "text" then
             self:append(self:get_text(child))
         elseif ntype == "element" then
-            self:append(Tag:from(self, child))
+            self:append(self:from(child))
         elseif ntype == "entity" then
             local text = self:get_text(child)
 
@@ -108,10 +119,6 @@ end
 
 local function req_tag(str) return require("leetcode-ui.group.tag." .. str) end
 
--- ---@param node TSNode
--- function Tag:from(node)
--- end
-
 function Tag:contents()
     local items = Tag.super.contents(self)
 
@@ -122,52 +129,50 @@ function Tag:contents()
     return items
 end
 
----@param text string
----@param opts lc.ui.opts
 ---@param node TSNode
----@param tags string[]
----@param tag string
-function Tag:init(text, opts, node, tags, tag) --
-    Tag.super.init(self, {}, opts or {})
-
-    self.text = text
-    self.node = node
-    self.tags = tags
-    self.name = tag
-
-    log.info(tag)
-
-    self:parse_helper()
-end
-
----@type fun(text: string, opts: lc.ui.opts, node?: TSNode, tags: string[], tag?: string): lc.ui.Tag
-local LeetTag = Tag
-
----@param tag lc.ui.Tag
----@param node TSNode
-function Tag.static:from(tag, node)
-    local t = {
+function Tag:from(node)
+    local tbl = {
         pre = req_tag("pre"),
-        ul = req_tag("ul"),
-        ol = req_tag("ol"),
+        ul = req_tag("list.ul"),
+        ol = req_tag("list.ol"),
+        li = req_tag("li"),
         img = req_tag("img"),
         a = req_tag("a"),
     }
 
-    local el = tag:get_el_data(node)
-    local tags = tag.tags
+    local tags = self.tags
+    local el = self:get_el_data(node)
 
-    -- log.info(tag.name)
-
-    table.insert(tags, el.tag)
-
-    local opts = { hl = theme.get_dynamic(tags) }
-    local parsed = (t[tags[#tags]] or LeetTag)(tag.text, opts, node, tags, el.tag)
-
+    table.insert(tags, self)
+    local parsed = (tbl[el.tag] or Tag)(self.text, {}, node, tags)
     table.remove(tags)
 
     return parsed
 end
+
+---@param text string
+---@param opts lc.ui.opts
+---@param node TSNode
+---@param tags lc.ui.Tag[]
+function Tag:init(text, opts, node, tags) --
+    self.text = text
+    self.node = node
+    self.tags = tags
+
+    self.data = self:get_el_data(node)
+    self.name = self.data.tag
+
+    opts = vim.tbl_extend("force", {
+        hl = utils.hl(self),
+    }, opts or {})
+
+    Tag.super.init(self, {}, opts)
+
+    self:parse_helper()
+end
+
+---@type fun(text: string, opts: lc.ui.opts, node: TSNode, tags: lc.ui.Tag[]): lc.ui.Tag
+local LeetTag = Tag
 
 ---@param text string
 function Tag.static:parse(text) --
@@ -175,7 +180,7 @@ function Tag.static:parse(text) --
     assert(ok, parser)
     local root = parser:parse()[1]:root()
 
-    return LeetTag(text, { spacing = 3, hl = "leetcode_normal" }, root, {}, nil)
+    return LeetTag(text, { spacing = 3, hl = "leetcode_normal" }, root, {})
 end
 
 return LeetTag
