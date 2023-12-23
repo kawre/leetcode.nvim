@@ -27,6 +27,8 @@ function Tag.normalize(text)
         :gsub("\n*(<ul[^>]*>)\n*", "\n\n%1\n")
         :gsub("\n*(<ol[^>]*>)\n*", "\n\n%1\n")
         :gsub("\n*(<pre[^>]*>)", "\n\n%1\n")
+        :gsub("<sub>(%s*)</sub>", "%1")
+        :gsub("<sup>(%s*)</sup>", "%1")
         :gsub("<strong>(Input:?%s*)</strong>", "<input>%1</input>")
         :gsub("<strong>(Output:?%s*)</strong>", "<output>%1</output>")
         :gsub("<strong>(Explanation:?%s*)</strong>", "<explanation>%1</explanation>")
@@ -178,6 +180,8 @@ function Tag:from(node)
         li = req_tag("li"),
         img = req_tag("img"),
         a = req_tag("a"),
+        sub = req_tag("sub"),
+        sup = req_tag("sup"),
     }
 
     local tags = self.tags
