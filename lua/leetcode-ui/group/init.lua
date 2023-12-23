@@ -91,7 +91,7 @@ function Group:replace(items)
 end
 
 --@param components lc-ui.Component[]
----@param opts? lc-ui.Group.opts
+---@param opts? lc.ui.opts
 ---
 ---@return lc.ui.Group
 function Group:init(items, opts) --
@@ -102,7 +102,7 @@ function Group:init(items, opts) --
     self._.items = items or {}
 end
 
----@type fun(items?: table, opts?: lc-ui.Group.opts): lc.ui.Group
+---@type fun(items?: table, opts?: lc.ui.opts): lc.ui.Group
 local LeetGroup = Group
 
 return LeetGroup

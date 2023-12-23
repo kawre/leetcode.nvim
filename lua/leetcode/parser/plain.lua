@@ -1,6 +1,6 @@
 local Lines = require("leetcode-ui.lines")
 local Line = require("leetcode-ui.line")
-local utils = require("leetcode.parser.utils")
+local utils = require("leetcode-ui.group.parser.utils")
 
 ---@class lc.Parser.Plain
 ---@field str string

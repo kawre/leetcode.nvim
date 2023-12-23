@@ -11,9 +11,8 @@ function Pre:contents()
     local items = Pre.super.contents(self)
 
     for _, value in ipairs(items) do
-        local indent = Line():append("\t▎\t", "leetcode_indent")
-
-        for _, line in ipairs(Lines.contents(value)) do
+        for _, line in ipairs(value:contents()) do
+            local indent = Line():append("\t▎\t", "leetcode_indent")
             table.insert(line._texts, 1, indent)
         end
     end

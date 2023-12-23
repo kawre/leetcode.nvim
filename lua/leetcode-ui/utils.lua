@@ -7,7 +7,6 @@ local utils = {}
 ---@param tbl table
 function utils.shallowcopy(tbl)
     local new_tbl = {}
-
     for _, value in ipairs(tbl) do
         table.insert(new_tbl, value)
     end
@@ -43,6 +42,19 @@ function utils.diff_to_hl(diff)
     }
 
     return hl[diff:lower()] or ""
+end
+
+---@param status string
+function utils.status_to_hl(status)
+    if not status then return end
+
+    local user_status = {
+        ac = { "", "leetcode_easy" },
+        notac = { "󱎖", "leetcode_medium" },
+        todo = { "", "leetcode_alt" },
+    }
+
+    return table.unpack(user_status[status])
 end
 
 ---@param layout lc.ui.Renderer

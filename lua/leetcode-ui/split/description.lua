@@ -129,6 +129,15 @@ function Description:populate()
         header:append("????", "leetcode_list")
     end
 
+    local user_status = {
+        ac = { "", "leetcode_easy" },
+        notac = { "󱎖", "leetcode_medium" },
+        todo = { "", "leetcode_alt" },
+    }
+    if user_status[self.question.cache.status] then
+        header:append(" "):append(table.unpack(user_status[self.question.cache.status]))
+    end
+
     header:append(" | ")
 
     local likes = show_stats and q.likes or "___"

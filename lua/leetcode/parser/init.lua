@@ -1,8 +1,8 @@
 local Object = require("nui.object")
 local Group = require("leetcode-ui.group")
 
-local Html = require("leetcode.parser.html")
-local plain = require("leetcode.parser.plain")
+local Tag = require("leetcode-ui.group.tag")
+-- local plain = require("leetcode.parser.plain")
 local log = require("leetcode.logger")
 
 ---@class lc.Parser
@@ -28,9 +28,9 @@ function Parser.static:parse(str)
     end
 
     if pcall(check_for_html) then
-        return Html:parse(str)
+        return Tag:parse(str)
     else
-        return plain:parse(str)
+        return nil
     end
 end
 
