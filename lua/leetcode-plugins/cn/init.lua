@@ -9,6 +9,7 @@ function cn.load()
     require("leetcode-plugins.cn.urls")
     require("leetcode-plugins.cn.queries")
     require("leetcode-plugins.cn.api")
+    require("leetcode-plugins.cn.normalizer")
 end
 
 return cn

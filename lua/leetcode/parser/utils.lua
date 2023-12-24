@@ -4,20 +4,7 @@ local theme = require("leetcode.theme")
 ---@class lc.Parser.Utils
 local utils = {}
 
-local entities = {
-    ["&lt;"] = "<",
-    ["&le;"] = "<=",
-    ["&gt;"] = ">",
-    ["&ge;"] = ">=",
-    ["&ne;"] = "!=",
-    ["&minus;"] = "-",
-    ["&plus;"] = "+",
-    ["&oplus;"] = "⊕",
-    ["&plusmn;"] = "±",
-    ["&cup;"] = "∪",
-    ["&times;"] = "×",
-    ["&frasl;"] = "/",
-
+utils.entities = {
     ["&nbsp;"] = " ",
     ["&quot;"] = "\"",
     ["&#39;"] = "'",
@@ -32,7 +19,8 @@ local entities = {
     ["&lfloor;"] = "⌊",
     ["&rfloor;"] = "⌋",
     ["&amp;"] = "&",
-    ["&infin;"] = "∞",
+    ["&mdash;"] = "—",
+    ["&ndash;"] = "–",
 
     ["&rdquo;"] = "”",
     ["&rsquo;"] = "’",
@@ -44,13 +32,61 @@ local entities = {
     ["&lctab;"] = "\t",
     ["&lcend;"] = "",
     ["&lccode;"] = "`",
+
+    -- Math symbols
+    ["&lt;"] = "<",
+    ["&gt;"] = ">",
+    ["&plus;"] = "+",
+    ["&plusmn;"] = "±",
+    ["&times;"] = "×",
+    ["&frasl;"] = "/",
+    ["&forall;"] = "∀",
+    ["&part;"] = "∂",
+    ["&exist;"] = "∃",
+    ["&empty;"] = "∅",
+    ["&nabla;"] = "∇",
+    ["&isin;"] = "∈",
+    ["&notin;"] = "∉",
+    ["&ni;"] = "∋",
+    ["&prod;"] = "∏",
+    ["&sum;"] = "∑",
+    ["&minus;"] = "−",
+    ["&lowast;"] = "∗",
+    ["&radic;"] = "√",
+    ["&prop;"] = "∝",
+    ["&infin;"] = "∞",
+    ["&ang;"] = "∠",
+    ["&and;"] = "∧",
+    ["&or;"] = "∨",
+    ["&cap;"] = "∩",
+    ["&cup;"] = "∪",
+    ["&int;"] = "∫",
+    ["&there4;"] = "∴",
+    ["&sim;"] = "∼",
+    ["&cong;"] = "≅",
+    ["&asymp;"] = "≈",
+    ["&ne;"] = "≠",
+    ["&equiv;"] = "≡",
+    -- ["&le;"] = "<=",
+    -- ["&ge;"] = ">=",
+    ["&le;"] = "≤",
+    ["&ge;"] = "≥",
+    ["&sub;"] = "⊂",
+    ["&sup;"] = "⊃",
+    ["&nsub;"] = "⊄",
+    ["&sube;"] = "⊆",
+    ["&supe;"] = "⊇",
+    ["&oplus;"] = "⊕",
+    ["&otimes;"] = "⊗",
+    ["&perp;"] = "⊥",
+    ["&sdot;"] = "⋅",
 }
 
 ---@param entity string
 ---@return string
 function utils.entity(entity)
-    if entities[entity] then
-        return entities[entity]
+    if utils.entities[entity] then
+        return utils.entities[entity]
     else
         log.error("unknown enitity: " .. entity)
         return entity

@@ -9,13 +9,14 @@ function Img:contents()
     local Group = require("leetcode-ui.group")
     local grp = Group()
 
-    local el = self:get_el_data(self.node)
+    local alt = self.data.attrs.alt
+    local link = (self.data.attrs.src or ""):gsub("：", ":")
 
     grp:append("[", "leetcode_alt")
-    grp:append(self:content(), "leetcode_ref")
+    grp:append((alt and alt ~= "") and alt or "img", "leetcode_ref")
     grp:append("]", "leetcode_alt")
     grp:append("(", "leetcode_alt")
-    grp:append(el.attrs.src or "", "leetcode_link")
+    grp:append(link, "leetcode_link")
     grp:append(")", "leetcode_alt")
 
     return grp:contents()

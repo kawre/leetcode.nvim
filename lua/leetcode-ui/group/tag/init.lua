@@ -4,6 +4,7 @@ local u = require("leetcode-ui.utils")
 local utils = require("leetcode.parser.utils")
 local Group = require("leetcode-ui.group")
 local Indent = require("nui.text")
+local Normalizer = require("leetcode.parser.normalizer")
 
 local ts = vim.treesitter
 
@@ -22,19 +23,24 @@ function Tag.normalize(text)
         :gsub("​", "")
         :gsub("\r\n", "\n")
         :gsub("<br />", "\n")
+        :gsub("<meta[^>]*/>", "")
         :gsub("(\n+)(\t+)", "%1")
         :gsub("<(/?li)>\n*", "<%1>\n\n")
         :gsub("\n*(<ul[^>]*>)\n*", "\n\n%1\n")
         :gsub("\n*(<ol[^>]*>)\n*", "\n\n%1\n")
         :gsub("\n*(<pre[^>]*>)", "\n\n%1\n")
-        -- :gsub("<([^>]+)>(%s)</([^>]+)>", "%2")
-        :gsub("<sub>(%s*)</sub>", "%1")
-        :gsub("<sup>(%s*)</sup>", "%1")
-        :gsub("<strong>(Input:?%s*)</strong>", "<input>%1</input>")
+        :gsub("<p>(%s+)</p>", "&lcpad;")
+        :gsub("<([^>]+)>(%s*)</%1>", "%2")
+        -- :gsub("<sub>(%s*)</sub>", "%1")
+        -- :gsub("<sup>(%s*)</sup>", "%1")
+        -- :gsub("<p>(%s*)</p>", "%1")
+        :gsub(
+            "<strong>(Input:?%s*)</strong>",
+            "<input>%1</input>"
+        )
         :gsub("<strong>(Output:?%s*)</strong>", "<output>%1</output>")
         :gsub("<strong>(Explanation:?%s*)</strong>", "<explanation>%1</explanation>")
         :gsub("<strong>(Follow-up:%s*)</strong>", "<followup>%1</followup>")
-        :gsub("<strong>(Note:%s*)</strong>", "<followup>%1</followup>")
         :gsub("<strong>(Note:%s*)</strong>", "<followup>%1</followup>")
         :gsub(
             "\n*<p><strong[^>]*>(Example%s*%d*:?)%s*</strong></p>\n*",
@@ -44,15 +50,21 @@ function Tag.normalize(text)
             "\n*<p><strong[^>]*>(Constraints:?)%s*</strong></p>\n*",
             "\n\n<constraints> %1</constraints>\n\n"
         )
-        :gsub("\n*<(img[^>]*)/>\n*", "\n\n<%1>img</img>\n\n")
+        -- :gsub("\n*<(img[^>]*)/>\n*", "\n\n<%1>img</img>\n\n")
+        :gsub(
+            "\n*(<img[^>]*/?>)\n*",
+            "\n\n%1\n\n"
+        )
         -- :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
-        :gsub("\n*<pre>", "\n\n<pre>")
-        :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
+        :gsub(
+            "\n*<p>&nbsp;</p>\n*",
+            "&lcpad;"
+        )
         :gsub("\n", "&lcnl;")
         :gsub("\t", "&lctab;")
         :gsub("%s", "&nbsp;")
         :gsub("<[^>]*>", function(match) return match:gsub("&nbsp;", " ") end)
-        :gsub("<a[^>]*>(.-)</a>", function(match) return match:gsub("&#?%w+;", utils.entity) end)
+    -- :gsub("<a[^>]*>(.-)</a>", function(match) return match:gsub("&#?%w+;", utils.entity) end)
 
     log.debug(text)
     log.debug(norm:gsub("&lcnl;", "&lcnl;\n"), false)
@@ -128,7 +140,7 @@ function Tag:parse_node() --
     for child in self.node:iter_children() do
         local ntype = child:type()
 
-        if ntype == "text" then
+        if ntype == "text" or ntype == "ERROR" then
             self:append(self:get_text(child))
         elseif ntype == "element" then
             self:append(self:from(child))
@@ -221,7 +233,7 @@ local LeetTag = Tag
 
 ---@param text string
 function Tag.static:parse(text) --
-    local normalized = Tag.normalize(text)
+    local normalized = Normalizer:norm(text)
 
     local ok, parser = pcall(ts.get_string_parser, normalized, "html")
 
