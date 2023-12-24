@@ -34,7 +34,6 @@ end
 function Info:hints_node()
     local hints = {}
     for i, hint_txt in ipairs(self.hints) do
-        log.info(self.hints)
         local line = Line()
 
         line:append(tostring(i), "leetcode_list")
