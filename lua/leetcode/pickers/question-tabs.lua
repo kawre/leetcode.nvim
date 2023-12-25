@@ -15,7 +15,7 @@ local action_state = require("telescope.actions.state")
 ---
 ---@return string
 local function question_formatter(q)
-    return string.format("%d. %s %s", q.frontend_id, q.title, q.translated_title)
+    return string.format("%s. %s %s", q.frontend_id, q.title, q.translated_title)
 end
 
 local function display_current(entry)
