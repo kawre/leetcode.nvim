@@ -244,23 +244,6 @@ function Tag.static:parse(text) --
 
     local root = parser:parse()[1]:root()
 
-    local query = ts.query.parse(
-        "html",
-        [[
-        (element
-            (start_tag
-                (tag_name) @stag (#any-of? @stag "strong" "b"))
-            (text) @text (#match? @text
-                            "(Input|Output|Explanation|Note|Follow-up):?")
-            (end_tag
-                (tag_name) @etag)) @el
-    ]]
-    )
-
-    for id, capture, md in query:iter_captures(root, normalized) do
-        log.info(md)
-    end
-
     return LeetTag(normalized, { spacing = 3, hl = "leetcode_normal" }, root, {})
 end
 

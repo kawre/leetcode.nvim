@@ -13,12 +13,13 @@ local function norm_url(url) return url:lower():gsub("/$", ""):gsub("#.-$", "") 
 local function is_same_url(u1, u2) return norm_url(u1) == norm_url(u2) end
 
 function A:contents()
-    if is_same_url(self:content(), self.data.attrs.href) then
-        return A.super.contents(self)
-    else
-        local Group = require("leetcode-ui.group")
-        local grp = Group()
+    local Group = require("leetcode-ui.group")
+    local grp = Group()
 
+    if is_same_url(self:content(), self.data.attrs.href) then
+        grp:append(self:content():gsub("：", ":"), "leetcode_link")
+        return grp:contents()
+    else
         local link = (self.data.attrs.href or ""):gsub("：", ":")
 
         grp:append("[", "leetcode_alt")

@@ -14,7 +14,6 @@ function Normalizer:cleanup() --
         :gsub("<br%s*/>", "\n")
         :gsub("<meta[^>]*/>", "")
         :gsub("&nbsp;", " ")
-        :gsub("\u{00A0}", " ")
         :gsub("<(/?)b([^>]*)>", "<%1strong%2>")
     -- :gsub("&#?%w+;", function(e) --
     --     return vim.tbl_keys({})
@@ -56,7 +55,6 @@ function Normalizer:tags() --
 end
 
 function Normalizer:entities()
-    log.debug(self.text)
     self.text = self
         .text --
         :gsub("\n*<p>%s*</p>\n*", "&lcpad;")
@@ -70,9 +68,9 @@ end
 
 ---@param text string
 function Normalizer:init(text) --
-    self.text = text
     log.debug(text)
 
+    self.text = text
     self:cleanup()
     self:fix_indent()
     self:tags()
