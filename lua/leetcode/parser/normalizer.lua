@@ -14,6 +14,7 @@ function Normalizer:cleanup() --
         :gsub("<br%s*/>", "\n")
         :gsub("<meta[^>]*/>", "")
         :gsub("&nbsp;", " ")
+        :gsub("\u{00A0}", " ")
         :gsub("<(/?)b([^>]*)>", "<%1strong%2>")
     -- :gsub("&#?%w+;", function(e) --
     --     return vim.tbl_keys({})
@@ -55,21 +56,16 @@ function Normalizer:tags() --
 end
 
 function Normalizer:entities()
+    log.debug(self.text)
     self.text = self
         .text --
-        :gsub("\n*<p>%s+</p>\n*", "&lcpad;")
+        :gsub("\n*<p>%s*</p>\n*", "&lcpad;")
+        :gsub("\n*<p> *</p>\n*", "&lcpad;")
         :gsub("<([^>]+)>(%s*)</%1>", "%2")
         :gsub("\n", "&lcnl;")
         :gsub("\t", "&lctab;")
         :gsub("%s", "&nbsp;")
-        -- :gsub(
-        --     "(%s*)(<[^>]+>)(%s*)",
-        --     function(m1, m2, m3) return m1:gsub(".", "&nbsp;") .. m2 .. m3:gsub(".", "&nbsp;") end
-        -- )
-        :gsub(
-            "<[^>]+>",
-            function(match) return match:gsub("&nbsp;", " ") end
-        )
+        :gsub("<[^>]+>", function(match) return match:gsub("&nbsp;", " ") end)
 end
 
 ---@param text string

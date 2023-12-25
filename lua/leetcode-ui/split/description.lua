@@ -135,7 +135,8 @@ function Description:populate()
         todo = { "", "leetcode_alt" },
     }
     if user_status[self.question.cache.status] then
-        header:append(" "):append(table.unpack(user_status[self.question.cache.status]))
+        local s = user_status[self.question.cache.status]
+        header:append(" "):append(s[1], s[2])
     end
 
     header:append(" | ")

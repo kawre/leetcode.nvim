@@ -3,13 +3,23 @@
     "library": {
       "enabled": true,
       "plugins": [
-        "nvim-treesitter",
         "telescope.nvim",
         "plenary.nvim",
         "nui.nvim",
         "nvim-web-devicons",
-        "image.nvim"
+        "image.nvim",
+        "nvim-treesitter"
       ]
     }
+  },
+  "neoconf": {
+    "plugins": {
+      "lua_ls": {
+        "enabled": true
+      }
+    }
+  },
+  "lspconfig": {
+    "sumneko_lua": {}
   }
 }

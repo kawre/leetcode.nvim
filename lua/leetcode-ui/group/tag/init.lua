@@ -1,12 +1,11 @@
 local theme = require("leetcode.theme")
 local u = require("leetcode-ui.utils")
+local ts = vim.treesitter
 
 local utils = require("leetcode.parser.utils")
 local Group = require("leetcode-ui.group")
 local Indent = require("nui.text")
 local Normalizer = require("leetcode.parser.normalizer")
-
-local ts = vim.treesitter
 
 local log = require("leetcode.logger")
 
@@ -233,6 +232,7 @@ local LeetTag = Tag
 
 ---@param text string
 function Tag.static:parse(text) --
+    ---@type string
     local normalized = Normalizer:norm(text)
 
     local ok, parser = pcall(ts.get_string_parser, normalized, "html")
@@ -243,7 +243,28 @@ function Tag.static:parse(text) --
     end
 
     local root = parser:parse()[1]:root()
+
+    local query = ts.query.parse(
+        "html",
+        [[
+        (element
+            (start_tag
+                (tag_name) @stag (#any-of? @stag "strong" "b"))
+            (text) @text (#match? @text
+                            "(Input|Output|Explanation|Note|Follow-up):?")
+            (end_tag
+                (tag_name) @etag)) @el
+    ]]
+    )
+
+    for id, capture, md in query:iter_captures(root, normalized) do
+        log.info(md)
+    end
+
     return LeetTag(normalized, { spacing = 3, hl = "leetcode_normal" }, root, {})
 end
+
+-- parser = ts.get_string_parser(normalized, "html")
+-- root = parser:parse()[1]:root()
 
 return LeetTag
