@@ -187,6 +187,7 @@ end
 function Tag:from(node)
     local tbl = {
         pre = req_tag("pre"),
+        blockquote = req_tag("pre"),
         ul = req_tag("list.ul"),
         ol = req_tag("list.ol"),
         li = req_tag("li"),
