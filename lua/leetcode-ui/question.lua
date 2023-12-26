@@ -56,10 +56,6 @@ function Question:handle_mount()
     self:create_file()
     vim.cmd("$tabe " .. self.file:absolute())
 
-    utils.exec_hooks("LeetQuestionNew", {
-        lang = self.lang,
-    })
-
     -- https://github.com/kawre/leetcode.nvim/issues/14
     if self.lang == "rust" then pcall(require("rust-tools.standalone").start_standalone_client) end
 
@@ -75,6 +71,8 @@ function Question:handle_mount()
     self.description = Description(self):mount()
     self.console = Console(self)
     self.info = Info(self)
+
+    utils.exec_hooks("LeetQuestionNew", self)
 
     return self
 end

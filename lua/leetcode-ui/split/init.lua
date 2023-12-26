@@ -1,5 +1,7 @@
 local Renderer = require("leetcode-ui.renderer")
 local NuiSplit = require("nui.split")
+local config = require("leetcode.config")
+local keys = config.user.keys
 
 local log = require("leetcode.logger")
 
@@ -58,7 +60,7 @@ function Split:mount()
 
     self.visible = true
 
-    self:map("n", { "q", "<Esc>" }, function() self:toggle() end)
+    self:map("n", keys.toggle, function() self:toggle() end)
 end
 
 function Split:map(...) self.renderer:map(...) end

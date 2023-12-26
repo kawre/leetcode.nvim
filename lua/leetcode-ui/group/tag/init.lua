@@ -49,16 +49,8 @@ function Tag.normalize(text)
             "\n*<p><strong[^>]*>(Constraints:?)%s*</strong></p>\n*",
             "\n\n<constraints> %1</constraints>\n\n"
         )
-        -- :gsub("\n*<(img[^>]*)/>\n*", "\n\n<%1>img</img>\n\n")
-        :gsub(
-            "\n*(<img[^>]*/?>)\n*",
-            "\n\n%1\n\n"
-        )
-        -- :gsub("<pre>\n*(.-)\n*</pre>", "<pre>\n%1</pre>")
-        :gsub(
-            "\n*<p>&nbsp;</p>\n*",
-            "&lcpad;"
-        )
+        :gsub("\n*(<img[^>]*/?>)\n*", "\n\n%1\n\n")
+        :gsub("\n*<p>&nbsp;</p>\n*", "&lcpad;")
         :gsub("\n", "&lcnl;")
         :gsub("\t", "&lctab;")
         :gsub("%s", "&nbsp;")

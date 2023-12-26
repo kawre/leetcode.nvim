@@ -151,13 +151,15 @@ end
 
 ---@param parent lc.ui.Console
 function Testcase:init(parent)
+    local keys = require("leetcode.config").user.keys
+
     Testcase.super.init(self, parent, {
         enter = true,
         border = {
             text = {
-                top = (" (H) %s "):format(t("Testcases")),
+                top = (" (%s) %s "):format(keys.focus_testcases, t("Testcases")),
                 top_align = "center",
-                bottom = (" (r) %s "):format(t("Reset")),
+                bottom = (" (%s) %s "):format(keys.reset_testcases, t("Reset")),
                 bottom_align = "center",
             },
         },

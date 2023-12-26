@@ -34,12 +34,14 @@ end
 
 ---@param parent lc.ui.Console
 function ResultPopup:init(parent)
+    local keys = require("leetcode.config").user.keys
+
     ResultPopup.super.init(self, parent, {
         border = {
             text = {
-                top = (" (L) %s "):format(t("Result")),
+                top = (" (%s) %s "):format(keys.focus_result, t("Result")),
                 top_align = "center",
-                bottom = (" (U) %s "):format(t("Use Testcase")),
+                bottom = (" (%s) %s "):format(keys.use_testcase, t("Use Testcase")),
                 bottom_align = "center",
             },
         },

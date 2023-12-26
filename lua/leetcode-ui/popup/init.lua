@@ -1,6 +1,7 @@
 local NuiPopup = require("nui.popup")
 local Renderer = require("leetcode-ui.renderer")
 local config = require("leetcode.config")
+local keys = config.user.keys
 
 local log = require("leetcode.logger")
 
@@ -63,7 +64,7 @@ function Popup:mount()
     self.visible = true
 
     self:on({ "BufLeave", "WinLeave" }, function() self:handle_leave() end)
-    self:map("n", { "q", "<Esc>" }, function() self:hide() end)
+    self:map("n", keys.toggle, function() self:hide() end)
 end
 
 function Popup:hide()

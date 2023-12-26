@@ -5,6 +5,7 @@ local Layout = require("leetcode-ui.layout")
 local Popup = require("leetcode-ui.popup")
 
 local config = require("leetcode.config")
+local keys = config.user.keys
 local Runner = require("leetcode.runner")
 local log = require("leetcode.logger")
 
@@ -43,10 +44,10 @@ function ConsoleLayout:mount()
     ConsoleLayout.super.mount(self)
 
     self:set_keymaps({
-        ["r"] = function() self.testcase:reset() end,
-        ["U"] = function() self:use_testcase() end,
-        ["H"] = function() self.testcase:focus() end,
-        ["L"] = function() self.result:focus() end,
+        [keys.reset_testcases] = function() self.testcase:reset() end,
+        [keys.use_testcase] = function() self:use_testcase() end,
+        [keys.focus_testcases] = function() self.testcase:focus() end,
+        [keys.focus_result] = function() self.result:focus() end,
     })
 end
 

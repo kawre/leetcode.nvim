@@ -7,6 +7,7 @@ local SimilarQuestions = require("leetcode-ui.group.similar-questions")
 local Parser = require("leetcode.parser")
 
 local config = require("leetcode.config")
+local keys = config.user.keys
 local utils = require("leetcode.utils")
 local log = require("leetcode.logger")
 
@@ -103,7 +104,7 @@ function Info:populate()
 
     tree:render()
 
-    self:map("n", { "<Tab>", "<CR>" }, function()
+    self:map("n", keys.confirm, function()
         local node = tree:get_node()
         if not node then return end
 

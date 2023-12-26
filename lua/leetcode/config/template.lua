@@ -94,12 +94,22 @@ local M = {
         ---@type fun()[]
         LeetEnter = {},
 
-        ---@type fun(question: { lang: string })[]
+        ---@type fun(question: lc.ui.Question)[]
         LeetQuestionNew = {},
     },
 
     ---@type boolean
     image_support = false, -- setting this to `true` will disable question description wrap
+
+    keys = {
+        toggle = { "q", "<Esc>" }, ---@type string|string[]
+        confirm = { "<CR>" }, ---@type string|string[]
+
+        reset_testcases = "r", ---@type string
+        use_testcase = "U", ---@type string
+        focus_testcases = "H", ---@type string
+        focus_result = "L", ---@type string
+    },
 }
 
 return M

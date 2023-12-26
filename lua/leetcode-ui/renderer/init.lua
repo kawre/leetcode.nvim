@@ -1,6 +1,6 @@
-local Padding = require("leetcode-ui.lines.padding")
-local Opts = require("leetcode-ui.opts")
 local Group = require("leetcode-ui.group")
+local config = require("leetcode.config")
+local keys = config.user.keys
 
 local log = require("leetcode.logger")
 
@@ -24,7 +24,7 @@ function Renderer:draw(component)
     self.bufnr = component.bufnr
     self.winid = component.winid
 
-    self:map("n", "<CR>", function() self:handle_press() end)
+    self:map("n", keys.confirm, function() self:handle_press() end)
 
     self:clear_keymaps()
     self._.buttons = {}
