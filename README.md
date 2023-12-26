@@ -135,6 +135,16 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
     ---@type boolean
     image_support = false, -- setting this to `true` will disable question description wrap
+
+    keys = {
+        toggle = { "q", "<Esc>" }, ---@type string|string[]
+        confirm = { "<CR>" }, ---@type string|string[]
+
+        reset_testcases = "r", ---@type string
+        use_testcase = "U", ---@type string
+        focus_testcases = "H", ---@type string
+        focus_result = "L", ---@type string
+    },
 }
 ```
 

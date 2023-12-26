@@ -18,19 +18,6 @@ end
 function leetcode.setup_cmds()
     local cmd = require("leetcode.command")
     cmd.setup()
-
-    -- deprecate
-    local utils = require("leetcode.utils")
-    utils.deprecate_usr_cmd("LcConsole", "Leet console")
-    utils.deprecate_usr_cmd("LcHints", "Leet hints")
-    utils.deprecate_usr_cmd("LcMenu", "Leet")
-    utils.deprecate_usr_cmd("LcTabs", "Leet tabs")
-    utils.deprecate_usr_cmd("LcQuestionTabs", "Leet tabs")
-    utils.deprecate_usr_cmd("LcLanguage", "Leet lang")
-    utils.deprecate_usr_cmd("LcDescriptionToggle", "Leet desc toggle")
-    utils.deprecate_usr_cmd("LcRun", "Leet run")
-    utils.deprecate_usr_cmd("LcSubmit", "Leet submit")
-    utils.deprecate_usr_cmd("LcFix", "Leet fix")
 end
 
 function leetcode.validate()

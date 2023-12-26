@@ -142,6 +142,16 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
     ---@type boolean
     image_support = false, -- setting this to `true` will disable question description wrap
+
+    keys = {
+        toggle = { "q", "<Esc>" }, ---@type string|string[]
+        confirm = { "<CR>" }, ---@type string|string[]
+
+        reset_testcases = "r", ---@type string
+        use_testcase = "U", ---@type string
+        focus_testcases = "H", ---@type string
+        focus_result = "L", ---@type string
+    },
 }
 ```
 

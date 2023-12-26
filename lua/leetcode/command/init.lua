@@ -191,7 +191,7 @@ function cmd.info()
 end
 
 function cmd.hints()
-    cmd.deprecate("Leet hints", "Leet info")
+    -- cmd.deprecate("Leet hints", "Leet info")
     cmd.info()
 end
 
@@ -338,6 +338,7 @@ cmd.commands = {
     menu = { cmd.menu },
     console = { cmd.console },
     info = { cmd.info },
+    hints = { cmd.hints },
     tabs = { cmd.question_tabs },
     lang = { cmd.change_lang },
     run = { cmd.q_run },
@@ -374,9 +375,6 @@ cmd.commands = {
     cache = {
         update = { cmd.cache_update },
     },
-
-    ---@deprecated
-    hints = { cmd.hints },
 }
 
 return cmd
