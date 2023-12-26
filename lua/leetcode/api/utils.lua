@@ -101,14 +101,29 @@ function utils.handle_res(out)
             msg = "curl failed",
         }
     elseif out.status >= 300 then
+        local ok, msg = pcall(function()
+            local dec = utils.decode(out.body)
+
+            if dec.error then return dec.error end
+
+            local tbl = {}
+            for _, e in ipairs(dec.errors) do
+                table.insert(tbl, e.message)
+            end
+
+            return table.concat(tbl, "\n")
+        end)
+
         res = out.body
         err = {
             code = 0,
             status = out.status,
             response = out,
-            msg = "http error " .. out.status,
+            msg = "http error " .. out.status .. (ok and ("\n\n" .. msg) or ""),
             out = out.body,
         }
+
+        log.info(err)
     else
         res = utils.decode(out.body)
     end
