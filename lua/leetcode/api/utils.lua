@@ -122,8 +122,6 @@ function utils.handle_res(out)
             msg = "http error " .. out.status .. (ok and ("\n\n" .. msg) or ""),
             out = out.body,
         }
-
-        log.info(err)
     else
         res = utils.decode(out.body)
     end

@@ -75,7 +75,7 @@ function Description:draw_imgs()
 
     local lines = vim.api.nvim_buf_get_lines(self.bufnr, 1, -1, false)
     for i, line in ipairs(lines) do
-        for link in line:gmatch("->%((http[s]?://%S+)%)") do
+        for link in line:gmatch("%((http[s]?://%S+)%)") do
             local img = self.images[link]
 
             if not img then
