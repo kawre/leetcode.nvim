@@ -37,6 +37,8 @@
 
 ---@alias lc.direction "col" | "row"
 
+---@alias lc.inject { before?: string|string[], after?: string|string[] }
+
 ---@class lc.UserConfig
 local M = {
     ---@type string
@@ -111,10 +113,7 @@ local M = {
         focus_result = "L", ---@type string
     },
 
-    inject = {
-      before = "", ---@type string|string[]
-      after = "", ---@type string|string[]
-    }
+    injector = {} ---@type table<lc.lang, lc.inject>
 }
 
 return M

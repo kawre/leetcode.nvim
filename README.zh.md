@@ -152,6 +152,8 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
         focus_testcases = "H", ---@type string
         focus_result = "L", ---@type string
     },
+
+    injector = {} ---@type table<lc.lang, lc.inject>
 }
 ```
 
@@ -217,6 +219,22 @@ hooks = {
     ---@type fun(question: { lang: string })[]
     LeetQuestionNew = {},
 },
+```
+
+### injector
+
+在你的答案前后注入额外代码，注入的代码不会被提交或测试。
+
+```lua
+injector = {
+    ["cpp"] = {
+        before = { "#include <bits/stdc++.h>", "using namespace std;" }, ---@type string|string[]
+        after = "int main(){}" ---@type string|string[]
+    },
+    ["java"] = {
+        before = "import java.util.*;", ---@type string|string[]
+    }
+}
 ```
 
 ### image support

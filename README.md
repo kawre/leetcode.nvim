@@ -145,6 +145,8 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         focus_testcases = "H", ---@type string
         focus_result = "L", ---@type string
     },
+
+    injector = {} ---@type table<lc.lang, lc.inject>
 }
 ```
 
@@ -210,6 +212,22 @@ hooks = {
     ---@type fun(question: { lang: string })[]
     LeetQuestionNew = {},
 },
+```
+
+### injector
+
+Inject code before or after your soluation, injected code won't be submitted or run.
+
+```lua
+injector = {
+    ["cpp"] = {
+        before = { "#include <bits/stdc++.h>", "using namespace std;" }, ---@type string|string[]
+        after = "int main(){}" ---@type string|string[]
+    },
+    ["java"] = {
+        before = "import java.util.*;", ---@type string|string[]
+    }
+}
 ```
 
 ### image support

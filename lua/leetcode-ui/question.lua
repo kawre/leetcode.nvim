@@ -19,35 +19,18 @@ local log = require("leetcode.logger")
 local Question = Object("LeetQuestion")
 
 function Question:get_snippet()
-    local inject = config.user.inject
-    -- If inject.start is a string, assign to inject_start
-    -- else if inject.start is a string[], join into inject_start with "\n" as separator
-    local inject_before = ""
-    local inject_after = ""
-
-    if type(inject.before) == "string" then
-        inject_before = inject.before
-    else
-        inject_before = table.concat(inject.before, "\n")
-    end
-    if type(inject.after) == "string" then
-        inject_after = inject.after
-    else
-        inject_after = table.concat(inject.after, "\n")
-    end
-
     local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
     local snip = vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
     if not snip then return end
 
     local lang = utils.get_lang(self.lang)
     snip.code = (snip.code or ""):gsub("\r\n", "\n")
-    return ("%s\n%s @leet start\n%s\n%s @leet end\n%s"):format(
-        inject_before,
+    return ("%s%s @leet start\n%s\n%s @leet end%s"):format(
+        self:generate_inject_string(true),
         lang.comment,
         snip.code,
         lang.comment,
-        inject_after
+        self:generate_inject_string(false)
     )
 end
 
@@ -58,6 +41,19 @@ function Question:create_file()
 
     self.file = config.home:joinpath(fn)
     if not self.file:exists() then self.file:write(self:get_snippet(), "w") end
+end
+
+---@private
+---@param before boolean
+function Question:generate_inject_string(before)
+    local injector = config.user.injector
+    if injector == nil or injector[self.lang] == nil then return "" end
+    local to_inject = before and injector[self.lang].before or injector[self.lang].after
+    if to_inject == nil or #to_inject == 0 then return "" end
+
+    if type(to_inject) ~= "string" then to_inject = table.concat(to_inject, "\n") end
+
+    return before and to_inject .. "\n" or "\n" .. to_inject
 end
 
 Question.unmount = vim.schedule_wrap(function(self)
