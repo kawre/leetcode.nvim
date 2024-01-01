@@ -19,13 +19,36 @@ local log = require("leetcode.logger")
 local Question = Object("LeetQuestion")
 
 function Question:get_snippet()
+    local inject = config.user.inject
+    -- If inject.start is a string, assign to inject_start
+    -- else if inject.start is a string[], join into inject_start with "\n" as separator
+    local inject_before = ""
+    local inject_after = ""
+
+    if type(inject.before) == "string" then
+        inject_before = inject.before
+    else
+        inject_before = table.concat(inject.before, "\n")
+    end
+    if type(inject.after) == "string" then
+        inject_after = inject.after
+    else
+        inject_after = table.concat(inject.after, "\n")
+    end
+
     local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
     local snip = vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
     if not snip then return end
 
     local lang = utils.get_lang(self.lang)
     snip.code = (snip.code or ""):gsub("\r\n", "\n")
-    return ("%s @leet start\n%s\n%s @leet end"):format(lang.comment, snip.code, lang.comment)
+    return ("%s\n%s @leet start\n%s\n%s @leet end\n%s"):format(
+        inject_before,
+        lang.comment,
+        snip.code,
+        lang.comment,
+        inject_after
+    )
 end
 
 ---@private

@@ -110,6 +110,11 @@ local M = {
         focus_testcases = "H", ---@type string
         focus_result = "L", ---@type string
     },
+
+    inject = {
+      before = "", ---@type string|string[]
+      after = "", ---@type string|string[]
+    }
 }
 
 return M
