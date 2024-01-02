@@ -37,6 +37,8 @@
 
 ---@alias lc.direction "col" | "row"
 
+---@alias lc.inject { before?: string|string[], after?: string|string[] }
+
 ---@class lc.UserConfig
 local M = {
     ---@type string
@@ -56,6 +58,8 @@ local M = {
 
     ---@type boolean
     logging = true,
+
+    injector = {}, ---@type table<lc.lang, lc.inject>
 
     cache = {
         update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
@@ -98,9 +102,6 @@ local M = {
         LeetQuestionNew = {},
     },
 
-    ---@type boolean
-    image_support = false, -- setting this to `true` will disable question description wrap
-
     keys = {
         toggle = { "q", "<Esc>" }, ---@type string|string[]
         confirm = { "<CR>" }, ---@type string|string[]
@@ -110,6 +111,9 @@ local M = {
         focus_testcases = "H", ---@type string
         focus_result = "L", ---@type string
     },
+
+    ---@type boolean
+    image_support = false, -- setting this to `true` will disable question description wrap
 }
 
 return M

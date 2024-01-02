@@ -145,6 +145,8 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         focus_testcases = "H", ---@type string
         focus_result = "L", ---@type string
     },
+
+    injector = {} ---@type table<lc.lang, lc.inject>
 }
 ```
 
@@ -198,6 +200,22 @@ Whether to log [leetcode.nvim] status notifications
 logging = true
 ```
 
+### injector
+
+Inject code before or after your solution, injected code won't be submitted or run.
+
+```lua
+injector = { ---@type table<lc.lang, lc.inject>
+    ["cpp"] = {
+        before = { "#include <bits/stdc++.h>", "using namespace std;" },
+        after = "int main() {}",
+    },
+    ["java"] = {
+        before = "import java.util.*;",
+    },
+}
+```
+
 ### hooks
 
 List of functions that get executed on specified event
@@ -207,7 +225,7 @@ hooks = {
     ---@type fun()[]
     LeetEnter = {},
 
-    ---@type fun(question: { lang: string })[]
+    ---@type fun(question: lc.ui.Question)[]
     LeetQuestionNew = {},
 },
 ```

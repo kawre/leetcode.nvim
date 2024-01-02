@@ -25,7 +25,10 @@ function Question:get_snippet()
 
     local lang = utils.get_lang(self.lang)
     snip.code = (snip.code or ""):gsub("\r\n", "\n")
-    return ("%s @leet start\n%s\n%s @leet end"):format(lang.comment, snip.code, lang.comment)
+
+    return self:injector(
+        ("%s @leet start\n%s\n%s @leet end"):format(lang.comment, snip.code, lang.comment)
+    )
 end
 
 ---@private
@@ -35,6 +38,37 @@ function Question:create_file()
 
     self.file = config.home:joinpath(fn)
     if not self.file:exists() then self.file:write(self:get_snippet(), "w") end
+end
+
+---@private
+---@param code string
+function Question:injector(code)
+    local injector = config.user.injector
+
+    local inject = injector[self.lang]
+    if not inject or vim.tbl_isempty(inject) then return code end
+
+    ---@param inj? string|string[]
+    ---@param before boolean
+    local function norm_inject(inj, before)
+        local res
+
+        if type(inj) == "table" then
+            res = table.concat(inj, "\n")
+        elseif type(inj) == "string" then
+            res = inj
+        end
+
+        if res and res ~= "" then
+            return before and (res .. "\n\n") or ("\n\n" .. res)
+        else
+            return ""
+        end
+    end
+
+    return norm_inject(inject.before, true) --
+        .. code
+        .. norm_inject(inject.after, false)
 end
 
 Question.unmount = vim.schedule_wrap(function(self)
