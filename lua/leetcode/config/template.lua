@@ -59,6 +59,8 @@ local M = {
     ---@type boolean
     logging = true,
 
+    injector = {}, ---@type table<lc.lang, lc.inject>
+
     cache = {
         update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
     },
@@ -100,9 +102,6 @@ local M = {
         LeetQuestionNew = {},
     },
 
-    ---@type boolean
-    image_support = false, -- setting this to `true` will disable question description wrap
-
     keys = {
         toggle = { "q", "<Esc>" }, ---@type string|string[]
         confirm = { "<CR>" }, ---@type string|string[]
@@ -113,7 +112,8 @@ local M = {
         focus_result = "L", ---@type string
     },
 
-    injector = {} ---@type table<lc.lang, lc.inject>
+    ---@type boolean
+    image_support = false, -- setting this to `true` will disable question description wrap
 }
 
 return M

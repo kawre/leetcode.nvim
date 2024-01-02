@@ -99,6 +99,8 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     ---@type boolean
     logging = true,
 
+    injector = {} ---@type table<lc.lang, lc.inject>
+
     cache = {
         update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
     },
@@ -152,8 +154,6 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
         focus_testcases = "H", ---@type string
         focus_result = "L", ---@type string
     },
-
-    injector = {} ---@type table<lc.lang, lc.inject>
 }
 ```
 
@@ -207,6 +207,22 @@ directory = vim.fn.stdpath("data") .. "/leetcode/"
 logging = true
 ```
 
+### injector
+
+在你的答案前后注入额外代码，注入的代码不会被提交或测试。
+
+```lua
+injector = { ---@type table<lc.lang, lc.inject>
+    ["cpp"] = {
+        before = { "#include <bits/stdc++.h>", "using namespace std;" },
+        after = "int main() {}",
+    },
+    ["java"] = {
+        before = "import java.util.*;",
+    },
+}
+```
+
 ### hooks
 
 在指定事件上执行的函数列表
@@ -216,25 +232,9 @@ hooks = {
     ---@type fun()[]
     LeetEnter = {},
 
-    ---@type fun(question: { lang: string })[]
+    ---@type fun(question: lc.ui.Question)[]
     LeetQuestionNew = {},
 },
-```
-
-### injector
-
-在你的答案前后注入额外代码，注入的代码不会被提交或测试。
-
-```lua
-injector = {
-    ["cpp"] = {
-        before = { "#include <bits/stdc++.h>", "using namespace std;" }, ---@type string|string[]
-        after = "int main(){}" ---@type string|string[]
-    },
-    ["java"] = {
-        before = "import java.util.*;", ---@type string|string[]
-    }
-}
 ```
 
 ### image support

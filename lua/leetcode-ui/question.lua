@@ -25,12 +25,9 @@ function Question:get_snippet()
 
     local lang = utils.get_lang(self.lang)
     snip.code = (snip.code or ""):gsub("\r\n", "\n")
-    return ("%s%s @leet start\n%s\n%s @leet end%s"):format(
-        self:generate_inject_string(true),
-        lang.comment,
-        snip.code,
-        lang.comment,
-        self:generate_inject_string(false)
+
+    return self:injector(
+        ("%s @leet start\n%s\n%s @leet end"):format(lang.comment, snip.code, lang.comment)
     )
 end
 
@@ -44,16 +41,34 @@ function Question:create_file()
 end
 
 ---@private
----@param before boolean
-function Question:generate_inject_string(before)
+---@param code string
+function Question:injector(code)
     local injector = config.user.injector
-    if injector == nil or injector[self.lang] == nil then return "" end
-    local to_inject = before and injector[self.lang].before or injector[self.lang].after
-    if to_inject == nil or #to_inject == 0 then return "" end
 
-    if type(to_inject) ~= "string" then to_inject = table.concat(to_inject, "\n") end
+    local inject = injector[self.lang]
+    if not inject or vim.tbl_isempty(inject) then return code end
 
-    return before and to_inject .. "\n" or "\n" .. to_inject
+    ---@param inj? string|string[]
+    ---@param before boolean
+    local function norm_inject(inj, before)
+        local res
+
+        if type(inj) == "table" then
+            res = table.concat(inj, "\n")
+        elseif type(inj) == "string" then
+            res = inj
+        end
+
+        if res and res ~= "" then
+            return before and (res .. "\n\n") or ("\n\n" .. res)
+        else
+            return ""
+        end
+    end
+
+    return norm_inject(inject.before, true) --
+        .. code
+        .. norm_inject(inject.after, false)
 end
 
 Question.unmount = vim.schedule_wrap(function(self)
