@@ -2,7 +2,7 @@
 
 🚨 **leetcode.nvim 目前处于 _alpha 阶段_ 开发中** 🚨
 
-______________________________________________________________________
+---
 
 # leetcode.nvim
 
@@ -73,11 +73,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
 要查看完整的配置类型，请参见 [template.lua](./lua/leetcode/config/template.lua)
 
-### ⚙️  默认配置
-
-<!-- <details> -->
-
-<!--   <summary>Click to see</summary> -->
+### ⚙️ 默认配置
 
 ```lua
 {
@@ -138,7 +134,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
         ---@type fun()[]
         LeetEnter = {},
 
-        ---@type fun(question: { lang: string })[]
+        ---@type fun(question: lc.ui.Question)[]
         LeetQuestionNew = {},
     },
 

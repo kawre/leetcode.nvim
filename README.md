@@ -2,7 +2,7 @@
 
 🚨 **leetcode.nvim is currently in the _alpha stage_ of development** 🚨
 
-______________________________________________________________________
+---
 
 # leetcode.nvim
 
@@ -92,6 +92,8 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     ---@type boolean
     logging = true,
 
+    injector = {} ---@type table<lc.lang, lc.inject>
+
     cache = {
         update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
     },
@@ -129,7 +131,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         ---@type fun()[]
         LeetEnter = {},
 
-        ---@type fun(question: { lang: string })[]
+        ---@type fun(question: lc.ui.Question)[]
         LeetQuestionNew = {},
     },
 
