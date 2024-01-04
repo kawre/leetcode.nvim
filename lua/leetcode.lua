@@ -10,7 +10,11 @@ function leetcode.should_skip()
     if usr_arg ~= arg then return true end
 
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
-    if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then return true end
+    if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then
+        local log = require("leetcode.logger")
+        log.warn(("Failed to initialize: `%s` is not an empty buffer"):format(usr_arg))
+        return true
+    end
 
     return false
 end
@@ -24,7 +28,24 @@ function leetcode.validate()
     local utils = require("leetcode.utils")
 
     assert(vim.fn.has("nvim-0.9.0") == 1, "Neovim >= 0.9.0 required")
-    assert(utils.get_lang(config.lang), "Unsupported Language: " .. config.lang)
+
+    if not utils.get_lang(config.lang) then --
+        ---@type lc.lang[]
+        local lang_slugs = vim.tbl_map(function(lang) return lang.slug end, config.langs)
+
+        local matches = {}
+        for _, slug in ipairs(lang_slugs) do
+            local percent = slug:match(config.lang) or config.lang:match(slug)
+            if percent then table.insert(matches, slug) end
+        end
+
+        if not vim.tbl_isempty(matches) then
+            local log = require("leetcode.logger")
+            log.warn("Did you mean: { " .. table.concat(matches, ", ") .. " }?")
+        end
+
+        error("Unsupported Language: " .. config.lang)
+    end
 end
 
 function leetcode.start()
