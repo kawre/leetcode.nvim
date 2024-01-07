@@ -92,7 +92,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     ---@type boolean
     logging = true,
 
-    injector = {} ---@type table<lc.lang, lc.inject>
+    injector = {}, ---@type table<lc.lang, lc.inject>
 
     cache = {
         update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
@@ -135,9 +135,6 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         LeetQuestionNew = {},
     },
 
-    ---@type boolean
-    image_support = false, -- setting this to `true` will disable question description wrap
-
     keys = {
         toggle = { "q", "<Esc>" }, ---@type string|string[]
         confirm = { "<CR>" }, ---@type string|string[]
@@ -148,7 +145,8 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         focus_result = "L", ---@type string
     },
 
-    injector = {} ---@type table<lc.lang, lc.inject>
+    ---@type boolean
+    image_support = false, -- setting this to `true` will disable question description wrap
 }
 ```
 

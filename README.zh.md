@@ -95,7 +95,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     ---@type boolean
     logging = true,
 
-    injector = {} ---@type table<lc.lang, lc.inject>
+    injector = {}, ---@type table<lc.lang, lc.inject>
 
     cache = {
         update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
@@ -138,9 +138,6 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
         LeetQuestionNew = {},
     },
 
-    ---@type boolean
-    image_support = false, -- setting this to `true` will disable question description wrap
-
     keys = {
         toggle = { "q", "<Esc>" }, ---@type string|string[]
         confirm = { "<CR>" }, ---@type string|string[]
@@ -150,6 +147,9 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
         focus_testcases = "H", ---@type string
         focus_result = "L", ---@type string
     },
+
+    ---@type boolean
+    image_support = false, -- setting this to `true` will disable question description wrap
 }
 ```
 
