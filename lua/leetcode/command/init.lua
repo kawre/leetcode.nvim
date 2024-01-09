@@ -137,6 +137,13 @@ function cmd.random_question(opts)
     local question = require("leetcode.api.question")
 
     if opts and opts.difficulty then opts.difficulty = opts.difficulty[1]:upper() end
+    if opts and opts.status then
+        opts.status = ({
+            ac = "AC",
+            notac = "TRIED",
+            todo = "NOT_STARTED",
+        })[opts.status[1]]
+    end
 
     local q, err = question.random(opts)
     if err then return log.err(err) end
