@@ -136,19 +136,25 @@ function Question:mount()
     return self
 end
 
----@return string
-function Question:lines()
+---@return integer, integer, string[]
+function Question:range()
     local lines = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, false)
     local start_i, end_i = 1, #lines
 
     for i, line in ipairs(lines) do
         if line:match("@leet start") then
             start_i = i + 1
-        else
-            if line:match("@leet end") then end_i = i - 1 end
+        elseif line:match("@leet end") then
+            end_i = i - 1
         end
     end
 
+    return start_i, end_i, lines
+end
+
+---@return string
+function Question:lines()
+    local start_i, end_i, lines = self:range()
     return table.concat(lines, "\n", start_i, end_i)
 end
 

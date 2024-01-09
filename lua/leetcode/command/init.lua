@@ -155,6 +155,15 @@ function cmd.menu()
     end
 end
 
+function cmd.yank()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if not q then return end
+
+    local start_i, end_i = q:range()
+    vim.cmd(("%d,%dyank"):format(start_i, end_i))
+end
+
 ---@param page lc-menu.page
 function cmd.menu_layout(page) _Lc_Menu:set_page(page) end
 
@@ -346,6 +355,7 @@ cmd.commands = {
     submit = { cmd.q_submit },
     daily = { cmd.qot },
     fix = { cmd.fix },
+    yank = { cmd.yank },
 
     list = {
         cmd.problems,
