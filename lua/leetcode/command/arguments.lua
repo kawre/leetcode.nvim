@@ -81,6 +81,7 @@ arguments.list = {
 
 arguments.random = {
     difficulty = { "easy", "medium", "hard" },
+    status = { "ac", "notac", "todo" },
     tags = topics,
 }
 
