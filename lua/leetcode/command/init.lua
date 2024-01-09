@@ -167,8 +167,11 @@ function cmd.yank()
     local q = utils.curr_question()
     if not q then return end
 
-    local start_i, end_i = q:range()
-    vim.cmd(("%d,%dyank"):format(start_i, end_i))
+    if vim.api.nvim_win_is_valid(q.winid) then
+        vim.api.nvim_set_current_win(q.winid)
+        local start_i, end_i = q:range()
+        vim.cmd(("%d,%dyank"):format(start_i, end_i))
+    end
 end
 
 ---@param page lc-menu.page
