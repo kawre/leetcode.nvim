@@ -3,7 +3,7 @@ local log = require("leetcode.logger")
 
 local config = require("leetcode.config")
 ---@type Path
-local file = config.home:joinpath((".cookie%s"):format(config.is_cn and "_cn" or ""))
+local file = config.cache_dir:joinpath((".cookie%s"):format(config.is_cn and "_cn" or ""))
 
 local hist = {}
 

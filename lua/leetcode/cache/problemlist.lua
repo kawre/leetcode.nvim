@@ -6,7 +6,7 @@ local config = require("leetcode.config")
 local interval = config.user.cache.update_interval
 
 ---@type Path
-local file = config.home:joinpath((".problemlist%s"):format(config.is_cn and "_cn" or ""))
+local file = config.cache_dir:joinpath((".problemlist%s"):format(config.is_cn and "_cn" or ""))
 
 ---@type { at: integer, payload: lc.cache.payload }
 local hist = nil

@@ -57,6 +57,9 @@ function leetcode.start()
     config.home = path:new(config.user.directory) ---@diagnostic disable-line
     config.home:mkdir()
 
+    config.cache_dir = path:new(vim.fn.stdpath("cache") .. "/leetcode/") ---@diagnostic disable-line
+    config.cache_dir:mkdir()
+
     vim.api.nvim_set_current_dir(config.home:absolute())
 
     leetcode.setup_cmds()

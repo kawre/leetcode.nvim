@@ -17,6 +17,7 @@ local config = {
     debug = false,
     lang = "cpp",
     home = {}, ---@type Path
+    cache_dir = {}, ---@type Path
     version = "1.0.1",
 
     translator = false,

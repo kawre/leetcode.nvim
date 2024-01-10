@@ -3,7 +3,7 @@ local interpreter = require("leetcode.api.interpreter")
 local config = require("leetcode.config")
 
 ---@type Path
-local leetbody = config.home:joinpath(".leetbody")
+local leetbody = config.cache_dir:joinpath(".leetbody")
 leetbody:touch()
 
 ---@class lc.Runner
