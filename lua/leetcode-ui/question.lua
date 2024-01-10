@@ -34,7 +34,8 @@ end
 ---@private
 function Question:create_file()
     local lang = utils.get_lang(self.lang)
-    local fn = ("%s.%s-%s.%s"):format(self.q.frontend_id, self.q.title_slug, lang.slug, lang.ft)
+    local alt = lang.alt and ("-" .. lang.alt) or ""
+    local fn = ("%s.%s%s.%s"):format(self.q.frontend_id, self.q.title_slug, alt, lang.ft)
 
     self.file = config.home:joinpath(fn)
     if not self.file:exists() then self.file:write(self:get_snippet(), "w") end
