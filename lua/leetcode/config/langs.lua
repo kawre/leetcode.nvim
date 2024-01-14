@@ -33,7 +33,7 @@ return {
         color = "#306998",
         ft = "py",
         comment = "#",
-        alt = "py2",
+        alt = "python2",
     },
     {
         lang = "Python3",

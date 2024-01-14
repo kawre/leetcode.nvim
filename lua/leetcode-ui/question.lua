@@ -34,11 +34,25 @@ end
 ---@private
 function Question:create_file()
     local lang = utils.get_lang(self.lang)
-    local alt = lang.alt and ("-" .. lang.alt) or ""
-    local fn = ("%s.%s%s.%s"):format(self.q.frontend_id, self.q.title_slug, alt, lang.ft)
+    local alt = lang.alt and ("." .. lang.alt) or ""
 
-    self.file = config.home:joinpath(fn)
-    if not self.file:exists() then self.file:write(self:get_snippet(), "w") end
+    -- handle legacy file names first
+    local fn_legacy = --
+        ("%s.%s-%s.%s"):format(self.q.frontend_id, self.q.title_slug, lang.slug, lang.ft)
+    self.file = config.storage.home:joinpath(fn_legacy)
+
+    if self.file:exists() then --
+        return self.file:absolute()
+    end
+
+    local fn = ("%s.%s%s.%s"):format(self.q.frontend_id, self.q.title_slug, alt, lang.ft)
+    self.file = config.storage.home:joinpath(fn)
+
+    if not self.file:exists() then --
+        self.file:write(self:get_snippet(), "w")
+    end
+
+    return self.file:absolute()
 end
 
 ---@private
@@ -88,8 +102,7 @@ Question.unmount = vim.schedule_wrap(function(self)
 end)
 
 function Question:handle_mount()
-    self:create_file()
-    vim.cmd("$tabe " .. self.file:absolute())
+    vim.cmd("$tabe " .. self:create_file())
 
     -- https://github.com/kawre/leetcode.nvim/issues/14
     if self.lang == "rust" then pcall(require("rust-tools.standalone").start_standalone_client) end

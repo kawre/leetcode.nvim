@@ -39,6 +39,8 @@
 
 ---@alias lc.inject { before?: string|string[], after?: string|string[] }
 
+---@alias lc.storage table<"cache"|"home", string>
+
 ---@class lc.UserConfig
 local M = {
     ---@type string
@@ -53,8 +55,11 @@ local M = {
         translate_problems = true, ---@type boolean
     },
 
-    ---@type string
-    directory = vim.fn.stdpath("data") .. "/leetcode/",
+    ---@type lc.storage
+    storage = {
+        home = vim.fn.stdpath("data") .. "/leetcode/",
+        cache = vim.fn.stdpath("cache") .. "/leetcode/",
+    },
 
     ---@type boolean
     logging = true,
