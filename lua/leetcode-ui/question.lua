@@ -91,7 +91,16 @@ function Question:handle_mount()
     vim.cmd("$tabe " .. self.file:absolute())
 
     -- https://github.com/kawre/leetcode.nvim/issues/14
-    if self.lang == "rust" then pcall(require("rust-tools.standalone").start_standalone_client) end
+    if self.lang == "rust" then
+        local ok, tool = pcall(require, "rust-tools.standalone")
+        if not ok then
+            if not pcall(require, "rustaceanvim") then
+                log.warn("Plugin rust-tool.nvim either rustaceanvim for rust not found.")
+            end
+        else
+            pcall(tool.start_standalone_client)
+        end
+    end
 
     self.bufnr = vim.api.nvim_get_current_buf()
     self.winid = vim.api.nvim_get_current_win()
