@@ -31,7 +31,7 @@ function Auth.handle(res, err)
     local auth = res.data.userStatus
     err = {}
 
-    if auth.id == vim.NIL then
+    if (not config.is_cn and auth.id == vim.NIL) or (config.is_cn and auth.slug == vim.NIL) then
         err.msg = "Session expired?"
     elseif not auth.is_signed_in then
         err.msg = "Sign-in failed"

@@ -61,6 +61,8 @@ function Cases:init(item, parent)
     local total = item.total_testcases ~= vim.NIL and item.total_testcases or 0
     for i = 1, total do
         self.cases[i] = Case({
+            -- TODO: cache the testcases on submission,
+            -- so it doesn't get out of sync
             input = self.console.testcase.testcases[i],
             output = item.code_answer[i],
             expected = item.expected_code_answer[i],
