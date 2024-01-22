@@ -21,6 +21,29 @@ function Menu:draw()
     return self
 end
 
+function Menu:is_open()
+    return self.winid
+        and vim.api.nvim_win_is_valid(self.winid)
+        and vim.api.nvim_win_get_buf(self.winid) == self.bufnr
+end
+
+function Menu:close()
+    if not self.winid or not vim.api.nvim_win_is_valid(self.winid) then return end
+    vim.api.nvim_buf_delete(self.bufnr, { force = true })
+    self.bufnr = nil
+    -- close the menu window if it is not the last window
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        if
+            win ~= self.winid
+            and vim.api.nvim_win_get_config(win).relative == ""
+            and vim.api.nvim_win_is_valid(self.winid)
+        then
+            vim.api.nvim_win_close(self.winid, true)
+            break
+        end
+    end
+end
+
 ---@private
 function Menu:autocmds()
     local group_id = vim.api.nvim_create_augroup("leetcode_menu", { clear = true })
@@ -82,9 +105,6 @@ function Menu:set_page(name)
 end
 
 function Menu:apply_options()
-    vim.api.nvim_buf_set_name(self.bufnr, "")
-    pcall(vim.diagnostic.disable, self.bufnr)
-
     utils.set_buf_opts(self.bufnr, {
         modifiable = false,
         buflisted = false,
@@ -110,6 +130,41 @@ function Menu:apply_options()
 end
 
 function Menu:mount()
+    if self.winid and vim.api.nvim_win_is_valid(self.winid) then
+        vim.api.nvim_set_current_win(self.winid)
+    else
+        vim.cmd.split()
+        self.winid = vim.api.nvim_get_current_win()
+        -- Teardown all other windows (we are initializing the UI)
+        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+            if win ~= self.winid and vim.api.nvim_win_is_valid(win) then
+                vim.api.nvim_win_close(win, true)
+            end
+        end
+    end
+    if self.bufnr == nil or not vim.api.nvim_buf_is_valid(self.bufnr) then
+        self.bufnr = vim.api.nvim_create_buf(false, true)
+        -- Ensure we don't keep the buffer handle around after the buffer is
+        -- deleted.
+        vim.api.nvim_create_autocmd({
+            "BufUnload",
+            "BufDelete",
+            "BufWipeout",
+        }, {
+            buffer = self.bufnr,
+            callback = function() self.bufnr = nil end,
+        })
+        -- Ensure we don't try to clear nonexistent maps in draw() when
+        -- we have just created the buffer.
+        self._.keymaps = {}
+    end
+    -- Ensure the correct buffer is displayed.
+    -- We need to set the buffer if we've just created the window,
+    -- and if the window was not just created then we need to ensure
+    -- the buffer is set in case the user has changed it.
+    if vim.api.nvim_win_get_buf(self.winid) ~= self.bufnr then
+        vim.api.nvim_win_set_buf(self.winid, self.bufnr)
+    end
     if cookie.get() then
         self:set_page("loading")
 
@@ -143,9 +198,6 @@ function Menu:init()
         prev = nil,
     }
     self.maps = {}
-
-    self.bufnr = vim.api.nvim_get_current_buf()
-    self.winid = vim.api.nvim_get_current_win()
 
     _Lc_Menu = self
 end

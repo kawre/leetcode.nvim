@@ -1,5 +1,6 @@
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
+local utils = require("leetcode.utils")
 
 ---@class lc.LeetCode
 local leetcode = {}
@@ -43,15 +44,10 @@ function leetcode.start(on_vimenter)
 
     leetcode.setup_cmds()
 
-    local utils = require("leetcode.utils")
     utils.exec_hooks("LeetEnter")
 
     local theme = require("leetcode.theme")
     theme.setup()
-
-    if not on_vimenter then --
-        vim.cmd.enew()
-    end
 
     local Menu = require("leetcode-ui.renderer.menu")
     Menu():mount()
@@ -63,7 +59,7 @@ end
 function leetcode.setup(cfg)
     config.apply(cfg or {})
 
-    vim.api.nvim_create_user_command("Leet", require("leetcode.command").start_with_cmd, {
+    vim.api.nvim_create_user_command("Leet", function() require("leetcode").start(false) end, {
         bar = true,
         bang = true,
         desc = "Open leetcode.nvim",

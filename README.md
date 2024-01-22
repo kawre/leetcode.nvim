@@ -245,6 +245,8 @@ image_support = false, -- setting this to `true` will disable question descripti
 
 - `menu` same as `Leet`
 
+- [`exit`](#exiting-leetcodenvim) closes [leetcode.nvim]
+
 - `console` opens console pop-up for currently opened question
 
 - `info` opens a pop-up containing information about the currently opened question
@@ -292,16 +294,25 @@ Leet list status=<status> difficulty=<difficulty>
 ## 🚀 Usage
 
 This plugin is meant to be used within a **fresh** [Neovim] instance.
-Meaning that to launch [leetcode.nvim] you **have** to pass
+Meaning that to launch [leetcode.nvim] you can to pass
 [`arg`](#arg) as the _first and **only**_ [Neovim] argument
 
 ```
 nvim leetcode.nvim
 ```
 
+You can also use the `:Leet` command to open [leetcode.nvim] at any time.
+
 ### Switching between questions
 
 To switch between questions, use `Leet tabs`
+
+### Exiting [leetcode.nvim]
+
+If [leetcode.nvim] was started from the cmdline with `nvim leetcode.nvim`, pressing `q` in the menu
+or running `:Leet exit` will close nvim. If [leetcode.nvim] was started from a normal nvim session using
+the `:Leet` command, pressing `q` in the menu or running `:Leet exit` will only close the [leetcode.nvim]
+UI.
 
 ### Sign In
 
@@ -328,6 +339,8 @@ return {
     ...
 }
 ```
+
+> Note: If you intend to use `:Leet` to open [leetcode.nvim], you can lazy load the plugin normally.
 
 ## ✅ Todo
 
