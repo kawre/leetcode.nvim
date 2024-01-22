@@ -8,6 +8,7 @@ local Button = require("leetcode-ui.lines.button.menu")
 local ExitButton = require("leetcode-ui.lines.button.menu.exit")
 
 local cmd = require("leetcode.command")
+local config = require("leetcode.config")
 
 local page = Page()
 
@@ -28,6 +29,8 @@ page:insert(Buttons({
     exit,
 }))
 
-page:insert(Footer())
+local footer = Footer()
+footer:append("leetcode." .. config.domain)
+page:insert(footer)
 
 return page
