@@ -3,7 +3,7 @@ local config = require("leetcode.config")
 ---@class lc.translate
 local translate = {
     ["problems"] = "题库",
-    ["statistics"] = "统计学",
+    ["statistics"] = "统计",
     ["cookie"] = "Cookie",
     ["cache"] = "缓存",
     ["exit"] = "退出",

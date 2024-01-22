@@ -29,6 +29,7 @@ function Testcase:populate()
     for i, case in ipairs(self.console.question.q.testcase_list) do
         if i ~= 1 then table.insert(tbl, "") end
 
+        -- TODO: Think of a better way to do this. Don't store testcases as a single strings
         table.insert(self.testcases, case:gsub("\n", " ")[1])
 
         for s in vim.gsplit(case, "\n", { trimempty = true }) do
