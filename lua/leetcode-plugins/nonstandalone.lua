@@ -1,13 +1,8 @@
+local leetcode = require("leetcode")
 local config = require("leetcode.config")
-local log = require("leetcode.logger")
-
----@class lc.LeetCode
-local leetcode = {}
 
 ---@param on_vimenter boolean
----
----@return boolean, boolean?
-function leetcode.should_skip(on_vimenter)
+leetcode.should_skip = function(on_vimenter)
     if on_vimenter then
         if vim.fn.argc() ~= 1 then return true end
 
@@ -23,7 +18,7 @@ function leetcode.should_skip(on_vimenter)
         for _, buf_id in pairs(vim.api.nvim_list_bufs()) do
             local bufinfo = vim.fn.getbufinfo(buf_id)[1]
             if bufinfo and (bufinfo.listed == 1 and #bufinfo.windows > 0) then --
-                return true, true
+                return false, true
             end
         end
     end
@@ -31,18 +26,16 @@ function leetcode.should_skip(on_vimenter)
     return false
 end
 
-function leetcode.setup_cmds() require("leetcode.command").setup() end
-
 ---@param on_vimenter boolean
-function leetcode.start(on_vimenter)
-    if leetcode.should_skip(on_vimenter) then --
+leetcode.start = function(on_vimenter)
+    local skip, buflisted = leetcode.should_skip(on_vimenter)
+    if skip then --
         return false
     end
 
     vim.api.nvim_set_current_dir(config.storage.home:absolute())
 
     leetcode.setup_cmds()
-    -- config.load_plugins()
 
     local utils = require("leetcode.utils")
     utils.exec_hooks("LeetEnter")
@@ -51,7 +44,11 @@ function leetcode.start(on_vimenter)
     theme.setup()
 
     if not on_vimenter then --
-        vim.cmd.enew()
+        if buflisted then
+            vim.cmd.tabe()
+        else
+            vim.cmd.enew()
+        end
     end
 
     local Menu = require("leetcode-ui.renderer.menu")
@@ -60,23 +57,9 @@ function leetcode.start(on_vimenter)
     return true
 end
 
----@param cfg? lc.UserConfig
-function leetcode.setup(cfg)
-    config.apply(cfg or {})
+---@class lc.plugins.cn
+local nonstandalone = {}
 
-    vim.api.nvim_create_user_command("Leet", require("leetcode.command").start_with_cmd, {
-        bar = true,
-        bang = true,
-        desc = "Open leetcode.nvim",
-    })
+function nonstandalone.load() end
 
-    local group_id = vim.api.nvim_create_augroup("leetcode_start", { clear = true })
-    vim.api.nvim_create_autocmd("VimEnter", {
-        group = group_id,
-        pattern = "*",
-        nested = true,
-        callback = function() leetcode.start(true) end,
-    })
-end
-
-return leetcode
+return nonstandalone

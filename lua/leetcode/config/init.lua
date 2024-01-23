@@ -85,7 +85,7 @@ function config.validate()
 end
 
 function config.load_plugins()
-    local plugins = {}
+    local plugins = { "nonstandalone" }
 
     if config.user.cn.enabled then
         config.translator = config.user.cn.translator
