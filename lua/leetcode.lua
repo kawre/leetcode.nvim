@@ -23,7 +23,7 @@ function leetcode.should_skip(on_vimenter)
         for _, buf_id in pairs(vim.api.nvim_list_bufs()) do
             local bufinfo = vim.fn.getbufinfo(buf_id)[1]
             if bufinfo and (bufinfo.listed == 1 and #bufinfo.windows > 0) then --
-                return true, true
+                return true
             end
         end
     end
@@ -42,7 +42,6 @@ function leetcode.start(on_vimenter)
     vim.api.nvim_set_current_dir(config.storage.home:absolute())
 
     leetcode.setup_cmds()
-    -- config.load_plugins()
 
     local utils = require("leetcode.utils")
     utils.exec_hooks("LeetEnter")

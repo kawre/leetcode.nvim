@@ -11,6 +11,7 @@ leetcode.should_skip = function(on_vimenter)
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
         if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then
+            local log = require("leetcode.logger")
             log.warn(("Failed to initialize: `%s` is not an empty buffer"):format(usr_arg))
             return true
         end
@@ -57,7 +58,7 @@ leetcode.start = function(on_vimenter)
     return true
 end
 
----@class lc.plugins.cn
+---@class lc.plugins.nonstandalone
 local nonstandalone = {}
 
 function nonstandalone.load() end
