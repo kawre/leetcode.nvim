@@ -153,6 +153,16 @@ function cmd.random_question(opts)
     Question(item):mount()
 end
 
+function cmd.start_with_cmd()
+    local leetcode = require("leetcode")
+
+    if leetcode.start(false) then
+        cmd.menu()
+    else
+        log.warn("Failed to initialize")
+    end
+end
+
 function cmd.menu()
     local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, _Lc_Menu.winid)
     if ok then
