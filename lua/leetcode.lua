@@ -40,7 +40,7 @@ function leetcode.start(on_vimenter)
     vim.api.nvim_set_current_dir(config.storage.home:absolute())
 
     leetcode.setup_cmds()
-    config.load_plugins()
+    -- config.load_plugins()
 
     local utils = require("leetcode.utils")
     utils.exec_hooks("LeetEnter")

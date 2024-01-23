@@ -56,6 +56,8 @@ function config.apply(cfg)
 
     config.storage.cache = P:new(config.user.storage.cache) ---@diagnostic disable-line
     config.storage.cache:mkdir()
+
+    config.load_plugins()
 end
 
 function config.validate()
