@@ -36,8 +36,6 @@ leetcode.start = function(on_vimenter)
         return false
     end
 
-    vim.api.nvim_set_current_dir(config.storage.home:absolute())
-
     leetcode.setup_cmds()
 
     local utils = require("leetcode.utils")
@@ -54,6 +52,9 @@ leetcode.start = function(on_vimenter)
             vim.cmd.enew()
         end
     end
+
+    --- TODO: maybe cache the previous cwd and restore it when quitting?
+    if standalone then vim.api.nvim_set_current_dir(config.storage.home:absolute()) end
 
     local Menu = require("leetcode-ui.renderer.menu")
     Menu():mount()
