@@ -73,4 +73,6 @@ leetcode.stop = function()
         bang = true,
         desc = "Open leetcode.nvim",
     })
+
+    require("leetcode.utils").exec_hooks("LeetLeave")
 end

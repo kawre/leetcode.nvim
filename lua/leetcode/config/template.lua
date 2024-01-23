@@ -26,6 +26,7 @@
 
 ---@alias lc.hook
 ---| "LeetEnter"
+---| "LeetLeave"
 ---| "LeetQuestionNew"
 
 ---@alias lc.size
@@ -109,6 +110,9 @@ local M = {
 
         ---@type fun(question: lc.ui.Question)[]
         LeetQuestionNew = {},
+
+        ---@type fun()[]
+        LeetLeave = {},
     },
 
     keys = {

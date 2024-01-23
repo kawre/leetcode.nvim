@@ -133,9 +133,7 @@ function Menu:apply_options()
 end
 
 function Menu:unmount()
-    for _, q in ipairs(_Lc_questions) do
-        q:unmount()
-    end
+    require("leetcode.command").q_close_all()
 
     pcall(vim.api.nvim_buf_delete, self.bufnr, { force = true })
     pcall(vim.api.nvim_win_close, self.winid, true)
