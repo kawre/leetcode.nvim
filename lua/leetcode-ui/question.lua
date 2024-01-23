@@ -86,19 +86,23 @@ function Question:injector(code)
         .. norm_inject(inject.after, false)
 end
 
+---@param self lc.ui.Question
 Question.unmount = vim.schedule_wrap(function(self)
     self.info:unmount()
     self.console:unmount()
     self.description:unmount()
 
     if vim.api.nvim_buf_is_valid(self.bufnr) then
-        vim.api.nvim_buf_delete(self.bufnr, { force = true })
+        pcall(vim.api.nvim_buf_delete, self.bufnr, { force = true })
     end
+
     if vim.api.nvim_win_is_valid(self.winid) then --
-        vim.api.nvim_win_close(self.winid, true)
+        pcall(vim.api.nvim_win_close, self.winid, true)
     end
 
     _Lc_questions = vim.tbl_filter(function(q) return q.bufnr ~= self.bufnr end, _Lc_questions)
+
+    self = nil
 end)
 
 function Question:handle_mount()

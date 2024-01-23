@@ -4,7 +4,7 @@ local P = require("plenary.path")
 ---@type lc.ui.Question[]
 _Lc_questions = {}
 
----@type lc.ui.menu
+---@type lc.ui.Menu
 _Lc_Menu = {} ---@diagnostic disable-line
 
 ---@class lc.Settings
@@ -85,11 +85,15 @@ function config.validate()
 end
 
 function config.load_plugins()
-    local plugins = { "nonstandalone" }
+    local plugins = {}
 
     if config.user.cn.enabled then
         config.translator = config.user.cn.translator
         table.insert(plugins, "cn")
+    end
+
+    for plugin, enabled in pairs(config.user.plugins) do
+        if enabled then table.insert(plugins, plugin) end
     end
 
     for _, plugin in ipairs(plugins) do

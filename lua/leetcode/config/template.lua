@@ -61,6 +61,10 @@ local M = {
         cache = vim.fn.stdpath("cache") .. "/leetcode/",
     },
 
+    plugins = {
+        nonstandalone = false, ---@type boolean
+    },
+
     ---@type boolean
     logging = true,
 
