@@ -227,6 +227,9 @@ hooks = {
 
     ---@type fun(question: lc.ui.Question)[]
     LeetQuestionNew = {},
+
+    ---@type fun()[]
+    LeetLeave = {},
 },
 ```
 

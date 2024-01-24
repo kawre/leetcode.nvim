@@ -4,7 +4,7 @@ local config = require("leetcode.config")
 local utils = require("leetcode-ui.utils")
 local Renderer = require("leetcode-ui.renderer")
 
----@class lc.ui.menu : lc.ui.Renderer
+---@class lc.ui.Menu : lc.ui.Renderer
 ---@field cursor lc-menu.cursor
 ---@field maps table
 local Menu = Renderer:extend("LeetMenu")
@@ -110,7 +110,9 @@ end
 
 function Menu:_unmount()
     for _, tabp in ipairs(require("leetcode.utils").question_tabs()) do
-        tabp.question:_unmount()
+        if vim.api.nvim_buf_is_valid(tabp.question.bufnr) then
+            vim.api.nvim_buf_delete(tabp.question.bufnr, { force = true })
+        end
     end
 
     pcall(vim.api.nvim_buf_delete, self.bufnr, { force = true })
