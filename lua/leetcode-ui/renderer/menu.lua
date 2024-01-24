@@ -22,29 +22,6 @@ function Menu:draw()
     return self
 end
 
-function Menu:is_open()
-    return self.winid
-        and vim.api.nvim_win_is_valid(self.winid)
-        and vim.api.nvim_win_get_buf(self.winid) == self.bufnr
-end
-
-function Menu:close()
-    if not self.winid or not vim.api.nvim_win_is_valid(self.winid) then return end
-    vim.api.nvim_buf_delete(self.bufnr, { force = true })
-    self.bufnr = nil
-    -- close the menu window if it is not the last window
-    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-        if
-            win ~= self.winid
-            and vim.api.nvim_win_get_config(win).relative == ""
-            and vim.api.nvim_win_is_valid(self.winid)
-        then
-            vim.api.nvim_win_close(self.winid, true)
-            break
-        end
-    end
-end
-
 ---@private
 function Menu:autocmds()
     local group_id = vim.api.nvim_create_augroup("leetcode_menu", { clear = true })

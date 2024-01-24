@@ -1,13 +1,11 @@
 local config = require("leetcode.config")
-local log = require("leetcode.logger")
-local utils = require("leetcode.utils")
 
 ---@class lc.LeetCode
 local leetcode = {}
 
 ---@param on_vimenter boolean
 ---
----@return boolean, boolean?
+---@return boolean
 function leetcode.should_skip(on_vimenter)
     if on_vimenter then
         if vim.fn.argc() ~= 1 then return true end
@@ -17,13 +15,16 @@ function leetcode.should_skip(on_vimenter)
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
         if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then
+            local log = require("leetcode.logger")
             log.warn(("Failed to initialize: `%s` is not an empty buffer"):format(usr_arg))
             return true
         end
     else
         for _, buf_id in pairs(vim.api.nvim_list_bufs()) do
             local bufinfo = vim.fn.getbufinfo(buf_id)[1]
-            if bufinfo and (bufinfo.listed == 1 and #bufinfo.windows > 0) then --
+            if bufinfo and (bufinfo.listed == 1 and #bufinfo.windows > 0) then
+                local log = require("leetcode.logger")
+                log.warn("Failed to initialize: `neovim` contains listed buffers")
                 return true
             end
         end
@@ -46,8 +47,6 @@ function leetcode.start(on_vimenter)
 
     leetcode.setup_cmds()
 
-    utils.exec_hooks("LeetEnter")
-
     local theme = require("leetcode.theme")
     theme.setup()
 
@@ -57,6 +56,9 @@ function leetcode.start(on_vimenter)
 
     local Menu = require("leetcode-ui.renderer.menu")
     Menu():mount()
+
+    local utils = require("leetcode.utils")
+    utils.exec_hooks("LeetEnter")
 
     return true
 end

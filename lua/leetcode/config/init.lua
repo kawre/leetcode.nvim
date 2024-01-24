@@ -94,37 +94,19 @@ function config.load_plugins()
 
     if config.user.cn.enabled then table.insert(plugins, "cn") end
 
-    for _, plugin in ipairs(plugins) do
-        local ok, plug = pcall(require, "leetcode-plugins." .. plugin)
-        if ok then
-            if not (plug.opts or {}).lazy then
-                plug.load()
-            else
-                table.insert(lazy_plugs, plug.load)
-            end
-        else
-            local log = require("leetcode.logger")
-            log.error(plug)
-        end
-    end
-end
-
-function config.load_high_priority_plugins()
-    local plugins = {}
-
-    if config.user.cn.enabled then
-        config.translator = config.user.cn.translator
-        table.insert(plugins, "cn")
-    end
-
     for plugin, enabled in pairs(config.user.plugins) do
         if enabled then table.insert(plugins, plugin) end
     end
 
     for _, plugin in ipairs(plugins) do
         local ok, plug = pcall(require, "leetcode-plugins." .. plugin)
+
         if ok then
-            plug.load()
+            if not (plug.opts or {}).lazy then
+                plug.load()
+            else
+                table.insert(lazy_plugs, plug.load)
+            end
         else
             local log = require("leetcode.logger")
             log.error(plug)

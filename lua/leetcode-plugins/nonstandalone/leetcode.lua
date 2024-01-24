@@ -36,10 +36,9 @@ leetcode.start = function(on_vimenter)
         return false
     end
 
-    leetcode.setup_cmds()
+    config.setup()
 
-    local utils = require("leetcode.utils")
-    utils.exec_hooks("LeetEnter")
+    leetcode.setup_cmds()
 
     local theme = require("leetcode.theme")
     theme.setup()
@@ -58,6 +57,9 @@ leetcode.start = function(on_vimenter)
 
     local Menu = require("leetcode-ui.renderer.menu")
     Menu():mount()
+
+    local utils = require("leetcode.utils")
+    utils.exec_hooks("LeetEnter")
 
     return true
 end

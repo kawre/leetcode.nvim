@@ -155,12 +155,7 @@ end
 
 function cmd.start_with_cmd()
     local leetcode = require("leetcode")
-
-    if leetcode.start(false) then
-        cmd.menu()
-    else
-        log.warn("Failed to initialize")
-    end
+    if leetcode.start(false) then cmd.menu() end
 end
 
 function cmd.menu()
