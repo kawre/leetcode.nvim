@@ -291,13 +291,18 @@ Leet list status=<status> difficulty=<difficulty>
 
 ## 🚀 Usage
 
-This plugin is meant to be used within a **fresh** [Neovim] instance.
-Meaning that to launch [leetcode.nvim] you **have** to pass
-[`arg`](#arg) as the _first and **only**_ [Neovim] argument
+This plugin can be initiated in two ways:
+
+- To start [leetcode.nvim], simply pass [`arg`](#arg)
+  as the _first and **only**_ [Neovim] argument
 
 ```
 nvim leetcode.nvim
 ```
+
+- _**(Experimental)**_ Alternatively, you can use `:Leet` command to open [leetcode.nvim]
+  within your preferred dashboard plugin. The only requirement is that [Neovim]
+  must not have any listed buffers open.
 
 ### Switching between questions
 
@@ -328,13 +333,6 @@ return {
     ...
 }
 ```
-
-## ✅ Todo
-
-- \[x\] CN version
-- \[x\] Statistics menu page
-- \[ \] Docs
-- \[x\] Hints pop-up
 
 ## 🙌 Credits
 

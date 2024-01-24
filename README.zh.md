@@ -294,13 +294,17 @@ Leet list status=<status> difficulty=<difficulty>
 
 ## 🚀 使用方法
 
-此插件应该在 **全新** 的 [Neovim] 实例中使用。
-这意味着要启动 [leetcode.nvim]，您 **必须** 将
-[`arg`](#arg) 作为 _第一个且 **唯一**_ [Neovim] 参数
+该插件可以通过两种方式启动：
+
+- 要启动 [leetcode.nvim]，只需将 [`arg`](#arg)
+  作为 第一个且唯一 [Neovim] 参数传递
 
 ```
 nvim leetcode.nvim
 ```
+
+- _**(实验性)**_ 另外，您可以使用 `:Leet` 命令在您喜欢的仪表板插件中打开
+  [leetcode.nvim]。唯一的要求是 [Neovim] 不能有任何列出的缓冲区打开。
 
 ### 切换问题
 
@@ -331,13 +335,6 @@ return {
     ...
 }
 ```
-
-## ✅ 待办事项
-
-- \[x\] 中文版本
-- \[x\] 统计菜单页面
-- \[ \] 文档
-- \[x\] 提示弹出窗口
 
 ## 🙌 鸣谢
 
