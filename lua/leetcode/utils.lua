@@ -77,7 +77,7 @@ function utils.exec_hooks(event, ...)
     if not fns then log.error("unknown hook event: " .. event) end
 
     for i, fn in ipairs(fns) do
-        local ok, msg = pcall(fn, ...)
+        local ok, msg = pcall(vim.schedule_wrap(fn), ...)
         if not ok then log.error(("bad hook #%d in `%s` event: %s"):format(i, event, msg)) end
     end
 end

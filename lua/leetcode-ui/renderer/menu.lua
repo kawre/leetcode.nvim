@@ -4,7 +4,7 @@ local config = require("leetcode.config")
 local utils = require("leetcode-ui.utils")
 local Renderer = require("leetcode-ui.renderer")
 
----@class lc.ui.menu : lc.ui.Renderer
+---@class lc.ui.Menu : lc.ui.Renderer
 ---@field cursor lc-menu.cursor
 ---@field maps table
 local Menu = Renderer:extend("LeetMenu")
@@ -150,7 +150,7 @@ function Menu:init()
     _Lc_Menu = self
 end
 
----@type fun(): lc.ui.menu
+---@type fun(): lc.ui.Menu
 local LeetMenu = Menu
 
 return LeetMenu
