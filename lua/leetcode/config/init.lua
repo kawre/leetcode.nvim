@@ -7,7 +7,9 @@ _Lc_questions = {}
 ---@type lc.ui.menu
 _Lc_Menu = {} ---@diagnostic disable-line
 
----@class lc.Settings
+local lazy_plugs = {}
+
+---@class lc.Config
 local config = {
     default = template,
     user = template,
@@ -33,23 +35,24 @@ local config = {
 ---
 ---@param cfg lc.UserConfig Configurations to be merged.
 function config.apply(cfg)
-    cfg.storage = cfg.storage or {}
+    config.user = vim.tbl_deep_extend("force", config.default, cfg or {})
+    config.load_plugins()
+end
+
+function config.setup()
+    config.validate()
 
     -- deprecate `directory` config
-    if cfg.directory then
+    if config.user.directory then
         local log = require("leetcode.logger")
-        log.warn("Config: `directory` is deprecated. Use `storage.home` instead.")
-        cfg.storage.home = cfg.directory
+        log.warn("leetcode.nvim config: `directory` is deprecated. Use `storage.home` instead.")
+        config.user.storage.home = config.user.directory
     end
 
-    cfg.storage = vim.tbl_map(vim.fn.expand, cfg.storage)
-
-    config.user = vim.tbl_deep_extend("force", config.default, cfg)
+    config.user.storage = vim.tbl_map(vim.fn.expand, config.user.storage)
 
     config.debug = config.user.debug or false ---@diagnostic disable-line
     config.lang = config.user.lang
-
-    config.validate()
 
     config.storage.home = P:new(config.user.storage.home) ---@diagnostic disable-line
     config.storage.home:mkdir()
@@ -57,7 +60,9 @@ function config.apply(cfg)
     config.storage.cache = P:new(config.user.storage.cache) ---@diagnostic disable-line
     config.storage.cache:mkdir()
 
-    config.load_plugins()
+    for _, plug_load_fn in ipairs(lazy_plugs) do
+        plug_load_fn()
+    end
 end
 
 function config.validate()
@@ -85,6 +90,26 @@ function config.validate()
 end
 
 function config.load_plugins()
+    local plugins = {}
+
+    if config.user.cn.enabled then table.insert(plugins, "cn") end
+
+    for _, plugin in ipairs(plugins) do
+        local ok, plug = pcall(require, "leetcode-plugins." .. plugin)
+        if ok then
+            if not (plug.opts or {}).lazy then
+                plug.load()
+            else
+                table.insert(lazy_plugs, plug.load)
+            end
+        else
+            local log = require("leetcode.logger")
+            log.error(plug)
+        end
+    end
+end
+
+function config.load_high_priority_plugins()
     local plugins = {}
 
     if config.user.cn.enabled then
