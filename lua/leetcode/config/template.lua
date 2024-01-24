@@ -53,8 +53,8 @@ local M = {
 
     ---@type lc.storage
     storage = {
-        home = vim.fn.stdpath("data") .. "/leetcode/",
-        cache = vim.fn.stdpath("cache") .. "/leetcode/",
+        home = vim.fn.stdpath("data") .. "/leetcode",
+        cache = vim.fn.stdpath("cache") .. "/leetcode",
     },
 
     ---@type boolean
