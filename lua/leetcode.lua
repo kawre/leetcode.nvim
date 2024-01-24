@@ -25,6 +25,7 @@ function leetcode.should_skip(on_vimenter)
             if bufinfo and (bufinfo.listed == 1 and #bufinfo.windows > 0) then
                 local log = require("leetcode.logger")
                 log.warn("Failed to initialize: `neovim` contains listed buffers")
+                return true
             end
         end
     end
