@@ -9,7 +9,7 @@ local Lines = require("leetcode-ui.lines")
 
 local Line = require("leetcode-ui.line")
 
----@alias case_body { input: string, raw_input: string, output: string, expected: string, std_output: string }
+---@alias case_body { input: string[], raw_input: string, output: string, expected: string, std_output: string }
 
 ---@class lc.ui.Case : lc.ui.Group
 ---@field pre lc.ui.Lines
@@ -43,17 +43,16 @@ local function split_input(input)
 end
 
 ---@private
----@param input string
+---@param input string[]
 function Case:input(input)
     local key = t("Input")
 
     local group = Group({}, { spacing = 1 })
 
-    local s = split_input(input)
-    for i = 1, #s do
+    for i, case in ipairs(input) do
         local ok, param = pcall(function() return self.question.q.meta_data.params[i].name end)
         if ok then group:append(param .. " =", "leetcode_normal"):endl() end
-        group:append(s[i]):endgrp()
+        group:append(case):endgrp()
     end
 
     local title = Line():append(key, "leetcode_normal")

@@ -19,10 +19,6 @@
 ---| "erlang"
 ---| "elixir"
 ---| "bash"
----| "html"
----| "pythonml"
----| "react"
----| "vanillajs"
 
 ---@alias lc.hook
 ---| "LeetEnter"

@@ -4,7 +4,7 @@ local ConsolePopup = require("leetcode-ui.popup.console")
 local t = require("leetcode.translator")
 
 ---@class lc.ui.Console.TestcasePopup : lc.ui.Console.Popup
----@field testcases string[]
+---@field testcases table<string[][]>
 ---@field extmarks integer[]
 local Testcase = ConsolePopup:extend("LeetTestcasePopup")
 
@@ -16,9 +16,10 @@ function Testcase:content()
 
     local testcases = {}
     for tcase in vim.gsplit(str, "\n\n") do
-        local case = tcase:gsub("\n", " ")
-        table.insert(self.testcases, case)
-        testcases = vim.list_extend(testcases, vim.split(tcase, "\n"))
+        local s = vim.split(tcase, "\n")
+
+        table.insert(self.testcases, s)
+        testcases = vim.list_extend(testcases, s)
     end
 
     return testcases
@@ -29,8 +30,7 @@ function Testcase:populate()
     for i, case in ipairs(self.console.question.q.testcase_list) do
         if i ~= 1 then table.insert(tbl, "") end
 
-        -- TODO: Think of a better way to do this. Don't store testcases as a single strings
-        table.insert(self.testcases, case:gsub("\n", " ")[1])
+        table.insert(self.testcases, vim.split(case, "\n"))
 
         for s in vim.gsplit(case, "\n", { trimempty = true }) do
             table.insert(tbl, s)
