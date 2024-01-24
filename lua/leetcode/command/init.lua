@@ -177,8 +177,10 @@ function cmd.yank()
     local q = utils.curr_question()
     if not q then return end
 
-    if vim.api.nvim_win_is_valid(q.winid) then
+    if vim.api.nvim_buf_is_valid(q.bufnr) and vim.api.nvim_win_is_valid(q.winid) then
         vim.api.nvim_set_current_win(q.winid)
+        vim.api.nvim_set_current_buf(q.bufnr)
+
         local start_i, end_i = q:range()
         vim.cmd(("%d,%dyank"):format(start_i, end_i))
     end

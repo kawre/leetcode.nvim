@@ -40,6 +40,8 @@ function leetcode.start(on_vimenter)
         return false
     end
 
+    config.setup()
+
     vim.api.nvim_set_current_dir(config.storage.home:absolute())
 
     leetcode.setup_cmds()

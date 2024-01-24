@@ -19,10 +19,6 @@
 ---| "erlang"
 ---| "elixir"
 ---| "bash"
----| "html"
----| "pythonml"
----| "react"
----| "vanillajs"
 
 ---@alias lc.hook
 ---| "LeetEnter"
@@ -58,8 +54,8 @@ local M = {
 
     ---@type lc.storage
     storage = {
-        home = vim.fn.stdpath("data") .. "/leetcode/",
-        cache = vim.fn.stdpath("cache") .. "/leetcode/",
+        home = vim.fn.stdpath("data") .. "/leetcode",
+        cache = vim.fn.stdpath("cache") .. "/leetcode",
     },
 
     plugins = {
