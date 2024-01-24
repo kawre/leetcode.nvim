@@ -339,15 +339,6 @@ return {
 }
 ```
 
-> Note: If you intend to use `:Leet` to open [leetcode.nvim], you can lazy load the plugin normally.
-
-## ✅ Todo
-
-- \[x\] CN version
-- \[x\] Statistics menu page
-- \[ \] Docs
-- \[x\] Hints pop-up
-
 ## 🙌 Credits
 
 - [Leetbuddy.nvim](https://github.com/Dhanus3133/Leetbuddy.nvim)
