@@ -145,6 +145,8 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         focus_result = "L", ---@type string
     },
 
+    plugins = {},
+
     ---@type boolean
     image_support = false, -- setting this to `true` will disable question description wrap
 }
@@ -336,6 +338,24 @@ return {
         arg = leet_arg,
     },
     ...
+}
+```
+
+### Plugins
+
+#### Non-Standalone mode
+
+To run [leetcode.nvim] in a non-standalone mode (i.e. not with argument or an empty Neovim session),
+enable the "nonstandalone" plugin in your config:
+
+```lua
+return {
+    "kawre/leetcode.nvim",
+    opts = {
+        plugins = {
+            nonstandalone = true,
+        }
+    },
 }
 ```
 
