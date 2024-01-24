@@ -86,8 +86,7 @@ function Question:injector(code)
         .. norm_inject(inject.after, false)
 end
 
----@param self lc.ui.Question
-Question.unmount = vim.schedule_wrap(function(self)
+function Question:_unmount()
     self.info:unmount()
     self.console:unmount()
     self.description:unmount()
@@ -103,7 +102,10 @@ Question.unmount = vim.schedule_wrap(function(self)
     _Lc_questions = vim.tbl_filter(function(q) return q.bufnr ~= self.bufnr end, _Lc_questions)
 
     self = nil
-end)
+end
+
+---@param self lc.ui.Question
+Question.unmount = vim.schedule_wrap(function(self) self:_unmount() end)
 
 function Question:handle_mount()
     vim.cmd("$tabe " .. self:create_file())

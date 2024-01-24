@@ -64,11 +64,10 @@ leetcode.start = function(on_vimenter)
     return true
 end
 
-leetcode.stop = function()
+leetcode.stop = vim.schedule_wrap(function()
     if standalone then return vim.cmd.quitall() end
 
-    local Menu = require("leetcode-ui.renderer.menu")
-    Menu():unmount()
+    _Lc_Menu:_unmount()
 
     vim.api.nvim_create_user_command("Leet", require("leetcode.command").start_with_cmd, {
         bar = true,
@@ -77,4 +76,4 @@ leetcode.stop = function()
     })
 
     require("leetcode.utils").exec_hooks("LeetLeave")
-end
+end)

@@ -109,14 +109,19 @@ function Menu:apply_options()
     })
 end
 
-function Menu:unmount()
-    require("leetcode.command").q_close_all()
+function Menu:_unmount()
+    for _, tabp in ipairs(require("leetcode.utils").question_tabs()) do
+        tabp.question:_unmount()
+    end
 
     pcall(vim.api.nvim_buf_delete, self.bufnr, { force = true })
     pcall(vim.api.nvim_win_close, self.winid, true)
 
     self = nil
 end
+
+---@param self lc.ui.Menu
+Menu.unmount = vim.schedule_wrap(function(self) self:_unmount() end)
 
 function Menu:mount()
     if cookie.get() then
