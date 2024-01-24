@@ -1,6 +1,10 @@
 ---@class lc.plugins.nonstandalone
 local nonstandalone = {}
 
+nonstandalone.opts = {
+    lazy = false,
+}
+
 function nonstandalone.load() --
     require("leetcode-plugins.nonstandalone.exit")
     require("leetcode-plugins.nonstandalone.leetcode")
