@@ -89,8 +89,11 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
         translate_problems = true, ---@type boolean
     },
 
-    ---@type string
-    directory = vim.fn.stdpath("data") .. "/leetcode/",
+    ---@type lc.storage
+    storage = {
+        home = vim.fn.stdpath("data") .. "/leetcode",
+        cache = vim.fn.stdpath("cache") .. "/leetcode",
+    },
 
     ---@type boolean
     logging = true,
@@ -149,7 +152,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     },
 
     ---@type boolean
-    image_support = false, -- setting this to `true` will disable question description wrap
+    image_support = false,
 }
 ```
 
@@ -173,6 +176,34 @@ arg = "leetcode.nvim"
 lang = "cpp"
 ```
 
+<details>
+  <summary>可用编程语言</summary>
+
+| Language   | lang       |
+| ---------- | ---------- |
+| C++        | cpp        |
+| Java       | java       |
+| Python     | python     |
+| Python3    | python3    |
+| C          | c          |
+| C#         | csharp     |
+| JavaScript | javascript |
+| TypeScript | typescript |
+| PHP        | php        |
+| Swift      | swift      |
+| Kotlin     | kotlin     |
+| Dart       | dart       |
+| Go         | golang     |
+| Ruby       | ruby       |
+| Scala      | scala      |
+| Rust       | rust       |
+| Racket     | racket     |
+| Erlang     | erlang     |
+| Elixir     | elixir     |
+| Bash       | bash       |
+
+</details>
+
 ### cn
 
 将 [leetcode.com][leetcode] 替换为 [leetcode.cn]
@@ -185,13 +216,16 @@ cn = { -- leetcode.cn
 },
 ```
 
-### directory
+### storage
 
-存储 [leetcode.nvim] 数据的位置
+存储目录
 
 ```lua
----@type string
-directory = vim.fn.stdpath("data") .. "/leetcode/"
+---@type lc.storage
+storage = {
+    home = vim.fn.stdpath("data") .. "/leetcode",
+    cache = vim.fn.stdpath("cache") .. "/leetcode",
+},
 ```
 
 ### logging
@@ -237,6 +271,9 @@ hooks = {
 
 是否使用 [image.nvim] 渲染问题描述中的图片
 
+启用此选项将禁用问题描述的换行，因为
+https://github.com/3rd/image.nvim/issues/62#issuecomment-1778082534
+
 ```lua
 ---@type boolean
 image_support = false, -- 将此设置为 `true` 将禁用问题描述的换行
@@ -266,7 +303,7 @@ image_support = false, -- 将此设置为 `true` 将禁用问题描述的换行
 
 - `daily` 打开今天的问题
 
-- [`list`](#leet-list) 打开问题列表选择器
+- `list` 打开问题列表选择器
 
 - `desc` 切换问题描述
 
@@ -284,13 +321,19 @@ image_support = false, -- 将此设置为 `true` 将禁用问题描述的换行
 
   - `update` 更新缓存
 
-#### `Leet list`
+#### 可以带有可选参数。要堆叠参数值，请使用 `,` 将它们分隔开
 
-可以带有可选参数。要堆叠参数值，请使用 , 将它们分隔开
+- `Leet list`
 
-```
-Leet list status=<status> difficulty=<difficulty>
-```
+  ```
+  Leet list status=<status> difficulty=<difficulty>
+  ```
+
+- `Leet random`
+
+  ```
+  Leet random status=<status> difficulty=<difficulty> tags=<tags>
+  ```
 
 ## 🚀 使用方法
 
@@ -299,9 +342,9 @@ Leet list status=<status> difficulty=<difficulty>
 - 要启动 [leetcode.nvim]，只需将 [`arg`](#arg)
   作为 第一个且唯一 [Neovim] 参数传递
 
-```
-nvim leetcode.nvim
-```
+  ```
+  nvim leetcode.nvim
+  ```
 
 - _**(实验性)**_ 另外，您可以使用 `:Leet` 命令在您喜欢的仪表板插件中打开
   [leetcode.nvim]。唯一的要求是 [Neovim] 不能有任何列出的缓冲区打开。
@@ -318,23 +361,32 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4
 
 ## 🍴 示例
 
-### 懒加载
+### 💤 使用 [lazy.nvim] 进行延迟加载
 
-- 使用 [lazy.nvim] 实现正确的懒加载
+- 使用 [`arg`](#arg)
 
-```lua
-local leet_arg = "leetcode.nvim"
+  ```lua
+  local leet_arg = "leetcode.nvim"
 
-return {
-    "kawre/leetcode.nvim",
-    ...
-    lazy = leet_arg ~= vim.fn.argv()[1],
-    opts = {
-        arg = leet_arg,
-    },
-    ...
-}
-```
+  return {
+      "kawre/leetcode.nvim",
+      ...
+      lazy = leet_arg ~= vim.fn.argv()[1],
+      opts = {
+          arg = leet_arg,
+      },
+      ...
+  }
+  ```
+
+- 使用 `:Leet`，这将导致使用 [`arg`](#arg) 启动不起作用
+
+  ```lua
+  {
+      "kawre/leetcode.nvim",
+      cmd = "Leet",
+  }
+  ```
 
 ## 🙌 鸣谢
 

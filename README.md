@@ -86,8 +86,11 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         translate_problems = true, ---@type boolean
     },
 
-    ---@type string
-    directory = vim.fn.stdpath("data") .. "/leetcode/",
+    ---@type lc.storage
+    storage = {
+        home = vim.fn.stdpath("data") .. "/leetcode",
+        cache = vim.fn.stdpath("cache") .. "/leetcode",
+    },
 
     ---@type boolean
     logging = true,
@@ -146,7 +149,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     },
 
     ---@type boolean
-    image_support = false, -- setting this to `true` will disable question description wrap
+    image_support = false,
 }
 ```
 
@@ -170,6 +173,34 @@ Language to start your session with
 lang = "cpp"
 ```
 
+<details>
+  <summary>available languages</summary>
+
+| Language   | lang       |
+| ---------- | ---------- |
+| C++        | cpp        |
+| Java       | java       |
+| Python     | python     |
+| Python3    | python3    |
+| C          | c          |
+| C#         | csharp     |
+| JavaScript | javascript |
+| TypeScript | typescript |
+| PHP        | php        |
+| Swift      | swift      |
+| Kotlin     | kotlin     |
+| Dart       | dart       |
+| Go         | golang     |
+| Ruby       | ruby       |
+| Scala      | scala      |
+| Rust       | rust       |
+| Racket     | racket     |
+| Erlang     | erlang     |
+| Elixir     | elixir     |
+| Bash       | bash       |
+
+</details>
+
 ### cn
 
 Use [leetcode.cn] instead of [leetcode.com][leetcode]
@@ -182,13 +213,16 @@ cn = { -- leetcode.cn
 },
 ```
 
-### directory
+### storage
 
-Where to store [leetcode.nvim] data
+storage directories
 
 ```lua
----@type string
-directory = vim.fn.stdpath("data") .. "/leetcode/"
+---@type lc.storage
+storage = {
+    home = vim.fn.stdpath("data") .. "/leetcode",
+    cache = vim.fn.stdpath("cache") .. "/leetcode",
+},
 ```
 
 ### logging
@@ -234,9 +268,12 @@ hooks = {
 
 Whether to render question description images using [image.nvim]
 
+Enabling this will disable question description wrap,
+because of https://github.com/3rd/image.nvim/issues/62#issuecomment-1778082534
+
 ```lua
 ---@type boolean
-image_support = false, -- setting this to `true` will disable question description wrap
+image_support = false,
 ```
 
 ## 📋 Commands
@@ -263,7 +300,7 @@ image_support = false, -- setting this to `true` will disable question descripti
 
 - `daily` opens the question of today
 
-- [`list`](#leet-list) opens a problemlist picker
+- `list` opens a problemlist picker
 
 - `desc` toggle question description
 
@@ -281,13 +318,19 @@ image_support = false, -- setting this to `true` will disable question descripti
 
   - `update` updates cache
 
-#### `Leet list`
+#### Some commands can take optional arguments. To stack argument values separate them by a `,`
 
-Can take optional arguments. To stack argument values separate them by a `,`
+- `Leet list`
 
-```
-Leet list status=<status> difficulty=<difficulty>
-```
+  ```
+  Leet list status=<status> difficulty=<difficulty>
+  ```
+
+- `Leet random`
+
+  ```
+  Leet random status=<status> difficulty=<difficulty> tags=<tags>
+  ```
 
 ## 🚀 Usage
 
@@ -296,9 +339,9 @@ This plugin can be initiated in two ways:
 - To start [leetcode.nvim], simply pass [`arg`](#arg)
   as the _first and **only**_ [Neovim] argument
 
-```
-nvim leetcode.nvim
-```
+  ```
+  nvim leetcode.nvim
+  ```
 
 - _**(Experimental)**_ Alternatively, you can use `:Leet` command to open [leetcode.nvim]
   within your preferred dashboard plugin. The only requirement is that [Neovim]
@@ -316,23 +359,32 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4
 
 ## 🍴 Recipes
 
-### lazy loading
+### 💤 lazy loading with [lazy.nvim]
 
-- proper lazy loading with [lazy.nvim]
+- with [`arg`](#arg)
 
-```lua
-local leet_arg = "leetcode.nvim"
+  ```lua
+  local leet_arg = "leetcode.nvim"
 
-return {
-    "kawre/leetcode.nvim",
-    ...
-    lazy = leet_arg ~= vim.fn.argv()[1],
-    opts = {
-        arg = leet_arg,
-    },
-    ...
-}
-```
+  return {
+      "kawre/leetcode.nvim",
+      ...
+      lazy = leet_arg ~= vim.fn.argv()[1],
+      opts = {
+          arg = leet_arg,
+      },
+      ...
+  }
+  ```
+
+- with `:Leet`, this will make launching with [`arg`](#arg) not work
+
+  ```lua
+  {
+      "kawre/leetcode.nvim",
+      cmd = "Leet",
+  }
+  ```
 
 ## 🙌 Credits
 
