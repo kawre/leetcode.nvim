@@ -104,17 +104,17 @@ local function filter_questions(questions, opts)
 
     ---@param q lc.cache.Question
     return vim.tbl_filter(function(q)
-        local flag = true
-        if opts.difficulty then
-            if not vim.tbl_contains(opts.difficulty, q.difficulty:lower()) then return false end
+        local diff_flag = true
+        if opts.difficulty and not vim.tbl_contains(opts.difficulty, q.difficulty:lower()) then
+            diff_flag = false
         end
 
-        if opts.status then
-            if not q.status then return true end
-            if not vim.tbl_contains(opts.status, q.status) then return false end
+        local status_flag = true
+        if opts.status and not vim.tbl_contains(opts.status, q.status) then --
+            status_flag = false
         end
 
-        return true
+        return diff_flag and status_flag
     end, questions)
 end
 

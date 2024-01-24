@@ -367,15 +367,13 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4
 
   ```lua
   local leet_arg = "leetcode.nvim"
+  ```
 
-  return {
+  ```lua
+  {
       "kawre/leetcode.nvim",
-      ...
       lazy = leet_arg ~= vim.fn.argv()[1],
-      opts = {
-          arg = leet_arg,
-      },
-      ...
+      opts = { arg = leet_arg },
   }
   ```
 
