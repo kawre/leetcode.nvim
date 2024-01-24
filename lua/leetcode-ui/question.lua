@@ -31,7 +31,6 @@ function Question:get_snippet()
     )
 end
 
----@private
 function Question:create_file()
     local lang = utils.get_lang(self.lang)
     local alt = lang.alt and ("." .. lang.alt) or ""
@@ -180,17 +179,28 @@ function Question:lines()
     return table.concat(lines, "\n", start_i, end_i)
 end
 
+---@param self lc.ui.Question
 ---@param lang lc.lang
 Question.change_lang = vim.schedule_wrap(function(self, lang)
+    local old_lang = self.lang
     self.lang = lang
-    self:create_file()
 
-    local new_bufnr = vim.fn.bufadd(self.file:absolute())
+    local new_bufnr = vim.fn.bufadd(self:create_file())
     if new_bufnr ~= 0 then
+        local bufloaded = vim.fn.bufloaded(new_bufnr)
+
         vim.api.nvim_win_set_buf(self.winid, new_bufnr)
+
+        vim.api.nvim_buf_set_option(self.bufnr, "buflisted", false)
+        vim.api.nvim_buf_set_option(new_bufnr, "buflisted", true)
+
         self.bufnr = new_bufnr
+        if bufloaded == 0 then --
+            utils.exec_hooks("LeetQuestionNew", self)
+        end
     else
         log.error("Changing language failed")
+        self.lang = old_lang
     end
 end)
 

@@ -10,7 +10,7 @@ function leetcode.should_skip(on_vimenter)
     if on_vimenter then
         if vim.fn.argc() ~= 1 then return true end
 
-        local usr_arg, arg = vim.fn.argv()[1], config.user.arg
+        local usr_arg, arg = config.user.arg, vim.fn.argv()[1]
         if usr_arg ~= arg then return true end
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
