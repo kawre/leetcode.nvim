@@ -20,28 +20,6 @@ local Line = require("leetcode-ui.line")
 ---@field question lc.ui.Question
 local Case = Group:extend("LeetCase")
 
-local function split_input(input)
-    local words = {}
-    local curr_word = ""
-    local inside = false
-
-    for char in input:gmatch(".") do
-        if char == " " and not inside then
-            if curr_word ~= "" then
-                table.insert(words, curr_word)
-                curr_word = ""
-            end
-        elseif char == "\"" then
-            inside = not inside
-        else
-            curr_word = curr_word .. char
-        end
-    end
-
-    if curr_word ~= "" then table.insert(words, curr_word) end
-    return words
-end
-
 ---@private
 ---@param input string[]
 function Case:input(input)
