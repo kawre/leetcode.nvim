@@ -295,6 +295,8 @@ image_support = false,
 
 - `tabs` opens a picker with all currently opened question tabs
 
+- `yank` yanks the current question solution
+
 - `lang` opens a picker to change the language of the current question
 
 - `run` run currently opened question
@@ -368,6 +370,9 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4
 
 ### 💤 lazy loading with [lazy.nvim]
 
+<small>🚨 _**opting for either option makes the alternative
+launch method unavailable due to lazy loading.**_</small>
+
 - with [`arg`](#arg)
 
   ```lua
@@ -382,7 +387,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4
   }
   ```
 
-- with `:Leet`, this will make launching with [`arg`](#arg) not work
+- with `:Leet`
 
   ```lua
   {

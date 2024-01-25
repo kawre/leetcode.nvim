@@ -24,6 +24,10 @@ function Renderer:draw(component)
     self.bufnr = component.bufnr
     self.winid = component.winid
 
+    if not vim.api.nvim_buf_is_valid(self.bufnr) then --
+        return
+    end
+
     self:map("n", keys.confirm, function() self:handle_press() end)
 
     self:clear_keymaps()
@@ -75,8 +79,7 @@ function Renderer:map(mode, key, handler, opts) --
 end
 
 function Renderer:unmap(mode, key) --
-    local ok, err = pcall(vim.api.nvim_buf_del_keymap, self.bufnr, mode, key)
-    if not ok then log.error(err) end
+    pcall(vim.api.nvim_buf_del_keymap, self.bufnr, mode, key)
 end
 
 function Renderer:clear_keymaps()
