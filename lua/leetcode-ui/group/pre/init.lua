@@ -8,7 +8,7 @@ local Pre = Group:extend("LeetPre")
 
 function Pre:add_margin(item)
     if item.class.name == "LeetLine" then
-        table.insert(item._texts, 1, NuiText("\t▎\t", "leetcode_indent"))
+        table.insert(item._texts, 1, NuiText("\t▎ ", "leetcode_indent"))
         return
     end
 

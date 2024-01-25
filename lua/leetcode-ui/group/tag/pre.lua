@@ -11,7 +11,7 @@ function Pre:contents()
     local items = Pre.super.contents(self)
 
     for _, item in ipairs(items) do
-        self:add_indent(item, "\t▎\t")
+        self:add_indent(item, "\t▎ ")
     end
 
     return items
