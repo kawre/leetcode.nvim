@@ -4,7 +4,7 @@ local ConsolePopup = require("leetcode-ui.popup.console")
 local t = require("leetcode.translator")
 
 ---@class lc.ui.Console.TestcasePopup : lc.ui.Console.Popup
----@field testcases table<string[][]>
+---@field testcases table<string[]>
 ---@field extmarks integer[]
 local Testcase = ConsolePopup:extend("LeetTestcasePopup")
 

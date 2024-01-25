@@ -108,8 +108,10 @@ function config.load_plugins()
                 table.insert(lazy_plugs, plug.load)
             end
         else
-            local log = require("leetcode.logger")
-            log.error(plug)
+            table.insert(lazy_plugs, function()
+                local log = require("leetcode.logger")
+                log.error(plug)
+            end)
         end
     end
 end
