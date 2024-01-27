@@ -9,7 +9,7 @@ local ui_utils = require("leetcode-ui.utils")
 
 local t = require("leetcode.translator")
 
----@class lc.ui.SimilarQuestions : lc.ui.Lines
+---@class lc.ui.SimilarQuestions : lc.ui.Group
 local SimilarQuestions = Group:extend("LeetSimilarQuestions")
 
 ---@param questions lc.QuestionResponse.similar

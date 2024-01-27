@@ -5,7 +5,7 @@ local SimilarQuestions = require("leetcode-ui.group.similar-questions")
 
 local Renderer = require("leetcode-ui.renderer")
 local Pre = require("leetcode-ui.group.pre")
-local Group = require("leetcode-ui.group")
+local Input = require("leetcode-ui.group.pre.input")
 local Stdout = require("leetcode-ui.group.pre.stdout")
 local Case = require("leetcode-ui.group.case")
 
@@ -141,15 +141,12 @@ function ResultLayout:handle_limit_exceeded(item) -- status code = 12,13,14
     self:insert(header)
 
     if item._.submission then
-        local last_testcase = Line()
-        last_testcase:append(item.last_testcase:gsub("\n", " "), "leetcode_indent")
-
-        local pre_header = Line()
-        pre_header:append((" %s"):format(t("Last Executed Input")), "leetcode_normal")
-
-        local last_exec = Pre(pre_header, last_testcase)
-
-        self:insert(last_exec)
+        local input = Input(
+            (" %s"):format(t("Last Executed Input")),
+            vim.split(item.last_testcase, "\n"),
+            self.parent.question.q.meta_data.params
+        )
+        self:insert(input)
 
         local stdout = Stdout(item.std_output or "")
         self:insert(stdout)
