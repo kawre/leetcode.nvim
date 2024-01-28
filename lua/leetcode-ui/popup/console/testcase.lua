@@ -72,26 +72,19 @@ function Testcase:draw_extmarks()
 
     if not md.params then return end
 
-    local max_lens = {}
-    local j, k = 1, 1
-    for _, line in ipairs(lines) do
-        if line == "" then k = k + 1 end
-        max_lens[k] = math.max(max_lens[k] or 1, line:len() + 1)
-    end
-
-    local function get_param(idx, param_idx, len)
+    local j = 1
+    local function get_param(idx)
         return {
-            { (" "):rep(max_lens[idx] - len) },
+            { (" "):rep(2) },
             { "", "Operator" },
             { " " },
-            { md.params[param_idx].name, "Comment" },
+            { md.params[idx].name, "Comment" },
             { " " },
-            { md.params[param_idx].type, "Type" },
+            { md.params[idx].type, "Type" },
         }
     end
 
     local invalid = false
-    k = 1
 
     for i, line in ipairs(lines) do
         pcall(function()
@@ -99,15 +92,14 @@ function Testcase:draw_extmarks()
         end)
 
         if line ~= "" then
-            local ok, text = pcall(get_param, k, j, line:len())
+            local ok, text = pcall(get_param, j)
             if not ok or invalid then
-                text = { { (" %s"):format(t("invalid")), "leetcode_error" } }
+                text = { { (" "):rep(2) }, { (" %s"):format(t("invalid")), "leetcode_error" } }
             end
 
             self:add_extmark(i - 1, -1, { virt_text = text })
             j = j + 1
         else
-            k = k + 1
             j = 1
         end
     end
