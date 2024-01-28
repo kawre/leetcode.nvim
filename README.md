@@ -355,7 +355,8 @@ To switch between questions, use `Leet tabs`
 
 ### Sign In
 
-It is **required** to be **signed-in** to use [leetcode.nvim]
+It is **required** to be **signed-in** to use [leetcode.nvim].
+Chrome's tokens aren't in the right format, you **MUST** use Firefox.
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4ad3abeda5c3
 
