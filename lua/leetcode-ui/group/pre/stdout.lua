@@ -2,9 +2,15 @@ local Pre = require("leetcode-ui.group.pre")
 local t = require("leetcode.translator")
 local Line = require("leetcode-ui.line")
 local Lines = require("leetcode-ui.lines")
+local log = require("leetcode.logger")
 
 ---@class lc.ui.Stdout : lc.ui.Pre
 local Stdout = Pre:extend("LeetStdout")
+
+local function norm(str)
+    local ins = vim.inspect(str)
+    return ins:sub(2, #ins - 1)
+end
 
 ---@param output string
 ---
@@ -19,7 +25,7 @@ function Stdout:init(output)
 
     local lines = Lines()
     for i = 1, #output_list do
-        lines:append(output_list[i]):endl()
+        lines:append(norm(output_list[i])):endl()
     end
 
     local title = Line():append((" %s"):format(t("Stdout")), "leetcode_alt")
