@@ -246,6 +246,13 @@ function cmd.ui_languages()
     languages:show()
 end
 
+function cmd.open()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if q then q.console:open_url() end
+end
+
 function cmd.fix()
     require("leetcode.cache.cookie").delete()
     require("leetcode.cache.problemlist").delete()
@@ -373,6 +380,7 @@ cmd.commands = {
     daily = { cmd.qot },
     fix = { cmd.fix },
     yank = { cmd.yank },
+    open = { cmd.open },
 
     list = {
         cmd.problems,

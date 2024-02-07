@@ -73,6 +73,28 @@ function ConsoleLayout:set_keymaps(keymaps)
     end
 end
 
+function ConsoleLayout:open_url()
+    local command
+    local p = io.popen("uname")
+    local os_name
+
+    if p then
+        os_name = p:read("*l")
+        p:close()
+    end
+
+    if os_name == "Linux" then
+        command = string.format("xdg-open '%s'", self.question.cache.link)
+    elseif os_name == "Darwin" then
+        command = string.format("open '%s'", self.question.cache.link)
+    else
+        -- Fallback to Windows if uname is not available or does not match Linux/Darwin.
+        command = string.format("start \"\" \"%s\"", self.question.cache.link)
+    end
+
+    os.execute(command)
+end
+
 ---@param parent lc.ui.Question
 function ConsoleLayout:init(parent)
     self.question = parent
