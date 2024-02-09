@@ -250,7 +250,22 @@ function cmd.open()
     local utils = require("leetcode.utils")
     utils.auth_guard()
     local q = utils.curr_question()
-    if q then q.console:open_url() end
+
+    if q then
+        local command
+        local os_name = vim.loop.os_uname().sysname
+
+        if os_name == "Linux" then
+            command = string.format("xdg-open '%s'", q.cache.link)
+        elseif os_name == "Darwin" then
+            command = string.format("open '%s'", q.cache.link)
+        else
+            -- Fallback to Windows if uname is not available or does not match Linux/Darwin.
+            command = string.format("start \"\" \"%s\"", q.cache.link)
+        end
+
+        vim.cmd("!" .. command)
+    end
 end
 
 function cmd.fix()
