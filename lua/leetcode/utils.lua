@@ -98,4 +98,9 @@ end
 
 function utils.auth_guard() assert(config.auth.is_signed_in, "User not logged-in") end
 
+function utils.norm_ins(str)
+    local ins = vim.inspect(str)
+    return ins:sub(2, #ins - 1)
+end
+
 return utils

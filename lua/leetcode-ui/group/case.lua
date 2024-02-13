@@ -22,7 +22,10 @@ local Case = Group:extend("LeetCase")
 
 ---@private
 ---@param input string[]
-function Case:input(input) return Input("Input", input, self.question.q.meta_data.params) end
+function Case:input(input)
+    input = vim.tbl_map(utils.norm_ins, input)
+    return Input("Input", input, self.question.q.meta_data.params)
+end
 
 ---@private
 ---@param output string
@@ -31,7 +34,7 @@ function Case:output(output, expected)
     local key = t("Output")
 
     local title = Line():append(key, "leetcode_normal")
-    local pre = Pre(title, Line():append(output))
+    local pre = Pre(title, Line():append(utils.norm_ins(output)))
 
     return pre
 end
@@ -43,7 +46,7 @@ function Case:expected(expected, output)
     local key = t("Expected")
     local title = Line():append(key, "leetcode_normal")
 
-    local pre = Pre(title, Line():append(expected))
+    local pre = Pre(title, Line():append(utils.norm_ins(expected)))
 
     return pre
 end
