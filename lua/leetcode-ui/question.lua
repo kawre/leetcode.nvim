@@ -173,10 +173,12 @@ function Question:range()
     return start_i, end_i, lines
 end
 
+---@param submit boolean
 ---@return string
-function Question:lines()
+function Question:lines(submit)
     local start_i, end_i, lines = self:range()
-    return table.concat(lines, "\n", start_i, end_i)
+    local prefix = not submit and ("\n"):rep(start_i - 1) or ""
+    return prefix .. table.concat(lines, "\n", start_i, end_i)
 end
 
 ---@param self lc.ui.Question

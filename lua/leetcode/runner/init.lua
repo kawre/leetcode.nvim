@@ -31,7 +31,7 @@ function Runner:handle(submit)
 
     local body = {
         lang = question.lang,
-        typed_code = self.question:lines(),
+        typed_code = self.question:lines(submit),
         question_id = question.q.id,
         data_input = not submit and table.concat(question.console.testcase:content(), "\n") or nil,
     }
