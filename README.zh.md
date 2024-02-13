@@ -301,6 +301,8 @@ image_support = false, -- 将此设置为 `true` 将禁用问题描述的换行
 
 - `submit` 提交当前打开的问题
 
+- `open` 在默认浏览器中打开当前问题。
+
 - `random` 打开一个随机问题
 
 - `daily` 打开今天的问题
