@@ -264,7 +264,7 @@ function cmd.open()
             command = string.format("start \"\" \"%s\"", q.cache.link)
         end
 
-        vim.cmd("!" .. command)
+        os.execute(command)
     end
 end
 
