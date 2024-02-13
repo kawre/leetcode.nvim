@@ -298,6 +298,8 @@ image_support = false,
 
 - `submit` submit currently opened question
 
+- `open` opens the current question in a default browser
+
 - `random` opens a random question
 
 - `daily` opens the question of today
