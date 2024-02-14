@@ -73,9 +73,10 @@ function Testcase:draw_extmarks()
     if not md.params then return end
 
     local j = 1
+    local pad = (" "):rep(2)
     local function get_param(idx)
         return {
-            { (" "):rep(2) },
+            { pad },
             { "", "Operator" },
             { " " },
             { md.params[idx].name, "Comment" },
@@ -94,7 +95,7 @@ function Testcase:draw_extmarks()
         if line ~= "" then
             local ok, text = pcall(get_param, j)
             if not ok or invalid then
-                text = { { (" "):rep(2) }, { (" %s"):format(t("invalid")), "leetcode_error" } }
+                text = { { pad }, { (" %s"):format(t("invalid")), "leetcode_error" } }
             end
 
             self:add_extmark(i - 1, -1, { virt_text = text })
@@ -163,6 +164,7 @@ function Testcase:init(parent)
         win_options = {
             winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder",
             wrap = true,
+            linebreak = true,
         },
     })
 

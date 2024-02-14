@@ -1,9 +1,5 @@
 <div align="center">
 
-🚨 **leetcode.nvim is currently in the _alpha stage_ of development** 🚨
-
----
-
 # leetcode.nvim
 
 🔥 Solve [LeetCode] problems within [Neovim] 🔥
@@ -13,6 +9,11 @@
 </div>
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-123cb32b7563
+
+> [!CAUTION]
+> This plugin has been exclusively tested with `Java`.
+> If you encounter any errors while using other languages,
+> please open an issue to report them.
 
 ## ✨ Features
 
@@ -268,8 +269,9 @@ hooks = {
 
 Whether to render question description images using [image.nvim]
 
-Enabling this will disable question description wrap,
-because of https://github.com/3rd/image.nvim/issues/62#issuecomment-1778082534
+> [!WARNING]
+> Enabling this will disable question description wrap,
+> because of https://github.com/3rd/image.nvim/issues/62#issuecomment-1778082534
 
 ```lua
 ---@type boolean
@@ -365,8 +367,9 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4
 
 ### 💤 lazy loading with [lazy.nvim]
 
-<small>🚨 _**opting for either option makes the alternative
-launch method unavailable due to lazy loading.**_</small>
+> [!WARNING]
+> opting for either option makes the alternative
+> launch method unavailable due to lazy loading
 
 - with [`arg`](#arg)
 

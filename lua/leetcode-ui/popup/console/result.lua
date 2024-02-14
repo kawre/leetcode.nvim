@@ -52,6 +52,7 @@ function ResultPopup:init(parent)
         win_options = {
             winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder",
             wrap = true,
+            linebreak = true,
         },
     })
 
