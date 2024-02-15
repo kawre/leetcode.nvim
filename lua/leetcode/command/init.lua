@@ -274,10 +274,8 @@ function cmd.reset()
     local q = utils.curr_question()
     if not q then return end
 
-    local snip = q:get_snippet()
-    if snip and vim.api.nvim_buf_is_valid(q.bufnr) then
-        vim.api.nvim_buf_set_lines(q.bufnr, 0, -1, false, vim.split(snip, "\n"))
-    end
+    local snip = q:get_snippet(true)
+    utils.set_question_lines(q, snip)
 end
 
 function cmd.last_submit()
@@ -299,8 +297,7 @@ function cmd.last_submit()
         end
 
         if type(res) == "table" and res.code and vim.api.nvim_buf_is_valid(q.bufnr) then
-            local code = q:injector(res.code)
-            vim.api.nvim_buf_set_lines(q.bufnr, 0, -1, false, vim.split(code, "\n"))
+            utils.set_question_lines(q, res.code)
         else
             log.error("Something went wrong")
         end

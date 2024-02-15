@@ -103,4 +103,11 @@ function utils.norm_ins(str)
     return ins:sub(2, #ins - 1)
 end
 
+function utils.set_question_lines(q, code)
+    if not vim.api.nvim_buf_is_valid(q.bufnr) then return end
+
+    local s_i, e_i = q:range()
+    vim.api.nvim_buf_set_lines(q.bufnr, s_i - 1, e_i, false, vim.split(code, "\n"))
+end
+
 return utils

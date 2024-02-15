@@ -18,12 +18,13 @@ local log = require("leetcode.logger")
 ---@field cache lc.cache.Question
 local Question = Object("LeetQuestion")
 
-function Question:get_snippet()
+---@param raw? boolean
+function Question:get_snippet(raw)
     local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
     local snip = vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
     if not snip then return end
 
-    return self:injector(snip.code or "")
+    return raw and snip.code or self:injector(snip.code)
 end
 
 function Question:create_file()
