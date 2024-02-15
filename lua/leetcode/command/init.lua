@@ -268,6 +268,20 @@ function cmd.open()
     end
 end
 
+function cmd.reset()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if not q then return end
+
+    local snip = q:get_snippet()
+    if not snip then return end
+
+    if vim.api.nvim_buf_is_valid(q.bufnr) then
+        vim.api.nvim_buf_set_lines(q.bufnr, 0, -1, false, vim.split(snip, "\n"))
+    end
+end
+
 function cmd.fix()
     require("leetcode.cache.cookie").delete()
     require("leetcode.cache.problemlist").delete()
@@ -396,6 +410,8 @@ cmd.commands = {
     fix = { cmd.fix },
     yank = { cmd.yank },
     open = { cmd.open },
+    reset = { cmd.reset },
+    last_submission = { cmd.last_submission },
 
     list = {
         cmd.problems,
