@@ -1,12 +1,9 @@
-local theme = require("leetcode.theme")
-local u = require("leetcode-ui.utils")
-local ts = vim.treesitter
-
-local utils = require("leetcode.parser.utils")
 local Group = require("leetcode-ui.group")
 local Indent = require("nui.text")
 local Normalizer = require("leetcode.parser.normalizer")
 
+local ts = vim.treesitter
+local utils = require("leetcode.parser.utils")
 local log = require("leetcode.logger")
 
 ---@class lc.ui.Tag : lc.ui.Group
