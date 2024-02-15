@@ -275,11 +275,36 @@ function cmd.reset()
     if not q then return end
 
     local snip = q:get_snippet()
-    if not snip then return end
-
-    if vim.api.nvim_buf_is_valid(q.bufnr) then
+    if snip and vim.api.nvim_buf_is_valid(q.bufnr) then
         vim.api.nvim_buf_set_lines(q.bufnr, 0, -1, false, vim.split(snip, "\n"))
     end
+end
+
+function cmd.last_submit()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if not q then return end
+
+    local question_api = require("leetcode.api.question")
+    question_api.latest_submission(q.q.id, q.lang, function(res, err) --
+        if err then
+            if err.status == 404 then
+                log.error("You haven't submitted any code!")
+            else
+                log.err(err)
+            end
+
+            return
+        end
+
+        if type(res) == "table" and res.code and vim.api.nvim_buf_is_valid(q.bufnr) then
+            local code = q:injector(res.code)
+            vim.api.nvim_buf_set_lines(q.bufnr, 0, -1, false, vim.split(code, "\n"))
+        else
+            log.error("Something went wrong")
+        end
+    end)
 end
 
 function cmd.fix()
@@ -411,7 +436,7 @@ cmd.commands = {
     yank = { cmd.yank },
     open = { cmd.open },
     reset = { cmd.reset },
-    last_submission = { cmd.last_submission },
+    last_submit = { cmd.last_submit },
 
     list = {
         cmd.problems,

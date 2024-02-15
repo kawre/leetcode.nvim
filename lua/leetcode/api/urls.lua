@@ -13,5 +13,6 @@ urls.interpret = "/problems/%s/interpret_solution/"
 urls.submit = "/problems/%s/submit/"
 urls.run = "/problems/%s/interpret_solution/"
 urls.check = "/submissions/detail/%s/check/"
+urls.latest_submission = "/submissions/latest/?qid=%s&lang=%s"
 
 return urls

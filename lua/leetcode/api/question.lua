@@ -2,6 +2,7 @@ local utils = require("leetcode.api.utils")
 local log = require("leetcode.logger")
 local queries = require("leetcode.api.queries")
 local problemlist = require("leetcode.cache.problemlist")
+local urls = require("leetcode.api.urls")
 
 local question = {}
 
@@ -67,6 +68,14 @@ function question.random(filters)
     end
 
     return q
+end
+
+---@param qid integer
+---@param lang lc.lang
+---@param cb function
+function question.latest_submission(qid, lang, cb)
+    local url = urls.latest_submission:format(qid, lang)
+    utils.get(url, { callback = cb })
 end
 
 return question

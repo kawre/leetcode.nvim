@@ -23,12 +23,7 @@ function Question:get_snippet()
     local snip = vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
     if not snip then return end
 
-    local lang = utils.get_lang(self.lang)
-    snip.code = (snip.code or ""):gsub("\r\n", "\n")
-
-    return self:injector(
-        ("%s @leet start\n%s\n%s @leet end"):format(lang.comment, snip.code, lang.comment)
-    )
+    return self:injector(snip.code or "")
 end
 
 function Question:create_file()
@@ -54,9 +49,10 @@ function Question:create_file()
     return self.file:absolute()
 end
 
----@private
 ---@param code string
 function Question:injector(code)
+    code = code:gsub("\r\n", "\n")
+
     local injector = config.user.injector
 
     local inject = injector[self.lang]
@@ -80,8 +76,11 @@ function Question:injector(code)
         end
     end
 
+    local lang = utils.get_lang(self.lang)
     return norm_inject(inject.before, true) --
+        .. ("%s @leet start\n"):format(lang.comment)
         .. code
+        .. ("\n%s @leet end"):format(lang.comment)
         .. norm_inject(inject.after, false)
 end
 
