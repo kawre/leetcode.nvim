@@ -24,7 +24,8 @@ function Question:get_snippet(raw)
     local snip = vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
     if not snip then return end
 
-    return raw and snip.code or self:injector(snip.code)
+    local code = snip.code:gsub("\r\n", "\n")
+    return raw and code or self:injector(code)
 end
 
 function Question:create_file()
@@ -52,12 +53,8 @@ end
 
 ---@param code string
 function Question:injector(code)
-    code = code:gsub("\r\n", "\n")
-
     local injector = config.user.injector
-
-    local inject = injector[self.lang]
-    if not inject or vim.tbl_isempty(inject) then return code end
+    local inject = injector[self.lang] or {}
 
     ---@param inj? string|string[]
     ---@param before boolean
