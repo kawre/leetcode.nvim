@@ -53,7 +53,10 @@ function interpreter.listener(id, callback)
 
     local function listen()
         interpreter.check(id, function(item, err)
-            if err then return noti:stop(err.msg, false) end
+            if err then
+                require("leetcode.runner"):stop()
+                return noti:stop(err.msg, false)
+            end
 
             if item.status_code then
                 item = interpreter:handle_item(item)

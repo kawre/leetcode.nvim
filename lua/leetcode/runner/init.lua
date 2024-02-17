@@ -20,10 +20,12 @@ Runner.run = vim.schedule_wrap(function(self, submit)
 
     local ok, err = pcall(Runner.handle, self, submit)
     if not ok then
-        Runner.running = false
+        self:stop()
         log.error(err)
     end
 end)
+
+Runner.stop = function() Runner.running = false end
 
 function Runner:handle(submit)
     Runner.running = true
@@ -41,7 +43,7 @@ function Runner:handle(submit)
             if item then
                 question.console.result:clear()
             else
-                Runner.running = false
+                self:stop()
             end
         else
             self:callback(item)
@@ -58,7 +60,7 @@ end
 
 ---@param item lc.interpreter_response
 function Runner:callback(item)
-    Runner.running = false
+    self:stop()
     self.question.console.result:handle(item)
 end
 
