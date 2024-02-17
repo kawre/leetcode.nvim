@@ -62,16 +62,18 @@ function interpreter.listener(id, callback)
                 item = interpreter:handle_item(item)
                 noti:stop(item.status_msg, item._.success)
                 return callback(item)
-            else
-                noti:update(check_state[item.state])
-                if item.state == "PENDING" then
-                    noti:change("points")
-                elseif item.state == "STARTED" then
-                    noti:change("dot")
-                end
-
-                vim.defer_fn(listen, 500)
             end
+
+            local interval = 500
+            noti:update(check_state[item.state])
+            if item.state == "PENDING" then
+                noti:change("points")
+            elseif item.state == "STARTED" then
+                noti:change("dot")
+                interval = 1000
+            end
+
+            vim.defer_fn(listen, interval)
         end)
     end
 
