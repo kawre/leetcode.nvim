@@ -304,13 +304,15 @@ image_support = false,
 
 - `daily` opens the question of today
 
-- `list` opens a problemlist picker
+- `list` opens a problem list picker
 
 - `open` opens the current question in a default browser
 
 - `reset` reset current question to default code definition
 
 - `last_submit` retrieve last submitted code for the current question
+
+- `restore` try to restore default question layout
 
 - `desc` toggle question description
 

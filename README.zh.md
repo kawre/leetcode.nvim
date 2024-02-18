@@ -314,6 +314,8 @@ image_support = false, -- 将此设置为 `true` 将禁用问题描述的换行
 
 - `last_submit` 检索上次提交的代码，用于当前问题
 
+- `restore` 尝试恢复默认问题布局
+
 - `desc` 切换问题描述
 
   - `toggle` 与 `Leet desc` 相同
