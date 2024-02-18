@@ -82,12 +82,13 @@ function Question:injector(code)
         .. norm_inject(inject.after, false)
 end
 
-function Question:_unmount()
+---@param pre? boolean
+function Question:_unmount(pre)
     self.info:unmount()
     self.console:unmount()
     self.description:unmount()
 
-    if vim.api.nvim_buf_is_valid(self.bufnr) then
+    if not pre and vim.api.nvim_buf_is_valid(self.bufnr) then
         pcall(vim.api.nvim_buf_delete, self.bufnr, { force = true })
     end
 
@@ -101,7 +102,8 @@ function Question:_unmount()
 end
 
 ---@param self lc.ui.Question
-Question.unmount = vim.schedule_wrap(function(self) self:_unmount() end)
+---@param pre? boolean
+Question.unmount = vim.schedule_wrap(function(self, pre) self:_unmount(pre) end)
 
 function Question:handle_mount()
     vim.cmd("$tabe " .. self:create_file())
@@ -117,7 +119,7 @@ function Question:handle_mount()
 
     vim.api.nvim_create_autocmd("QuitPre", {
         buffer = self.bufnr,
-        callback = function() self:unmount() end,
+        callback = function() self:unmount(true) end,
     })
 
     self.description = Description(self):mount()
