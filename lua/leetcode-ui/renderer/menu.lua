@@ -47,12 +47,30 @@ function Menu:cursor_move()
     local keys = tbl_keys(self._.buttons)
     if not keys then return end
 
-    if prev then
-        if curr[1] > prev[1] then
-            self.cursor.idx = math.min(self.cursor.idx + 1, #keys)
-        elseif curr[1] < prev[1] then
-            self.cursor.idx = math.max(self.cursor.idx - 1, 1)
+    local function find_nearest(l, r)
+        while l < r do
+            local m = math.floor((l + r) / 2)
+
+            if keys[m] < curr[1] then
+                l = m + 1
+            else
+                r = m
+            end
         end
+
+        return math.max(r, 1)
+    end
+
+    if prev then
+        local next_idx = self.cursor.idx
+
+        if curr[1] < prev[1] then
+            next_idx = find_nearest(1, self.cursor.idx - 1)
+        elseif curr[1] > prev[1] then
+            next_idx = find_nearest(self.cursor.idx + 1, #keys)
+        end
+
+        self.cursor.idx = next_idx
     end
 
     local row = keys[self.cursor.idx]
