@@ -155,4 +155,14 @@ queries.languages = [[
         }
     ]]
 
+queries.streak = [[
+        query getStreakCounter {
+            streakCounter {
+                streakCount
+                daysSkipped
+                todayCompleted: currentDayCompleted
+            }
+        }
+    ]]
+
 return queries

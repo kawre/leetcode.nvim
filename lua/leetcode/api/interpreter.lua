@@ -54,7 +54,7 @@ function interpreter.listener(id, callback)
     local function listen()
         interpreter.check(id, function(item, err)
             if err then
-                require("leetcode.runner"):stop()
+                callback(false)
                 return noti:stop(err.msg, false)
             end
 

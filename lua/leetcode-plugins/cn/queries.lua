@@ -139,3 +139,13 @@ queries.skills = [[
             }
         }
     ]]
+
+queries.streak = [[
+        query getStreakCounter {
+            streakCounter: problemsetStreakCounter {
+                streakCount
+                daysSkipped
+                todayCompleted
+            }
+        }
+    ]]

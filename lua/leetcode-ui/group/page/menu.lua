@@ -3,6 +3,7 @@ local Title = require("leetcode-ui.lines.title")
 local Buttons = require("leetcode-ui.group.buttons.menu")
 local Header = require("leetcode-ui.lines.menu-header")
 local Footer = require("leetcode-ui.lines.footer")
+local Stats = require("leetcode-ui.lines.stats")
 
 local Button = require("leetcode-ui.lines.button.menu")
 local ExitButton = require("leetcode-ui.lines.button.menu.exit")
@@ -54,5 +55,7 @@ page:insert(Buttons({
 }))
 
 page:insert(Footer())
+
+page:insert(Stats)
 
 return page
