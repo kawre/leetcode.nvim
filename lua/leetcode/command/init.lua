@@ -2,7 +2,6 @@ local log = require("leetcode.logger")
 local arguments = require("leetcode.command.arguments")
 local config = require("leetcode.config")
 local event = require("nui.utils.autocmd").event
-local keys = config.user.keys
 local api = vim.api
 
 local t = require("leetcode.translator")
@@ -72,6 +71,7 @@ function cmd.cookie_prompt(cb)
 
     input:mount()
 
+    local keys = config.user.keys
     input:map("n", keys.toggle, function() input:unmount() end)
     input:on(event.BufLeave, function() input:unmount() end)
 end

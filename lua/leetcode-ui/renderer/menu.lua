@@ -3,6 +3,7 @@ local cookie = require("leetcode.cache.cookie")
 local config = require("leetcode.config")
 local utils = require("leetcode-ui.utils")
 local Renderer = require("leetcode-ui.renderer")
+local api = vim.api
 
 ---@class lc.ui.Menu : lc.ui.Renderer
 ---@field cursor lc-menu.cursor
@@ -23,31 +24,35 @@ end
 
 ---@private
 function Menu:autocmds()
-    local group_id = vim.api.nvim_create_augroup("leetcode_menu", { clear = true })
+    local group_id = api.nvim_create_augroup("leetcode_menu", { clear = true })
 
-    vim.api.nvim_create_autocmd("WinResized", {
+    api.nvim_create_autocmd("WinResized", {
         group = group_id,
         buffer = self.bufnr,
         callback = function() self:draw() end,
     })
 
-    vim.api.nvim_create_autocmd("CursorMoved", {
+    api.nvim_create_autocmd("CursorMoved", {
         group = group_id,
         buffer = self.bufnr,
         callback = function() self:cursor_move() end,
     })
 
-    vim.api.nvim_create_autocmd("QuitPre", {
+    api.nvim_create_autocmd("QuitPre", {
         group = group_id,
         buffer = self.bufnr,
-        callback = function() self:clear_keymaps() end,
+        callback = function()
+            self.winid = nil
+            self.bufnr = nil
+            self:clear_keymaps()
+        end,
     })
 end
 
 function Menu:cursor_move()
-    if not self.winid or not vim.api.nvim_win_is_valid(self.winid) then return end
+    if not self.winid or not api.nvim_win_is_valid(self.winid) then return end
 
-    local curr = vim.api.nvim_win_get_cursor(self.winid)
+    local curr = api.nvim_win_get_cursor(self.winid)
     local prev = self.cursor.prev
 
     local keys = tbl_keys(self._.buttons)
@@ -83,7 +88,7 @@ function Menu:cursor_move()
     local col = #vim.fn.getline(row):match("^%s*")
 
     self.cursor.prev = { row, col }
-    vim.api.nvim_win_set_cursor(self.winid, self.cursor.prev)
+    api.nvim_win_set_cursor(self.winid, self.cursor.prev)
 end
 
 function Menu:cursor_reset()
@@ -106,7 +111,7 @@ function Menu:set_page(name)
 end
 
 function Menu:apply_options()
-    vim.api.nvim_buf_set_name(self.bufnr, "")
+    api.nvim_buf_set_name(self.bufnr, "")
     pcall(vim.diagnostic.disable, self.bufnr)
 
     utils.set_buf_opts(self.bufnr, {
@@ -134,14 +139,18 @@ function Menu:apply_options()
 end
 
 function Menu:remount()
+    if self.winid and api.nvim_win_is_valid(self.winid) then --
+        api.nvim_win_close(self.winid, true)
+    end
+    if self.bufnr and api.nvim_buf_is_valid(self.bufnr) then --
+        api.nvim_buf_delete(self.bufnr, { force = true })
+    end
+
     vim.cmd.tabe()
+    self.bufnr = api.nvim_get_current_buf()
+    self.winid = api.nvim_get_current_win()
 
-    self.bufnr = vim.api.nvim_get_current_buf()
-    self.winid = vim.api.nvim_get_current_win()
-
-    self:apply_options()
-    self:autocmds()
-    self:draw()
+    self:_mount()
 end
 
 function Menu:mount()
@@ -162,11 +171,15 @@ function Menu:mount()
         self:set_page("signin")
     end
 
+    self:_mount()
+
+    return self
+end
+
+function Menu:_mount()
     self:apply_options()
     self:autocmds()
     self:draw()
-
-    return self
 end
 
 function Menu:init()
@@ -180,8 +193,8 @@ function Menu:init()
     }
     self.maps = {}
 
-    self.bufnr = vim.api.nvim_get_current_buf()
-    self.winid = vim.api.nvim_get_current_win()
+    self.bufnr = api.nvim_get_current_buf()
+    self.winid = api.nvim_get_current_win()
 
     _Lc_menu = self
 end

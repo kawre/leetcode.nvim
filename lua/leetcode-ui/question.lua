@@ -89,11 +89,11 @@ function Question:_unmount(pre)
     self.description:unmount()
 
     if not pre and vim.api.nvim_buf_is_valid(self.bufnr) then
-        pcall(vim.api.nvim_buf_delete, self.bufnr, { force = true })
+        vim.api.nvim_buf_delete(self.bufnr, { force = true })
     end
 
     if vim.api.nvim_win_is_valid(self.winid) then --
-        pcall(vim.api.nvim_win_close, self.winid, true)
+        vim.api.nvim_win_close(self.winid, true)
     end
 
     _Lc_questions = vim.tbl_filter(function(q) return q.bufnr ~= self.bufnr end, _Lc_questions)
