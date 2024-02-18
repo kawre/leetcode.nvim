@@ -137,7 +137,8 @@ function Menu:mount()
                 self:set_page("signin")
                 log.err(err)
             else
-                self:set_page("menu")
+                local cmd = require("leetcode.command")
+                cmd.start_user_session()
             end
         end)
     else
@@ -165,7 +166,7 @@ function Menu:init()
     self.bufnr = vim.api.nvim_get_current_buf()
     self.winid = vim.api.nvim_get_current_win()
 
-    _Lc_Menu = self
+    _Lc_menu = self
 end
 
 ---@type fun(): lc.ui.Menu

@@ -5,7 +5,7 @@ local P = require("plenary.path")
 _Lc_questions = {}
 
 ---@type lc.ui.Menu
-_Lc_Menu = {} ---@diagnostic disable-line
+_Lc_menu = {} ---@diagnostic disable-line
 
 local lazy_plugs = {}
 

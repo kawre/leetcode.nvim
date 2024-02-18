@@ -25,14 +25,8 @@ function Stats:update()
         self.streak = res.streakCount
         self.today_completed = res.todayCompleted
 
-        if _Lc_Menu then _Lc_Menu:draw() end
+        if _Lc_menu then _Lc_menu:draw() end
     end)
-end
-
-function Stats:init() --
-    Stats.super.init(self, {}, {})
-
-    self:update()
 end
 
 ---@type fun(): lc.ui.menu.Stats

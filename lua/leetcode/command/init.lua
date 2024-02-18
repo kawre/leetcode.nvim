@@ -60,12 +60,12 @@ function cmd.cookie_prompt(cb)
 
             if not err then
                 log.info("Sign-in successful")
-                cmd.menu_layout("menu")
-                pcall(cb, true)
+                cmd.start_user_session()
             else
                 log.error("Sign-in failed: " .. err)
-                pcall(cb, false)
             end
+
+            pcall(cb, not err and true or false)
         end,
     })
 
@@ -78,7 +78,7 @@ end
 function cmd.sign_out()
     log.warn("You're now signed out")
     cmd.delete_cookie()
-    cmd.menu_layout("signin")
+    cmd.set_menu_page("signin")
     cmd.q_close_all()
 end
 
@@ -108,7 +108,7 @@ cmd.expire = vim.schedule_wrap(function()
             log.info("Successful re-login")
         else
             cmd.delete_cookie()
-            cmd.menu_layout("signin")
+            cmd.set_menu_page("signin")
             cmd.q_close_all()
         end
     end)
@@ -159,7 +159,7 @@ function cmd.start_with_cmd()
 end
 
 function cmd.menu()
-    local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, _Lc_Menu.winid)
+    local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, _Lc_menu.winid)
     if ok then
         vim.api.nvim_set_current_tabpage(tabp)
     else
@@ -182,7 +182,14 @@ function cmd.yank()
 end
 
 ---@param page lc-menu.page
-function cmd.menu_layout(page) _Lc_Menu:set_page(page) end
+function cmd.set_menu_page(page) _Lc_menu:set_page(page) end
+
+function cmd.start_user_session() --
+    cmd.set_menu_page("menu")
+
+    local stats = require("leetcode-ui.lines.stats")
+    stats:update()
+end
 
 function cmd.question_tabs() require("leetcode.pickers.question-tabs").pick() end
 
