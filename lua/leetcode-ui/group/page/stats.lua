@@ -7,7 +7,7 @@ local Buttons = require("leetcode-ui.group.buttons.menu")
 local Button = require("leetcode-ui.lines.button.menu")
 local BackButton = require("leetcode-ui.lines.button.menu.back")
 local Title = require("leetcode-ui.lines.title")
-local Stats = require("leetcode-ui.lines.stats")
+local stats = require("leetcode-ui.lines.stats")
 
 local cmd = require("leetcode.command")
 local config = require("leetcode.config")
@@ -53,6 +53,7 @@ local update = Button("Update", {
     on_press = function()
         calendar:update()
         solved:update()
+        stats:update()
     end,
 })
 buttons:insert(update)
@@ -64,6 +65,6 @@ page:insert(buttons)
 
 page:insert(Footer())
 
-page:insert(Stats)
+page:insert(stats)
 
 return page

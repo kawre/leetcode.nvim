@@ -3,7 +3,7 @@ local Title = require("leetcode-ui.lines.title")
 local Footer = require("leetcode-ui.lines.footer")
 local Buttons = require("leetcode-ui.group.buttons.menu")
 local Page = require("leetcode-ui.group.page")
-local Stats = require("leetcode-ui.lines.stats")
+local stats = require("leetcode-ui.lines.stats")
 
 local Button = require("leetcode-ui.lines.button.menu")
 local BackButton = require("leetcode-ui.lines.button.menu.back")
@@ -31,6 +31,6 @@ page:insert(Buttons({
 
 page:insert(Footer())
 
-page:insert(Stats)
+page:insert(stats)
 
 return page
