@@ -75,8 +75,7 @@ function Renderer:map(mode, key, handler, opts) --
 end
 
 function Renderer:unmap(mode, key) --
-    local ok, err = pcall(vim.api.nvim_buf_del_keymap, self.bufnr, mode, key)
-    if not ok then log.error(err) end
+    pcall(vim.api.nvim_buf_del_keymap, self.bufnr, mode, key)
 end
 
 function Renderer:clear_keymaps()

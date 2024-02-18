@@ -36,6 +36,12 @@ function Menu:autocmds()
         buffer = self.bufnr,
         callback = function() self:cursor_move() end,
     })
+
+    vim.api.nvim_create_autocmd("QuitPre", {
+        group = group_id,
+        buffer = self.bufnr,
+        callback = function() self:clear_keymaps() end,
+    })
 end
 
 function Menu:cursor_move()
@@ -125,6 +131,17 @@ function Menu:apply_options()
         spell = false,
         signcolumn = "no",
     })
+end
+
+function Menu:remount()
+    vim.cmd.tabe()
+
+    self.bufnr = vim.api.nvim_get_current_buf()
+    self.winid = vim.api.nvim_get_current_win()
+
+    self:apply_options()
+    self:autocmds()
+    self:draw()
 end
 
 function Menu:mount()

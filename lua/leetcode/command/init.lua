@@ -3,6 +3,7 @@ local arguments = require("leetcode.command.arguments")
 local config = require("leetcode.config")
 local event = require("nui.utils.autocmd").event
 local keys = config.user.keys
+local api = vim.api
 
 local t = require("leetcode.translator")
 
@@ -99,12 +100,12 @@ cmd.q_close_all = vim.schedule_wrap(function()
 end)
 
 cmd.expire = vim.schedule_wrap(function()
-    local tabp = vim.api.nvim_get_current_tabpage()
+    local tabp = api.nvim_get_current_tabpage()
     cmd.menu()
 
     cmd.cookie_prompt(function(success)
         if success then
-            if vim.api.nvim_tabpage_is_valid(tabp) then vim.api.nvim_set_current_tabpage(tabp) end
+            if api.nvim_tabpage_is_valid(tabp) then api.nvim_set_current_tabpage(tabp) end
             log.info("Successful re-login")
         else
             cmd.delete_cookie()
@@ -159,11 +160,12 @@ function cmd.start_with_cmd()
 end
 
 function cmd.menu()
-    local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, _Lc_menu.winid)
+    local ok, tabp = pcall(api.nvim_win_get_tabpage, _Lc_menu.winid)
+
     if ok then
-        vim.api.nvim_set_current_tabpage(tabp)
+        api.nvim_set_current_tabpage(tabp)
     else
-        log.error(tabp)
+        _Lc_menu:remount()
     end
 end
 
@@ -172,9 +174,9 @@ function cmd.yank()
     local q = utils.curr_question()
     if not q then return end
 
-    if vim.api.nvim_buf_is_valid(q.bufnr) and vim.api.nvim_win_is_valid(q.winid) then
-        vim.api.nvim_set_current_win(q.winid)
-        vim.api.nvim_set_current_buf(q.bufnr)
+    if api.nvim_buf_is_valid(q.bufnr) and api.nvim_win_is_valid(q.winid) then
+        api.nvim_set_current_win(q.winid)
+        api.nvim_set_current_buf(q.bufnr)
 
         local start_i, end_i = q:range()
         vim.cmd(("%d,%dyank"):format(start_i, end_i))
@@ -303,12 +305,36 @@ function cmd.last_submit()
             return
         end
 
-        if type(res) == "table" and res.code and vim.api.nvim_buf_is_valid(q.bufnr) then
+        if type(res) == "table" and res.code and api.nvim_buf_is_valid(q.bufnr) then
             utils.set_question_lines(q, res.code)
         else
             log.error("Something went wrong")
         end
     end)
+end
+
+function cmd.restore()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if not q then return end
+
+    if
+        (q.winid and api.nvim_win_is_valid(q.winid))
+        and (q.bufnr and api.nvim_buf_is_valid(q.bufnr))
+    then
+        api.nvim_win_set_buf(q.winid, q.bufnr)
+    end
+
+    q.description:show()
+    local winid, bufnr = q.description.winid, q.description.bufnr
+
+    if
+        (winid and api.nvim_win_is_valid(winid)) --
+        and (bufnr and api.nvim_buf_is_valid(bufnr))
+    then
+        api.nvim_win_set_buf(winid, bufnr)
+    end
 end
 
 function cmd.fix()
@@ -415,7 +441,7 @@ function cmd.exec(args)
 end
 
 function cmd.setup()
-    vim.api.nvim_create_user_command("Leet", cmd.exec, {
+    api.nvim_create_user_command("Leet", cmd.exec, {
         bar = true,
         bang = true,
         nargs = "?",
@@ -441,6 +467,7 @@ cmd.commands = {
     open = { cmd.open },
     reset = { cmd.reset },
     last_submit = { cmd.last_submit },
+    restore = { cmd.restore },
 
     list = {
         cmd.problems,
