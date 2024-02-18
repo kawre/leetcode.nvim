@@ -331,14 +331,15 @@ function cmd.parse(args)
     return parts, options
 end
 
----@param t table
-local function cmds_keys(t)
+---@param tbl table
+local function cmds_keys(tbl)
     return vim.tbl_filter(function(key)
         if type(key) ~= "string" then return false end
         if key:sub(1, 1) == "_" then return false end
+        if tbl[key]._private then return false end
 
         return true
-    end, vim.tbl_keys(t))
+    end, vim.tbl_keys(tbl))
 end
 
 ---@param _ string
@@ -436,7 +437,6 @@ cmd.commands = {
     test = { cmd.q_run },
     submit = { cmd.q_submit },
     daily = { cmd.qot },
-    fix = { cmd.fix },
     yank = { cmd.yank },
     open = { cmd.open },
     reset = { cmd.reset },
@@ -469,6 +469,12 @@ cmd.commands = {
 
     cache = {
         update = { cmd.cache_update },
+    },
+
+    fix = {
+        cmd.fix,
+
+        _private = true,
     },
 }
 
