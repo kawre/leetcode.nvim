@@ -1,18 +1,18 @@
+local cmd = require("leetcode.command")
+
 local Page = require("leetcode-ui.group.page")
 local Title = require("leetcode-ui.lines.title")
 local Buttons = require("leetcode-ui.group.buttons.menu")
-local Header = require("leetcode-ui.lines.menu-header")
-local Footer = require("leetcode-ui.lines.footer")
-local stats = require("leetcode-ui.lines.stats")
-
 local Button = require("leetcode-ui.lines.button.menu")
 local ExitButton = require("leetcode-ui.lines.button.menu.exit")
 
-local cmd = require("leetcode.command")
+local header = require("leetcode-ui.lines.menu-header")
+local footer = require("leetcode-ui.lines.footer")
+local stats = require("leetcode-ui.lines.stats")
 
 local page = Page()
 
-page:insert(Header())
+page:insert(header)
 
 page:insert(Title({}, "Menu"))
 
@@ -54,7 +54,7 @@ page:insert(Buttons({
     exit,
 }))
 
-page:insert(Footer())
+page:insert(footer)
 
 page:insert(stats)
 

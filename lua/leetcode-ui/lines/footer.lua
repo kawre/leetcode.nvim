@@ -27,4 +27,4 @@ end
 ---@type fun(): lc.ui.menu.Footer
 local LeetFooter = Footer
 
-return LeetFooter
+return LeetFooter()

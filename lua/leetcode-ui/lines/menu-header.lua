@@ -27,4 +27,4 @@ end
 ---@type fun(): lc.ui.menu.Header
 local LeetMenuHeader = MenuHeader
 
-return LeetMenuHeader
+return LeetMenuHeader()
