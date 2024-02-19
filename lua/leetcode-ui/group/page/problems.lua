@@ -8,7 +8,6 @@ local Page = require("leetcode-ui.group.page")
 
 local footer = require("leetcode-ui.lines.footer")
 local header = require("leetcode-ui.lines.menu-header")
-local stats = require("leetcode-ui.lines.stats")
 
 local page = Page()
 

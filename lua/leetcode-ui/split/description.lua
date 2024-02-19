@@ -129,13 +129,8 @@ function Description:populate()
         header:append("????", "leetcode_list")
     end
 
-    local user_status = {
-        ac = { "", "leetcode_easy" },
-        notac = { "󱎖", "leetcode_medium" },
-        todo = { "", "leetcode_alt" },
-    }
-    if user_status[self.question.cache.status] then
-        local s = user_status[self.question.cache.status]
+    if config.icons.hl.status[self.question.cache.status] then
+        local s = config.icons.hl.status[self.question.cache.status]
         header:append(" "):append(s[1], s[2])
     end
 

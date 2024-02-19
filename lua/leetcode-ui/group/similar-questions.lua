@@ -32,12 +32,12 @@ function SimilarQuestions:init(questions)
             local fid = p.frontend_id .. "."
             fid = fid .. (" "):rep(5 - vim.api.nvim_strwidth(fid))
 
-            button:append("󱓻 ", ui_utils.diff_to_hl(p.difficulty))
+            button:append(config.icons.square .. " ", ui_utils.diff_to_hl(p.difficulty))
             button:append(fid .. " ", "leetcode_normal")
             button:append(utils.translate(p.title, p.title_cn))
 
             if not config.auth.is_premium and q.paid_only then
-                button:append("  " .. t("Premium"), "leetcode_medium")
+                button:append((" %s "):format(config.icons.lock) .. t("Premium"), "leetcode_medium")
             end
 
             self:insert(button)

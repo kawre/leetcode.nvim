@@ -1,6 +1,7 @@
-local config = require("leetcode.config")
 local t = require("leetcode.translator")
 local Group = require("leetcode-ui.group")
+
+local config = require("leetcode.config")
 local stats = require("leetcode-ui.lines.stats")
 
 ---@class lc.ui.menu.Footer : lc.ui.Group

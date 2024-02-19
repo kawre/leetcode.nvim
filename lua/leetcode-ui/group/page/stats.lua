@@ -11,7 +11,6 @@ local BackButton = require("leetcode-ui.lines.button.menu.back")
 local Title = require("leetcode-ui.lines.title")
 
 local footer = require("leetcode-ui.lines.footer")
-local stats = require("leetcode-ui.lines.stats")
 
 local page = Page()
 
@@ -54,7 +53,7 @@ local update = Button("Update", {
     on_press = function()
         calendar:update()
         solved:update()
-        stats:update()
+        config.stats.update()
     end,
 })
 buttons:insert(update)

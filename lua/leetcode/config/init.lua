@@ -27,6 +27,7 @@ local config = {
     langs = require("leetcode.config.langs"),
     icons = require("leetcode.config.icons"),
     sessions = require("leetcode.config.sessions"),
+    stats = require("leetcode.config.stats"),
 
     ---@type lc.UserStatus
     auth = {}, ---@diagnostic disable-line

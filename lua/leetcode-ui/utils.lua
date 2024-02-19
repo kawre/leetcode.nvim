@@ -1,5 +1,6 @@
 local O = require("nui.object")
 local log = require("leetcode.logger")
+local config = require("leetcode.config")
 
 ---@class lc-ui.Utils
 local utils = {}
@@ -48,13 +49,7 @@ end
 function utils.status_to_hl(status)
     if not status then return end
 
-    local user_status = {
-        ac = { "", "leetcode_easy" },
-        notac = { "󱎖", "leetcode_medium" },
-        todo = { "", "leetcode_alt" },
-    }
-
-    return table.unpack(user_status[status])
+    return table.unpack(config.icons.hl.status[status])
 end
 
 ---@param layout lc.ui.Renderer

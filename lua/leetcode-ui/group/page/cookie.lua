@@ -8,7 +8,6 @@ local BackButton = require("leetcode-ui.lines.button.menu.back")
 
 local header = require("leetcode-ui.lines.menu-header")
 local footer = require("leetcode-ui.lines.footer")
-local stats = require("leetcode-ui.lines.stats")
 
 local page = Page()
 

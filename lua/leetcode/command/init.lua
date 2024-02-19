@@ -188,9 +188,7 @@ function cmd.set_menu_page(page) _Lc_menu:set_page(page) end
 
 function cmd.start_user_session() --
     cmd.set_menu_page("menu")
-
-    local stats = require("leetcode-ui.lines.stats")
-    stats:update()
+    config.stats.update()
 end
 
 function cmd.question_tabs() require("leetcode.pickers.question-tabs").pick() end
@@ -356,12 +354,11 @@ function cmd.change_session(opts)
     local session = cmd.get_session_by_name(name)
     if not session then return log.error("Session not found") end
 
-    local stats = require("leetcode-ui.lines.stats")
     local stats_api = require("leetcode.api.statistics")
     stats_api.change_session(session.id, function(_, err)
         if err then return log.err(err) end
         log.info(("Session changed to `%s`"):format(name))
-        stats:update()
+        config.stats.update()
     end)
 end
 
@@ -398,8 +395,6 @@ end
 
 ---@param tbl table
 local function cmds_keys(tbl)
-    log.debug(tbl)
-
     return vim.tbl_filter(function(key)
         if type(key) ~= "string" then return false end
         if key:sub(1, 1) == "_" then return false end
