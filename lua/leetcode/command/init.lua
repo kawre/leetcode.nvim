@@ -344,8 +344,10 @@ end
 
 function cmd.get_session_by_name(name)
     local sessions = config.sessions.all
+
+    name = name:lower()
     if name == config.sessions.default then name = "" end
-    return vim.tbl_filter(function(s) return s.name == name end, sessions)[1]
+    return vim.tbl_filter(function(s) return s.name:lower() == name end, sessions)[1]
 end
 
 function cmd.change_session(opts)

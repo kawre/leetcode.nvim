@@ -15,7 +15,7 @@ function Sessions.update(sessions) --
 
     for _, session in ipairs(sessions) do
         local name = session.name == "" and Sessions.default or session.name
-        table.insert(Sessions.names, name)
+        table.insert(Sessions.names, name:lower())
     end
 end
 
