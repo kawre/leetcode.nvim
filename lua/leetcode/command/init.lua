@@ -373,6 +373,8 @@ function cmd.create_session(opts)
     end)
 end
 
+function cmd.update_sessions() config.stats.update_sessions() end
+
 function cmd.fix()
     require("leetcode.cache.cookie").delete()
     require("leetcode.cache.problemlist").delete()
@@ -517,6 +519,8 @@ cmd.commands = {
 
             _args = arguments.session_create,
         },
+
+        update = { cmd.update_sessions },
     },
 
     list = {
