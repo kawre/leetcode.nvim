@@ -3,6 +3,8 @@ local icons = {
     circle = "",
     square = "󱓻",
     lock = "",
+    unlock = "",
+    star = "",
     status = {
         ac = "",
         notac = "󱎖",
@@ -17,6 +19,7 @@ icons.hl = {
         todo = { icons.status.todo, "leetcode_alt" },
     },
     lock = { icons.lock, "leetcode_medium" },
+    unlock = { icons.unlock, "leetcode_medium" },
 }
 
 icons.indent = ("\t%s "):format(icons.bar)

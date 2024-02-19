@@ -34,7 +34,9 @@ end
 
 ---@param question lc.cache.Question
 local function display_user_status(question)
-    if question.paid_only and not config.auth.is_premium then return config.icons.hl.lock end
+    if question.paid_only then
+        return config.auth.is_premium and config.icons.hl.unlock or config.icons.hl.lock
+    end
 
     if question.status == vim.NIL then return { "" } end
     return config.icons.hl.status[question.status] or { "" }

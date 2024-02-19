@@ -36,8 +36,16 @@ function SimilarQuestions:init(questions)
             button:append(fid .. " ", "leetcode_normal")
             button:append(utils.translate(p.title, p.title_cn))
 
-            if not config.auth.is_premium and q.paid_only then
-                button:append((" %s "):format(config.icons.lock) .. t("Premium"), "leetcode_medium")
+            if q.paid_only then
+                local txt
+
+                if config.auth.is_premium then
+                    txt = " " .. config.icons.unlock
+                else
+                    txt = (" %s "):format(config.icons.lock) .. t("Premium")
+                end
+
+                button:append(txt, "leetcode_medium")
             end
 
             self:insert(button)

@@ -119,6 +119,7 @@ function Description:populate()
 
     header:append(q.frontend_id .. ". ", "leetcode_normal")
     header:append(utils.translate(q.title, q.translated_title))
+    if q.is_paid_only then header:append(" " .. t("Premium"), "leetcode_medium") end
     header:endgrp()
 
     local show_stats = self.show_stats
