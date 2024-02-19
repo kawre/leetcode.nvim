@@ -29,6 +29,9 @@ local config = {
 
     ---@type lc.UserStatus
     auth = {}, ---@diagnostic disable-line
+
+    ---@type lc.res.session[]
+    sessions = {},
 }
 
 ---Merge configurations into default configurations and set it as user configurations.

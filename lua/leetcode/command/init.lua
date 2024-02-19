@@ -337,6 +337,43 @@ function cmd.restore()
     end
 end
 
+function cmd.get_active_session()
+    local sessions = config.sessions
+    return vim.tbl_filter(function(s) return s.is_active end, sessions)[1]
+end
+
+function cmd.get_session_by_name(name)
+    local sessions = config.sessions
+    if name == "default" then name = "" end
+    return vim.tbl_filter(function(s) return s.name == name end, sessions)[1]
+end
+
+function cmd.change_session(opts)
+    local name = opts.name[1]
+    if not name then return log.error("Session name not provided") end
+
+    local session = cmd.get_session_by_name(name)
+    if not session then return log.error("Session not found") end
+
+    local stats = require("leetcode-ui.lines.stats")
+    local stats_api = require("leetcode.api.statistics")
+    stats_api.change_session(session.id, function(_, err)
+        if err then return log.err(err) end
+        stats:update()
+    end)
+end
+
+function cmd.create_session(opts)
+    local name = opts.name[1]
+    if not name then return log.error("Session name not provided") end
+
+    local stats_api = require("leetcode.api.statistics")
+    stats_api.create_session(name, function(_, err)
+        if err then return log.err(err) end
+        log.info(("session `%s` created"):format(name))
+    end)
+end
+
 function cmd.fix()
     require("leetcode.cache.cookie").delete()
     require("leetcode.cache.problemlist").delete()
@@ -468,6 +505,20 @@ cmd.commands = {
     reset = { cmd.reset },
     last_submit = { cmd.last_submit },
     restore = { cmd.restore },
+
+    session = {
+        change = {
+            cmd.change_session,
+
+            _args = arguments.session_change,
+        },
+
+        create = {
+            cmd.create_session,
+
+            _args = arguments.session_create,
+        },
+    },
 
     list = {
         cmd.problems,

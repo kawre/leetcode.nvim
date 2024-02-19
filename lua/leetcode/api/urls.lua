@@ -15,5 +15,6 @@ urls.run = "/problems/%s/interpret_solution/"
 urls.check = "/submissions/detail/%s/check/"
 urls.latest_submission = "/submissions/latest/?qid=%s&lang=%s"
 urls.streak_counter = "/graphql/"
+urls.session = "/session/"
 
 return urls

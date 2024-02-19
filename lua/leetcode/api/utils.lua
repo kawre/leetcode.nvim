@@ -1,12 +1,20 @@
 local curl = require("plenary.curl")
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
-local path = require("plenary.path")
 local headers = require("leetcode.api.headers")
 local urls = require("leetcode.api.urls")
 
 ---@class lc.Api.Utils
 local utils = {}
+
+---@param endpoint string
+function utils.put(endpoint, opts)
+    local options = vim.tbl_deep_extend("force", {
+        endpoint = endpoint,
+    }, opts or {})
+
+    return utils.curl("put", options)
+end
 
 ---@param endpoint string
 function utils.post(endpoint, opts)

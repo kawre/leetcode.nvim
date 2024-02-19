@@ -66,6 +66,4 @@ page:insert(buttons)
 
 page:insert(footer)
 
-page:insert(stats)
-
 return page

@@ -31,6 +31,4 @@ page:insert(Buttons({
 
 page:insert(footer)
 
-page:insert(stats)
-
 return page

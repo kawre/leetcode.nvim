@@ -1,3 +1,5 @@
+local config = require("leetcode.config")
+
 local arguments = {}
 
 local topics = {
@@ -83,6 +85,19 @@ arguments.random = {
     difficulty = { "easy", "medium", "hard" },
     status = { "ac", "notac", "todo" },
     tags = topics,
+}
+
+arguments.session_change = setmetatable({}, {
+    __index = function(_, key)
+        if key == "name" then
+            local sessions = config.sessions
+            return vim.tbl_map(function(s) return s.name end, sessions)
+        end
+    end,
+})
+
+arguments.session_create = {
+    name = {},
 }
 
 return arguments

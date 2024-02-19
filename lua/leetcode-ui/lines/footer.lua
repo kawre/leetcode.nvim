@@ -1,24 +1,30 @@
-local Lines = require("leetcode-ui.lines")
 local config = require("leetcode.config")
 local t = require("leetcode.translator")
+local Group = require("leetcode-ui.group")
+local stats = require("leetcode-ui.lines.stats")
 
----@class lc.ui.menu.Footer : lc.ui.Lines
-local Footer = Lines:extend("LeetFooter")
+---@class lc.ui.menu.Footer : lc.ui.Group
+local Footer = Group:extend("LeetFooter")
 
-function Footer:draw(layout, opts)
+function Footer:contents()
+    self:clear()
+
     if config.auth.is_signed_in then
-        self:clear()
+        self:append(stats)
+        self:endgrp()
+
         self:append(t("Signed in as") .. ": ", "leetcode_alt")
         self:append(config.auth.name):endl()
     end
 
-    Footer.super.draw(self, layout, opts)
+    return Footer.super.contents(self)
 end
 
 ---@param opts? any
 function Footer:init(opts)
     opts = vim.tbl_deep_extend("force", {
         hl = "Number",
+        spacing = 1,
     }, opts or {})
 
     Footer.super.init(self, {}, opts)

@@ -9,6 +9,7 @@ queries.auth = [[
                 is_signed_in: isSignedIn
                 is_premium: isPremium
                 is_verified: isVerified
+                session_id: activeSessionId
             }
         }
     ]]
@@ -161,6 +162,20 @@ queries.streak = [[
                 streakCount
                 daysSkipped
                 todayCompleted: currentDayCompleted
+            }
+        }
+    ]]
+
+queries.session_progress = [[
+        query userSessionProgress($username: String!) {
+            matchedUser(username: $username) {
+                submitStats {
+                    acSubmissionNum {
+                        difficulty
+                        count
+                        submissions
+                    }
+                }
             }
         }
     ]]

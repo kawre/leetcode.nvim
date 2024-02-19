@@ -32,6 +32,25 @@ function statistics.calendar(cb)
     })
 end
 
+---@param cb fun(res: lc.Stats.QuestionCount[], err: lc.err)
+function statistics.session_progress(cb)
+    local variables = {
+        username = config.auth.name,
+    }
+
+    local query = queries.session_progress
+
+    utils.query(query, variables, {
+        callback = function(res, err)
+            if err then return cb(nil, err) end
+
+            local data = res.data
+            local session_progress = data["matchedUser"]["submitStats"]["acSubmissionNum"]
+            cb(session_progress)
+        end,
+    })
+end
+
 ---@param cb fun(res: lc.Stats.Res, err: lc.err)
 function statistics.solved(cb)
     local variables = {
@@ -107,6 +126,56 @@ function statistics.streak(cb)
             local data = res.data
             local streak = data["streakCounter"]
             cb(streak)
+        end,
+    })
+end
+
+---@param cb fun(res: lc.res.session[], err: lc.err)
+function statistics.sessions(cb)
+    local url = urls.session
+
+    utils.post(url, {
+        body = vim.empty_dict(),
+        callback = function(res, err)
+            if err then return cb(nil, err) end
+            config.sessions = res.sessions
+            cb(res.sessions)
+        end,
+    })
+end
+
+function statistics.change_session(id, cb)
+    local body = {
+        func = "activate",
+        target = id,
+    }
+
+    local url = urls.session
+
+    utils.put(url, {
+        body = body,
+        callback = function(res, err)
+            if err then return cb(nil, err) end
+            config.sessions = res.sessions
+            cb(res.sessions)
+        end,
+    })
+end
+
+function statistics.create_session(name, cb)
+    local body = {
+        func = "create",
+        name = name,
+    }
+
+    local url = urls.session
+
+    utils.put(url, {
+        body = body,
+        callback = function(res, err)
+            if err then return cb(nil, err) end
+            config.sessions = res.sessions
+            cb(res.sessions)
         end,
     })
 end
