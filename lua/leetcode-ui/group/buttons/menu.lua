@@ -6,7 +6,7 @@ local MenuButtons = Group:extend("LeetMenuButtons")
 function MenuButtons:init(buttons, opts)
     opts = vim.tbl_deep_extend("force", {
         padding = {
-            bot = 1,
+            bot = 2,
         },
         spacing = 1,
     }, opts or {})

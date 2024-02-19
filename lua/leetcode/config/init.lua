@@ -32,6 +32,8 @@ local config = {
 
     ---@type lc.res.session[]
     sessions = {},
+
+    default_session_name = "anonymous",
 }
 
 ---Merge configurations into default configurations and set it as user configurations.

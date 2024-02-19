@@ -91,7 +91,10 @@ arguments.session_change = setmetatable({}, {
     __index = function(_, key)
         if key == "name" then
             local sessions = config.sessions
-            return vim.tbl_map(function(s) return s.name end, sessions)
+            return vim.tbl_map(
+                function(s) return s.name == "" and config.default_session_name or s.name end,
+                sessions
+            )
         end
     end,
 })

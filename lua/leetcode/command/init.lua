@@ -344,12 +344,12 @@ end
 
 function cmd.get_session_by_name(name)
     local sessions = config.sessions
-    if name == "anonymous" then name = "" end
+    if name == config.default_session_name then name = "" end
     return vim.tbl_filter(function(s) return s.name == name end, sessions)[1]
 end
 
 function cmd.change_session(opts)
-    local name = opts.name[1] or ""
+    local name = opts.name[1] or config.default_session_name
 
     local session = cmd.get_session_by_name(name)
     if not session then return log.error("Session not found") end
