@@ -139,7 +139,7 @@ function Description:populate()
         header:append(" "):append(s[1], s[2])
     end
 
-    header:append(" | ")
+    header:append((" %s "):format(config.icons.bar))
 
     local likes = show_stats and q.likes or "___"
     header:append(likes .. " ", "leetcode_alt")
@@ -147,13 +147,13 @@ function Description:populate()
     local dislikes = show_stats and q.dislikes or "___"
     if not config.is_cn then header:append((" %s "):format(dislikes), "leetcode_alt") end
 
-    header:append(" | ")
+    header:append((" %s "):format(config.icons.bar))
 
     local ac_rate = show_stats and q.stats.acRate or "__%"
     local total_sub = show_stats and q.stats.totalSubmission or "__"
     header:append(("%s %s %s"):format(ac_rate, t("of"), total_sub), "leetcode_alt")
     if not vim.tbl_isempty(q.hints) then
-        header:append(" | ")
+        header:append((" %s "):format(config.icons.bar))
         header:append("󰛨 " .. t("Hints"), "leetcode_hint")
     end
     header:endgrp()

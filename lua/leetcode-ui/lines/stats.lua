@@ -22,7 +22,7 @@ function Stats:contents()
 
     self:append("session: ", "leetcode_alt")
     local session = cmd.get_active_session()
-    local session_name = session and (session.name == "" and "default" or session.name) or "-"
+    local session_name = session and (session.name == "" and "anonymous" or session.name) or "-"
     self:append(session_name)
 
     local function create_progress(key)
@@ -39,6 +39,8 @@ function Stats:contents()
 end
 
 function Stats:update()
+    self.progress = {}
+
     stats_api.streak(function(res, err)
         if err then return log.err(err) end
 
@@ -65,6 +67,8 @@ function Stats:update()
 
         if _Lc_menu then _Lc_menu:draw() end
     end)
+
+    if _Lc_menu then _Lc_menu:draw() end
 end
 
 function Stats:init(...)

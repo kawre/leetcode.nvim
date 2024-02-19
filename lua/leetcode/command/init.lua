@@ -344,13 +344,12 @@ end
 
 function cmd.get_session_by_name(name)
     local sessions = config.sessions
-    if name == "default" then name = "" end
+    if name == "anonymous" then name = "" end
     return vim.tbl_filter(function(s) return s.name == name end, sessions)[1]
 end
 
 function cmd.change_session(opts)
-    local name = opts.name[1]
-    if not name then return log.error("Session name not provided") end
+    local name = opts.name[1] or ""
 
     local session = cmd.get_session_by_name(name)
     if not session then return log.error("Session not found") end
@@ -359,6 +358,7 @@ function cmd.change_session(opts)
     local stats_api = require("leetcode.api.statistics")
     stats_api.change_session(session.id, function(_, err)
         if err then return log.err(err) end
+        log.info(("Session changed to `%s`"):format(name))
         stats:update()
     end)
 end
