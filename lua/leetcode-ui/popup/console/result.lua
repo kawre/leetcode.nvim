@@ -20,6 +20,7 @@ function ResultPopup:handle(item)
     if item._.submission then
         local status = item.status_code == 10 and "ac" or "notac"
         problemlist.change_status(self.console.question.q.title_slug, status)
+        if status == "ac" then require("leetcode-ui.lines.stats"):update_streak() end
     end
 
     self:draw()

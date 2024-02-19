@@ -38,9 +38,7 @@ function Stats:contents()
     return Stats.super.contents(self)
 end
 
-function Stats:update()
-    self.progress = {}
-
+function Stats:update_streak()
     stats_api.streak(function(res, err)
         if err then return log.err(err) end
 
@@ -49,6 +47,10 @@ function Stats:update()
 
         if _Lc_menu then _Lc_menu:draw() end
     end)
+end
+
+function Stats:update_sessions()
+    self.progress = {}
 
     stats_api.sessions(function(_, err)
         if err then return log.err(err) end
@@ -67,6 +69,11 @@ function Stats:update()
 
         if _Lc_menu then _Lc_menu:draw() end
     end)
+end
+
+function Stats:update()
+    self:update_streak()
+    self:update_sessions()
 
     if _Lc_menu then _Lc_menu:draw() end
 end
