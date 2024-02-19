@@ -26,14 +26,10 @@ local config = {
 
     langs = require("leetcode.config.langs"),
     icons = require("leetcode.config.icons"),
+    sessions = require("leetcode.config.sessions"),
 
     ---@type lc.UserStatus
     auth = {}, ---@diagnostic disable-line
-
-    ---@type lc.res.session[]
-    sessions = {},
-
-    default_session_name = "anonymous",
 }
 
 ---Merge configurations into default configurations and set it as user configurations.

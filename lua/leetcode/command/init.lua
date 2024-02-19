@@ -338,18 +338,18 @@ function cmd.restore()
 end
 
 function cmd.get_active_session()
-    local sessions = config.sessions
+    local sessions = config.sessions.all
     return vim.tbl_filter(function(s) return s.is_active end, sessions)[1]
 end
 
 function cmd.get_session_by_name(name)
-    local sessions = config.sessions
-    if name == config.default_session_name then name = "" end
+    local sessions = config.sessions.all
+    if name == config.sessions.default then name = "" end
     return vim.tbl_filter(function(s) return s.name == name end, sessions)[1]
 end
 
 function cmd.change_session(opts)
-    local name = opts.name[1] or config.default_session_name
+    local name = opts.name[1] or config.sessions.default
 
     local session = cmd.get_session_by_name(name)
     if not session then return log.error("Session not found") end
@@ -396,6 +396,8 @@ end
 
 ---@param tbl table
 local function cmds_keys(tbl)
+    log.debug(tbl)
+
     return vim.tbl_filter(function(key)
         if type(key) ~= "string" then return false end
         if key:sub(1, 1) == "_" then return false end

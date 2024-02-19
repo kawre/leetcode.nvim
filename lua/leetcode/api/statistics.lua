@@ -138,7 +138,7 @@ function statistics.sessions(cb)
         body = vim.empty_dict(),
         callback = function(res, err)
             if err then return cb(nil, err) end
-            config.sessions = res.sessions
+            config.sessions.update(res.sessions)
             cb(res.sessions)
         end,
     })
@@ -156,7 +156,7 @@ function statistics.change_session(id, cb)
         body = body,
         callback = function(res, err)
             if err then return cb(nil, err) end
-            config.sessions = res.sessions
+            config.sessions.update(res.sessions)
             cb(res.sessions)
         end,
     })
@@ -174,7 +174,7 @@ function statistics.create_session(name, cb)
         body = body,
         callback = function(res, err)
             if err then return cb(nil, err) end
-            config.sessions = res.sessions
+            config.sessions.update(res.sessions)
             cb(res.sessions)
         end,
     })

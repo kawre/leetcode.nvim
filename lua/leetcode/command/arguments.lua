@@ -87,17 +87,9 @@ arguments.random = {
     tags = topics,
 }
 
-arguments.session_change = setmetatable({}, {
-    __index = function(_, key)
-        if key == "name" then
-            local sessions = config.sessions
-            return vim.tbl_map(
-                function(s) return s.name == "" and config.default_session_name or s.name end,
-                sessions
-            )
-        end
-    end,
-})
+arguments.session_change = {
+    name = config.sessions.names,
+}
 
 arguments.session_create = {
     name = {},

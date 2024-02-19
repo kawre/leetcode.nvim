@@ -23,7 +23,7 @@ function Stats:contents()
     self:append("session: ", "leetcode_alt")
     local session = cmd.get_active_session()
     local session_name = session
-            and (session.name == "" and config.default_session_name or session.name)
+            and (session.name == "" and config.sessions.default or session.name)
         or "-"
     self:append(session_name)
 
