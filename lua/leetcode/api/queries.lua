@@ -173,7 +173,6 @@ queries.session_progress = [[
                     acSubmissionNum {
                         difficulty
                         count
-                        submissions
                     }
                 }
             }

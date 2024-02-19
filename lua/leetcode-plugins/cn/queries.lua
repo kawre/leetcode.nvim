@@ -149,3 +149,14 @@ queries.streak = [[
             }
         }
     ]]
+
+queries.session_progress = [[
+        query userSessionProgress($userSlug: String!) {
+            userProfileUserQuestionProgress(userSlug: $userSlug) {
+                numAcceptedQuestions {
+                    difficulty
+                    count
+                }
+            }
+        }
+    ]]

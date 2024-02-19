@@ -20,7 +20,7 @@ function Stats:contents()
 
     self:append((" %s "):format(config.icons.bar))
 
-    self:append("session: ", "leetcode_alt")
+    self:append(t("session") .. ": ", "leetcode_alt")
     local session = cmd.get_active_session()
     local session_name = session
             and (session.name == "" and config.sessions.default or session.name)

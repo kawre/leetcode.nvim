@@ -28,6 +28,25 @@ statistics.solved = function(cb) ---@diagnostic disable-line
     })
 end
 
+---@param cb fun(res: lc.Stats.QuestionCount[], err: lc.err)
+statistics.session_progress = function(cb)
+    local variables = {
+        userSlug = config.auth.name,
+    }
+
+    local query = queries.session_progress
+
+    utils.query(query, variables, {
+        callback = function(res, err)
+            if err then return cb(nil, err) end
+
+            local data = res.data
+            local session_progress = data["userProfileUserQuestionProgress"]["numAcceptedQuestions"]
+            cb(session_progress)
+        end,
+    })
+end
+
 statistics.calendar = function(cb) ---@diagnostic disable-line
     local variables = {
         username = config.auth.name,
