@@ -11,7 +11,7 @@
 https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-123cb32b7563
 
 > [!CAUTION]
-> This plugin has been exclusively tested with `Java`.
+> This plugin has been primarily tested with `Java`.
 > If you encounter any errors while using other languages,
 > please open an issue to report them.
 
@@ -313,6 +313,13 @@ image_support = false,
 - `last_submit` retrieve last submitted code for the current question
 
 - `restore` try to restore default question layout
+
+- `session`
+
+  - `create` create a new session
+  - `change` change the current session
+
+  - `update` update the current session in case it went out of sync
 
 - `desc` toggle question description
 

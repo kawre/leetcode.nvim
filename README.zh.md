@@ -316,6 +316,14 @@ image_support = false, -- 将此设置为 `true` 将禁用问题描述的换行
 
 - `restore` 尝试恢复默认问题布局
 
+- `session`
+
+  - `create` 创建一个新的会话
+
+  - `change` 更改当前会话
+
+  - `update` 更新当前会话，以防它失去同步
+
 - `desc` 切换问题描述
 
   - `toggle` 与 `Leet desc` 相同
