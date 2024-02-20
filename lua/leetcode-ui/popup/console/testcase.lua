@@ -127,10 +127,12 @@ function Testcase:append(input)
 end
 
 function Testcase:autocmds()
-    self:on(
-        { "TextChanged", "TextChangedI", "TextChangedP", "TextChangedT" },
-        function() self:draw_extmarks() end
-    )
+    self:on({
+        "TextChanged",
+        "TextChangedI",
+        "TextChangedP",
+        "InsertLeave",
+    }, function() self:draw_extmarks() end)
 end
 
 function Testcase:mount()
