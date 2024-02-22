@@ -112,7 +112,6 @@ end
 
 function Menu:apply_options()
     api.nvim_buf_set_name(self.bufnr, "")
-    pcall(vim.diagnostic.disable, self.bufnr)
 
     utils.set_buf_opts(self.bufnr, {
         modifiable = false,
