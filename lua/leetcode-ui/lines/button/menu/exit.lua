@@ -1,4 +1,5 @@
 local MenuButton = require("leetcode-ui.lines.button.menu")
+local leetcode = require("leetcode")
 
 ---@class lc.ui.Button.Menu.Exit : lc.ui.Button.Menu
 local MenuExitButton = MenuButton:extend("LeetMenuExitButton")
@@ -8,7 +9,7 @@ function MenuExitButton:init()
     MenuExitButton.super.init(self, "Exit", {
         icon = "󰩈",
         sc = "q",
-        on_press = function() vim.cmd.quitall() end,
+        on_press = leetcode.stop,
     })
 end
 

@@ -6,10 +6,14 @@ local standalone = true
 ---@param on_vimenter boolean
 leetcode.should_skip = function(on_vimenter)
     if on_vimenter then
-        if vim.fn.argc() ~= 1 then return true end
+        if vim.fn.argc() ~= 1 then
+            return true
+        end
 
         local usr_arg, arg = vim.fn.argv()[1], config.user.arg
-        if usr_arg ~= arg then return true end
+        if usr_arg ~= arg then
+            return true
+        end
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
         if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then
@@ -53,7 +57,9 @@ leetcode.start = function(on_vimenter)
     end
 
     --- TODO: maybe cache the previous cwd and restore it when quitting?
-    if standalone then vim.api.nvim_set_current_dir(config.storage.home:absolute()) end
+    if standalone then
+        vim.api.nvim_set_current_dir(config.storage.home:absolute())
+    end
 
     local Menu = require("leetcode-ui.renderer.menu")
     Menu():mount()
@@ -65,9 +71,11 @@ leetcode.start = function(on_vimenter)
 end
 
 leetcode.stop = vim.schedule_wrap(function()
-    if standalone then return vim.cmd.quitall() end
+    if standalone then
+        return vim.cmd("qa!")
+    end
 
-    _Lc_Menu:_unmount()
+    _Lc_menu:_unmount()
 
     vim.api.nvim_create_user_command("Leet", require("leetcode.command").start_with_cmd, {
         bar = true,
