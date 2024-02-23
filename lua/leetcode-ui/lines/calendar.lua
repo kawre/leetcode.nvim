@@ -18,9 +18,7 @@ local Calendar = Lines:extend("LeetCalendar")
 
 local function get_days_in_month(month, year)
     local days_in_month = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
-    if (year % 4 == 0 and year % 100 ~= 0) or (year % 400 == 0) then
-        days_in_month[2] = 29
-    end
+    if (year % 4 == 0 and year % 100 ~= 0) or (year % 400 == 0) then days_in_month[2] = 29 end
     return days_in_month[month]
 end
 
@@ -59,9 +57,7 @@ function Calendar:handle_res(res)
         hour = 1,
         isdst = false,
     })
-    if self.threshold <= os.time(time) then
-        self.threshold = self.threshold + 24 * 60 * 60
-    end
+    if self.threshold <= os.time(time) then self.threshold = self.threshold + 24 * 60 * 60 end
 
     self.last_year_sub_count = 0
     self.month_lens = {}
@@ -165,9 +161,7 @@ local function square_hl(count, max_count)
 end
 
 function Calendar:handle_weekdays()
-    if self.curr_time > self.threshold then
-        return
-    end
+    if self.curr_time > self.threshold then return end
 
     local curr = os.date("*t", self.curr_time)
     local count = self:get_submission(curr) or 0
@@ -180,9 +174,7 @@ end
 
 function Calendar:fetch()
     statistics.calendar(function(res, err)
-        if err then
-            return log.err(err)
-        end
+        if err then return log.err(err) end
         self:handle_res(res)
     end)
 end

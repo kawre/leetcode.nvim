@@ -93,9 +93,7 @@ end
 
 function Solved:fetch()
     statistics.solved(function(res, err)
-        if err then
-            return log.err(err)
-        end
+        if err then return log.err(err) end
         self:handle_res(res)
     end)
 end

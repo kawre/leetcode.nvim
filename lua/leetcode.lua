@@ -8,14 +8,10 @@ local leetcode = {}
 ---@return boolean
 function leetcode.should_skip(on_vimenter)
     if on_vimenter then
-        if vim.fn.argc() ~= 1 then
-            return true
-        end
+        if vim.fn.argc() ~= 1 then return true end
 
         local usr_arg, arg = config.user.arg, vim.fn.argv()[1]
-        if usr_arg ~= arg then
-            return true
-        end
+        if usr_arg ~= arg then return true end
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
         if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then
@@ -41,9 +37,7 @@ function leetcode.setup_cmds() require("leetcode.command").setup() end
 
 ---@param on_vimenter boolean
 function leetcode.start(on_vimenter)
-    if leetcode.should_skip(on_vimenter) then
-        return false
-    end
+    if leetcode.should_skip(on_vimenter) then return false end
 
     config.setup()
 

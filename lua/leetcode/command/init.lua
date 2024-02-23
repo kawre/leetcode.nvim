@@ -105,9 +105,7 @@ cmd.expire = vim.schedule_wrap(function()
 
     cmd.cookie_prompt(function(success)
         if success then
-            if api.nvim_tabpage_is_valid(tabp) then
-                api.nvim_set_current_tabpage(tabp)
-            end
+            if api.nvim_tabpage_is_valid(tabp) then api.nvim_set_current_tabpage(tabp) end
             log.info("Successful re-login")
         else
             cmd.delete_cookie()
@@ -127,9 +125,7 @@ function cmd.qot()
     local Question = require("leetcode-ui.question")
 
     problems.question_of_today(function(qot, err)
-        if err then
-            return log.err(err)
-        end
+        if err then return log.err(err) end
         local problemlist = require("leetcode.cache.problemlist")
         Question(problemlist.get_by_title_slug(qot.title_slug)):mount()
     end)
@@ -141,9 +137,7 @@ function cmd.random_question(opts)
     local problems = require("leetcode.cache.problemlist")
     local question = require("leetcode.api.question")
 
-    if opts and opts.difficulty then
-        opts.difficulty = opts.difficulty[1]:upper()
-    end
+    if opts and opts.difficulty then opts.difficulty = opts.difficulty[1]:upper() end
     if opts and opts.status then
         opts.status = ({
             ac = "AC",
@@ -153,9 +147,7 @@ function cmd.random_question(opts)
     end
 
     local q, err = question.random(opts)
-    if err then
-        return log.err(err)
-    end
+    if err then return log.err(err) end
 
     local item = problems.get_by_title_slug(q.title_slug) or {}
     local Question = require("leetcode-ui.question")
@@ -164,9 +156,7 @@ end
 
 function cmd.start_with_cmd()
     local leetcode = require("leetcode")
-    if leetcode.start(false) then
-        cmd.menu()
-    end
+    if leetcode.start(false) then cmd.menu() end
 end
 
 function cmd.menu()
@@ -182,9 +172,7 @@ end
 function cmd.yank()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-    if not q then
-        return
-    end
+    if not q then return end
 
     if api.nvim_buf_is_valid(q.bufnr) and api.nvim_win_is_valid(q.winid) then
         api.nvim_set_current_win(q.winid)
@@ -208,41 +196,31 @@ function cmd.question_tabs() require("leetcode.pickers.question-tabs").pick() en
 function cmd.change_lang()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-    if q then
-        require("leetcode.pickers.language").pick(q)
-    end
+    if q then require("leetcode.pickers.language").pick(q) end
 end
 
 function cmd.desc_toggle()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-    if q then
-        q.description:toggle()
-    end
+    if q then q.description:toggle() end
 end
 
 function cmd.desc_toggle_stats()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-    if q then
-        q.description:toggle_stats()
-    end
+    if q then q.description:toggle_stats() end
 end
 
 function cmd.console()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-    if q then
-        q.console:toggle()
-    end
+    if q then q.console:toggle() end
 end
 
 function cmd.info()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
-    if q then
-        q.info:toggle()
-    end
+    if q then q.info:toggle() end
 end
 
 function cmd.hints()
@@ -254,24 +232,18 @@ function cmd.q_run()
     local utils = require("leetcode.utils")
     utils.auth_guard()
     local q = utils.curr_question()
-    if q then
-        q.console:run()
-    end
+    if q then q.console:run() end
 end
 
 function cmd.q_submit()
     local utils = require("leetcode.utils")
     utils.auth_guard()
     local q = utils.curr_question()
-    if q then
-        q.console:run(true)
-    end
+    if q then q.console:run(true) end
 end
 
 function cmd.ui_skills()
-    if config.is_cn then
-        return
-    end
+    if config.is_cn then return end
     local skills = require("leetcode-ui.popup.skills")
     skills:show()
 end
@@ -307,9 +279,7 @@ function cmd.reset()
     local utils = require("leetcode.utils")
     utils.auth_guard()
     local q = utils.curr_question()
-    if not q then
-        return
-    end
+    if not q then return end
 
     local snip = q:get_snippet(true)
     utils.set_question_lines(q, snip)
@@ -319,9 +289,7 @@ function cmd.last_submit()
     local utils = require("leetcode.utils")
     utils.auth_guard()
     local q = utils.curr_question()
-    if not q then
-        return
-    end
+    if not q then return end
 
     local question_api = require("leetcode.api.question")
     question_api.latest_submission(q.q.id, q.lang, function(res, err) --
@@ -347,9 +315,7 @@ function cmd.restore()
     local utils = require("leetcode.utils")
     utils.auth_guard()
     local q = utils.curr_question()
-    if not q then
-        return
-    end
+    if not q then return end
 
     if
         (q.winid and api.nvim_win_is_valid(q.winid))
@@ -378,9 +344,7 @@ function cmd.get_session_by_name(name)
     local sessions = config.sessions.all
 
     name = name:lower()
-    if name == config.sessions.default then
-        name = ""
-    end
+    if name == config.sessions.default then name = "" end
     return vim.tbl_filter(function(s) return s.name:lower() == name end, sessions)[1]
 end
 
@@ -388,15 +352,11 @@ function cmd.change_session(opts)
     local name = opts.name[1] or config.sessions.default
 
     local session = cmd.get_session_by_name(name)
-    if not session then
-        return log.error("Session not found")
-    end
+    if not session then return log.error("Session not found") end
 
     local stats_api = require("leetcode.api.statistics")
     stats_api.change_session(session.id, function(_, err)
-        if err then
-            return log.err(err)
-        end
+        if err then return log.err(err) end
         log.info(("Session changed to `%s`"):format(name))
         config.stats.update()
     end)
@@ -404,15 +364,11 @@ end
 
 function cmd.create_session(opts)
     local name = opts.name[1]
-    if not name then
-        return log.error("Session name not provided")
-    end
+    if not name then return log.error("Session name not provided") end
 
     local stats_api = require("leetcode.api.statistics")
     stats_api.create_session(name, function(_, err)
-        if err then
-            return log.err(err)
-        end
+        if err then return log.err(err) end
         log.info(("session `%s` created"):format(name))
     end)
 end
@@ -428,16 +384,12 @@ end
 ---@return string[], string[]
 function cmd.parse(args)
     local parts = vim.split(vim.trim(args), "%s+")
-    if args:sub(-1) == " " then
-        parts[#parts + 1] = ""
-    end
+    if args:sub(-1) == " " then parts[#parts + 1] = "" end
 
     local options = {}
     for _, part in ipairs(parts) do
         local opt = part:match("(.-)=.-")
-        if opt then
-            table.insert(options, opt)
-        end
+        if opt then table.insert(options, opt) end
     end
 
     return parts, options
@@ -446,15 +398,9 @@ end
 ---@param tbl table
 local function cmds_keys(tbl)
     return vim.tbl_filter(function(key)
-        if type(key) ~= "string" then
-            return false
-        end
-        if key:sub(1, 1) == "_" then
-            return false
-        end
-        if tbl[key]._private then
-            return false
-        end
+        if type(key) ~= "string" then return false end
+        if key:sub(1, 1) == "_" then return false end
+        if tbl[key]._private then return false end
 
         return true
     end, vim.tbl_keys(tbl))
@@ -475,9 +421,7 @@ end
 ---
 ---@return string[]
 function cmd.rec_complete(args, options, cmds)
-    if not cmds or vim.tbl_isempty(args) then
-        return {}
-    end
+    if not cmds or vim.tbl_isempty(args) then return {} end
 
     if not cmds._args and cmds[args[1]] then
         return cmd.rec_complete(args, options, cmds[table.remove(args, 1)])

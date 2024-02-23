@@ -22,9 +22,7 @@ local Question = Object("LeetQuestion")
 function Question:get_snippet(raw)
     local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
     local snip = vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
-    if not snip then
-        return
-    end
+    if not snip then return end
 
     local code = snip.code:gsub("\r\n", "\n")
     return raw and code or self:injector(code)
@@ -138,9 +136,7 @@ end
 
 function Question:mount()
     local tabp = utils.detect_duplicate_question(self.cache.title_slug, config.lang)
-    if tabp then
-        return pcall(vim.api.nvim_set_current_tabpage, tabp)
-    end
+    if tabp then return pcall(vim.api.nvim_set_current_tabpage, tabp) end
 
     local q = api_question.by_title_slug(self.cache.title_slug)
     if not q or q.is_paid_only and not config.auth.is_premium then

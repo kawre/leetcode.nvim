@@ -33,9 +33,7 @@ function utils.question_tabs()
 
     for _, q in ipairs(_Lc_state.questions) do
         local tabp = utils.question_tabp(q)
-        if tabp then
-            table.insert(questions, { tabpage = tabp, question = q })
-        end
+        if tabp then table.insert(questions, { tabpage = tabp, question = q }) end
     end
 
     return questions
@@ -45,9 +43,7 @@ end
 ---@return integer|nil
 function utils.question_tabp(q)
     local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, q.winid)
-    if ok then
-        return tabp
-    end
+    if ok then return tabp end
 end
 
 ---@return lc.ui.Question
@@ -78,15 +74,11 @@ end
 ---@param event lc.hook
 function utils.exec_hooks(event, ...)
     local fns = config.user.hooks[event]
-    if not fns then
-        log.error("unknown hook event: " .. event)
-    end
+    if not fns then log.error("unknown hook event: " .. event) end
 
     for i, fn in ipairs(fns) do
         local ok, msg = pcall(vim.schedule_wrap(fn), ...)
-        if not ok then
-            log.error(("bad hook #%d in `%s` event: %s"):format(i, event, msg))
-        end
+        if not ok then log.error(("bad hook #%d in `%s` event: %s"):format(i, event, msg)) end
     end
 end
 
@@ -112,9 +104,7 @@ function utils.norm_ins(str)
 end
 
 function utils.set_question_lines(q, code)
-    if not vim.api.nvim_buf_is_valid(q.bufnr) then
-        return
-    end
+    if not vim.api.nvim_buf_is_valid(q.bufnr) then return end
 
     local s_i, e_i = q:range()
     vim.api.nvim_buf_set_lines(q.bufnr, s_i - 1, e_i, false, vim.split(code, "\n"))

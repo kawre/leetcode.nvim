@@ -2,18 +2,15 @@ local leetcode = require("leetcode")
 local config = require("leetcode.config")
 
 local standalone = true
+local prev_cwd = nil
 
 ---@param on_vimenter boolean
 leetcode.should_skip = function(on_vimenter)
     if on_vimenter then
-        if vim.fn.argc() ~= 1 then
-            return true
-        end
+        if vim.fn.argc() ~= 1 then return true end
 
         local usr_arg, arg = vim.fn.argv()[1], config.user.arg
-        if usr_arg ~= arg then
-            return true
-        end
+        if usr_arg ~= arg then return true end
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
         if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then
@@ -49,17 +46,16 @@ leetcode.start = function(on_vimenter)
 
     if not on_vimenter then --
         if buflisted then
-            standalone = false
+            prev_cwd = vim.fn.getcwd()
             vim.cmd.tabe()
         else
             vim.cmd.enew()
         end
+
+        standalone = not buflisted
     end
 
-    --- TODO: maybe cache the previous cwd and restore it when quitting?
-    if standalone then
-        vim.api.nvim_set_current_dir(config.storage.home:absolute())
-    end
+    vim.api.nvim_set_current_dir(config.storage.home:absolute())
 
     local Menu = require("leetcode-ui.renderer.menu")
     Menu():mount()
@@ -71,9 +67,7 @@ leetcode.start = function(on_vimenter)
 end
 
 leetcode.stop = vim.schedule_wrap(function()
-    if standalone then
-        return vim.cmd("qa!")
-    end
+    if standalone then return vim.cmd("qa!") end
 
     _Lc_state.menu:_unmount()
 
@@ -84,4 +78,9 @@ leetcode.stop = vim.schedule_wrap(function()
     })
 
     require("leetcode.utils").exec_hooks("LeetLeave")
+
+    if prev_cwd then
+        vim.api.nvim_set_current_dir(prev_cwd)
+        prev_cwd = nil
+    end
 end)

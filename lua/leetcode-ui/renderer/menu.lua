@@ -12,9 +12,7 @@ local Menu = Renderer:extend("LeetMenu")
 
 local function tbl_keys(t)
     local keys = vim.tbl_keys(t)
-    if vim.tbl_isempty(keys) then
-        return
-    end
+    if vim.tbl_isempty(keys) then return end
     table.sort(keys)
     return keys
 end
@@ -52,17 +50,13 @@ function Menu:autocmds()
 end
 
 function Menu:cursor_move()
-    if not self.winid or not api.nvim_win_is_valid(self.winid) then
-        return
-    end
+    if not self.winid or not api.nvim_win_is_valid(self.winid) then return end
 
     local curr = api.nvim_win_get_cursor(self.winid)
     local prev = self.cursor.prev
 
     local keys = tbl_keys(self._.buttons)
-    if not keys then
-        return
-    end
+    if not keys then return end
 
     local function find_nearest(l, r)
         while l < r do
