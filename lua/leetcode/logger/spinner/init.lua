@@ -50,7 +50,7 @@ function spinner:spin()
 
     self.index = (self.index + 1) % #stype.frames
 
-    local fps = 1000 / #stype.frames
+    local fps = math.floor(1000 / #stype.frames)
     vim.defer_fn(function() self:spin() end, fps)
 end
 
@@ -62,6 +62,9 @@ end
 function spinner:set(msg, lvl, opts)
     if msg then self:update(msg) end
     lvl = lvl or vim.log.levels.INFO
+
+    local log = require("leetcode.logger")
+    log.debug(self.noti)
 
     opts = vim.tbl_deep_extend("force", {
         hide_from_history = true,
@@ -97,6 +100,10 @@ function spinner:stop(msg, success, opts)
 
     self.spinner = nil
     local lvl = vim.log.levels[success and "INFO" or "ERROR"]
+
+    local log = require("leetcode.logger")
+    log.debug({ noti = self.noti, msg = "spinner stop" })
+
     self:set(msg, lvl, opts)
 end
 

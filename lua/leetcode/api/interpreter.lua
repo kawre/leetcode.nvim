@@ -83,8 +83,9 @@ function interpreter.run(submit, q, body, callback)
                 end
                 callback(nil, nil, err)
             else
-                q.console.result:clear()
                 local id = submit and res.submission_id or res.interpret_id
+                q.console.testcase:snapshot(id, res)
+                q.console.result:clear()
                 interpreter.listener(id, callback)
             end
         end,
