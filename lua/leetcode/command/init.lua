@@ -99,6 +99,11 @@ cmd.q_close_all = vim.schedule_wrap(function()
     end
 end)
 
+function cmd.exit()
+    local leetcode = require("leetcode")
+    leetcode.stop()
+end
+
 cmd.expire = vim.schedule_wrap(function()
     local tabp = api.nvim_get_current_tabpage()
     cmd.menu()
@@ -492,6 +497,7 @@ cmd.commands = {
     cmd.menu,
 
     menu = { cmd.menu },
+    exit = { cmd.exit },
     console = { cmd.console },
     info = { cmd.info },
     hints = { cmd.hints },

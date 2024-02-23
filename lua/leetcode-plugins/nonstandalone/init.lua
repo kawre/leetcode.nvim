@@ -5,9 +5,8 @@ nonstandalone.opts = {
     lazy = false,
 }
 
-function nonstandalone.load()
+function nonstandalone.load() --
     require("leetcode-plugins.nonstandalone.leetcode")
-    require("leetcode-plugins.nonstandalone.command")
 end
 
 return nonstandalone
