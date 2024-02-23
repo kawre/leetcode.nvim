@@ -24,7 +24,7 @@ function Renderer:draw(component)
     self.bufnr = component.bufnr
     self.winid = component.winid
 
-    if not vim.api.nvim_buf_is_valid(self.bufnr) then --
+    if not vim.api.nvim_buf_is_valid(self.bufnr) then
         return
     end
 
@@ -41,7 +41,9 @@ function Renderer:draw(component)
 
         Renderer.super.draw(self, self, self._.opts)
     end)
-    if c_ok then pcall(vim.api.nvim_win_set_cursor, self.winid, c) end
+    if c_ok then
+        pcall(vim.api.nvim_win_set_cursor, self.winid, c)
+    end
 end
 
 ---@private
@@ -49,17 +51,27 @@ end
 ---@param fn function
 function Renderer:modifiable(fn)
     local bufnr = self.bufnr
-    if not (bufnr and vim.api.nvim_buf_is_valid(bufnr)) then return end
+    if not (bufnr and vim.api.nvim_buf_is_valid(bufnr)) then
+        return
+    end
 
     local modi = vim.api.nvim_buf_get_option(bufnr, "modifiable")
-    if not modi then vim.api.nvim_buf_set_option(bufnr, "modifiable", true) end
+    if not modi then
+        vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
+    end
     fn()
-    if not modi then vim.api.nvim_buf_set_option(bufnr, "modifiable", false) end
+    if not modi then
+        vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
+    end
 end
 
 function Renderer:map(mode, key, handler, opts) --
-    if not self.bufnr then return end
-    if type(key) == "number" then key = tostring(key) end
+    if not self.bufnr then
+        return
+    end
+    if type(key) == "number" then
+        key = tostring(key)
+    end
 
     if type(key) == "table" then
         for _, k in ipairs(key) do
@@ -72,7 +84,9 @@ function Renderer:map(mode, key, handler, opts) --
         local clearable = options.clearable
         options.clearable = nil
 
-        if clearable then self._.keymaps[key] = mode end
+        if clearable then
+            self._.keymaps[key] = mode
+        end
         vim.keymap.set(mode, key, handler, options)
         vim.keymap.set(mode, key, handler, options)
     end
@@ -112,15 +126,23 @@ function Renderer:handle_press(line_idx)
         vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<cr>", true, false, true), "n", true)
     end
 
-    if not self.bufnr or not self.winid then feedenter() end
-    if not line_idx and not vim.api.nvim_win_is_valid(self.winid) then return feedenter() end
+    if not self.bufnr or not self.winid then
+        feedenter()
+    end
+    if not line_idx and not vim.api.nvim_win_is_valid(self.winid) then
+        return feedenter()
+    end
 
     line_idx = line_idx or vim.api.nvim_win_get_cursor(self.winid)[1]
 
-    if not self._.buttons[line_idx] then return feedenter() end
+    if not self._.buttons[line_idx] then
+        return feedenter()
+    end
 
     local ok, err = pcall(function() self._.buttons[line_idx]:press() end)
-    if not ok then log.error(err) end
+    if not ok then
+        log.error(err)
+    end
 end
 
 ---@param button lc.ui.Button

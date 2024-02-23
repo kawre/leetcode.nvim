@@ -75,7 +75,7 @@ leetcode.stop = vim.schedule_wrap(function()
         return vim.cmd("qa!")
     end
 
-    _Lc_menu:_unmount()
+    _Lc_state.menu:_unmount()
 
     vim.api.nvim_create_user_command("Leet", require("leetcode.command").start_with_cmd, {
         bar = true,

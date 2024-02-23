@@ -12,7 +12,9 @@ local Menu = Renderer:extend("LeetMenu")
 
 local function tbl_keys(t)
     local keys = vim.tbl_keys(t)
-    if vim.tbl_isempty(keys) then return end
+    if vim.tbl_isempty(keys) then
+        return
+    end
     table.sort(keys)
     return keys
 end
@@ -50,13 +52,17 @@ function Menu:autocmds()
 end
 
 function Menu:cursor_move()
-    if not self.winid or not api.nvim_win_is_valid(self.winid) then return end
+    if not self.winid or not api.nvim_win_is_valid(self.winid) then
+        return
+    end
 
     local curr = api.nvim_win_get_cursor(self.winid)
     local prev = self.cursor.prev
 
     local keys = tbl_keys(self._.buttons)
-    if not keys then return end
+    if not keys then
+        return
+    end
 
     local function find_nearest(l, r)
         while l < r do
@@ -138,13 +144,7 @@ function Menu:apply_options()
 end
 
 function Menu:_unmount()
-    for _, tabp in ipairs(require("leetcode.utils").question_tabs()) do
-        vim.api.nvim_set_current_tabpage(tabp.tabpage) -- question tabpage
-        vim.cmd.tabclose()
-        if vim.api.nvim_buf_is_valid(tabp.question.bufnr) then
-            vim.api.nvim_buf_delete(tabp.question.bufnr, { force = true })
-        end
-    end
+    require("leetcode.command").q_close_all()
 
     -- close menu tabpage
     if self.bufnr and vim.api.nvim_buf_is_valid(self.bufnr) then
@@ -154,8 +154,6 @@ function Menu:_unmount()
     if self.winid and vim.api.nvim_win_is_valid(self.winid) then
         vim.api.nvim_win_close(self.winid, true)
     end
-
-    self = nil
 end
 
 ---@param self lc.ui.Menu
@@ -219,7 +217,7 @@ function Menu:init()
     self.bufnr = api.nvim_get_current_buf()
     self.winid = api.nvim_get_current_win()
 
-    _Lc_menu = self
+    _Lc_state.menu = self
 end
 
 ---@type fun(): lc.ui.Menu

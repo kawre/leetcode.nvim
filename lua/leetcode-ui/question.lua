@@ -22,7 +22,9 @@ local Question = Object("LeetQuestion")
 function Question:get_snippet(raw)
     local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
     local snip = vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
-    if not snip then return end
+    if not snip then
+        return
+    end
 
     local code = snip.code:gsub("\r\n", "\n")
     return raw and code or self:injector(code)
@@ -96,7 +98,10 @@ function Question:_unmount(pre)
         vim.api.nvim_win_close(self.winid, true)
     end
 
-    _Lc_questions = vim.tbl_filter(function(q) return q.bufnr ~= self.bufnr end, _Lc_questions)
+    _Lc_state.questions = vim.tbl_filter(
+        function(q) return q.bufnr ~= self.bufnr end,
+        _Lc_state.questions
+    )
 
     self = nil
 end
@@ -115,7 +120,7 @@ function Question:handle_mount()
 
     self.bufnr = vim.api.nvim_get_current_buf()
     self.winid = vim.api.nvim_get_current_win()
-    table.insert(_Lc_questions, self)
+    table.insert(_Lc_state.questions, self)
 
     vim.api.nvim_create_autocmd("QuitPre", {
         buffer = self.bufnr,
@@ -133,7 +138,9 @@ end
 
 function Question:mount()
     local tabp = utils.detect_duplicate_question(self.cache.title_slug, config.lang)
-    if tabp then return pcall(vim.api.nvim_set_current_tabpage, tabp) end
+    if tabp then
+        return pcall(vim.api.nvim_set_current_tabpage, tabp)
+    end
 
     local q = api_question.by_title_slug(self.cache.title_slug)
     if not q or q.is_paid_only and not config.auth.is_premium then

@@ -76,7 +76,7 @@ function Solved:handle_res(res)
         self:endl()
     end
 
-    _Lc_menu:draw()
+    _Lc_state.menu:draw()
 end
 
 function Solved:update()
@@ -93,7 +93,9 @@ end
 
 function Solved:fetch()
     statistics.solved(function(res, err)
-        if err then return log.err(err) end
+        if err then
+            return log.err(err)
+        end
         self:handle_res(res)
     end)
 end
