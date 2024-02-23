@@ -60,7 +60,7 @@ local M = {
 
     ---@type table<string, boolean>
     plugins = {
-        nonstandalone = false,
+        non_standalone = false,
     },
 
     ---@type boolean

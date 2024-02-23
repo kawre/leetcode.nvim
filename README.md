@@ -95,7 +95,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
     ---@type table<string, boolean>
     plugins = {
-        nonstandalone = false,
+        non_standalone = false,
     },
 
     ---@type boolean
@@ -239,7 +239,7 @@ storage = {
 ```lua
 ---@type table<string, boolean>
 plugins = {
-    nonstandalone = false,
+    non_standalone = false,
 },
 ```
 
@@ -434,11 +434,11 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4
 ### Non-Standalone mode
 
 To run [leetcode.nvim] in a non-standalone mode (i.e. not with argument or an empty Neovim session),
-enable the `nonstandalone` plugin in your config:
+enable the `non_standalone` plugin in your config:
 
 ```lua
 plugins = {
-    nonstandalone = true,
+    non_standalone = true,
 }
 ```
 

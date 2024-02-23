@@ -97,7 +97,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
     ---@type table<string, boolean>
     plugins = {
-        nonstandalone = false,
+        non_standalone = false,
     },
 
     ---@type boolean
@@ -240,7 +240,7 @@ storage = {
 ```lua
 ---@type table<string, boolean>
 plugins = {
-    nonstandalone = false,
+    non_standalone = false,
 },
 ```
 
@@ -429,11 +429,11 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4
 ### Non-Standalone mode
 
 要在非独立模式下运行 [leetcode.nvim]（即不带参数或在空的 Neovim 会话中运行），
-请在您的配置中启用 `nonstandalone` 插件：
+请在您的配置中启用 `non_standalone` 插件：
 
 ```lua
 plugins = {
-    nonstandalone = true,
+    non_standalone = true,
 }
 ```
 
