@@ -93,6 +93,11 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         cache = vim.fn.stdpath("cache") .. "/leetcode",
     },
 
+    ---@type table<string, boolean>
+    plugins = {
+        nonstandalone = false,
+    },
+
     ---@type boolean
     logging = true,
 
@@ -149,7 +154,6 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         focus_result = "L", ---@type string
     },
 
-    plugins = {},
 
     ---@type boolean
     image_support = false,
@@ -225,6 +229,17 @@ storage directories
 storage = {
     home = vim.fn.stdpath("data") .. "/leetcode",
     cache = vim.fn.stdpath("cache") .. "/leetcode",
+},
+```
+
+### plugins
+
+[plugins list](#-plugins)
+
+```lua
+---@type table<string, boolean>
+plugins = {
+    nonstandalone = false,
 },
 ```
 
@@ -414,21 +429,16 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4
   }
   ```
 
-### Plugins
+## 🧩 Plugins
 
-#### Non-Standalone mode
+### Non-Standalone mode
 
 To run [leetcode.nvim] in a non-standalone mode (i.e. not with argument or an empty Neovim session),
 enable the "nonstandalone" plugin in your config:
 
 ```lua
-return {
-    "kawre/leetcode.nvim",
-    opts = {
-        plugins = {
-            nonstandalone = true,
-        }
-    },
+plugins = {
+    nonstandalone = true,
 }
 ```
 
