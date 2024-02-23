@@ -119,6 +119,7 @@ function Description:populate()
 
     header:append(q.frontend_id .. ". ", "leetcode_normal")
     header:append(utils.translate(q.title, q.translated_title))
+    if q.is_paid_only then header:append(" " .. t("Premium"), "leetcode_medium") end
     header:endgrp()
 
     local show_stats = self.show_stats
@@ -129,17 +130,12 @@ function Description:populate()
         header:append("????", "leetcode_list")
     end
 
-    local user_status = {
-        ac = { "", "leetcode_easy" },
-        notac = { "󱎖", "leetcode_medium" },
-        todo = { "", "leetcode_alt" },
-    }
-    if user_status[self.question.cache.status] then
-        local s = user_status[self.question.cache.status]
+    if config.icons.hl.status[self.question.cache.status] then
+        local s = config.icons.hl.status[self.question.cache.status]
         header:append(" "):append(s[1], s[2])
     end
 
-    header:append(" | ")
+    header:append((" %s "):format(config.icons.bar))
 
     local likes = show_stats and q.likes or "___"
     header:append(likes .. " ", "leetcode_alt")
@@ -147,13 +143,13 @@ function Description:populate()
     local dislikes = show_stats and q.dislikes or "___"
     if not config.is_cn then header:append((" %s "):format(dislikes), "leetcode_alt") end
 
-    header:append(" | ")
+    header:append((" %s "):format(config.icons.bar))
 
     local ac_rate = show_stats and q.stats.acRate or "__%"
     local total_sub = show_stats and q.stats.totalSubmission or "__"
     header:append(("%s %s %s"):format(ac_rate, t("of"), total_sub), "leetcode_alt")
     if not vim.tbl_isempty(q.hints) then
-        header:append(" | ")
+        header:append((" %s "):format(config.icons.bar))
         header:append("󰛨 " .. t("Hints"), "leetcode_hint")
     end
     header:endgrp()

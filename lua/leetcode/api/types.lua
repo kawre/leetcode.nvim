@@ -332,6 +332,7 @@
 ---@field is_premium boolean
 ---@field is_verified boolean
 ---@field id integer
+---@field session_id integer
 
 --------------------------------------------
 --- Statistics
@@ -392,3 +393,15 @@
 ---@field lvl integer
 
 ---@alias lc.err lc.Api.err|nil
+
+--------------------------------------------
+--- Sessions
+--------------------------------------------
+---@class lc.res.session
+---@field ac_questions integer
+---@field id integer
+---@field is_active boolean
+---@field name string
+---@field submitted_questions integer
+---@field total_acs integer
+---@field total_submitted integer

@@ -9,6 +9,7 @@ queries.auth = [[
                 is_signed_in: isSignedIn
                 is_premium: isPremium
                 is_verified: isVerified
+                session_id: activeSessionId
             }
         }
     ]]
@@ -150,6 +151,29 @@ queries.languages = [[
                 languageProblemCount {
                     lang: languageName
                     problems_solved: problemsSolved
+                }
+            }
+        }
+    ]]
+
+queries.streak = [[
+        query getStreakCounter {
+            streakCounter {
+                streakCount
+                daysSkipped
+                todayCompleted: currentDayCompleted
+            }
+        }
+    ]]
+
+queries.session_progress = [[
+        query userSessionProgress($username: String!) {
+            matchedUser(username: $username) {
+                submitStats {
+                    acSubmissionNum {
+                        difficulty
+                        count
+                    }
                 }
             }
         }

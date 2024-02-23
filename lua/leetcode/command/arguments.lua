@@ -1,3 +1,5 @@
+local config = require("leetcode.config")
+
 local arguments = {}
 
 local topics = {
@@ -83,6 +85,14 @@ arguments.random = {
     difficulty = { "easy", "medium", "hard" },
     status = { "ac", "notac", "todo" },
     tags = topics,
+}
+
+arguments.session_change = {
+    name = config.sessions.names,
+}
+
+arguments.session_create = {
+    name = {},
 }
 
 return arguments

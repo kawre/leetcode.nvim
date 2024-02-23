@@ -1,15 +1,16 @@
+local cmd = require("leetcode.command")
+local config = require("leetcode.config")
+
 local Solved = require("leetcode-ui.lines.solved")
 local Calendar = require("leetcode-ui.lines.calendar")
 local Group = require("leetcode-ui.group")
-local Footer = require("leetcode-ui.lines.footer")
 local Page = require("leetcode-ui.group.page")
 local Buttons = require("leetcode-ui.group.buttons.menu")
 local Button = require("leetcode-ui.lines.button.menu")
 local BackButton = require("leetcode-ui.lines.button.menu.back")
 local Title = require("leetcode-ui.lines.title")
 
-local cmd = require("leetcode.command")
-local config = require("leetcode.config")
+local footer = require("leetcode-ui.lines.footer")
 
 local page = Page()
 
@@ -52,6 +53,7 @@ local update = Button("Update", {
     on_press = function()
         calendar:update()
         solved:update()
+        config.stats.update()
     end,
 })
 buttons:insert(update)
@@ -61,6 +63,6 @@ buttons:insert(back)
 
 page:insert(buttons)
 
-page:insert(Footer())
+page:insert(footer)
 
 return page

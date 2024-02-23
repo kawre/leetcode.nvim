@@ -18,17 +18,14 @@ local log = require("leetcode.logger")
 ---@field cache lc.cache.Question
 local Question = Object("LeetQuestion")
 
-function Question:get_snippet()
+---@param raw? boolean
+function Question:get_snippet(raw)
     local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
     local snip = vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
     if not snip then return end
 
-    local lang = utils.get_lang(self.lang)
-    snip.code = (snip.code or ""):gsub("\r\n", "\n")
-
-    return self:injector(
-        ("%s @leet start\n%s\n%s @leet end"):format(lang.comment, snip.code, lang.comment)
-    )
+    local code = snip.code:gsub("\r\n", "\n")
+    return raw and code or self:injector(code)
 end
 
 function Question:create_file()
@@ -54,13 +51,10 @@ function Question:create_file()
     return self.file:absolute()
 end
 
----@private
 ---@param code string
 function Question:injector(code)
     local injector = config.user.injector
-
-    local inject = injector[self.lang]
-    if not inject or vim.tbl_isempty(inject) then return code end
+    local inject = injector[self.lang] or {}
 
     ---@param inj? string|string[]
     ---@param before boolean
@@ -80,22 +74,26 @@ function Question:injector(code)
         end
     end
 
+    local lang = utils.get_lang(self.lang)
     return norm_inject(inject.before, true) --
+        .. ("%s @leet start\n"):format(lang.comment)
         .. code
+        .. ("\n%s @leet end"):format(lang.comment)
         .. norm_inject(inject.after, false)
 end
 
-function Question:_unmount()
+---@param pre? boolean
+function Question:_unmount(pre)
     self.info:unmount()
     self.console:unmount()
     self.description:unmount()
 
-    if vim.api.nvim_buf_is_valid(self.bufnr) then
-        pcall(vim.api.nvim_buf_delete, self.bufnr, { force = true })
+    if not pre and vim.api.nvim_buf_is_valid(self.bufnr) then
+        vim.api.nvim_buf_delete(self.bufnr, { force = true })
     end
 
     if vim.api.nvim_win_is_valid(self.winid) then --
-        pcall(vim.api.nvim_win_close, self.winid, true)
+        vim.api.nvim_win_close(self.winid, true)
     end
 
     _Lc_questions = vim.tbl_filter(function(q) return q.bufnr ~= self.bufnr end, _Lc_questions)
@@ -104,7 +102,8 @@ function Question:_unmount()
 end
 
 ---@param self lc.ui.Question
-Question.unmount = vim.schedule_wrap(function(self) self:_unmount() end)
+---@param pre? boolean
+Question.unmount = vim.schedule_wrap(function(self, pre) self:_unmount(pre) end)
 
 function Question:handle_mount()
     vim.cmd("$tabe " .. self:create_file())
@@ -120,7 +119,7 @@ function Question:handle_mount()
 
     vim.api.nvim_create_autocmd("QuitPre", {
         buffer = self.bufnr,
-        callback = function() self:unmount() end,
+        callback = function() self:unmount(true) end,
     })
 
     self.description = Description(self):mount()
@@ -173,10 +172,12 @@ function Question:range()
     return start_i, end_i, lines
 end
 
+---@param submit boolean
 ---@return string
-function Question:lines()
+function Question:lines(submit)
     local start_i, end_i, lines = self:range()
-    return table.concat(lines, "\n", start_i, end_i)
+    local prefix = not submit and ("\n"):rep(start_i - 1) or ""
+    return prefix .. table.concat(lines, "\n", start_i, end_i)
 end
 
 ---@param self lc.ui.Question

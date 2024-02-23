@@ -14,15 +14,23 @@ spinner.__index = spinner
 ---@field fps integer
 
 ---@alias lc.spinner_types
+---| "hamburger"
+---| "snake"
 ---| "dot"
 ---| "points"
 
 ---@type lc.spinner[]
 local spinners = {
+    hamburger = {
+        frames = { "☱", "☲", "☴", "☲" },
+        fps = 15,
+    },
+    snake = {
+        frames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
+        fps = 10,
+    },
     dot = {
         frames = { "⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷" },
-        -- frames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
-        -- frames = { "☱", "☲", "☴", "☲" },
         fps = 15,
     },
     points = {

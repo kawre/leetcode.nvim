@@ -1,5 +1,6 @@
 local NuiText = require("nui.text")
 local Group = require("leetcode-ui.group")
+local config = require("leetcode.config")
 
 local log = require("leetcode.logger")
 
@@ -8,7 +9,7 @@ local Pre = Group:extend("LeetPre")
 
 function Pre:add_margin(item)
     if item.class.name == "LeetLine" then
-        table.insert(item._texts, 1, NuiText("\t▎\t", "leetcode_indent"))
+        table.insert(item._texts, 1, NuiText(config.icons.indent, "leetcode_indent"))
         return
     end
 

@@ -1,17 +1,17 @@
-local Header = require("leetcode-ui.lines.menu-header")
+local cmd = require("leetcode.command")
+
 local Title = require("leetcode-ui.lines.title")
-local Footer = require("leetcode-ui.lines.footer")
 local Buttons = require("leetcode-ui.group.buttons.menu")
 local Page = require("leetcode-ui.group.page")
-
 local Button = require("leetcode-ui.lines.button.menu")
 local BackButton = require("leetcode-ui.lines.button.menu.back")
 
-local cmd = require("leetcode.command")
+local header = require("leetcode-ui.lines.menu-header")
+local footer = require("leetcode-ui.lines.footer")
 
 local page = Page()
 
-page:insert(Header())
+page:insert(header)
 
 page:insert(Title({ "Menu" }, "Cache"))
 
@@ -28,6 +28,6 @@ page:insert(Buttons({
     back_btn,
 }))
 
-page:insert(Footer())
+page:insert(footer)
 
 return page

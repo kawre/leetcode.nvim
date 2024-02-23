@@ -17,7 +17,7 @@ function Skills:handle(name, skills)
     local lines = Lines()
 
     table.sort(skills, function(a, b) return a.problems_solved > b.problems_solved end)
-    lines:append("󱓻", utils.diff_to_hl(name))
+    lines:append(config.icons.square, utils.diff_to_hl(name))
     lines:append(" " .. name)
 
     for _, skill in ipairs(skills) do

@@ -76,7 +76,7 @@ function Solved:handle_res(res)
         self:endl()
     end
 
-    _Lc_Menu:draw()
+    _Lc_menu:draw()
 end
 
 function Solved:update()

@@ -2,7 +2,7 @@ local log = require("leetcode.logger")
 local arguments = require("leetcode.command.arguments")
 local config = require("leetcode.config")
 local event = require("nui.utils.autocmd").event
-local keys = config.user.keys
+local api = vim.api
 
 local t = require("leetcode.translator")
 
@@ -60,17 +60,18 @@ function cmd.cookie_prompt(cb)
 
             if not err then
                 log.info("Sign-in successful")
-                cmd.menu_layout("menu")
-                pcall(cb, true)
+                cmd.start_user_session()
             else
                 log.error("Sign-in failed: " .. err)
-                pcall(cb, false)
             end
+
+            pcall(cb, not err and true or false)
         end,
     })
 
     input:mount()
 
+    local keys = config.user.keys
     input:map("n", keys.toggle, function() input:unmount() end)
     input:on(event.BufLeave, function() input:unmount() end)
 end
@@ -78,7 +79,7 @@ end
 function cmd.sign_out()
     log.warn("You're now signed out")
     cmd.delete_cookie()
-    cmd.menu_layout("signin")
+    cmd.set_menu_page("signin")
     cmd.q_close_all()
 end
 
@@ -99,16 +100,16 @@ cmd.q_close_all = vim.schedule_wrap(function()
 end)
 
 cmd.expire = vim.schedule_wrap(function()
-    local tabp = vim.api.nvim_get_current_tabpage()
+    local tabp = api.nvim_get_current_tabpage()
     cmd.menu()
 
     cmd.cookie_prompt(function(success)
         if success then
-            if vim.api.nvim_tabpage_is_valid(tabp) then vim.api.nvim_set_current_tabpage(tabp) end
+            if api.nvim_tabpage_is_valid(tabp) then api.nvim_set_current_tabpage(tabp) end
             log.info("Successful re-login")
         else
             cmd.delete_cookie()
-            cmd.menu_layout("signin")
+            cmd.set_menu_page("signin")
             cmd.q_close_all()
         end
     end)
@@ -159,11 +160,12 @@ function cmd.start_with_cmd()
 end
 
 function cmd.menu()
-    local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, _Lc_Menu.winid)
+    local ok, tabp = pcall(api.nvim_win_get_tabpage, _Lc_menu.winid)
+
     if ok then
-        vim.api.nvim_set_current_tabpage(tabp)
+        api.nvim_set_current_tabpage(tabp)
     else
-        log.error(tabp)
+        _Lc_menu:remount()
     end
 end
 
@@ -172,9 +174,9 @@ function cmd.yank()
     local q = utils.curr_question()
     if not q then return end
 
-    if vim.api.nvim_buf_is_valid(q.bufnr) and vim.api.nvim_win_is_valid(q.winid) then
-        vim.api.nvim_set_current_win(q.winid)
-        vim.api.nvim_set_current_buf(q.bufnr)
+    if api.nvim_buf_is_valid(q.bufnr) and api.nvim_win_is_valid(q.winid) then
+        api.nvim_set_current_win(q.winid)
+        api.nvim_set_current_buf(q.bufnr)
 
         local start_i, end_i = q:range()
         vim.cmd(("%d,%dyank"):format(start_i, end_i))
@@ -182,7 +184,12 @@ function cmd.yank()
 end
 
 ---@param page lc-menu.page
-function cmd.menu_layout(page) _Lc_Menu:set_page(page) end
+function cmd.set_menu_page(page) _Lc_menu:set_page(page) end
+
+function cmd.start_user_session() --
+    cmd.set_menu_page("menu")
+    config.stats.update()
+end
 
 function cmd.question_tabs() require("leetcode.pickers.question-tabs").pick() end
 
@@ -246,6 +253,128 @@ function cmd.ui_languages()
     languages:show()
 end
 
+function cmd.open()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+
+    if q then
+        local command
+        local os_name = vim.loop.os_uname().sysname
+
+        if os_name == "Linux" then
+            command = string.format("xdg-open '%s'", q.cache.link)
+        elseif os_name == "Darwin" then
+            command = string.format("open '%s'", q.cache.link)
+        else
+            -- Fallback to Windows if uname is not available or does not match Linux/Darwin.
+            command = string.format("start \"\" \"%s\"", q.cache.link)
+        end
+
+        os.execute(command)
+    end
+end
+
+function cmd.reset()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if not q then return end
+
+    local snip = q:get_snippet(true)
+    utils.set_question_lines(q, snip)
+end
+
+function cmd.last_submit()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if not q then return end
+
+    local question_api = require("leetcode.api.question")
+    question_api.latest_submission(q.q.id, q.lang, function(res, err) --
+        if err then
+            if err.status == 404 then
+                log.error("You haven't submitted any code!")
+            else
+                log.err(err)
+            end
+
+            return
+        end
+
+        if type(res) == "table" and res.code and api.nvim_buf_is_valid(q.bufnr) then
+            utils.set_question_lines(q, res.code)
+        else
+            log.error("Something went wrong")
+        end
+    end)
+end
+
+function cmd.restore()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if not q then return end
+
+    if
+        (q.winid and api.nvim_win_is_valid(q.winid))
+        and (q.bufnr and api.nvim_buf_is_valid(q.bufnr))
+    then
+        api.nvim_win_set_buf(q.winid, q.bufnr)
+    end
+
+    q.description:show()
+    local winid, bufnr = q.description.winid, q.description.bufnr
+
+    if
+        (winid and api.nvim_win_is_valid(winid)) --
+        and (bufnr and api.nvim_buf_is_valid(bufnr))
+    then
+        api.nvim_win_set_buf(winid, bufnr)
+    end
+end
+
+function cmd.get_active_session()
+    local sessions = config.sessions.all
+    return vim.tbl_filter(function(s) return s.is_active end, sessions)[1]
+end
+
+function cmd.get_session_by_name(name)
+    local sessions = config.sessions.all
+
+    name = name:lower()
+    if name == config.sessions.default then name = "" end
+    return vim.tbl_filter(function(s) return s.name:lower() == name end, sessions)[1]
+end
+
+function cmd.change_session(opts)
+    local name = opts.name[1] or config.sessions.default
+
+    local session = cmd.get_session_by_name(name)
+    if not session then return log.error("Session not found") end
+
+    local stats_api = require("leetcode.api.statistics")
+    stats_api.change_session(session.id, function(_, err)
+        if err then return log.err(err) end
+        log.info(("Session changed to `%s`"):format(name))
+        config.stats.update()
+    end)
+end
+
+function cmd.create_session(opts)
+    local name = opts.name[1]
+    if not name then return log.error("Session name not provided") end
+
+    local stats_api = require("leetcode.api.statistics")
+    stats_api.create_session(name, function(_, err)
+        if err then return log.err(err) end
+        log.info(("session `%s` created"):format(name))
+    end)
+end
+
+function cmd.update_sessions() config.stats.update_sessions() end
+
 function cmd.fix()
     require("leetcode.cache.cookie").delete()
     require("leetcode.cache.problemlist").delete()
@@ -266,14 +395,15 @@ function cmd.parse(args)
     return parts, options
 end
 
----@param t table
-local function cmds_keys(t)
+---@param tbl table
+local function cmds_keys(tbl)
     return vim.tbl_filter(function(key)
         if type(key) ~= "string" then return false end
         if key:sub(1, 1) == "_" then return false end
+        if tbl[key]._private then return false end
 
         return true
-    end, vim.tbl_keys(t))
+    end, vim.tbl_keys(tbl))
 end
 
 ---@param _ string
@@ -349,7 +479,7 @@ function cmd.exec(args)
 end
 
 function cmd.setup()
-    vim.api.nvim_create_user_command("Leet", cmd.exec, {
+    api.nvim_create_user_command("Leet", cmd.exec, {
         bar = true,
         bang = true,
         nargs = "?",
@@ -371,8 +501,27 @@ cmd.commands = {
     test = { cmd.q_run },
     submit = { cmd.q_submit },
     daily = { cmd.qot },
-    fix = { cmd.fix },
     yank = { cmd.yank },
+    open = { cmd.open },
+    reset = { cmd.reset },
+    last_submit = { cmd.last_submit },
+    restore = { cmd.restore },
+
+    session = {
+        change = {
+            cmd.change_session,
+
+            _args = arguments.session_change,
+        },
+
+        create = {
+            cmd.create_session,
+
+            _args = arguments.session_create,
+        },
+
+        update = { cmd.update_sessions },
+    },
 
     list = {
         cmd.problems,
@@ -401,6 +550,12 @@ cmd.commands = {
 
     cache = {
         update = { cmd.cache_update },
+    },
+
+    fix = {
+        cmd.fix,
+
+        _private = true,
     },
 }
 

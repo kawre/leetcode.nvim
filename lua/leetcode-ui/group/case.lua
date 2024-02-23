@@ -1,13 +1,13 @@
-local log = require("leetcode.logger")
-local t = require("leetcode.translator")
 local utils = require("leetcode.utils")
 
 local Pre = require("leetcode-ui.group.pre")
+local Input = require("leetcode-ui.group.pre.input")
 local Stdout = require("leetcode-ui.group.pre.stdout")
 local Group = require("leetcode-ui.group")
-local Lines = require("leetcode-ui.lines")
-
 local Line = require("leetcode-ui.line")
+
+local t = require("leetcode.translator")
+local log = require("leetcode.logger")
 
 ---@alias case_body { input: string[], raw_input: string, output: string, expected: string, std_output: string }
 
@@ -23,20 +23,8 @@ local Case = Group:extend("LeetCase")
 ---@private
 ---@param input string[]
 function Case:input(input)
-    local key = t("Input")
-
-    local group = Group({}, { spacing = 1 })
-
-    for i, case in ipairs(input) do
-        local ok, param = pcall(function() return self.question.q.meta_data.params[i].name end)
-        if ok then group:append(param .. " =", "leetcode_normal"):endl() end
-        group:append(case):endgrp()
-    end
-
-    local title = Line():append(key, "leetcode_normal")
-    local pre = Pre(title, group)
-
-    return pre
+    input = vim.tbl_map(utils.norm_ins, input)
+    return Input("Input", input, self.question.q.meta_data.params)
 end
 
 ---@private
@@ -46,7 +34,7 @@ function Case:output(output, expected)
     local key = t("Output")
 
     local title = Line():append(key, "leetcode_normal")
-    local pre = Pre(title, Line():append(output))
+    local pre = Pre(title, Line():append(utils.norm_ins(output)))
 
     return pre
 end
@@ -58,7 +46,7 @@ function Case:expected(expected, output)
     local key = t("Expected")
     local title = Line():append(key, "leetcode_normal")
 
-    local pre = Pre(title, Line():append(expected))
+    local pre = Pre(title, Line():append(utils.norm_ins(expected)))
 
     return pre
 end

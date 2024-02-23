@@ -9,7 +9,7 @@ local ui_utils = require("leetcode-ui.utils")
 
 local t = require("leetcode.translator")
 
----@class lc.ui.SimilarQuestions : lc.ui.Lines
+---@class lc.ui.SimilarQuestions : lc.ui.Group
 local SimilarQuestions = Group:extend("LeetSimilarQuestions")
 
 ---@param questions lc.QuestionResponse.similar
@@ -32,12 +32,20 @@ function SimilarQuestions:init(questions)
             local fid = p.frontend_id .. "."
             fid = fid .. (" "):rep(5 - vim.api.nvim_strwidth(fid))
 
-            button:append("󱓻 ", ui_utils.diff_to_hl(p.difficulty))
+            button:append(config.icons.square .. " ", ui_utils.diff_to_hl(p.difficulty))
             button:append(fid .. " ", "leetcode_normal")
             button:append(utils.translate(p.title, p.title_cn))
 
-            if not config.auth.is_premium and q.paid_only then
-                button:append("  " .. t("Premium"), "leetcode_medium")
+            if q.paid_only then
+                local txt
+
+                if config.auth.is_premium then
+                    txt = " " .. config.icons.unlock
+                else
+                    txt = (" %s "):format(config.icons.lock) .. t("Premium")
+                end
+
+                button:append(txt, "leetcode_medium")
             end
 
             self:insert(button)

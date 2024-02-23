@@ -1,6 +1,7 @@
 local log = require("leetcode.logger")
 local interpreter = require("leetcode.api.interpreter")
 local config = require("leetcode.config")
+local Judge = require("leetcode.logger.spinner.judge")
 
 ---@type Path
 local leetbody = config.storage.cache:joinpath("body")
@@ -20,10 +21,12 @@ Runner.run = vim.schedule_wrap(function(self, submit)
 
     local ok, err = pcall(Runner.handle, self, submit)
     if not ok then
-        Runner.running = false
+        self:stop()
         log.error(err)
     end
 end)
+
+Runner.stop = function() Runner.running = false end
 
 function Runner:handle(submit)
     Runner.running = true
@@ -31,35 +34,28 @@ function Runner:handle(submit)
 
     local body = {
         lang = question.lang,
-        typed_code = self.question:lines(),
+        typed_code = self.question:lines(submit),
         question_id = question.q.id,
         data_input = not submit and table.concat(question.console.testcase:content(), "\n") or nil,
     }
 
-    local function callback(item)
-        if type(item) == "boolean" then
-            if item then
-                question.console.result:clear()
-            else
-                Runner.running = false
-            end
-        else
-            self:callback(item)
+    local judge = Judge:init()
+    local function callback(item, state, err)
+        if err or item then self:stop() end
+
+        if item then
+            judge:stop(item.status_msg, item._.success)
+        elseif state then
+            judge:from_state(state)
+        elseif err then
+            judge:stop(err.msg or "Something went wrong", false)
         end
+
+        if item then question.console.result:handle(item) end
     end
 
     leetbody:write(vim.json.encode(body), "w")
-    if not submit then
-        interpreter.interpret_solution(question.q.title_slug, leetbody:absolute(), callback)
-    else
-        interpreter.submit(question.q.title_slug, leetbody:absolute(), callback)
-    end
-end
-
----@param item lc.interpreter_response
-function Runner:callback(item)
-    Runner.running = false
-    self.question.console.result:handle(item)
+    interpreter.run(submit, question, leetbody:absolute(), callback)
 end
 
 ---@param question lc.ui.Question

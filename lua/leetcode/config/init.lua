@@ -5,7 +5,7 @@ local P = require("plenary.path")
 _Lc_questions = {}
 
 ---@type lc.ui.Menu
-_Lc_Menu = {} ---@diagnostic disable-line
+_Lc_menu = {} ---@diagnostic disable-line
 
 local lazy_plugs = {}
 
@@ -26,6 +26,8 @@ local config = {
 
     langs = require("leetcode.config.langs"),
     icons = require("leetcode.config.icons"),
+    sessions = require("leetcode.config.sessions"),
+    stats = require("leetcode.config.stats"),
 
     ---@type lc.UserStatus
     auth = {}, ---@diagnostic disable-line

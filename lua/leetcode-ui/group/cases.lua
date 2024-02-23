@@ -23,7 +23,7 @@ function Cases:make_nav()
         self.console.result:map("n", i, function() self:change(i) end, { clearable = true })
 
         local hl = self:nav_case_hl(case, i)
-        local msg = (" Case (%d) "):format(i)
+        local msg = (" Case (%d) "):format(i)
 
         nav:append(msg, hl)
         if i ~= #self.cases then nav:append(" ") end

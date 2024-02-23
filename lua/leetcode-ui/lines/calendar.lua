@@ -83,7 +83,7 @@ function Calendar:handle_res(res)
         self:append(line):endl()
     end
 
-    _Lc_Menu:draw()
+    _Lc_menu:draw()
 end
 
 function Calendar:handle_submissions()

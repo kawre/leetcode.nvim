@@ -1,6 +1,5 @@
 local Tag = require("leetcode-ui.group.tag")
-local Lines = require("leetcode-ui.lines")
-local Line = require("nui.line")
+local config = require("leetcode.config")
 
 local log = require("leetcode.logger")
 
@@ -11,7 +10,7 @@ function Pre:contents()
     local items = Pre.super.contents(self)
 
     for _, item in ipairs(items) do
-        self:add_indent(item, "\t▎\t")
+        self:add_indent(item, config.icons.indent)
     end
 
     return items

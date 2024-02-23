@@ -29,23 +29,17 @@ end
 ---@param question lc.cache.Question
 local function display_difficulty(question)
     local hl = ui_utils.diff_to_hl(question.difficulty)
-    return { "󱓻", hl }
+    return { config.icons.square, hl }
 end
 
 ---@param question lc.cache.Question
 local function display_user_status(question)
-    if question.paid_only and not config.auth.is_premium then
-        return { "", "leetcode_medium" }
+    if question.paid_only then
+        return config.auth.is_premium and config.icons.hl.unlock or config.icons.hl.lock
     end
 
-    local user_status = {
-        ac = { "", "leetcode_easy" },
-        notac = { "󱎖", "leetcode_medium" },
-        todo = { "", "leetcode_alt" },
-    }
-
     if question.status == vim.NIL then return { "" } end
-    return user_status[question.status] or { "" }
+    return config.icons.hl.status[question.status] or { "" }
 end
 
 ---@param question lc.cache.Question

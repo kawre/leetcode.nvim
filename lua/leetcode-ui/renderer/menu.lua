@@ -3,6 +3,7 @@ local cookie = require("leetcode.cache.cookie")
 local config = require("leetcode.config")
 local utils = require("leetcode-ui.utils")
 local Renderer = require("leetcode-ui.renderer")
+local api = vim.api
 
 ---@class lc.ui.Menu : lc.ui.Renderer
 ---@field cursor lc-menu.cursor
@@ -23,43 +24,71 @@ end
 
 ---@private
 function Menu:autocmds()
-    local group_id = vim.api.nvim_create_augroup("leetcode_menu", { clear = true })
+    local group_id = api.nvim_create_augroup("leetcode_menu", { clear = true })
 
-    vim.api.nvim_create_autocmd("WinResized", {
+    api.nvim_create_autocmd("WinResized", {
         group = group_id,
         buffer = self.bufnr,
         callback = function() self:draw() end,
     })
 
-    vim.api.nvim_create_autocmd("CursorMoved", {
+    api.nvim_create_autocmd("CursorMoved", {
         group = group_id,
         buffer = self.bufnr,
         callback = function() self:cursor_move() end,
     })
+
+    api.nvim_create_autocmd("QuitPre", {
+        group = group_id,
+        buffer = self.bufnr,
+        callback = function()
+            self.winid = nil
+            self.bufnr = nil
+            self:clear_keymaps()
+        end,
+    })
 end
 
 function Menu:cursor_move()
-    if not self.winid or not vim.api.nvim_win_is_valid(self.winid) then return end
+    if not self.winid or not api.nvim_win_is_valid(self.winid) then return end
 
-    local curr = vim.api.nvim_win_get_cursor(self.winid)
+    local curr = api.nvim_win_get_cursor(self.winid)
     local prev = self.cursor.prev
 
     local keys = tbl_keys(self._.buttons)
     if not keys then return end
 
-    if prev then
-        if curr[1] > prev[1] then
-            self.cursor.idx = math.min(self.cursor.idx + 1, #keys)
-        elseif curr[1] < prev[1] then
-            self.cursor.idx = math.max(self.cursor.idx - 1, 1)
+    local function find_nearest(l, r)
+        while l < r do
+            local m = math.floor((l + r) / 2)
+
+            if keys[m] < curr[1] then
+                l = m + 1
+            else
+                r = m
+            end
         end
+
+        return math.max(r, 1)
+    end
+
+    if prev then
+        local next_idx = self.cursor.idx
+
+        if curr[1] < prev[1] then
+            next_idx = find_nearest(1, self.cursor.idx - 1)
+        elseif curr[1] > prev[1] then
+            next_idx = find_nearest(self.cursor.idx + 1, #keys)
+        end
+
+        self.cursor.idx = next_idx
     end
 
     local row = keys[self.cursor.idx]
     local col = #vim.fn.getline(row):match("^%s*")
 
     self.cursor.prev = { row, col }
-    vim.api.nvim_win_set_cursor(self.winid, self.cursor.prev)
+    api.nvim_win_set_cursor(self.winid, self.cursor.prev)
 end
 
 function Menu:cursor_reset()
@@ -82,7 +111,7 @@ function Menu:set_page(name)
 end
 
 function Menu:apply_options()
-    vim.api.nvim_buf_set_name(self.bufnr, "")
+    api.nvim_buf_set_name(self.bufnr, "")
 
     utils.set_buf_opts(self.bufnr, {
         modifiable = false,
@@ -132,6 +161,21 @@ end
 ---@param self lc.ui.Menu
 Menu.unmount = vim.schedule_wrap(function(self) self:_unmount() end)
 
+function Menu:remount()
+    if self.winid and api.nvim_win_is_valid(self.winid) then --
+        api.nvim_win_close(self.winid, true)
+    end
+    if self.bufnr and api.nvim_buf_is_valid(self.bufnr) then --
+        api.nvim_buf_delete(self.bufnr, { force = true })
+    end
+
+    vim.cmd.tabe()
+    self.bufnr = api.nvim_get_current_buf()
+    self.winid = api.nvim_get_current_win()
+
+    self:_mount()
+end
+
 function Menu:mount()
     if cookie.get() then
         self:set_page("loading")
@@ -142,18 +186,23 @@ function Menu:mount()
                 self:set_page("signin")
                 log.err(err)
             else
-                self:set_page("menu")
+                local cmd = require("leetcode.command")
+                cmd.start_user_session()
             end
         end)
     else
         self:set_page("signin")
     end
 
+    self:_mount()
+
+    return self
+end
+
+function Menu:_mount()
     self:apply_options()
     self:autocmds()
     self:draw()
-
-    return self
 end
 
 function Menu:init()
@@ -167,10 +216,10 @@ function Menu:init()
     }
     self.maps = {}
 
-    self.bufnr = vim.api.nvim_get_current_buf()
-    self.winid = vim.api.nvim_get_current_win()
+    self.bufnr = api.nvim_get_current_buf()
+    self.winid = api.nvim_get_current_win()
 
-    _Lc_Menu = self
+    _Lc_menu = self
 end
 
 ---@type fun(): lc.ui.Menu
