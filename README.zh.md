@@ -135,10 +135,10 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
     hooks = {
         ---@type fun()[]
-        LeetEnter = {},
+        ["enter"] = {},
 
         ---@type fun(question: lc.ui.Question)[]
-        LeetQuestionNew = {},
+        ["question_enter"] = {},
     },
 
     keys = {
@@ -260,10 +260,10 @@ injector = { ---@type table<lc.lang, lc.inject>
 ```lua
 hooks = {
     ---@type fun()[]
-    LeetEnter = {},
+    ["enter"] = {},
 
     ---@type fun(question: lc.ui.Question)[]
-    LeetQuestionNew = {},
+    ["question_enter"] = {},
 },
 ```
 

@@ -133,10 +133,10 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
     hooks = {
         ---@type fun()[]
-        LeetEnter = {},
+        ["enter"] = {},
 
         ---@type fun(question: lc.ui.Question)[]
-        LeetQuestionNew = {},
+        ["question_enter"] = {},
     },
 
     keys = {
@@ -258,10 +258,10 @@ List of functions that get executed on specified event
 ```lua
 hooks = {
     ---@type fun()[]
-    LeetEnter = {},
+    ["enter"] = {},
 
     ---@type fun(question: lc.ui.Question)[]
-    LeetQuestionNew = {},
+    ["question_enter"] = {},
 },
 ```
 

@@ -133,7 +133,7 @@ function Question:handle_mount()
     self.console = Console(self)
     self.info = Info(self)
 
-    utils.exec_hook("LeetQuestionNew", self)
+    utils.exec_hook("question_enter", self)
 
     return self
 end
@@ -209,7 +209,7 @@ Question.change_lang = vim.schedule_wrap(function(self, lang)
 
         self.bufnr = new_bufnr
         if bufloaded == 0 then --
-            utils.exec_hook("LeetQuestionNew", self)
+            utils.exec_hook("question_enter", self)
         end
     else
         log.error("Changing language failed")
