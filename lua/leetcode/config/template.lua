@@ -102,7 +102,7 @@ local M = {
         ["enter"] = {},
 
         ---@type fun(question: lc.ui.Question)[]
-        ["question_open"] = {},
+        ["question_enter"] = {},
     },
 
     keys = {

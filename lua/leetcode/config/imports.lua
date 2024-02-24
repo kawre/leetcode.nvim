@@ -68,6 +68,7 @@ imports["python"] = {
 
 imports["java"] = {
     "import java.util.*;",
+    "import java.math.*;",
 }
 
 return imports

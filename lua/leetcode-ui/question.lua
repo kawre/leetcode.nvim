@@ -51,6 +51,39 @@ function Question:create_file()
     return self.file:absolute()
 end
 
+---@param new_tabp? boolean
+---@return boolean was_loaded
+function Question:create_buffer(new_tabp)
+    local file_name = self:create_file()
+
+    local buf = vim.fn.bufadd(file_name)
+    assert(buf ~= 0, "Failed to create buffer")
+
+    self.bufnr = buf
+    if vim.fn.bufloaded(self.bufnr) == 1 then
+        return true
+    else
+        vim.fn.bufload(self.bufnr)
+    end
+
+    local cmd
+    if new_tabp then
+        cmd = ("$tabe %s"):format(file_name)
+    else
+        cmd = ("e %s"):format(file_name)
+    end
+
+    local i = self:fold_range()
+    if i then cmd = cmd .. (" | %d,%dfold"):format(1, i) end
+    vim.api.nvim_exec2(cmd, {})
+
+    self.winid = vim.api.nvim_get_current_win()
+
+    utils.exec_hook("question_enter", self)
+
+    return false
+end
+
 ---@param before boolean
 function Question:inject(before)
     local inject = config.user.injector[self.lang] or {}
@@ -113,15 +146,8 @@ end
 Question.unmount = vim.schedule_wrap(function(self, pre) self:_unmount(pre) end)
 
 function Question:handle_mount()
-    vim.cmd("$tabe " .. self:create_file())
+    self:create_buffer(true)
 
-    -- https://github.com/kawre/leetcode.nvim/issues/14
-    if self.lang == "rust" then
-        pcall(function() require("rust-tools.standalone").start_standalone_client() end)
-    end
-
-    self.bufnr = vim.api.nvim_get_current_buf()
-    self.winid = vim.api.nvim_get_current_win()
     table.insert(_Lc_questions, self)
 
     vim.api.nvim_create_autocmd("QuitPre", {
@@ -132,8 +158,6 @@ function Question:handle_mount()
     self.description = Description(self):mount()
     self.console = Console(self)
     self.info = Info(self)
-
-    utils.exec_hook("question_enter", self)
 
     return self
 end
@@ -180,6 +204,18 @@ function Question:range(inclusive)
     return start_i, end_i, lines
 end
 
+function Question:fold_range()
+    local start_i, _, lines = self:range(true)
+    if start_i == nil or start_i <= 1 then return end
+
+    local i = start_i - 1
+    while lines[i] == "" do
+        i = i - 1
+    end
+
+    if 1 < i then return i end
+end
+
 ---@param submit boolean
 ---@return string
 function Question:lines(submit)
@@ -195,25 +231,23 @@ end
 ---@param self lc.ui.Question
 ---@param lang lc.lang
 Question.change_lang = vim.schedule_wrap(function(self, lang)
-    local old_lang = self.lang
+    local old_lang, old_bufnr = self.lang, self.bufnr
     self.lang = lang
 
-    local new_bufnr = vim.fn.bufadd(self:create_file())
-    if new_bufnr ~= 0 then
-        local bufloaded = vim.fn.bufloaded(new_bufnr)
+    local ok, was_loaded = pcall(Question.create_buffer, self)
+    if ok then
+        vim.api.nvim_buf_set_option(old_bufnr, "buflisted", false)
+        vim.api.nvim_buf_set_option(self.bufnr, "buflisted", true)
 
-        vim.api.nvim_win_set_buf(self.winid, new_bufnr)
-
-        vim.api.nvim_buf_set_option(self.bufnr, "buflisted", false)
-        vim.api.nvim_buf_set_option(new_bufnr, "buflisted", true)
-
-        self.bufnr = new_bufnr
-        if bufloaded == 0 then --
+        if was_loaded then
+            vim.api.nvim_win_set_buf(self.winid, self.bufnr)
+        else
             utils.exec_hook("question_enter", self)
         end
     else
         log.error("Changing language failed")
         self.lang = old_lang
+        self.bufnr = old_bufnr
     end
 end)
 

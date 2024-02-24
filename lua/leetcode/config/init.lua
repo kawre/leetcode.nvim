@@ -29,6 +29,7 @@ local config = {
     sessions = require("leetcode.config.sessions"),
     stats = require("leetcode.config.stats"),
     imports = require("leetcode.config.imports"),
+    hooks = require("leetcode.config.hooks"),
 
     ---@type lc.UserStatus
     auth = {}, ---@diagnostic disable-line
