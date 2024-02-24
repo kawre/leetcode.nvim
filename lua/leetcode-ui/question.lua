@@ -34,7 +34,9 @@ function Question:set_lines(code)
     if not vim.api.nvim_buf_is_valid(self.bufnr) then return end
 
     pcall(vim.cmd.undojoin)
-    local s_i, e_i = self:range()
+    local s_i, e_i, lines = self:range()
+    s_i = s_i or 1
+    e_i = e_i or #lines
     code = code and code or (self:snippet(true) or "")
     vim.api.nvim_buf_set_lines(self.bufnr, s_i - 1, e_i, false, vim.split(code, "\n"))
 end
@@ -51,7 +53,7 @@ function Question:reset_lines()
     self:set_lines(new_lines)
 end
 
----@return string path, boolean? existed
+---@return string path, boolean existed
 function Question:path()
     local lang = utils.get_lang(self.lang)
     local alt = lang.alt and ("." .. lang.alt) or ""
@@ -85,6 +87,12 @@ function Question:create_buffer()
     self.bufnr = vim.api.nvim_get_current_buf()
     self.winid = vim.api.nvim_get_current_win()
 
+    self:open_buffer(existed, false)
+end
+
+---@param existed boolean
+---@param loaded boolean
+function Question:open_buffer(existed, loaded)
     vim.api.nvim_set_option_value("buflisted", true, { buf = self.bufnr })
 
     local i = self:fold_range()
@@ -94,6 +102,11 @@ function Question:create_buffer()
 
     if existed then --
         self:reset_lines()
+    end
+
+    if not loaded then
+        utils.exec_hook("question_enter", self)
+        self:autocmds()
     end
 end
 
@@ -180,13 +193,9 @@ function Question:handle_mount()
 
     table.insert(_Lc_questions, self)
 
-    self:autocmds()
-
     self.description = Description(self):mount()
     self.console = Console(self)
     self.info = Info(self)
-
-    utils.exec_hook("question_enter", self)
 
     return self
 end
@@ -275,22 +284,8 @@ Question.change_lang = vim.schedule_wrap(function(self, lang)
         vim.api.nvim_win_set_buf(self.winid, self.bufnr)
 
         vim.api.nvim_set_option_value("buflisted", false, { buf = old_bufnr })
-        vim.api.nvim_set_option_value("buflisted", true, { buf = self.bufnr })
 
-        local i = self:fold_range()
-        if i then --
-            pcall(vim.cmd, ("%d,%dfold"):format(1, i))
-        end
-
-        if existed then --
-            self:reset_lines()
-        end
-
-        if not loaded then --
-            utils.exec_hook("question_enter", self)
-        end
-
-        self:autocmds()
+        self:open_buffer(existed, loaded)
     end)
 
     if not ok then
