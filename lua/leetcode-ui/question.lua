@@ -16,10 +16,11 @@ local log = require("leetcode.logger")
 ---@field console lc.ui.Console
 ---@field lang string
 ---@field cache lc.cache.Question
+---@field reset boolean
 local Question = Object("LeetQuestion")
 
 ---@param raw? boolean
-function Question:get_snippet(raw)
+function Question:snippet(raw)
     local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
     local snip = vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
     if not snip then return end
@@ -28,7 +29,30 @@ function Question:get_snippet(raw)
     return raw and code or self:injector(code)
 end
 
-function Question:create_file()
+---@param code? string
+function Question:set_lines(code)
+    if not vim.api.nvim_buf_is_valid(self.bufnr) then return end
+
+    pcall(vim.cmd.undojoin)
+    local s_i, e_i = self:range()
+    code = code and code or (self:snippet(true) or "")
+    vim.api.nvim_buf_set_lines(self.bufnr, s_i - 1, e_i, false, vim.split(code, "\n"))
+end
+
+function Question:reset_lines()
+    if not self.reset then return end
+
+    local new_lines = self:snippet(true) or ""
+
+    vim.schedule(function() --
+        log.info("Previous code found, resetting…\nTo undo, simply press `u`")
+    end)
+
+    self:set_lines(new_lines)
+end
+
+---@return string path, boolean? existed
+function Question:path()
     local lang = utils.get_lang(self.lang)
     local alt = lang.alt and ("." .. lang.alt) or ""
 
@@ -38,47 +62,39 @@ function Question:create_file()
     self.file = config.storage.home:joinpath(fn_legacy)
 
     if self.file:exists() then --
-        return self.file:absolute()
+        return self.file:absolute(), true
     end
 
     local fn = ("%s.%s%s.%s"):format(self.q.frontend_id, self.q.title_slug, alt, lang.ft)
     self.file = config.storage.home:joinpath(fn)
+    local existed = true
 
     if not self.file:exists() then --
-        self.file:write(self:get_snippet(), "w")
+        self.file:write(self:snippet(), "w")
+        existed = false
     end
 
-    return self.file:absolute()
+    return self.file:absolute(), existed
 end
 
----@param new_tabp? boolean
----@return boolean was_loaded
-function Question:create_buffer(new_tabp)
-    local file_name = self:create_file()
+function Question:create_buffer()
+    local path, existed = self:path()
 
-    local buf = vim.fn.bufadd(file_name)
-    assert(buf ~= 0, "Failed to create buffer")
+    vim.cmd("$tabe " .. path)
 
-    self.bufnr = buf
-    if vim.fn.bufloaded(self.bufnr) == 1 then
-        return true
-    else
-        vim.fn.bufload(self.bufnr)
-    end
+    self.bufnr = vim.api.nvim_get_current_buf()
+    self.winid = vim.api.nvim_get_current_win()
 
-    local cmd
-    if new_tabp then
-        cmd = ("$tabe %s"):format(file_name)
-    else
-        cmd = ("edit %s"):format(file_name)
-    end
+    vim.api.nvim_set_option_value("buflisted", true, { buf = self.bufnr })
 
     local i = self:fold_range()
-    if i then cmd = cmd .. (" | %d,%dfold"):format(1, i) end
+    if i then --
+        pcall(vim.cmd, ("%d,%dfold"):format(1, i))
+    end
 
-    vim.api.nvim_exec2(cmd, {})
-
-    return false
+    if existed then --
+        self:reset_lines()
+    end
 end
 
 ---@param before boolean
@@ -99,7 +115,7 @@ function Question:inject(before)
     end
 
     if res and res ~= "" then
-        return before and (res .. "\n\n") or ("\n\n" .. res)
+        return before and (res .. "\n") or ("\n" .. res)
     else
         return nil
     end
@@ -109,50 +125,62 @@ end
 function Question:injector(code)
     local lang = utils.get_lang(self.lang)
 
-    local inj_before = self:inject(true) or ""
-    local inj_after = self:inject(false) or ""
+    local parts = {
+        ("%s @leet start"):format(lang.comment),
+        code,
+        ("%s @leet end"):format(lang.comment),
+    }
 
-    return inj_before --
-        .. ("%s @leet start\n"):format(lang.comment)
-        .. code
-        .. ("\n%s @leet end"):format(lang.comment)
-        .. inj_after
+    local before = self:inject(true)
+    if before then table.insert(parts, 1, before) end
+
+    local after = self:inject(false)
+    if after then table.insert(parts, after) end
+
+    return table.concat(parts, "\n")
 end
 
----@param pre? boolean
-function Question:_unmount(pre)
-    self.info:unmount()
-    self.console:unmount()
-    self.description:unmount()
-
-    if not pre and vim.api.nvim_buf_is_valid(self.bufnr) then
-        vim.api.nvim_buf_delete(self.bufnr, { force = true })
+function Question:unmount()
+    if vim.v.dying ~= 0 then --
+        return
     end
 
-    if vim.api.nvim_win_is_valid(self.winid) then --
-        vim.api.nvim_win_close(self.winid, true)
-    end
+    vim.schedule(function()
+        self.info:unmount()
+        self.console:unmount()
+        self.description:unmount()
 
-    _Lc_questions = vim.tbl_filter(function(q) return q.bufnr ~= self.bufnr end, _Lc_questions)
+        if vim.api.nvim_buf_is_valid(self.bufnr) then
+            vim.api.nvim_buf_delete(self.bufnr, { force = true, unload = false })
+        end
 
-    self = nil
+        _Lc_questions = vim.tbl_filter(function(q) --
+            return q.bufnr ~= self.bufnr
+        end, _Lc_questions)
+
+        self = nil
+    end)
 end
 
----@param self lc.ui.Question
----@param pre? boolean
-Question.unmount = vim.schedule_wrap(function(self, pre) self:_unmount(pre) end)
+function Question:_unmount()
+    if vim.api.nvim_win_is_valid(self.winid) then vim.api.nvim_win_close(self.winid, true) end
+end
+
+local group = vim.api.nvim_create_augroup("leetcode_questions", { clear = true })
+function Question:autocmds()
+    vim.api.nvim_create_autocmd("WinClosed", {
+        group = group,
+        buffer = self.bufnr,
+        callback = function() self:unmount() end,
+    })
+end
 
 function Question:handle_mount()
-    self:create_buffer(true)
-
-    self.winid = vim.api.nvim_get_current_win()
+    self:create_buffer()
 
     table.insert(_Lc_questions, self)
 
-    vim.api.nvim_create_autocmd("QuitPre", {
-        buffer = self.bufnr,
-        callback = function() self:unmount(true) end,
-    })
+    self:autocmds()
 
     self.description = Description(self):mount()
     self.console = Console(self)
@@ -173,7 +201,7 @@ function Question:mount()
     end
     self.q = q
 
-    if self:get_snippet() then
+    if self:snippet() then
         self:handle_mount()
     else
         local msg = ("Snippet for `%s` not found. Select a different language"):format(self.lang)
@@ -232,37 +260,55 @@ end
 ---@param self lc.ui.Question
 ---@param lang lc.lang
 Question.change_lang = vim.schedule_wrap(function(self, lang)
-    if vim.api.nvim_get_current_win() ~= self.winid then
-        vim.api.nvim_set_current_win(self.winid)
-    end
-
     local old_lang, old_bufnr = self.lang, self.bufnr
-    self.lang = lang
 
-    local ok, was_loaded = pcall(Question.create_buffer, self)
-    if ok then
-        vim.api.nvim_buf_set_option(old_bufnr, "buflisted", false)
-        vim.api.nvim_buf_set_option(self.bufnr, "buflisted", true)
+    local ok, err = pcall(function()
+        self.lang = lang
+        local path, existed = self:path()
 
-        if was_loaded then
-            vim.api.nvim_win_set_buf(self.winid, self.bufnr)
-        else
+        self.bufnr = vim.fn.bufadd(path)
+        assert(self.bufnr ~= 0, "Failed to create buffer " .. path)
+
+        local loaded = vim.api.nvim_buf_is_loaded(self.bufnr)
+        vim.fn.bufload(self.bufnr)
+
+        vim.api.nvim_win_set_buf(self.winid, self.bufnr)
+
+        vim.api.nvim_set_option_value("buflisted", false, { buf = old_bufnr })
+        vim.api.nvim_set_option_value("buflisted", true, { buf = self.bufnr })
+
+        local i = self:fold_range()
+        if i then --
+            pcall(vim.cmd, ("%d,%dfold"):format(1, i))
+        end
+
+        if existed then --
+            self:reset_lines()
+        end
+
+        if not loaded then --
             utils.exec_hook("question_enter", self)
         end
-    else
-        log.error("Changing language failed")
+
+        self:autocmds()
+    end)
+
+    if not ok then
+        log.error("Failed to change language\n" .. err)
         self.lang = old_lang
         self.bufnr = old_bufnr
     end
 end)
 
 ---@param problem lc.cache.Question
-function Question:init(problem)
+---@param reset boolean
+function Question:init(problem, reset)
     self.cache = problem
     self.lang = config.lang
+    self.reset = reset and true or false
 end
 
----@type fun(question: lc.cache.Question): lc.ui.Question
+---@type fun(question: lc.cache.Question, reset?: boolean): lc.ui.Question
 local LeetQuestion = Question
 
 return LeetQuestion

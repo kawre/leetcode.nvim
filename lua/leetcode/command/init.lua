@@ -90,14 +90,14 @@ function cmd.delete_cookie()
     cookie.delete()
 end
 
-cmd.q_close_all = vim.schedule_wrap(function()
+cmd.q_close_all = function()
     local utils = require("leetcode.utils")
     local qs = utils.question_tabs()
 
     for _, tabp in ipairs(qs) do
-        tabp.question:unmount()
+        tabp.question:_unmount()
     end
-end)
+end
 
 cmd.expire = vim.schedule_wrap(function()
     local tabp = api.nvim_get_current_tabpage()
@@ -127,7 +127,7 @@ function cmd.qot()
     problems.question_of_today(function(qot, err)
         if err then return log.err(err) end
         local problemlist = require("leetcode.cache.problemlist")
-        Question(problemlist.get_by_title_slug(qot.title_slug)):mount()
+        Question(problemlist.get_by_title_slug(qot.title_slug), true):mount()
     end)
 end
 
@@ -151,7 +151,7 @@ function cmd.random_question(opts)
 
     local item = problems.get_by_title_slug(q.title_slug) or {}
     local Question = require("leetcode-ui.question")
-    Question(item):mount()
+    Question(item, true):mount()
 end
 
 function cmd.start_with_cmd()
@@ -281,8 +281,7 @@ function cmd.reset()
     local q = utils.curr_question()
     if not q then return end
 
-    local snip = q:get_snippet(true)
-    utils.set_question_lines(q, snip)
+    q:set_lines()
 end
 
 function cmd.last_submit()
@@ -303,8 +302,8 @@ function cmd.last_submit()
             return
         end
 
-        if type(res) == "table" and res.code and api.nvim_buf_is_valid(q.bufnr) then
-            utils.set_question_lines(q, res.code)
+        if type(res) == "table" and res.code then
+            q:set_lines(res.code)
         else
             log.error("Something went wrong")
         end
@@ -359,7 +358,7 @@ function cmd.inject()
         end
 
         if end_i == nil then
-            log.error("`@leet start` not found")
+            log.error("`@leet end` not found")
         else
             local after = q:inject(false)
             if after then

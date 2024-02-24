@@ -8,7 +8,7 @@ function MenuExitButton:init()
     MenuExitButton.super.init(self, "Exit", {
         icon = "󰩈",
         sc = "q",
-        on_press = vim.cmd.quitall,
+        on_press = function() vim.cmd("qa!") end,
     })
 end
 
