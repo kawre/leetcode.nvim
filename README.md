@@ -314,6 +314,8 @@ image_support = false,
 
 - `restore` try to restore default question layout
 
+- `inject` re-inject code for the current question
+
 - `session`
 
   - `create` create a new session

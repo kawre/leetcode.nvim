@@ -51,35 +51,38 @@ function Question:create_file()
     return self.file:absolute()
 end
 
----@param code string
-function Question:injector(code)
-    local injector = config.user.injector
-    local inject = injector[self.lang] or {}
+---@param before boolean
+function Question:inject(before)
+    local inject = config.user.injector[self.lang] or {}
+    local inj = before and inject.before or inject.after
 
-    ---@param inj? string|string[]
-    ---@param before boolean
-    local function norm_inject(inj, before)
-        local res
+    local res
 
-        if type(inj) == "table" then
-            res = table.concat(inj, "\n")
-        elseif type(inj) == "string" then
-            res = inj
-        end
-
-        if res and res ~= "" then
-            return before and (res .. "\n\n") or ("\n\n" .. res)
-        else
-            return ""
-        end
+    if type(inj) == "table" then
+        res = table.concat(inj, "\n")
+    elseif type(inj) == "string" then
+        res = inj
     end
 
+    if res and res ~= "" then
+        return before and (res .. "\n\n") or ("\n\n" .. res)
+    else
+        return nil
+    end
+end
+
+---@param code string
+function Question:injector(code)
     local lang = utils.get_lang(self.lang)
-    return norm_inject(inject.before, true) --
+
+    local inj_before = self:inject(true) or ""
+    local inj_after = self:inject(false) or ""
+
+    return inj_before --
         .. ("%s @leet start\n"):format(lang.comment)
         .. code
         .. ("\n%s @leet end"):format(lang.comment)
-        .. norm_inject(inject.after, false)
+        .. inj_after
 end
 
 ---@param pre? boolean
@@ -156,16 +159,17 @@ function Question:mount()
     return self
 end
 
+---@param inclusive? boolean
 ---@return integer, integer, string[]
-function Question:range()
+function Question:range(inclusive)
     local lines = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, false)
     local start_i, end_i = 1, #lines
 
     for i, line in ipairs(lines) do
         if line:match("@leet start") then
-            start_i = i + 1
+            start_i = i + (inclusive and 0 or 1)
         elseif line:match("@leet end") then
-            end_i = i - 1
+            end_i = i - (inclusive and 0 or 1)
         end
     end
 

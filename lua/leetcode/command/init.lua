@@ -335,6 +335,27 @@ function cmd.restore()
     end
 end
 
+function cmd.inject()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if not q then return end
+
+    local start_i, end_i = q:range(true)
+
+    if vim.api.nvim_buf_is_valid(q.bufnr) then
+        local before = q:inject(true)
+        if before then
+            vim.api.nvim_buf_set_lines(q.bufnr, 0, start_i - 1, false, vim.split(before, "\n"))
+        end
+
+        local after = q:inject(false)
+        if after then
+            vim.api.nvim_buf_set_lines(q.bufnr, end_i + 1, -1, false, vim.split(after, "\n"))
+        end
+    end
+end
+
 function cmd.get_active_session()
     local sessions = config.sessions.all
     return vim.tbl_filter(function(s) return s.is_active end, sessions)[1]
@@ -506,6 +527,7 @@ cmd.commands = {
     reset = { cmd.reset },
     last_submit = { cmd.last_submit },
     restore = { cmd.restore },
+    inject = { cmd.inject },
 
     session = {
         change = {
