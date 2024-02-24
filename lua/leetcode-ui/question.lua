@@ -70,16 +70,13 @@ function Question:create_buffer(new_tabp)
     if new_tabp then
         cmd = ("$tabe %s"):format(file_name)
     else
-        cmd = ("e %s"):format(file_name)
+        cmd = ("edit %s"):format(file_name)
     end
 
     local i = self:fold_range()
     if i then cmd = cmd .. (" | %d,%dfold"):format(1, i) end
+
     vim.api.nvim_exec2(cmd, {})
-
-    self.winid = vim.api.nvim_get_current_win()
-
-    utils.exec_hook("question_enter", self)
 
     return false
 end
@@ -148,6 +145,8 @@ Question.unmount = vim.schedule_wrap(function(self, pre) self:_unmount(pre) end)
 function Question:handle_mount()
     self:create_buffer(true)
 
+    self.winid = vim.api.nvim_get_current_win()
+
     table.insert(_Lc_questions, self)
 
     vim.api.nvim_create_autocmd("QuitPre", {
@@ -158,6 +157,8 @@ function Question:handle_mount()
     self.description = Description(self):mount()
     self.console = Console(self)
     self.info = Info(self)
+
+    utils.exec_hook("question_enter", self)
 
     return self
 end
@@ -231,6 +232,10 @@ end
 ---@param self lc.ui.Question
 ---@param lang lc.lang
 Question.change_lang = vim.schedule_wrap(function(self, lang)
+    if vim.api.nvim_get_current_win() ~= self.winid then
+        vim.api.nvim_set_current_win(self.winid)
+    end
+
     local old_lang, old_bufnr = self.lang, self.bufnr
     self.lang = lang
 
