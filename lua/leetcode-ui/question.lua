@@ -58,6 +58,10 @@ function Question:inject(before)
 
     local res
 
+    if type(inj) == "boolean" and inj == true and before then --
+        inj = config.imports[self.lang]
+    end
+
     if type(inj) == "table" then
         res = table.concat(inj, "\n")
     elseif type(inj) == "string" then
@@ -129,7 +133,7 @@ function Question:handle_mount()
     self.console = Console(self)
     self.info = Info(self)
 
-    utils.exec_hooks("LeetQuestionNew", self)
+    utils.exec_hook("LeetQuestionNew", self)
 
     return self
 end
@@ -163,7 +167,7 @@ end
 ---@return integer, integer, string[]
 function Question:range(inclusive)
     local lines = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, false)
-    local start_i, end_i = 1, #lines
+    local start_i, end_i
 
     for i, line in ipairs(lines) do
         if line:match("@leet start") then
@@ -180,6 +184,10 @@ end
 ---@return string
 function Question:lines(submit)
     local start_i, end_i, lines = self:range()
+
+    start_i = start_i or 1
+    end_i = end_i or #lines
+
     local prefix = not submit and ("\n"):rep(start_i - 1) or ""
     return prefix .. table.concat(lines, "\n", start_i, end_i)
 end
@@ -201,7 +209,7 @@ Question.change_lang = vim.schedule_wrap(function(self, lang)
 
         self.bufnr = new_bufnr
         if bufloaded == 0 then --
-            utils.exec_hooks("LeetQuestionNew", self)
+            utils.exec_hook("LeetQuestionNew", self)
         end
     else
         log.error("Changing language failed")

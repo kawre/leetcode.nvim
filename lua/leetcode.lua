@@ -58,7 +58,7 @@ function leetcode.start(on_vimenter)
     Menu():mount()
 
     local utils = require("leetcode.utils")
-    utils.exec_hooks("LeetEnter")
+    utils.exec_hook("LeetEnter")
 
     return true
 end

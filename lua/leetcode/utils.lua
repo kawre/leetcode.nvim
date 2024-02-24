@@ -72,7 +72,7 @@ function utils.get_lang_by_name(name)
 end
 
 ---@param event lc.hook
-function utils.exec_hooks(event, ...)
+function utils.exec_hook(event, ...)
     local fns = config.user.hooks[event]
     if not fns then log.error("unknown hook event: " .. event) end
 
