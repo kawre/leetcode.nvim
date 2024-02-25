@@ -55,11 +55,11 @@ end
 ---@param passed boolean
 ---
 ---@return lc.ui.Case
-function Case:init(body, passed)
+function Case:init(body, passed, question)
     Case.super.init(self, {}, { spacing = 1 })
 
     self.body = body
-    self.question = utils.curr_question()
+    self.question = question
 
     self:insert(self:input(body.input))
     self:insert(self:output(body.output, body.expected))
@@ -71,7 +71,7 @@ function Case:init(body, passed)
     self.passed = passed
 end
 
----@alias lc.Result.Case.constructor fun(body: case_body, passed: boolean): lc.ui.Case
+---@alias lc.Result.Case.constructor fun(body: case_body, passed: boolean, question: lc.ui.Question): lc.ui.Case
 ---@type lc.Result.Case.constructor
 local LeetCase = Case
 
