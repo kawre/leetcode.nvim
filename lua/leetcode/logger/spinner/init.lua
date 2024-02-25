@@ -31,11 +31,11 @@ local spinners = {
     },
     dot = {
         frames = { "⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷" },
-        fps = 15,
+        fps = 8,
     },
     points = {
         frames = { "∙∙∙", "●∙∙", "∙●∙", "∙∙●" },
-        fps = 7,
+        fps = 4,
     },
 }
 
@@ -50,7 +50,7 @@ function spinner:spin()
 
     self.index = (self.index + 1) % #stype.frames
 
-    local fps = math.floor(1000 / #stype.frames)
+    local fps = math.floor(1000 / stype.fps)
     vim.defer_fn(function() self:spin() end, fps)
 end
 
@@ -60,11 +60,10 @@ end
 ---@param lvl? integer
 ---@param opts? table
 function spinner:set(msg, lvl, opts)
+    if not self.spinner then return end
+
     if msg then self:update(msg) end
     lvl = lvl or vim.log.levels.INFO
-
-    local log = require("leetcode.logger")
-    log.debug(self.noti)
 
     opts = vim.tbl_deep_extend("force", {
         hide_from_history = true,
@@ -98,13 +97,10 @@ function spinner:stop(msg, success, opts)
         timeout = 1500,
     }, opts or {})
 
-    self.spinner = nil
     local lvl = vim.log.levels[success and "INFO" or "ERROR"]
 
-    local log = require("leetcode.logger")
-    log.debug({ noti = self.noti, msg = "spinner stop" })
-
     self:set(msg, lvl, opts)
+    self.spinner = nil
 end
 
 ---@param msg? string
