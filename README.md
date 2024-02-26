@@ -239,8 +239,18 @@ logging = true
 
 Inject code before or after your solution, injected code won't be submitted or run.
 
+#### default imports
+
+You can also pass `before = true` to inject default imports for the language.
+Supported languages are `python`, `python3`, `java`
+
+Access default imports via `require("leetcode.config.imports)`
+
 ```lua
 injector = { ---@type table<lc.lang, lc.inject>
+    ["python3"] = {
+        before = true
+    },
     ["cpp"] = {
         before = { "#include <bits/stdc++.h>", "using namespace std;" },
         after = "int main() {}",

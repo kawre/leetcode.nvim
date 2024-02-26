@@ -241,6 +241,13 @@ logging = true
 
 在你的答案前后注入额外代码，注入的代码不会被提交或测试。
 
+#### 默认导入
+
+您还可以传递 `before = true` 以注入语言的默认导入。
+支持的语言为 `python`、`python3`、`java`
+
+通过 `require("leetcode.config.imports)` 访问默认导入
+
 ```lua
 injector = { ---@type table<lc.lang, lc.inject>
     ["cpp"] = {
@@ -315,6 +322,8 @@ image_support = false, -- 将此设置为 `true` 将禁用问题描述的换行
 - `last_submit` 检索上次提交的代码，用于当前问题
 
 - `restore` 尝试恢复默认问题布局
+
+- `inject` 重新注入当前问题的代码
 
 - `session`
 
