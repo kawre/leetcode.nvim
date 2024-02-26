@@ -59,15 +59,15 @@ function Cases:init(item, parent)
     self.console = parent
 
     local total = item.total_testcases ~= vim.NIL and item.total_testcases or 0
+    local testcases = parent.testcase:by_id(item.submission_id)
+
     for i = 1, total do
         self.cases[i] = Case({
-            -- TODO: cache the testcases on submission,
-            -- so it doesn't get out of sync
-            input = self.console.testcase.testcases[i],
+            input = testcases[i],
             output = item.code_answer[i],
             expected = item.expected_code_answer[i],
             std_output = item.std_output_list[i],
-        }, item.compare_result:sub(i, i) == "1")
+        }, item.compare_result:sub(i, i) == "1", parent.question)
     end
 
     self:change(1)

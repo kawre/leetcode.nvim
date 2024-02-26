@@ -138,10 +138,10 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
     hooks = {
         ---@type fun()[]
-        LeetEnter = {},
+        ["enter"] = {},
 
         ---@type fun(question: lc.ui.Question)[]
-        LeetQuestionNew = {},
+        ["question_enter"] = {},
     },
 
     keys = {
@@ -256,8 +256,18 @@ logging = true
 
 Inject code before or after your solution, injected code won't be submitted or run.
 
+#### default imports
+
+You can also pass `before = true` to inject default imports for the language.
+Supported languages are `python`, `python3`, `java`
+
+Access default imports via `require("leetcode.config.imports)`
+
 ```lua
 injector = { ---@type table<lc.lang, lc.inject>
+    ["python3"] = {
+        before = true
+    },
     ["cpp"] = {
         before = { "#include <bits/stdc++.h>", "using namespace std;" },
         after = "int main() {}",
@@ -275,13 +285,13 @@ List of functions that get executed on specified event
 ```lua
 hooks = {
     ---@type fun()[]
-    LeetEnter = {},
+    ["enter"] = {},
 
     ---@type fun(question: lc.ui.Question)[]
-    LeetQuestionNew = {},
+    ["question_enter"] = {},
 
     ---@type fun()[]
-    LeetLeave = {},
+    ["leave"] = {},
 },
 ```
 
@@ -335,6 +345,8 @@ image_support = false,
 - `last_submit` retrieve last submitted code for the current question
 
 - `restore` try to restore default question layout
+
+- `inject` re-inject code for the current question
 
 - `session`
 

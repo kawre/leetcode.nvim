@@ -36,7 +36,7 @@ function Runner:handle(submit)
         lang = question.lang,
         typed_code = self.question:lines(submit),
         question_id = question.q.id,
-        data_input = not submit and table.concat(question.console.testcase:content(), "\n") or nil,
+        data_input = not submit and question.console.testcase:content(),
     }
 
     local judge = Judge:init()

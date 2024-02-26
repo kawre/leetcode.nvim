@@ -21,9 +21,9 @@
 ---| "bash"
 
 ---@alias lc.hook
----| "LeetEnter"
----| "LeetLeave"
----| "LeetQuestionNew"
+---| "enter"
+---| "question_enter"
+---| "leave"
 
 ---@alias lc.size
 ---| string
@@ -103,13 +103,13 @@ local M = {
 
     hooks = {
         ---@type fun()[]
-        LeetEnter = {},
+        ["enter"] = {},
 
         ---@type fun(question: lc.ui.Question)[]
-        LeetQuestionNew = {},
+        ["question_enter"] = {},
 
         ---@type fun()[]
-        LeetLeave = {},
+        ["leave"] = {},
     },
 
     keys = {

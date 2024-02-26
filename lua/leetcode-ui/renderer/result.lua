@@ -130,7 +130,7 @@ function ResultLayout:handle_submission_error(item) -- status code = 11
         output = item.code_output,
         expected = item.expected_output,
         std_output = item.std_output,
-    }, false))
+    }, false, self.parent.question))
 end
 
 ---@private

@@ -5,40 +5,53 @@ local t = require("leetcode.translator")
 
 ---@class lc.ui.Console.TestcasePopup : lc.ui.Console.Popup
 ---@field testcases table<string[]>
+---@field testcase_len integer
 ---@field extmarks integer[]
+---@field snapshots table<string, string[]>
 local Testcase = ConsolePopup:extend("LeetTestcasePopup")
 
 function Testcase:content()
-    self.testcases = {}
+    local lines = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, false)
+    lines = vim.tbl_filter(function(line) return line ~= "" end, lines)
+    return table.concat(lines, "\n")
+end
 
-    local tbl = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, false)
-    local str = table.concat(tbl, "\n")
+function Testcase:snapshot(id, data) --
+    if not data.test_case then return end
+    self.testcases[id] = data.test_case
+end
 
-    local testcases = {}
-    for tcase in vim.gsplit(str, "\n\n") do
-        local s = vim.split(tcase, "\n")
+---@return string[][]
+function Testcase:by_id(id) --
+    local testcases = {} ---@type string[][]
 
-        table.insert(self.testcases, s)
-        testcases = vim.list_extend(testcases, s)
+    local i, n = 0, self.testcase_len
+    for case in vim.gsplit(self.testcases[id] or "", "\n") do
+        local j = math.floor(i / n) + 1
+
+        if not testcases[j] then testcases[j] = {} end
+        table.insert(testcases[j], case)
+
+        i = i + 1
     end
 
     return testcases
 end
 
 function Testcase:populate()
-    local tbl = {}
-    for i, case in ipairs(self.console.question.q.testcase_list) do
-        if i ~= 1 then table.insert(tbl, "") end
+    local lines = {}
 
-        table.insert(self.testcases, vim.split(case, "\n"))
+    local t_list = self.console.question.q.testcase_list
+    self.testcase_len = #vim.split(t_list[1] or "", "\n")
 
+    for i, case in ipairs(t_list) do
+        if i ~= 1 then table.insert(lines, "") end
         for s in vim.gsplit(case, "\n", { trimempty = true }) do
-            table.insert(tbl, s)
+            table.insert(lines, s)
         end
     end
 
-    vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, tbl)
-
+    vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, lines)
     return self:draw_extmarks()
 end
 
@@ -114,6 +127,8 @@ function Testcase:reset()
 end
 
 function Testcase:append(input)
+    -- pcall(vim.cmd.undojoin)
+
     local s = vim.split(input, "\n", { trimempty = true })
 
     local lines = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, true)
@@ -140,6 +155,7 @@ function Testcase:mount()
 
     self.testcases = {}
     self.extmarks = {}
+    self.testcase_len = 0
 
     self:autocmds()
     self:populate()
@@ -172,6 +188,7 @@ function Testcase:init(parent)
 
     self.testcases = {}
     self.extmarks = {}
+    self.testcase_len = 0
 
     self:populate()
 end

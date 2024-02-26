@@ -72,12 +72,23 @@ function utils.get_lang_by_name(name)
 end
 
 ---@param event lc.hook
-function utils.exec_hooks(event, ...)
+---@return fun()[]|nil
+function utils.get_hooks(event)
     local fns = config.user.hooks[event]
-    if not fns then log.error("unknown hook event: " .. event) end
+    if not fns then return end
+
+    if type(fns) == "function" then fns = { fns } end
+
+    return vim.list_extend(fns, config.hooks[event] or {})
+end
+
+---@param event lc.hook
+function utils.exec_hooks(event, ...)
+    local fns = utils.get_hooks(event)
+    if not fns then return log.error("unknown hook event: " .. event) end
 
     for i, fn in ipairs(fns) do
-        local ok, msg = pcall(vim.schedule_wrap(fn), ...)
+        local ok, msg = pcall(fn, ...)
         if not ok then log.error(("bad hook #%d in `%s` event: %s"):format(i, event, msg)) end
     end
 end
@@ -101,13 +112,6 @@ function utils.auth_guard() assert(config.auth.is_signed_in, "User not logged-in
 function utils.norm_ins(str)
     local ins = vim.inspect(str)
     return ins:sub(2, #ins - 1)
-end
-
-function utils.set_question_lines(q, code)
-    if not vim.api.nvim_buf_is_valid(q.bufnr) then return end
-
-    local s_i, e_i = q:range()
-    vim.api.nvim_buf_set_lines(q.bufnr, s_i - 1, e_i, false, vim.split(code, "\n"))
 end
 
 return utils

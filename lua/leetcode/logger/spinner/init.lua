@@ -31,28 +31,27 @@ local spinners = {
     },
     dot = {
         frames = { "⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷" },
-        fps = 15,
+        fps = 8,
     },
     points = {
         frames = { "∙∙∙", "●∙∙", "∙●∙", "∙∙●" },
-        fps = 7,
+        fps = 4,
     },
 }
 
 ---@private
 function spinner:spin()
     local stype = self.spinner
+    if not stype then return end
 
-    if stype then
-        self:set(nil, nil, {
-            icon = stype.frames[self.index + 1],
-        })
+    self:set(nil, nil, {
+        icon = stype.frames[self.index + 1],
+    })
 
-        self.index = (self.index + 1) % #stype.frames
+    self.index = (self.index + 1) % #stype.frames
 
-        local fps = 1000 / #stype.frames
-        vim.defer_fn(function() self:spin() end, fps)
-    end
+    local fps = math.floor(1000 / stype.fps)
+    vim.defer_fn(function() self:spin() end, fps)
 end
 
 ---@private
@@ -61,13 +60,16 @@ end
 ---@param lvl? integer
 ---@param opts? table
 function spinner:set(msg, lvl, opts)
+    if not self.spinner then return end
+
     if msg then self:update(msg) end
     lvl = lvl or vim.log.levels.INFO
 
-    opts = vim.tbl_deep_extend("force", self.noti and { replace = self.noti } or {}, {
+    opts = vim.tbl_deep_extend("force", {
         hide_from_history = true,
         title = config.name,
         timeout = false,
+        replace = self.noti,
     }, opts or {})
 
     self.noti = vim.notify(self.msg, lvl, opts)
@@ -92,12 +94,13 @@ function spinner:stop(msg, success, opts)
 
     opts = vim.tbl_deep_extend("force", {
         icon = success and "" or "󰅘",
-        timeout = 2000,
+        timeout = 1500,
     }, opts or {})
 
-    self.spinner = nil
     local lvl = vim.log.levels[success and "INFO" or "ERROR"]
+
     self:set(msg, lvl, opts)
+    self.spinner = nil
 end
 
 ---@param msg? string

@@ -124,7 +124,7 @@ return {
                 }),
                 sorter = conf.generic_sorter(theme),
                 attach_mappings = function(prompt_bufnr, map)
-                    actions.select_default:replace(function()
+                    local function mount_question(reset)
                         local selection = action_state.get_selected_entry()
                         if not selection then return end
 
@@ -134,8 +134,12 @@ return {
                         end
 
                         actions.close(prompt_bufnr)
-                        Question(q):mount()
-                    end)
+                        Question(q, reset):mount()
+                    end
+
+                    actions.select_default:replace(function() mount_question() end)
+                    map({ "n", "i" }, "<C-Enter>", function() mount_question(true) end)
+
                     return true
                 end,
             })

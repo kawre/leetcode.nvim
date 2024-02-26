@@ -90,14 +90,14 @@ function cmd.delete_cookie()
     cookie.delete()
 end
 
-cmd.q_close_all = vim.schedule_wrap(function()
+cmd.q_close_all = function()
     local utils = require("leetcode.utils")
     local qs = utils.question_tabs()
 
     for _, tabp in ipairs(qs) do
-        tabp.question:unmount()
+        tabp.question:_unmount()
     end
-end)
+end
 
 function cmd.exit()
     local leetcode = require("leetcode")
@@ -132,7 +132,7 @@ function cmd.qot()
     problems.question_of_today(function(qot, err)
         if err then return log.err(err) end
         local problemlist = require("leetcode.cache.problemlist")
-        Question(problemlist.get_by_title_slug(qot.title_slug)):mount()
+        Question(problemlist.get_by_title_slug(qot.title_slug), true):mount()
     end)
 end
 
@@ -156,7 +156,7 @@ function cmd.random_question(opts)
 
     local item = problems.get_by_title_slug(q.title_slug) or {}
     local Question = require("leetcode-ui.question")
-    Question(item):mount()
+    Question(item, true):mount()
 end
 
 function cmd.start_with_cmd()
@@ -183,8 +183,8 @@ function cmd.yank()
         api.nvim_set_current_win(q.winid)
         api.nvim_set_current_buf(q.bufnr)
 
-        local start_i, end_i = q:range()
-        vim.cmd(("%d,%dyank"):format(start_i, end_i))
+        local start_i, end_i, lines = q:range()
+        vim.cmd(("%d,%dyank"):format(start_i or 1, end_i or #lines))
     end
 end
 
@@ -286,8 +286,7 @@ function cmd.reset()
     local q = utils.curr_question()
     if not q then return end
 
-    local snip = q:get_snippet(true)
-    utils.set_question_lines(q, snip)
+    q:set_lines()
 end
 
 function cmd.last_submit()
@@ -308,8 +307,8 @@ function cmd.last_submit()
             return
         end
 
-        if type(res) == "table" and res.code and api.nvim_buf_is_valid(q.bufnr) then
-            utils.set_question_lines(q, res.code)
+        if type(res) == "table" and res.code then
+            q:set_lines(res.code)
         else
             log.error("Something went wrong")
         end
@@ -337,6 +336,40 @@ function cmd.restore()
         and (bufnr and api.nvim_buf_is_valid(bufnr))
     then
         api.nvim_win_set_buf(winid, bufnr)
+    end
+end
+
+function cmd.inject()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if not q then return end
+
+    if vim.api.nvim_buf_is_valid(q.bufnr) then
+        local start_i, end_i = q:range(true)
+
+        if start_i == nil and end_i == nil then
+            log.error("`@leet start` and `@leet end` not found")
+            return
+        end
+
+        if start_i == nil then
+            log.error("`@leet start` not found")
+        else
+            local before = q:inject(true)
+            if before then
+                vim.api.nvim_buf_set_lines(q.bufnr, 0, start_i - 1, false, vim.split(before, "\n"))
+            end
+        end
+
+        if end_i == nil then
+            log.error("`@leet end` not found")
+        else
+            local after = q:inject(false)
+            if after then
+                vim.api.nvim_buf_set_lines(q.bufnr, end_i + 1, -1, false, vim.split(after, "\n"))
+            end
+        end
     end
 end
 
@@ -512,6 +545,7 @@ cmd.commands = {
     reset = { cmd.reset },
     last_submit = { cmd.last_submit },
     restore = { cmd.restore },
+    inject = { cmd.inject },
 
     session = {
         change = {
