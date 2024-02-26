@@ -127,6 +127,8 @@ function Testcase:reset()
 end
 
 function Testcase:append(input)
+    -- pcall(vim.cmd.undojoin)
+
     local s = vim.split(input, "\n", { trimempty = true })
 
     local lines = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, true)

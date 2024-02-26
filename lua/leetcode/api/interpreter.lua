@@ -50,7 +50,7 @@ function interpreter.listener(id, callback)
                 item = interpreter:handle_item(item)
                 callback(item)
             else -- still judging
-                local intervals = config.auth.is_premium and { 500, 500 } or { 500, 1000 }
+                local intervals = config.auth.is_premium and { 450, 450 } or { 450, 900 }
                 local interval = item.sate == "STARTED" and intervals[2] or intervals[1]
                 callback(nil, item.state)
                 vim.defer_fn(listen, interval)

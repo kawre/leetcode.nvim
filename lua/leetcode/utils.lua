@@ -74,22 +74,21 @@ end
 ---@param event lc.hook
 ---@return fun()[]|nil
 function utils.get_hooks(event)
-    local defaults = config.hooks[event] or {}
     local fns = config.user.hooks[event]
-
     if not fns then return end
 
     if type(fns) == "function" then fns = { fns } end
-    return vim.list_extend(defaults, fns)
+
+    return vim.list_extend(fns, config.hooks[event] or {})
 end
 
 ---@param event lc.hook
-function utils.exec_hook(event, ...)
+function utils.exec_hooks(event, ...)
     local fns = utils.get_hooks(event)
     if not fns then return log.error("unknown hook event: " .. event) end
 
     for i, fn in ipairs(fns) do
-        local ok, msg = pcall(vim.schedule_wrap(fn), ...)
+        local ok, msg = pcall(fn, ...)
         if not ok then log.error(("bad hook #%d in `%s` event: %s"):format(i, event, msg)) end
     end
 end

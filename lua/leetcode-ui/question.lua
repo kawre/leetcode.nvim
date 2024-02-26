@@ -47,7 +47,7 @@ function Question:reset_lines()
     local new_lines = self:snippet(true) or ""
 
     vim.schedule(function() --
-        log.info("Previous code found, resetting…\nTo undo, simply press `u`")
+        log.info("Previous code found and reseted\nTo undo, simply press `u`")
     end)
 
     self:set_lines(new_lines)
@@ -105,7 +105,7 @@ function Question:open_buffer(existed, loaded)
     end
 
     if not loaded then
-        utils.exec_hook("question_enter", self)
+        utils.exec_hooks("question_enter", self)
         self:autocmds()
     end
 end
@@ -183,7 +183,7 @@ local group = vim.api.nvim_create_augroup("leetcode_questions", { clear = true }
 function Question:autocmds()
     vim.api.nvim_create_autocmd("WinClosed", {
         group = group,
-        buffer = self.bufnr,
+        pattern = tostring(self.winid),
         callback = function() self:unmount() end,
     })
 end
