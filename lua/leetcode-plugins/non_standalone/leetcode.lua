@@ -61,7 +61,7 @@ leetcode.start = function(on_vimenter)
     Menu():mount()
 
     local utils = require("leetcode.utils")
-    utils.exec_hooks("LeetEnter")
+    utils.exec_hooks("enter")
 
     return true
 end
@@ -77,7 +77,8 @@ leetcode.stop = vim.schedule_wrap(function()
         desc = "Open leetcode.nvim",
     })
 
-    require("leetcode.utils").exec_hooks("LeetLeave")
+    local utils = require("leetcode.utils")
+    utils.exec_hooks("leave")
 
     if prev_cwd then
         vim.api.nvim_set_current_dir(prev_cwd)
