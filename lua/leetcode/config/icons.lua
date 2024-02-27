@@ -10,6 +10,9 @@ local icons = {
         notac = "󱎖",
         todo = "",
     },
+    caret = {
+        right = "",
+    },
 }
 
 icons.hl = {

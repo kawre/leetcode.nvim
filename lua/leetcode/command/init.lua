@@ -540,55 +540,40 @@ cmd.commands = {
     last_submit = { cmd.last_submit },
     restore = { cmd.restore },
     inject = { cmd.inject },
-
     session = {
         change = {
             cmd.change_session,
-
             _args = arguments.session_change,
         },
-
         create = {
             cmd.create_session,
-
             _args = arguments.session_create,
         },
-
         update = { cmd.update_sessions },
     },
-
     list = {
         cmd.problems,
-
         _args = arguments.list,
     },
-
     random = {
         cmd.random_question,
-
         _args = arguments.random,
     },
-
     desc = {
         cmd.desc_toggle,
 
         stats = { cmd.desc_toggle_stats },
-
         toggle = { cmd.desc_toggle },
     },
-
     cookie = {
         update = { cmd.cookie_prompt },
         delete = { cmd.sign_out },
     },
-
     cache = {
         update = { cmd.cache_update },
     },
-
     fix = {
         cmd.fix,
-
         _private = true,
     },
 }
