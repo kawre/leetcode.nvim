@@ -145,7 +145,7 @@ function Menu:remount()
         api.nvim_buf_delete(self.bufnr, { force = true })
     end
 
-    vim.cmd.tabe()
+    vim.cmd("$tabnew")
     self.bufnr = api.nvim_get_current_buf()
     self.winid = api.nvim_get_current_win()
 

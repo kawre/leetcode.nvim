@@ -51,7 +51,6 @@ imports["python"] = {
     "from itertools import *",
     "from functools import *",
     "from operator import *",
-    "from __builtin__ import *",
     "import string",
     "import re",
     "import datetime",
