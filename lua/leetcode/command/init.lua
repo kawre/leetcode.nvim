@@ -340,30 +340,30 @@ function cmd.inject()
     local q = utils.curr_question()
     if not q then return end
 
-    if vim.api.nvim_buf_is_valid(q.bufnr) then
+    if api.nvim_buf_is_valid(q.bufnr) then
         local start_i, end_i = q:range(true)
+        local not_found = {}
 
-        if start_i == nil and end_i == nil then
-            log.error("`@leet start` and `@leet end` not found")
-            return
-        end
-
-        if start_i == nil then
-            log.error("`@leet start` not found")
+        if not start_i then
+            table.insert(not_found, "`@leet start`")
         else
             local before = q:inject(true)
             if before then
-                vim.api.nvim_buf_set_lines(q.bufnr, 0, start_i - 1, false, vim.split(before, "\n"))
+                api.nvim_buf_set_lines(q.bufnr, 0, start_i - 1, false, vim.split(before, "\n"))
             end
         end
 
-        if end_i == nil then
-            log.error("`@leet end` not found")
+        if not end_i then
+            table.insert(not_found, "`@leet end`")
         else
             local after = q:inject(false)
             if after then
-                vim.api.nvim_buf_set_lines(q.bufnr, end_i + 1, -1, false, vim.split(after, "\n"))
+                api.nvim_buf_set_lines(q.bufnr, end_i + 1, -1, false, vim.split(after, "\n"))
             end
+        end
+
+        if not vim.tbl_isempty(not_found) then
+            log.error(table.concat(not_found, " and ") .. " not found")
         end
     end
 end

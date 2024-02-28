@@ -52,7 +52,10 @@ function ConsoleLayout:mount()
 end
 
 function ConsoleLayout:run(submit)
-    if config.user.console.open_on_runcode then self:show() end
+    if config.user.console.open_on_runcode then
+        self:show()
+        self.result:focus()
+    end
     Runner:init(self.question):run(submit)
 end
 
