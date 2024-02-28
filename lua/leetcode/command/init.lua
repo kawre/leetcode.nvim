@@ -347,30 +347,30 @@ function cmd.inject()
     local q = utils.curr_question()
     if not q then return end
 
-    if vim.api.nvim_buf_is_valid(q.bufnr) then
+    if api.nvim_buf_is_valid(q.bufnr) then
         local start_i, end_i = q:range(true)
+        local not_found = {}
 
-        if start_i == nil and end_i == nil then
-            log.error("`@leet start` and `@leet end` not found")
-            return
-        end
-
-        if start_i == nil then
-            log.error("`@leet start` not found")
+        if not start_i then
+            table.insert(not_found, "`@leet start`")
         else
             local before = q:inject(true)
             if before then
-                vim.api.nvim_buf_set_lines(q.bufnr, 0, start_i - 1, false, vim.split(before, "\n"))
+                api.nvim_buf_set_lines(q.bufnr, 0, start_i - 1, false, vim.split(before, "\n"))
             end
         end
 
-        if end_i == nil then
-            log.error("`@leet end` not found")
+        if not end_i then
+            table.insert(not_found, "`@leet end`")
         else
             local after = q:inject(false)
             if after then
-                vim.api.nvim_buf_set_lines(q.bufnr, end_i + 1, -1, false, vim.split(after, "\n"))
+                api.nvim_buf_set_lines(q.bufnr, end_i + 1, -1, false, vim.split(after, "\n"))
             end
+        end
+
+        if not vim.tbl_isempty(not_found) then
+            log.error(table.concat(not_found, " and ") .. " not found")
         end
     end
 end
@@ -548,55 +548,40 @@ cmd.commands = {
     last_submit = { cmd.last_submit },
     restore = { cmd.restore },
     inject = { cmd.inject },
-
     session = {
         change = {
             cmd.change_session,
-
             _args = arguments.session_change,
         },
-
         create = {
             cmd.create_session,
-
             _args = arguments.session_create,
         },
-
         update = { cmd.update_sessions },
     },
-
     list = {
         cmd.problems,
-
         _args = arguments.list,
     },
-
     random = {
         cmd.random_question,
-
         _args = arguments.random,
     },
-
     desc = {
         cmd.desc_toggle,
 
         stats = { cmd.desc_toggle_stats },
-
         toggle = { cmd.desc_toggle },
     },
-
     cookie = {
         update = { cmd.cookie_prompt },
         delete = { cmd.sign_out },
     },
-
     cache = {
         update = { cmd.cache_update },
     },
-
     fix = {
         cmd.fix,
-
         _private = true,
     },
 }

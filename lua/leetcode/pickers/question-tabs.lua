@@ -6,6 +6,8 @@ local t = require("leetcode.translator")
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local conf = require("telescope.config").values
+local config = require("leetcode.config")
+local icons = config.icons
 
 local entry_display = require("telescope.pickers.entry_display")
 local actions = require("telescope.actions")
@@ -22,7 +24,7 @@ local function display_current(entry)
     local tabp = vim.api.nvim_get_current_tabpage()
     if tabp ~= entry.tabpage then return unpack({ "", "" }) end
 
-    return { "", "" }
+    return { icons.caret.right, "leetcode_ref" }
 end
 
 local function display_difficulty(q)
@@ -75,7 +77,16 @@ local opts = require("telescope.themes").get_dropdown()
 return {
     pick = function()
         local tabs = utils.question_tabs()
-        if vim.tbl_isempty(tabs) then return log.warn("No questions opened") end
+
+        if vim.tbl_isempty(tabs) then --
+            return log.warn("No questions opened")
+        end
+
+        table.sort(tabs, function(q1, q2)
+            local fid1, fid2 =
+                tonumber(q1.question.q.frontend_id), tonumber(q2.question.q.frontend_id)
+            return (fid1 and fid2) and fid1 < fid2 or fid1 ~= nil
+        end)
 
         pickers
             .new(opts, {

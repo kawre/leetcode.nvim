@@ -69,11 +69,10 @@ function Question:path()
 
     local fn = ("%s.%s%s.%s"):format(self.q.frontend_id, self.q.title_slug, alt, lang.ft)
     self.file = config.storage.home:joinpath(fn)
-    local existed = true
+    local existed = self.file:exists()
 
-    if not self.file:exists() then --
+    if not existed then --
         self.file:write(self:snippet(), "w")
-        existed = false
     end
 
     return self.file:absolute(), existed

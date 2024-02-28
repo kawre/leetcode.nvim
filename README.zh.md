@@ -265,7 +265,7 @@ logging = true
 您还可以传递 `before = true` 以注入语言的默认导入。
 支持的语言为 `python`、`python3`、`java`
 
-通过 `require("leetcode.config.imports)` 访问默认导入
+通过 `require("leetcode.config.imports")` 访问默认导入
 
 ```lua
 injector = { ---@type table<lc.lang, lc.inject>
