@@ -144,6 +144,9 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
         ---@type fun(question: lc.ui.Question)[]
         ["question_enter"] = {},
+
+        ---@type fun()[]
+        ["leave"] = {},
     },
 
     keys = {
@@ -287,6 +290,9 @@ hooks = {
 
     ---@type fun(question: lc.ui.Question)[]
     ["question_enter"] = {},
+
+    ---@type fun()[]
+    ["leave"] = {},
 },
 ```
 
@@ -308,6 +314,8 @@ image_support = false, -- 将此设置为 `true` 将禁用问题描述的换行
 ### `Leet` 打开菜单仪表板
 
 - `menu` 与 `Leet` 相同
+
+- `exit` 关闭 [leetcode.nvim]
 
 - `console` 打开当前打开问题的控制台弹出窗口
 
@@ -445,6 +453,8 @@ plugins = {
     non_standalone = true,
 }
 ```
+
+你可以使用 `:Leet exit` 命令退出 [leetcode.nvim]
 
 ## 🙌 鸣谢
 

@@ -140,13 +140,15 @@ end
 function Menu:_unmount()
     require("leetcode.command").q_close_all()
 
-    -- if self.bufnr and vim.api.nvim_buf_is_valid(self.bufnr) then
-    --     vim.api.nvim_buf_delete(self.bufnr, { force = true })
-    -- end
-
     if self.winid and vim.api.nvim_win_is_valid(self.winid) then
         vim.api.nvim_win_close(self.winid, true)
     end
+
+    vim.schedule(function()
+        if self.bufnr and vim.api.nvim_buf_is_valid(self.bufnr) then
+            vim.api.nvim_buf_delete(self.bufnr, { force = true })
+        end
+    end)
 end
 
 ---@param self lc.ui.Menu

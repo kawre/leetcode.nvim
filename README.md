@@ -142,6 +142,9 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
         ---@type fun(question: lc.ui.Question)[]
         ["question_enter"] = {},
+
+        ---@type fun()[]
+        ["leave"] = {},
     },
 
     keys = {
@@ -153,7 +156,6 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         focus_testcases = "H", ---@type string
         focus_result = "L", ---@type string
     },
-
 
     ---@type boolean
     image_support = false,
@@ -314,7 +316,7 @@ image_support = false,
 
 - `menu` same as `Leet`
 
-- [`exit`](#exiting-leetcodenvim) closes [leetcode.nvim]
+- `exit` close [leetcode.nvim]
 
 - `console` opens console pop-up for currently opened question
 
@@ -453,6 +455,8 @@ plugins = {
     non_standalone = true,
 }
 ```
+
+You can then exit [leetcode.nvim] using `:Leet exit` command
 
 ## 🙌 Credits
 
