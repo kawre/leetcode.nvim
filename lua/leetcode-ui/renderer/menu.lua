@@ -137,7 +137,11 @@ function Menu:apply_options()
     })
 end
 
-function Menu:_unmount()
+function Menu:unmount()
+    if vim.v.dying ~= 0 then --
+        return
+    end
+
     require("leetcode.command").q_close_all()
 
     if self.winid and vim.api.nvim_win_is_valid(self.winid) then
@@ -150,9 +154,6 @@ function Menu:_unmount()
         end
     end)
 end
-
----@param self lc.ui.Menu
-Menu.unmount = vim.schedule_wrap(function(self) self:_unmount() end)
 
 function Menu:remount()
     if self.winid and api.nvim_win_is_valid(self.winid) then --

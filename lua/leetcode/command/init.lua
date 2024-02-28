@@ -95,7 +95,7 @@ cmd.q_close_all = function()
     local qs = utils.question_tabs()
 
     for _, tabp in ipairs(qs) do
-        tabp.question:_unmount()
+        tabp.question:unmount()
     end
 end
 

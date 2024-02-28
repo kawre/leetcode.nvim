@@ -152,7 +152,7 @@ function Question:injector(code)
     return table.concat(parts, "\n")
 end
 
-function Question:unmount()
+function Question:_unmount()
     if vim.v.dying ~= 0 then --
         return
     end
@@ -175,7 +175,7 @@ function Question:unmount()
     end)
 end
 
-function Question:_unmount()
+function Question:unmount()
     if vim.api.nvim_win_is_valid(self.winid) then vim.api.nvim_win_close(self.winid, true) end
 end
 
@@ -184,7 +184,7 @@ function Question:autocmds()
     vim.api.nvim_create_autocmd("WinClosed", {
         group = group,
         pattern = tostring(self.winid),
-        callback = function() self:unmount() end,
+        callback = function() self:_unmount() end,
     })
 end
 
