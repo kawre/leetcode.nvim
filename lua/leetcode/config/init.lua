@@ -1,11 +1,10 @@
 local template = require("leetcode.config.template")
 local P = require("plenary.path")
 
----@type lc.ui.Question[]
-_Lc_questions = {}
-
----@type lc.ui.Menu
-_Lc_menu = {} ---@diagnostic disable-line
+_Lc_state = {
+    menu = nil, ---@type lc.ui.Menu
+    questions = {}, ---@type lc.ui.Question[]
+}
 
 local lazy_plugs = {}
 

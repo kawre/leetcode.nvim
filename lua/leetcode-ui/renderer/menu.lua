@@ -137,6 +137,24 @@ function Menu:apply_options()
     })
 end
 
+function Menu:unmount()
+    if vim.v.dying ~= 0 then --
+        return
+    end
+
+    require("leetcode.command").q_close_all()
+
+    if self.winid and vim.api.nvim_win_is_valid(self.winid) then
+        vim.api.nvim_win_close(self.winid, true)
+    end
+
+    vim.schedule(function()
+        if self.bufnr and vim.api.nvim_buf_is_valid(self.bufnr) then
+            vim.api.nvim_buf_delete(self.bufnr, { force = true })
+        end
+    end)
+end
+
 function Menu:remount()
     if self.winid and api.nvim_win_is_valid(self.winid) then --
         api.nvim_win_close(self.winid, true)
@@ -195,7 +213,7 @@ function Menu:init()
     self.bufnr = api.nvim_get_current_buf()
     self.winid = api.nvim_get_current_win()
 
-    _Lc_menu = self
+    _Lc_state.menu = self
 end
 
 ---@type fun(): lc.ui.Menu

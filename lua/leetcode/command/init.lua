@@ -95,8 +95,13 @@ cmd.q_close_all = function()
     local qs = utils.question_tabs()
 
     for _, tabp in ipairs(qs) do
-        tabp.question:_unmount()
+        tabp.question:unmount()
     end
+end
+
+function cmd.exit()
+    local leetcode = require("leetcode")
+    leetcode.stop()
 end
 
 cmd.expire = vim.schedule_wrap(function()
@@ -160,12 +165,14 @@ function cmd.start_with_cmd()
 end
 
 function cmd.menu()
-    local ok, tabp = pcall(api.nvim_win_get_tabpage, _Lc_menu.winid)
+    local winid, bufnr = _Lc_state.menu.winid, _Lc_state.menu.bufnr
+    local ok, tabp = pcall(api.nvim_win_get_tabpage, winid)
 
     if ok then
         api.nvim_set_current_tabpage(tabp)
+        api.nvim_win_set_buf(winid, bufnr)
     else
-        _Lc_menu:remount()
+        _Lc_state.menu:remount()
     end
 end
 
@@ -184,7 +191,7 @@ function cmd.yank()
 end
 
 ---@param page lc-menu.page
-function cmd.set_menu_page(page) _Lc_menu:set_page(page) end
+function cmd.set_menu_page(page) _Lc_state.menu:set_page(page) end
 
 function cmd.start_user_session() --
     cmd.set_menu_page("menu")
@@ -525,6 +532,7 @@ cmd.commands = {
     cmd.menu,
 
     menu = { cmd.menu },
+    exit = { cmd.exit },
     console = { cmd.console },
     info = { cmd.info },
     hints = { cmd.hints },

@@ -4,4 +4,5 @@ indent_type = "Spaces"
 indent_width = 4
 quote_style = "ForceDouble"
 call_parentheses = "Always"
+# collapse_simple_statement = "FunctionOnly"
 collapse_simple_statement = "Always"

@@ -152,7 +152,7 @@ function Question:injector(code)
     return table.concat(parts, "\n")
 end
 
-function Question:unmount()
+function Question:_unmount()
     if vim.v.dying ~= 0 then --
         return
     end
@@ -166,15 +166,16 @@ function Question:unmount()
             vim.api.nvim_buf_delete(self.bufnr, { force = true, unload = false })
         end
 
-        _Lc_questions = vim.tbl_filter(function(q) --
-            return q.bufnr ~= self.bufnr
-        end, _Lc_questions)
+        _Lc_state.questions = vim.tbl_filter(
+            function(q) return q.bufnr ~= self.bufnr end,
+            _Lc_state.questions
+        )
 
         self = nil
     end)
 end
 
-function Question:_unmount()
+function Question:unmount()
     if vim.api.nvim_win_is_valid(self.winid) then vim.api.nvim_win_close(self.winid, true) end
 end
 
@@ -183,14 +184,14 @@ function Question:autocmds()
     vim.api.nvim_create_autocmd("WinClosed", {
         group = group,
         pattern = tostring(self.winid),
-        callback = function() self:unmount() end,
+        callback = function() self:_unmount() end,
     })
 end
 
 function Question:handle_mount()
     self:create_buffer()
 
-    table.insert(_Lc_questions, self)
+    table.insert(_Lc_state.questions, self)
 
     self.description = Description(self):mount()
     self.console = Console(self)

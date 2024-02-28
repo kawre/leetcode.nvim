@@ -31,7 +31,7 @@ end
 function utils.question_tabs()
     local questions = {}
 
-    for _, q in ipairs(_Lc_questions) do
+    for _, q in ipairs(_Lc_state.questions) do
         local tabp = utils.question_tabp(q)
         if tabp then table.insert(questions, { tabpage = tabp, question = q }) end
     end

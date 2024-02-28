@@ -36,7 +36,10 @@ logger.info = function(msg) logger.log(msg) end
 logger.warn = function(msg) logger.log(msg, lvls.WARN) end
 
 ---@param msg any
-logger.error = function(msg) logger.log(msg, lvls.ERROR) end
+logger.error = function(msg)
+    logger.log(msg, lvls.ERROR)
+    logger.debug(msg)
+end
 
 ---@param err lc.err
 logger.err = function(err)

@@ -24,6 +24,8 @@ function Renderer:draw(component)
     self.bufnr = component.bufnr
     self.winid = component.winid
 
+    if not vim.api.nvim_buf_is_valid(self.bufnr) then return end
+
     self:map("n", keys.confirm, function() self:handle_press() end)
 
     self:clear_keymaps()

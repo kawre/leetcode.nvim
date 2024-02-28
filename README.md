@@ -93,6 +93,11 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         cache = vim.fn.stdpath("cache") .. "/leetcode",
     },
 
+    ---@type table<string, boolean>
+    plugins = {
+        non_standalone = false,
+    },
+
     ---@type boolean
     logging = true,
 
@@ -137,6 +142,9 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
         ---@type fun(question: lc.ui.Question)[]
         ["question_enter"] = {},
+
+        ---@type fun()[]
+        ["leave"] = {},
     },
 
     keys = {
@@ -226,6 +234,17 @@ storage = {
 },
 ```
 
+### plugins
+
+[plugins list](#-plugins)
+
+```lua
+---@type table<string, boolean>
+plugins = {
+    non_standalone = false,
+},
+```
+
 ### logging
 
 Whether to log [leetcode.nvim] status notifications
@@ -272,6 +291,9 @@ hooks = {
 
     ---@type fun(question: lc.ui.Question)[]
     ["question_enter"] = {},
+
+    ---@type fun()[]
+    ["leave"] = {},
 },
 ```
 
@@ -293,6 +315,8 @@ image_support = false,
 ### `Leet` opens menu dashboard
 
 - `menu` same as `Leet`
+
+- `exit` close [leetcode.nvim]
 
 - `console` opens console pop-up for currently opened question
 
@@ -418,6 +442,21 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4
       cmd = "Leet",
   }
   ```
+
+## 🧩 Plugins
+
+### Non-Standalone mode
+
+To run [leetcode.nvim] in a non-standalone mode (i.e. not with argument or an empty Neovim session),
+enable the `non_standalone` plugin in your config:
+
+```lua
+plugins = {
+    non_standalone = true,
+}
+```
+
+You can then exit [leetcode.nvim] using `:Leet exit` command
 
 ## 🙌 Credits
 

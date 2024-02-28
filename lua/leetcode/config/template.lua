@@ -23,6 +23,7 @@
 ---@alias lc.hook
 ---| "enter"
 ---| "question_enter"
+---| "leave"
 
 ---@alias lc.size
 ---| string
@@ -57,7 +58,10 @@ local M = {
         cache = vim.fn.stdpath("cache") .. "/leetcode",
     },
 
-    plugins = {},
+    ---@type table<string, boolean>
+    plugins = {
+        non_standalone = false,
+    },
 
     ---@type boolean
     logging = true,
@@ -103,6 +107,9 @@ local M = {
 
         ---@type fun(question: lc.ui.Question)[]
         ["question_enter"] = {},
+
+        ---@type fun()[]
+        ["leave"] = {},
     },
 
     keys = {
