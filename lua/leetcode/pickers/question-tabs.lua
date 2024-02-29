@@ -82,11 +82,11 @@ return {
             return log.warn("No questions opened")
         end
 
-        table.sort(tabs, function(q1, q2)
-            local fid1, fid2 =
-                tonumber(q1.question.q.frontend_id), tonumber(q2.question.q.frontend_id)
-            return (fid1 and fid2) and fid1 < fid2 or fid1 ~= nil
-        end)
+        -- table.sort(tabs, function(q1, q2)
+        --     local fid1, fid2 =
+        --         tonumber(q1.question.q.frontend_id), tonumber(q2.question.q.frontend_id)
+        --     return (fid1 and fid2) and fid1 < fid2 or fid1 ~= nil
+        -- end)
 
         pickers
             .new(opts, {
