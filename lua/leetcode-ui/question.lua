@@ -82,16 +82,15 @@ function Question:create_buffer()
     local path, existed = self:path()
 
     vim.cmd("$tabe " .. path)
-
     self.bufnr = vim.api.nvim_get_current_buf()
     self.winid = vim.api.nvim_get_current_win()
 
-    self:open_buffer(existed, false)
+    self:open_buffer(existed)
 end
 
 ---@param existed boolean
----@param loaded boolean
-function Question:open_buffer(existed, loaded)
+function Question:open_buffer(existed)
+    vim.api.nvim_win_set_buf(self.winid, self.bufnr)
     vim.api.nvim_set_option_value("buflisted", true, { buf = self.bufnr })
 
     local i = self:fold_range()
@@ -101,11 +100,6 @@ function Question:open_buffer(existed, loaded)
 
     if existed then --
         self:reset_lines()
-    end
-
-    if not loaded then
-        utils.exec_hooks("question_enter", self)
-        self:autocmds()
     end
 end
 
@@ -191,11 +185,14 @@ end
 function Question:handle_mount()
     self:create_buffer()
 
-    table.insert(_Lc_state.questions, self)
-
     self.description = Description(self):mount()
     self.console = Console(self)
     self.info = Info(self)
+
+    table.insert(_Lc_state.questions, self)
+
+    self:autocmds()
+    utils.exec_hooks("question_enter", self)
 
     return self
 end
@@ -281,11 +278,10 @@ Question.change_lang = vim.schedule_wrap(function(self, lang)
         local loaded = vim.api.nvim_buf_is_loaded(self.bufnr)
         vim.fn.bufload(self.bufnr)
 
-        vim.api.nvim_win_set_buf(self.winid, self.bufnr)
-
         vim.api.nvim_set_option_value("buflisted", false, { buf = old_bufnr })
+        self:open_buffer(existed)
 
-        self:open_buffer(existed, loaded)
+        if not loaded then utils.exec_hooks("question_enter", self) end
     end)
 
     if not ok then
