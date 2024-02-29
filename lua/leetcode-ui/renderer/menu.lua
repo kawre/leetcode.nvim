@@ -12,7 +12,9 @@ local Menu = Renderer:extend("LeetMenu")
 
 local function tbl_keys(t)
     local keys = vim.tbl_keys(t)
-    if vim.tbl_isempty(keys) then return end
+    if vim.tbl_isempty(keys) then
+        return
+    end
     table.sort(keys)
     return keys
 end
@@ -29,13 +31,17 @@ function Menu:autocmds()
     api.nvim_create_autocmd("WinResized", {
         group = group_id,
         buffer = self.bufnr,
-        callback = function() self:draw() end,
+        callback = function()
+            self:draw()
+        end,
     })
 
     api.nvim_create_autocmd("CursorMoved", {
         group = group_id,
         buffer = self.bufnr,
-        callback = function() self:cursor_move() end,
+        callback = function()
+            self:cursor_move()
+        end,
     })
 
     api.nvim_create_autocmd("QuitPre", {
@@ -50,13 +56,17 @@ function Menu:autocmds()
 end
 
 function Menu:cursor_move()
-    if not self.winid or not api.nvim_win_is_valid(self.winid) then return end
+    if not self.winid or not api.nvim_win_is_valid(self.winid) then
+        return
+    end
 
     local curr = api.nvim_win_get_cursor(self.winid)
     local prev = self.cursor.prev
 
     local keys = tbl_keys(self._.buttons)
-    if not keys then return end
+    if not keys then
+        return
+    end
 
     local function find_nearest(l, r)
         while l < r do
@@ -138,7 +148,7 @@ function Menu:apply_options()
 end
 
 function Menu:unmount()
-    if vim.v.dying ~= 0 then --
+    if vim.v.dying ~= 0 then
         return
     end
 
@@ -156,10 +166,10 @@ function Menu:unmount()
 end
 
 function Menu:remount()
-    if self.winid and api.nvim_win_is_valid(self.winid) then --
+    if self.winid and api.nvim_win_is_valid(self.winid) then
         api.nvim_win_close(self.winid, true)
     end
-    if self.bufnr and api.nvim_buf_is_valid(self.bufnr) then --
+    if self.bufnr and api.nvim_buf_is_valid(self.bufnr) then
         api.nvim_buf_delete(self.bufnr, { force = true })
     end
 

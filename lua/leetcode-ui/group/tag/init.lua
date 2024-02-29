@@ -51,7 +51,9 @@ function Tag.normalize(text)
         :gsub("\n", "&lcnl;")
         :gsub("\t", "&lctab;")
         :gsub("%s", "&nbsp;")
-        :gsub("<[^>]*>", function(match) return match:gsub("&nbsp;", " ") end)
+        :gsub("<[^>]*>", function(match)
+            return match:gsub("&nbsp;", " ")
+        end)
     -- :gsub("<a[^>]*>(.-)</a>", function(match) return match:gsub("&#?%w+;", utils.entity) end)
 
     log.debug(text)
@@ -71,7 +73,9 @@ function Tag:add_indent(item, text)
     end
 end
 
-function Tag:get_text(node) return ts.get_node_text(node, self.text) end
+function Tag:get_text(node)
+    return ts.get_node_text(node, self.text)
+end
 
 ---@param node TSNode
 ---
@@ -95,7 +99,9 @@ end
 -- 1206
 ---@param node TSNode
 function Tag:get_el_data(node)
-    if node:type() ~= "element" then return {} end
+    if node:type() ~= "element" then
+        return {}
+    end
 
     local start_tag
     for child in node:iter_children() do
@@ -107,7 +113,9 @@ function Tag:get_el_data(node)
         end
     end
 
-    if not start_tag then return {} end
+    if not start_tag then
+        return {}
+    end
 
     local tag, attrs = nil, {}
     for child in start_tag:iter_children() do
@@ -147,7 +155,9 @@ function Tag:parse_node() --
 end
 
 function Tag.trim(lines) --
-    if not lines or vim.tbl_isempty(lines) then return {} end
+    if not lines or vim.tbl_isempty(lines) then
+        return {}
+    end
 
     while not vim.tbl_isempty(lines) and lines[1]:content() == "" do
         table.remove(lines, 1)
@@ -160,7 +170,9 @@ function Tag.trim(lines) --
     return lines
 end
 
-local function req_tag(str) return require("leetcode-ui.group.tag." .. str) end
+local function req_tag(str)
+    return require("leetcode-ui.group.tag." .. str)
+end
 
 function Tag:contents()
     local items = Tag.super.contents(self)
@@ -224,13 +236,13 @@ end
 local LeetTag = Tag
 
 ---@param text string
-function Tag.static:parse(text) --
+function Tag.static:parse(text)
     ---@type string
     local normalized = Normalizer:norm(text)
 
     local ok, parser = pcall(ts.get_string_parser, normalized, "html")
 
-    if not ok then --
+    if not ok then
         local Plain = require("leetcode.parser.plain")
         return Plain:parse(text)
     end

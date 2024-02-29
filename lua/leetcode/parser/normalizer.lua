@@ -64,7 +64,9 @@ function Normalizer:entities()
         :gsub("\n", "&lcnl;")
         :gsub("\t", "&lctab;")
         :gsub("%s", "&nbsp;")
-        :gsub("<[^>]+>", function(match) return match:gsub("&nbsp;", " ") end)
+        :gsub("<[^>]+>", function(match)
+            return match:gsub("&nbsp;", " ")
+        end)
 end
 
 ---@param text string
@@ -84,6 +86,8 @@ end
 local LeetNormalizer = Normalizer
 
 ---@param text string
-function Normalizer:norm(text) return LeetNormalizer(text).text end
+function Normalizer:norm(text)
+    return LeetNormalizer(text).text
+end
 
 return LeetNormalizer

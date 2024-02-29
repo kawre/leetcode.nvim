@@ -20,30 +20,40 @@ local Cookie = {}
 ---@return string|nil
 function Cookie.set(str)
     local _, cerr = Cookie.parse(str)
-    if cerr then return cerr end
+    if cerr then
+        return cerr
+    end
 
     file:write(str, "w")
     local auth_api = require("leetcode.api.auth")
     local _, aerr = auth_api.user()
 
-    if aerr then return aerr.msg end
+    if aerr then
+        return aerr.msg
+    end
 end
 
 ---@return boolean
 function Cookie.delete()
-    if not file:exists() then return false end
+    if not file:exists() then
+        return false
+    end
     return pcall(path.rm, file)
 end
 
 ---@return lc.cache.Cookie | nil
 function Cookie.get()
-    if not file:exists() then return end
+    if not file:exists() then
+        return
+    end
 
     local fstats = file:_stat()
     local ftime = fstats.mtime.sec
 
     local hcookie = hist[ftime]
-    if hcookie then return hcookie end
+    if hcookie then
+        return hcookie
+    end
 
     local contents = file:read()
     if not contents or type(contents) ~= "string" then
@@ -66,10 +76,14 @@ end
 ---@return lc.cache.Cookie|nil, string|nil
 function Cookie.parse(str)
     local csrf = str:match("csrftoken=([^;]+)")
-    if not csrf or csrf == "" then return nil, "Bad csrf token format" end
+    if not csrf or csrf == "" then
+        return nil, "Bad csrf token format"
+    end
 
     local ls = str:match("LEETCODE_SESSION=([^;]+)")
-    if not ls or ls == "" then return nil, "Bad leetcode session token format" end
+    if not ls or ls == "" then
+        return nil, "Bad leetcode session token format"
+    end
 
     return { csrftoken = csrf, leetcode_session = ls, str = str }
 end

@@ -22,14 +22,18 @@ end
 
 local function display_current(entry)
     local tabp = vim.api.nvim_get_current_tabpage()
-    if tabp ~= entry.tabpage then return unpack({ "", "" }) end
+    if tabp ~= entry.tabpage then
+        return unpack({ "", "" })
+    end
 
     return { icons.caret.right, "leetcode_ref" }
 end
 
 local function display_difficulty(q)
     local lang = utils.get_lang(q.lang)
-    if not lang then return {} end
+    if not lang then
+        return {}
+    end
     return { lang.icon, "leetcode_lang_" .. lang.slug }
 end
 
@@ -78,7 +82,7 @@ return {
     pick = function()
         local tabs = utils.question_tabs()
 
-        if vim.tbl_isempty(tabs) then --
+        if vim.tbl_isempty(tabs) then
             return log.warn("No questions opened")
         end
 
@@ -101,10 +105,14 @@ return {
                         actions.close(prompt_bufnr)
                         local selection = action_state.get_selected_entry()
 
-                        if not selection then return end
+                        if not selection then
+                            return
+                        end
                         local ok, err =
                             pcall(vim.api.nvim_set_current_tabpage, selection.value.tabpage)
-                        if not ok then log.error(err) end
+                        if not ok then
+                            log.error(err)
+                        end
                     end)
                     return true
                 end,

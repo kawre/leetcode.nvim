@@ -49,7 +49,9 @@ function Split:show()
 end
 
 function Split:hide()
-    if not self.visible then return end
+    if not self.visible then
+        return
+    end
     Split.super.hide(self)
 
     self.visible = false
@@ -60,10 +62,14 @@ function Split:mount()
 
     self.visible = true
 
-    self:map("n", keys.toggle, function() self:toggle() end)
+    self:map("n", keys.toggle, function()
+        self:toggle()
+    end)
 end
 
-function Split:map(...) self.renderer:map(...) end
+function Split:map(...)
+    self.renderer:map(...)
+end
 
 function Split:unmount()
     Split.super.unmount(self)
@@ -71,9 +77,13 @@ function Split:unmount()
     self.visible = false
 end
 
-function Split:draw() self.renderer:draw(self) end
+function Split:draw()
+    self.renderer:draw(self)
+end
 
-function Split:clear() self.renderer:clear() end
+function Split:clear()
+    self.renderer:clear()
+end
 
 function Split:update_renderer()
     self.renderer.bufnr = self.bufnr

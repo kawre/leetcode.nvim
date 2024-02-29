@@ -13,7 +13,9 @@ function Auth.user(cb)
 
     if cb then
         utils.query(query, {}, {
-            callback = function(res, err) cb(Auth.handle(res, err)) end,
+            callback = function(res, err)
+                cb(Auth.handle(res, err))
+            end,
             endpoint = urls.auth,
         })
     else
@@ -26,7 +28,9 @@ end
 ---@private
 ---@return lc.UserStatus, lc.err
 function Auth.handle(res, err)
-    if err then return res, err end
+    if err then
+        return res, err
+    end
 
     local auth = res.data.userStatus
     err = {}

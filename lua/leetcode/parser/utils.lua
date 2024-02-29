@@ -99,10 +99,14 @@ function utils.hl(tag) --
     local tag_names = {}
 
     for _, v in ipairs(tag.tags) do
-        if v.name then table.insert(tag_names, v.name) end
+        if v.name then
+            table.insert(tag_names, v.name)
+        end
     end
 
-    if tag.name then table.insert(tag_names, tag.name) end
+    if tag.name then
+        table.insert(tag_names, tag.name)
+    end
 
     return theme.get_dynamic(tag_names)
 end

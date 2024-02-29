@@ -17,7 +17,9 @@ statistics.solved = function(cb) ---@diagnostic disable-line
     utils.query(query, variables, {
         endpoint = urls.solved,
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
 
             local data = res.data
             local submit_stats = data["submit_stats"]
@@ -38,7 +40,9 @@ statistics.session_progress = function(cb)
 
     utils.query(query, variables, {
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
 
             local data = res.data
             local session_progress = data["userProfileUserQuestionProgress"]["numAcceptedQuestions"]
@@ -57,7 +61,9 @@ statistics.calendar = function(cb) ---@diagnostic disable-line
     utils.query(query, variables, {
         endpoint = urls.calendar,
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
 
             local data = res.data
             local calendar = data["calendar"]
@@ -83,7 +89,9 @@ statistics.languages = function(cb) ---@diagnostic disable-line
     utils.query(query, variables, {
         endpoint = urls.languages,
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
 
             local data = res.data
             local lang_prob_count = data["languageProblemCount"]

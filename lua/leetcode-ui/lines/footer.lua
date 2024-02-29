@@ -15,7 +15,9 @@ function Footer:contents()
         self:endgrp()
 
         self:append(t("Signed in as") .. ": ", "leetcode_alt")
-        if config.auth.is_premium then self:append(config.icons.star .. " ", "leetcode_medium") end
+        if config.auth.is_premium then
+            self:append(config.icons.star .. " ", "leetcode_medium")
+        end
         self:append(config.auth.name):endl()
     end
 

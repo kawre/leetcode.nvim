@@ -38,7 +38,9 @@ local skills = Button("Skills", {
     sc = "s",
     on_press = cmd.ui_skills,
 })
-if not config.is_cn then buttons:insert(skills) end
+if not config.is_cn then
+    buttons:insert(skills)
+end
 
 local languages = Button("Languages", {
     icon = "",

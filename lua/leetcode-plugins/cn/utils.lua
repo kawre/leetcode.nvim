@@ -3,7 +3,9 @@ local log = require("leetcode.logger")
 local cn_utils = {}
 
 ---@param str string
-local function capitalizeFirst(str) return str:lower():gsub("^%l", string.upper) end
+local function capitalizeFirst(str)
+    return str:lower():gsub("^%l", string.upper)
+end
 
 ---@return table
 function cn_utils.calc_question_count(stats)

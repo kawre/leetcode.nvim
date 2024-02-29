@@ -14,7 +14,9 @@ function Lines:contents()
     local lines = utils.shallowcopy(self._.lines)
 
     local contents = Lines.super.contents(self)
-    if not vim.tbl_isempty(contents) then table.insert(lines, Line(contents)) end
+    if not vim.tbl_isempty(contents) then
+        table.insert(lines, Line(contents))
+    end
 
     return lines
 end
@@ -57,10 +59,14 @@ function Lines:draw(layout, opts)
     options:set({ padding = { left = leftpad } })
 
     local toppad = padding and padding.top
-    if toppad then lines = vim.list_extend(create_pad(toppad), lines) end
+    if toppad then
+        lines = vim.list_extend(create_pad(toppad), lines)
+    end
 
     local botpad = padding and padding.bot
-    if botpad then lines = vim.list_extend(lines, create_pad(botpad)) end
+    if botpad then
+        lines = vim.list_extend(lines, create_pad(botpad))
+    end
 
     for _, line in pairs(lines) do
         line:draw(layout, options:get())
@@ -68,12 +74,14 @@ function Lines:draw(layout, opts)
 end
 
 function Lines:append(content, highlight)
-    if type(content) == "table" and O.is_instance(content, Lines) then --
+    if type(content) == "table" and O.is_instance(content, Lines) then
         local lines = content:contents()
 
         for i, line in ipairs(lines) do
             Lines.super.append(self, line)
-            if i ~= #lines then self:endl() end
+            if i ~= #lines then
+                self:endl()
+            end
         end
     else
         Lines.super.append(self, content, highlight)
@@ -90,7 +98,9 @@ function Lines:clear()
 end
 
 function Lines:insert(item) --
-    if not vim.tbl_isempty(Lines.super.contents(self)) then self:endl() end
+    if not vim.tbl_isempty(Lines.super.contents(self)) then
+        self:endl()
+    end
     table.insert(self._.lines, item)
 
     return self

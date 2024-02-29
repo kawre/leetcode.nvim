@@ -22,8 +22,12 @@ local Question = Object("LeetQuestion")
 ---@param raw? boolean
 function Question:snippet(raw)
     local snippets = self.q.code_snippets ~= vim.NIL and self.q.code_snippets or {}
-    local snip = vim.tbl_filter(function(snip) return snip.lang_slug == self.lang end, snippets)[1]
-    if not snip then return end
+    local snip = vim.tbl_filter(function(snip)
+        return snip.lang_slug == self.lang
+    end, snippets)[1]
+    if not snip then
+        return
+    end
 
     local code = snip.code:gsub("\r\n", "\n")
     return raw and code or self:injector(code)
@@ -31,7 +35,9 @@ end
 
 ---@param code? string
 function Question:set_lines(code)
-    if not vim.api.nvim_buf_is_valid(self.bufnr) then return end
+    if not vim.api.nvim_buf_is_valid(self.bufnr) then
+        return
+    end
 
     pcall(vim.cmd.undojoin)
     local s_i, e_i, lines = self:range()
@@ -42,7 +48,9 @@ function Question:set_lines(code)
 end
 
 function Question:reset_lines()
-    if not self.reset then return end
+    if not self.reset then
+        return
+    end
 
     local new_lines = self:snippet(true) or ""
 
@@ -63,7 +71,7 @@ function Question:path()
         ("%s.%s-%s.%s"):format(self.q.frontend_id, self.q.title_slug, lang.slug, lang.ft)
     self.file = config.storage.home:joinpath(fn_legacy)
 
-    if self.file:exists() then --
+    if self.file:exists() then
         return self.file:absolute(), true
     end
 
@@ -71,7 +79,7 @@ function Question:path()
     self.file = config.storage.home:joinpath(fn)
     local existed = self.file:exists()
 
-    if not existed then --
+    if not existed then
         self.file:write(self:snippet(), "w")
     end
 
@@ -94,11 +102,11 @@ function Question:open_buffer(existed)
     vim.api.nvim_set_option_value("buflisted", true, { buf = self.bufnr })
 
     local i = self:fold_range()
-    if i then --
+    if i then
         pcall(vim.cmd, ("%d,%dfold"):format(1, i))
     end
 
-    if existed then --
+    if existed then
         self:reset_lines()
     end
 end
@@ -110,7 +118,7 @@ function Question:inject(before)
 
     local res
 
-    if type(inj) == "boolean" and inj == true and before then --
+    if type(inj) == "boolean" and inj == true and before then
         inj = config.imports[self.lang]
     end
 
@@ -138,16 +146,20 @@ function Question:injector(code)
     }
 
     local before = self:inject(true)
-    if before then table.insert(parts, 1, before) end
+    if before then
+        table.insert(parts, 1, before)
+    end
 
     local after = self:inject(false)
-    if after then table.insert(parts, after) end
+    if after then
+        table.insert(parts, after)
+    end
 
     return table.concat(parts, "\n")
 end
 
 function Question:_unmount()
-    if vim.v.dying ~= 0 then --
+    if vim.v.dying ~= 0 then
         return
     end
 
@@ -160,17 +172,18 @@ function Question:_unmount()
             vim.api.nvim_buf_delete(self.bufnr, { force = true, unload = false })
         end
 
-        _Lc_state.questions = vim.tbl_filter(
-            function(q) return q.bufnr ~= self.bufnr end,
-            _Lc_state.questions
-        )
+        _Lc_state.questions = vim.tbl_filter(function(q)
+            return q.bufnr ~= self.bufnr
+        end, _Lc_state.questions)
 
         self = nil
     end)
 end
 
 function Question:unmount()
-    if vim.api.nvim_win_is_valid(self.winid) then vim.api.nvim_win_close(self.winid, true) end
+    if vim.api.nvim_win_is_valid(self.winid) then
+        vim.api.nvim_win_close(self.winid, true)
+    end
 end
 
 local group = vim.api.nvim_create_augroup("leetcode_questions", { clear = true })
@@ -178,7 +191,9 @@ function Question:autocmds()
     vim.api.nvim_create_autocmd("WinClosed", {
         group = group,
         pattern = tostring(self.winid),
-        callback = function() self:_unmount() end,
+        callback = function()
+            self:_unmount()
+        end,
     })
 end
 
@@ -199,7 +214,9 @@ end
 
 function Question:mount()
     local tabp = utils.detect_duplicate_question(self.cache.title_slug, config.lang)
-    if tabp then return pcall(vim.api.nvim_set_current_tabpage, tabp) end
+    if tabp then
+        return pcall(vim.api.nvim_set_current_tabpage, tabp)
+    end
 
     local q = api_question.by_title_slug(self.cache.title_slug)
     if not q or q.is_paid_only and not config.auth.is_premium then
@@ -241,14 +258,18 @@ end
 
 function Question:fold_range()
     local start_i, _, lines = self:range(true)
-    if start_i == nil or start_i <= 1 then return end
+    if start_i == nil or start_i <= 1 then
+        return
+    end
 
     local i = start_i - 1
     while lines[i] == "" do
         i = i - 1
     end
 
-    if 1 < i then return i end
+    if 1 < i then
+        return i
+    end
 end
 
 ---@param submit boolean
@@ -281,7 +302,9 @@ Question.change_lang = vim.schedule_wrap(function(self, lang)
         vim.api.nvim_set_option_value("buflisted", false, { buf = old_bufnr })
         self:open_buffer(existed)
 
-        if not loaded then utils.exec_hooks("question_enter", self) end
+        if not loaded then
+            utils.exec_hooks("question_enter", self)
+        end
     end)
 
     if not ok then

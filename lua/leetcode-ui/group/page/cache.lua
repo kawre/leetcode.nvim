@@ -18,7 +18,9 @@ page:insert(Title({ "Menu" }, "Cache"))
 local update_btn = Button("Update", {
     icon = "󱘴",
     sc = "u",
-    on_press = function() cmd.cache_update() end,
+    on_press = function()
+        cmd.cache_update()
+    end,
 })
 
 local back_btn = BackButton("menu")

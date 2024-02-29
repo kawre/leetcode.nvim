@@ -16,12 +16,16 @@ function ResultPopup:handle(item)
     self.border:set_highlight(item._.hl)
     self.renderer:handle_res(item)
 
-    if item.last_testcase then self.last_testcase = item.last_testcase end
+    if item.last_testcase then
+        self.last_testcase = item.last_testcase
+    end
 
     if item._.submission then
         local status = item.status_code == 10 and "ac" or "notac"
         problemlist.change_status(self.console.question.q.title_slug, status)
-        if status == "ac" then config.stats.update_streak() end
+        if status == "ac" then
+            config.stats.update_streak()
+        end
     end
 
     self:draw()

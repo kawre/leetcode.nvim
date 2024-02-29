@@ -44,10 +44,18 @@ function ConsoleLayout:mount()
     ConsoleLayout.super.mount(self)
 
     self:set_keymaps({
-        [keys.reset_testcases] = function() self.testcase:reset() end,
-        [keys.use_testcase] = function() self:use_testcase() end,
-        [keys.focus_testcases] = function() self.testcase:focus() end,
-        [keys.focus_result] = function() self.result:focus() end,
+        [keys.reset_testcases] = function()
+            self.testcase:reset()
+        end,
+        [keys.use_testcase] = function()
+            self:use_testcase()
+        end,
+        [keys.focus_testcases] = function()
+            self.testcase:focus()
+        end,
+        [keys.focus_result] = function()
+            self.result:focus()
+        end,
     })
 end
 

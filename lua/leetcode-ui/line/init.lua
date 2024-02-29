@@ -7,10 +7,14 @@ local log = require("leetcode.logger")
 ---@class lc.ui.Line : NuiLine
 local Line = NuiLine:extend("LeetLine")
 
-function Line:contents() return self._texts end
+function Line:contents()
+    return self._texts
+end
 
 function Line:longest()
-    if self.class.name == "LeetLine" then return vim.api.nvim_strwidth(self:content()) end
+    if self.class.name == "LeetLine" then
+        return vim.api.nvim_strwidth(self:content())
+    end
 
     local max_len = 0
     for _, item in pairs(self:contents()) do
@@ -29,7 +33,7 @@ function Line:draw(layout, opts)
     local pad = options:get_padding()
 
     if pad then
-        if pad.left then --
+        if pad.left then
             table.insert(texts, 1, NuiText((" "):rep(pad.left)))
         elseif pad.right then
             table.insert(texts, NuiText((" "):rep(pad.right)))

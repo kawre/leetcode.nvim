@@ -17,7 +17,9 @@ Runner.running = false
 ---@param self lc.Runner
 ---@param submit boolean
 Runner.run = vim.schedule_wrap(function(self, submit)
-    if Runner.running then return log.warn("Runner is busy") end
+    if Runner.running then
+        return log.warn("Runner is busy")
+    end
 
     local ok, err = pcall(Runner.handle, self, submit)
     if not ok then
@@ -26,7 +28,9 @@ Runner.run = vim.schedule_wrap(function(self, submit)
     end
 end)
 
-Runner.stop = function() Runner.running = false end
+Runner.stop = function()
+    Runner.running = false
+end
 
 function Runner:handle(submit)
     Runner.running = true
@@ -41,7 +45,9 @@ function Runner:handle(submit)
 
     local judge = Judge:init()
     local function callback(item, state, err)
-        if err or item then self:stop() end
+        if err or item then
+            self:stop()
+        end
 
         if item then
             judge:stop(item.status_msg, item._.success)
@@ -51,7 +57,9 @@ function Runner:handle(submit)
             judge:stop(err.msg or "Something went wrong", false)
         end
 
-        if item then question.console.result:handle(item) end
+        if item then
+            question.console.result:handle(item)
+        end
     end
 
     leetbody:write(vim.json.encode(body), "w")
@@ -59,6 +67,8 @@ function Runner:handle(submit)
 end
 
 ---@param question lc.ui.Question
-function Runner:init(question) return setmetatable({ question = question }, self) end
+function Runner:init(question)
+    return setmetatable({ question = question }, self)
+end
 
 return Runner

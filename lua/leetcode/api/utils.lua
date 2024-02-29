@@ -63,10 +63,14 @@ function utils.curl(method, params)
     }, params or {})
     local url = ("https://leetcode.%s%s"):format(config.domain, params.endpoint)
 
-    if type(params.body) == "table" then params.body = vim.json.encode(params.body) end
+    if type(params.body) == "table" then
+        params.body = vim.json.encode(params.body)
+    end
 
     local tries = params.retry
-    local function should_retry(err) return err and err.status >= 500 and tries > 0 end
+    local function should_retry(err)
+        return err and err.status >= 500 and tries > 0
+    end
 
     if params.callback then
         local cb = vim.schedule_wrap(params.callback)
@@ -112,7 +116,9 @@ function utils.handle_res(out)
         local ok, msg = pcall(function()
             local dec = utils.decode(out.body)
 
-            if dec.error then return dec.error end
+            if dec.error then
+                return dec.error
+            end
 
             local tbl = {}
             for _, e in ipairs(dec.errors) do
@@ -139,7 +145,9 @@ end
 
 ---@param err lc.err
 function utils.check_err(err)
-    if not err then return end
+    if not err then
+        return
+    end
 
     if err.status then
         if err.status == 401 or err.status == 403 then
@@ -161,25 +169,26 @@ end
 function utils.normalize_similar_cn(s)
     s = select(2, pcall(utils.decode, s))
 
-    return vim.tbl_map(
-        function(sq)
-            return {
-                title = sq.title,
-                translated_title = sq.translatedTitle,
-                paid_only = sq.isPaidOnly,
-                title_slug = sq.titleSlug,
-                difficulty = sq.difficulty,
-            }
-        end,
-        s
-    )
+    return vim.tbl_map(function(sq)
+        return {
+            title = sq.title,
+            translated_title = sq.translatedTitle,
+            paid_only = sq.isPaidOnly,
+            title_slug = sq.titleSlug,
+            difficulty = sq.difficulty,
+        }
+    end, s)
 end
 
-function utils.lvl_to_name(lvl) return ({ "Easy", "Medium", "Hard" })[lvl] end
+function utils.lvl_to_name(lvl)
+    return ({ "Easy", "Medium", "Hard" })[lvl]
+end
 
 ---@return lc.cache.Question[]
 function utils.normalize_problems(problems)
-    problems = vim.tbl_filter(function(p) return not p.stat.question__hide end, problems)
+    problems = vim.tbl_filter(function(p)
+        return not p.stat.question__hide
+    end, problems)
 
     local comp = function(a, b)
         local a_fid = a.stat.frontend_question_id
@@ -200,28 +209,25 @@ function utils.normalize_problems(problems)
     end
     table.sort(problems, comp)
 
-    return vim.tbl_map(
-        function(p)
-            return {
-                status = p.status,
-                id = p.stat.question_id,
-                frontend_id = p.stat.frontend_question_id,
-                title = p.stat.question__title,
-                title_cn = "",
-                title_slug = p.stat.question__title_slug,
-                link = ("https://leetcode.%s/problems/%s/"):format(
-                    config.domain,
-                    p.stat.question__title_slug
-                ),
-                paid_only = p.paid_only,
-                ac_rate = p.stat.total_acs * 100 / math.max(p.stat.total_submitted, 1),
-                difficulty = utils.lvl_to_name(p.difficulty.level),
-                starred = p.is_favor,
-                topic_tags = {},
-            }
-        end,
-        problems
-    )
+    return vim.tbl_map(function(p)
+        return {
+            status = p.status,
+            id = p.stat.question_id,
+            frontend_id = p.stat.frontend_question_id,
+            title = p.stat.question__title,
+            title_cn = "",
+            title_slug = p.stat.question__title_slug,
+            link = ("https://leetcode.%s/problems/%s/"):format(
+                config.domain,
+                p.stat.question__title_slug
+            ),
+            paid_only = p.paid_only,
+            ac_rate = p.stat.total_acs * 100 / math.max(p.stat.total_submitted, 1),
+            difficulty = utils.lvl_to_name(p.difficulty.level),
+            starred = p.is_favor,
+            topic_tags = {},
+        }
+    end, problems)
 end
 
 ---@param problems lc.cache.Question[]
@@ -234,7 +240,9 @@ function utils.translate_titles(problems, titles)
 
     return vim.tbl_map(function(p)
         local title = map[tostring(p.id)]
-        if title then p.title_cn = title end
+        if title then
+            p.title_cn = title
+        end
         return p
     end, problems)
 end

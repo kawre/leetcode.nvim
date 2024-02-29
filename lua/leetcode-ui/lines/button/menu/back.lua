@@ -9,7 +9,9 @@ function MenuBackButton:init(page)
     MenuBackButton.super.init(self, "Back", {
         icon = "",
         sc = "q",
-        on_press = function() cmd.set_menu_page(page) end,
+        on_press = function()
+            cmd.set_menu_page(page)
+        end,
     })
 end
 

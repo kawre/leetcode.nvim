@@ -12,12 +12,16 @@ local Testcase = ConsolePopup:extend("LeetTestcasePopup")
 
 function Testcase:content()
     local lines = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, false)
-    lines = vim.tbl_filter(function(line) return line ~= "" end, lines)
+    lines = vim.tbl_filter(function(line)
+        return line ~= ""
+    end, lines)
     return table.concat(lines, "\n")
 end
 
 function Testcase:snapshot(id, data) --
-    if not data.test_case then return end
+    if not data.test_case then
+        return
+    end
     self.testcases[id] = data.test_case
 end
 
@@ -29,7 +33,9 @@ function Testcase:by_id(id) --
     for case in vim.gsplit(self.testcases[id] or "", "\n") do
         local j = math.floor(i / n) + 1
 
-        if not testcases[j] then testcases[j] = {} end
+        if not testcases[j] then
+            testcases[j] = {}
+        end
         table.insert(testcases[j], case)
 
         i = i + 1
@@ -45,7 +51,9 @@ function Testcase:populate()
     self.testcase_len = #vim.split(t_list[1] or "", "\n")
 
     for i, case in ipairs(t_list) do
-        if i ~= 1 then table.insert(lines, "") end
+        if i ~= 1 then
+            table.insert(lines, "")
+        end
         for s in vim.gsplit(case, "\n", { trimempty = true }) do
             table.insert(lines, s)
         end
@@ -56,13 +64,14 @@ function Testcase:populate()
 end
 
 function Testcase:clear_extmarks()
-    if not config.user.console.testcase.virt_text then return end
+    if not config.user.console.testcase.virt_text then
+        return
+    end
     local ns = vim.api.nvim_create_namespace("leetcode_extmarks")
 
-    self.extmarks = vim.tbl_filter(
-        function(extmark) return not vim.api.nvim_buf_del_extmark(self.bufnr, ns, extmark) end,
-        self.extmarks
-    )
+    self.extmarks = vim.tbl_filter(function(extmark)
+        return not vim.api.nvim_buf_del_extmark(self.bufnr, ns, extmark)
+    end, self.extmarks)
 end
 
 ---@param line integer
@@ -75,7 +84,9 @@ function Testcase:add_extmark(line, col, opts)
 end
 
 function Testcase:draw_extmarks()
-    if not config.user.console.testcase.virt_text then return end
+    if not config.user.console.testcase.virt_text then
+        return
+    end
 
     self:clear_extmarks()
     local bufnr = self.bufnr
@@ -83,7 +94,9 @@ function Testcase:draw_extmarks()
     local md = self.console.question.q.meta_data
     local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 
-    if not md.params then return end
+    if not md.params then
+        return
+    end
 
     local j = 1
     local pad = (" "):rep(2)
@@ -102,7 +115,9 @@ function Testcase:draw_extmarks()
 
     for i, line in ipairs(lines) do
         pcall(function()
-            if lines[i - 1] == "" and lines[i] == "" then invalid = true end
+            if lines[i - 1] == "" and lines[i] == "" then
+                invalid = true
+            end
         end)
 
         if line ~= "" then
@@ -147,7 +162,9 @@ function Testcase:autocmds()
         "TextChangedI",
         "TextChangedP",
         "InsertLeave",
-    }, function() self:draw_extmarks() end)
+    }, function()
+        self:draw_extmarks()
+    end)
 end
 
 function Testcase:mount()

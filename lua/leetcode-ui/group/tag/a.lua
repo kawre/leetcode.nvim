@@ -6,11 +6,15 @@ local log = require("leetcode.logger")
 local A = Tag:extend("LeetTagA")
 
 ---@param url string
-local function norm_url(url) return url:lower():gsub("/$", ""):gsub("#.-$", "") end
+local function norm_url(url)
+    return url:lower():gsub("/$", ""):gsub("#.-$", "")
+end
 
 ---@param u1 string
 ---@param u2 string
-local function is_same_url(u1, u2) return norm_url(u1) == norm_url(u2) end
+local function is_same_url(u1, u2)
+    return norm_url(u1) == norm_url(u2)
+end
 
 function A:contents()
     local Group = require("leetcode-ui.group")

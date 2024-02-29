@@ -20,13 +20,17 @@ function Cases:make_nav()
     local nav = Lines({}, { padding = { top = 1 } })
 
     for i, case in ipairs(self.cases) do
-        self.console.result:map("n", i, function() self:change(i) end, { clearable = true })
+        self.console.result:map("n", i, function()
+            self:change(i)
+        end, { clearable = true })
 
         local hl = self:nav_case_hl(case, i)
         local msg = (" Case (%d) "):format(i)
 
         nav:append(msg, hl)
-        if i ~= #self.cases then nav:append(" ") end
+        if i ~= #self.cases then
+            nav:append(" ")
+        end
     end
 
     return nav
@@ -43,7 +47,9 @@ end
 
 ---@param idx integer
 function Cases:change(idx)
-    if not self.cases[idx] or idx == self.idx then return end
+    if not self.cases[idx] or idx == self.idx then
+        return
+    end
 
     self.idx = idx
     self.console.result:draw()

@@ -7,10 +7,14 @@ local prev_cwd = nil
 ---@param on_vimenter boolean
 leetcode.should_skip = function(on_vimenter)
     if on_vimenter then
-        if vim.fn.argc() ~= 1 then return true end
+        if vim.fn.argc() ~= 1 then
+            return true
+        end
 
         local usr_arg, arg = vim.fn.argv()[1], config.user.arg
-        if usr_arg ~= arg then return true end
+        if usr_arg ~= arg then
+            return true
+        end
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
         if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then
@@ -21,7 +25,7 @@ leetcode.should_skip = function(on_vimenter)
     else
         for _, buf_id in pairs(vim.api.nvim_list_bufs()) do
             local bufinfo = vim.fn.getbufinfo(buf_id)[1]
-            if bufinfo and (bufinfo.listed == 1 and #bufinfo.windows > 0) then --
+            if bufinfo and (bufinfo.listed == 1 and #bufinfo.windows > 0) then
                 return false, true
             end
         end
@@ -33,7 +37,7 @@ end
 ---@param on_vimenter boolean
 leetcode.start = function(on_vimenter)
     local skip, buflisted = leetcode.should_skip(on_vimenter)
-    if skip then --
+    if skip then
         return false
     end
 
@@ -44,7 +48,7 @@ leetcode.start = function(on_vimenter)
     local theme = require("leetcode.theme")
     theme.setup()
 
-    if not on_vimenter then --
+    if not on_vimenter then
         if buflisted then
             prev_cwd = vim.fn.getcwd()
             vim.cmd.tabe()
@@ -67,7 +71,9 @@ leetcode.start = function(on_vimenter)
 end
 
 leetcode.stop = vim.schedule_wrap(function()
-    if standalone then return vim.cmd("qa!") end
+    if standalone then
+        return vim.cmd("qa!")
+    end
 
     _Lc_state.menu:unmount()
 

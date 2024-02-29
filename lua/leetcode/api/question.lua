@@ -20,12 +20,16 @@ function question.by_title_slug(title_slug)
     local query = queries.question
 
     local res, err = utils.query(query, variables)
-    if not res or err then return log.err(err) end
+    if not res or err then
+        return log.err(err)
+    end
 
     local q = res.data.question
     q.meta_data = select(2, pcall(utils.decode, q.meta_data))
     q.stats = select(2, pcall(utils.decode, q.stats))
-    if type(q.similar) == "string" then q.similar = utils.normalize_similar_cn(q.similar) end
+    if type(q.similar) == "string" then
+        q.similar = utils.normalize_similar_cn(q.similar)
+    end
 
     return q
 end
@@ -41,14 +45,18 @@ function question.random(filters)
 
     local config = require("leetcode.config")
     local res, err = utils.query(query, variables)
-    if err then return nil, err end
+    if err then
+        return nil, err
+    end
 
     local q = res.data.randomQuestion
 
     if q == vim.NIL then
         local msg = "Random question fetch responded with `null`"
 
-        if filters then msg = msg .. ".\n\nMaybe invalid filters?\n" .. vim.inspect(filters) end
+        if filters then
+            msg = msg .. ".\n\nMaybe invalid filters?\n" .. vim.inspect(filters)
+        end
 
         return nil, { msg = msg, lvl = vim.log.levels.ERROR }
     end

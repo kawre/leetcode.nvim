@@ -23,7 +23,7 @@ end
 function Pre:init(title, item)
     Pre.super.init(self, {}, { spacing = 1, position = "left" })
 
-    if title then --
+    if title then
         self:insert(title)
     end
 

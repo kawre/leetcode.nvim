@@ -34,10 +34,9 @@ function Solved:handle_res(res)
 
     local max_count_len = 0
     for _, stat in ipairs(res.submit_stats.acSubmissionNum) do
-        local total_count = vim.tbl_filter(
-            function(c) return c.difficulty == stat.difficulty end,
-            res.questions_count
-        )[1].count
+        local total_count = vim.tbl_filter(function(c)
+            return c.difficulty == stat.difficulty
+        end, res.questions_count)[1].count
 
         local solved_line = Line()
         solved_line:append(tostring(stat.count))
@@ -93,7 +92,9 @@ end
 
 function Solved:fetch()
     statistics.solved(function(res, err)
-        if err then return log.err(err) end
+        if err then
+            return log.err(err)
+        end
         self:handle_res(res)
     end)
 end

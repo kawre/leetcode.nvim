@@ -42,9 +42,13 @@ end
 ---@param res lc.Languages.Res
 function Languages:populate(res)
     local group = Group({}, { spacing = 1 })
-    if res == vim.NIL then return end
+    if res == vim.NIL then
+        return
+    end
 
-    table.sort(res, function(a, b) return a.problems_solved > b.problems_solved end)
+    table.sort(res, function(a, b)
+        return a.problems_solved > b.problems_solved
+    end)
     for _, lang in ipairs(res) do
         group:insert(self:handle(lang))
     end

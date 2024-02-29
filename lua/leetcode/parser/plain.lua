@@ -7,7 +7,9 @@ local u = require("leetcode.parser.utils")
 ---@field text string
 local Plain = Group:extend("LeetParserPlain")
 
-function Plain.normalize(text) return text:gsub("<[^>]+>", "") end
+function Plain.normalize(text)
+    return text:gsub("<[^>]+>", "")
+end
 
 ---@param text string
 function Plain:init(text)
@@ -24,6 +26,8 @@ end
 local LeetParserPlain = Plain
 
 ---@param text string
-function Plain.static:parse(text) return LeetParserPlain(text) end
+function Plain.static:parse(text)
+    return LeetParserPlain(text)
+end
 
 return LeetParserPlain

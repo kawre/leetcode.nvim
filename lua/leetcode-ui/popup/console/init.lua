@@ -8,7 +8,9 @@ local ConsolePopup = Popup:extend("LeetConsolePopup")
 ConsolePopup.handle_leave = vim.schedule_wrap(function(self)
     local curr_bufnr = vim.api.nvim_get_current_buf()
     for _, p in pairs(self.console.popups) do
-        if p.bufnr == curr_bufnr then return end
+        if p.bufnr == curr_bufnr then
+            return
+        end
     end
     self.console:hide()
 end)

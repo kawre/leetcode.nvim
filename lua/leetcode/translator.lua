@@ -94,9 +94,13 @@ local translate = {
 
 ---@param text string
 local function t(text)
-    local keys = vim.tbl_map(function(key) return key:lower() end, vim.tbl_keys(translate))
+    local keys = vim.tbl_map(function(key)
+        return key:lower()
+    end, vim.tbl_keys(translate))
 
-    if not vim.tbl_contains(keys, text:lower()) then return text end
+    if not vim.tbl_contains(keys, text:lower()) then
+        return text
+    end
     return translate[text:lower()]
 end
 

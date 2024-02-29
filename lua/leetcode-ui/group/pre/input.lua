@@ -13,8 +13,12 @@ function Input:init(title, input, params) --
     local group = Group({}, { spacing = 1 })
 
     for i, case in ipairs(input) do
-        local ok, param = pcall(function() return params[i].name end)
-        if ok then group:append(param .. " =", "leetcode_normal"):endl() end
+        local ok, param = pcall(function()
+            return params[i].name
+        end)
+        if ok then
+            group:append(param .. " =", "leetcode_normal"):endl()
+        end
         group:append(case):endgrp()
     end
 

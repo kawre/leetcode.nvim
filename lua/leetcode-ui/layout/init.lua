@@ -17,7 +17,9 @@ function Layout:show()
 end
 
 function Layout:hide()
-    if not self.visible then return end
+    if not self.visible then
+        return
+    end
     Layout.super.hide(self)
     self.visible = false
 end

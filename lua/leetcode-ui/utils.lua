@@ -17,7 +17,9 @@ end
 
 ---@param item lc.ui.Lines
 function utils.longest_line(item)
-    if item.class.name == "LeetLine" then return vim.api.nvim_strwidth(item:content()) end
+    if item.class.name == "LeetLine" then
+        return vim.api.nvim_strwidth(item:content())
+    end
 
     local max_len = 0
     for _, line in pairs(item:contents()) do
@@ -47,14 +49,18 @@ end
 
 ---@param status string
 function utils.status_to_hl(status)
-    if not status then return end
+    if not status then
+        return
+    end
 
     return table.unpack(config.icons.hl.status[status])
 end
 
 ---@param layout lc.ui.Renderer
 function utils.win_width(layout)
-    if not vim.api.nvim_win_is_valid(layout.winid) then return 0 end
+    if not vim.api.nvim_win_is_valid(layout.winid) then
+        return 0
+    end
     return vim.api.nvim_win_get_width(layout.winid)
 end
 
@@ -98,21 +104,29 @@ function utils.get_padding(lines, layout)
 end
 
 function utils.set_buf_opts(bufnr, options)
-    if not vim.api.nvim_buf_is_valid(bufnr) then return end
+    if not vim.api.nvim_buf_is_valid(bufnr) then
+        return
+    end
 
     for opt, value in pairs(options) do
         local ok, err = pcall(vim.api.nvim_set_option_value, opt, value, { buf = bufnr })
-        if not ok then log.error(err) end
+        if not ok then
+            log.error(err)
+        end
     end
 end
 
 function utils.set_win_opts(winid, options)
-    if not vim.api.nvim_win_is_valid(winid) then return end
+    if not vim.api.nvim_win_is_valid(winid) then
+        return
+    end
 
     for opt, value in pairs(options) do
         local ok, err =
             pcall(vim.api.nvim_set_option_value, opt, value, { win = winid, scope = "local" })
-        if not ok then log.error(err) end
+        if not ok then
+            log.error(err)
+        end
     end
 end
 

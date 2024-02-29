@@ -28,17 +28,25 @@ local hist = nil
 local Problemlist = {}
 
 ---@return lc.cache.Question[]
-function Problemlist.get() return Problemlist.read().data end
+function Problemlist.get()
+    return Problemlist.read().data
+end
 
 ---@return lc.cache.payload
 function Problemlist.read()
-    if not file:exists() then return Problemlist.populate() end
+    if not file:exists() then
+        return Problemlist.populate()
+    end
 
     local time = os.time()
-    if hist and (time - hist.at) <= math.min(60, interval) then return hist.payload end
+    if hist and (time - hist.at) <= math.min(60, interval) then
+        return hist.payload
+    end
 
     local contents = file:read()
-    if not contents or type(contents) ~= "string" then return Problemlist.populate() end
+    if not contents or type(contents) ~= "string" then
+        return Problemlist.populate()
+    end
 
     local cached = Problemlist.parse(contents)
 
@@ -47,7 +55,9 @@ function Problemlist.read()
     end
 
     hist = { at = time, payload = cached }
-    if (time - cached.updated_at) > interval then Problemlist.update() end
+    if (time - cached.updated_at) > interval then
+        Problemlist.update()
+    end
 
     return cached
 end
@@ -67,7 +77,9 @@ end
 
 function Problemlist.update()
     problems_api.all(function(res, err)
-        if not err then Problemlist.write({ data = res }) end
+        if not err then
+            Problemlist.write({ data = res })
+        end
     end, true)
 end
 
@@ -75,7 +87,9 @@ end
 function Problemlist.get_by_title_slug(title_slug)
     local problems = Problemlist.get()
 
-    local problem = vim.tbl_filter(function(e) return e.title_slug == title_slug end, problems)[1]
+    local problem = vim.tbl_filter(function(e)
+        return e.title_slug == title_slug
+    end, problems)[1]
 
     assert(problem, ("Problem `%s` not found. Try updating cache?"):format(title_slug))
     return problem
@@ -89,7 +103,9 @@ function Problemlist.write(payload)
         username = config.auth.name,
     }, payload)
 
-    if not payload.data then payload.data = Problemlist.get() end
+    if not payload.data then
+        payload.data = Problemlist.get()
+    end
 
     file:write(vim.json.encode(payload), "w")
     hist = { at = os.time(), payload = payload }
@@ -100,7 +116,9 @@ end
 ---@param str string
 ---
 ---@return lc.cache.payload
-function Problemlist.parse(str) return vim.json.decode(str) end
+function Problemlist.parse(str)
+    return vim.json.decode(str)
+end
 
 ---@param title_slug string
 ---@param status "ac" | "notac"
@@ -108,7 +126,9 @@ Problemlist.change_status = vim.schedule_wrap(function(title_slug, status)
     local cached = Problemlist.read()
 
     cached.data = vim.tbl_map(function(p)
-        if p.title_slug == title_slug then p.status = status end
+        if p.title_slug == title_slug then
+            p.status = status
+        end
         return p
     end, cached.data)
 
@@ -116,7 +136,9 @@ Problemlist.change_status = vim.schedule_wrap(function(title_slug, status)
 end)
 
 function Problemlist.delete()
-    if not file:exists() then return false end
+    if not file:exists() then
+        return false
+    end
     return pcall(path.rm, file)
 end
 

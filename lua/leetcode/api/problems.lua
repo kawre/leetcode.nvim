@@ -17,33 +17,45 @@ function Problems.all(cb, noti)
     local endpoint = urls.problems:format("algorithms")
 
     local spinner
-    if noti then spinner = Spinner:init("updating problemlist cache...", "points") end
+    if noti then
+        spinner = Spinner:init("updating problemlist cache...", "points")
+    end
 
     if cb then
         utils.get(endpoint, {
             callback = function(res, err)
                 if err then
-                    if spinner then spinner:stop(err.msg, false) end
+                    if spinner then
+                        spinner:stop(err.msg, false)
+                    end
                     return cb(nil, err)
                 end
 
                 local problems = utils.normalize_problems(res.stat_status_pairs)
 
                 if config.is_cn then
-                    if spinner then spinner:update("fetching title translations") end
+                    if spinner then
+                        spinner:update("fetching title translations")
+                    end
                     Problems.translated_titles(function(titles, terr)
                         if terr then
-                            if spinner then spinner:stop(terr.msg, false) end
+                            if spinner then
+                                spinner:stop(terr.msg, false)
+                            end
                             return cb(nil, terr)
                         end
 
                         problems = utils.translate_titles(problems, titles)
-                        if spinner then spinner:stop("cache updated") end
+                        if spinner then
+                            spinner:stop("cache updated")
+                        end
 
                         cb(problems)
                     end)
                 else
-                    if spinner then spinner:stop("cache updated") end
+                    if spinner then
+                        spinner:stop("cache updated")
+                    end
 
                     cb(problems)
                 end
@@ -52,7 +64,9 @@ function Problems.all(cb, noti)
     else
         local res, err = utils.get(endpoint)
         if err then
-            if spinner then spinner:stop(err.msg, false) end
+            if spinner then
+                spinner:stop(err.msg, false)
+            end
             return nil, err
         end
 
@@ -61,14 +75,20 @@ function Problems.all(cb, noti)
         if config.is_cn then
             local titles, terr = Problems.translated_titles()
             if terr then
-                if spinner then spinner:stop(terr.msg, false) end
+                if spinner then
+                    spinner:stop(terr.msg, false)
+                end
                 return nil, terr
             end
 
-            if spinner then spinner:stop("problems cache updated") end
+            if spinner then
+                spinner:stop("problems cache updated")
+            end
             return utils.translate_titles(problems, titles)
         else
-            if spinner then spinner:stop("problems cache updated") end
+            if spinner then
+                spinner:stop("problems cache updated")
+            end
             return problems
         end
     end
@@ -79,7 +99,9 @@ function Problems.question_of_today(cb)
 
     utils.query(query, {}, {
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
 
             local tday_record = res.data["todayRecord"]
             local question = config.is_cn and tday_record[1].question or tday_record.question
@@ -94,13 +116,17 @@ function Problems.translated_titles(cb)
     if cb then
         utils.query(query, {}, {
             callback = function(res, err)
-                if err then return cb(nil, err) end
+                if err then
+                    return cb(nil, err)
+                end
                 cb(res.data.translations)
             end,
         })
     else
         local res, err = utils.query(query, {})
-        if err then return nil, err end
+        if err then
+            return nil, err
+        end
         return res.data.translations
     end
 end

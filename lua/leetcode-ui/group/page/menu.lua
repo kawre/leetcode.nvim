@@ -18,28 +18,36 @@ page:insert(Title({}, "Menu"))
 local problems = Button("Problems", {
     icon = "",
     sc = "p",
-    on_press = function() cmd.set_menu_page("problems") end,
+    on_press = function()
+        cmd.set_menu_page("problems")
+    end,
     expandable = true,
 })
 
 local statistics = Button("Statistics", {
     icon = "󰄪",
     sc = "s",
-    on_press = function() cmd.set_menu_page("stats") end,
+    on_press = function()
+        cmd.set_menu_page("stats")
+    end,
     expandable = true,
 })
 
 local cookie = Button("Cookie", {
     icon = "󰆘",
     sc = "i",
-    on_press = function() cmd.set_menu_page("cookie") end,
+    on_press = function()
+        cmd.set_menu_page("cookie")
+    end,
     expandable = true,
 })
 
 local cache = Button("Cache", {
     icon = "",
     sc = "c",
-    on_press = function() cmd.set_menu_page("cache") end,
+    on_press = function()
+        cmd.set_menu_page("cache")
+    end,
     expandable = true,
 })
 

@@ -92,7 +92,9 @@ function Info:populate()
                 if type(node.text) == "string" then
                     line:append("  ")
                     local txt = Parser:parse(node.text)
-                    if txt:lines()[1] then line:append(txt:lines()[1]) end
+                    if txt:lines()[1] then
+                        line:append(txt:lines()[1])
+                    end
                 else
                     line:append(node.text)
                 end
@@ -106,9 +108,13 @@ function Info:populate()
 
     self:map("n", keys.confirm, function()
         local node = tree:get_node()
-        if not node then return end
+        if not node then
+            return
+        end
 
-        if node.text and node.text.press then node.text:press() end
+        if node.text and node.text.press then
+            node.text:press()
+        end
 
         if not node:is_expanded() then
             node:expand()

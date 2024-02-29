@@ -24,7 +24,9 @@ function Button:draw(renderer, opts)
     Button.super.draw(self, renderer, opts)
 end
 
-function Button:press() self._.opts.on_press() end
+function Button:press()
+    self._.opts.on_press()
+end
 
 ---@param lines lc.ui.Line[]
 ---@param opts lc.ui.Button.opts

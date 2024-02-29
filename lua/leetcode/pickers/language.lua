@@ -17,7 +17,9 @@ local M = {}
 ---@param snippet lc.QuestionCodeSnippet
 ---
 ---@return string
-local function lang_formatter(snippet) return string.format("%s %s", snippet.t.lang, snippet.t.slug) end
+local function lang_formatter(snippet)
+    return string.format("%s %s", snippet.t.lang, snippet.t.slug)
+end
 
 ---@param snippet lc.QuestionCodeSnippet
 local function dislay_icon(snippet)
@@ -55,7 +57,9 @@ end
 local function entry_maker(entry)
     ---@type lc.language
     entry.t = utils.get_lang(entry.lang_slug)
-    if not entry.t then return end
+    if not entry.t then
+        return
+    end
 
     return {
         value = entry,
@@ -79,7 +83,9 @@ M.pick_lang = function(question, callback)
             attach_mappings = function(prompt_bufnr, map)
                 actions.select_default:replace(function()
                     local selection = action_state.get_selected_entry()
-                    if not selection then return end
+                    if not selection then
+                        return
+                    end
 
                     local snippet = selection.value
                     if question.lang == snippet.t.slug then
@@ -112,7 +118,9 @@ M.pick = function(question)
             attach_mappings = function(prompt_bufnr, map)
                 actions.select_default:replace(function()
                     local selection = action_state.get_selected_entry()
-                    if not selection then return end
+                    if not selection then
+                        return
+                    end
 
                     local snippet = selection.value
                     if question.lang == snippet.t.slug then

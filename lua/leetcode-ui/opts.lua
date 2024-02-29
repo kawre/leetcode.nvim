@@ -30,9 +30,13 @@ function Opts:merge(opts) --
     return self
 end
 
-function Opts:set(opts) self.opts = vim.tbl_deep_extend("force", self.opts, opts) end
+function Opts:set(opts)
+    self.opts = vim.tbl_deep_extend("force", self.opts, opts)
+end
 
-function Opts:get() return self.opts end
+function Opts:get()
+    return self.opts
+end
 
 function Opts:init(opts) --
     self.opts = vim.tbl_deep_extend("force", {

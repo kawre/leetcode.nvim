@@ -31,7 +31,9 @@ function Popup:_buf_destory()
 end
 
 function Popup:focus()
-    if not vim.api.nvim_win_is_valid(self.winid) then return end
+    if not vim.api.nvim_win_is_valid(self.winid) then
+        return
+    end
     vim.api.nvim_set_current_win(self.winid)
 end
 
@@ -56,19 +58,27 @@ function Popup:unmount()
     self.visible = false
 end
 
-function Popup:map(...) self.renderer:map(...) end
+function Popup:map(...)
+    self.renderer:map(...)
+end
 
 function Popup:mount()
     Popup.super.mount(self)
 
     self.visible = true
 
-    self:on({ "BufLeave", "WinLeave" }, function() self:handle_leave() end)
-    self:map("n", keys.toggle, function() self:hide() end)
+    self:on({ "BufLeave", "WinLeave" }, function()
+        self:handle_leave()
+    end)
+    self:map("n", keys.toggle, function()
+        self:hide()
+    end)
 end
 
 function Popup:hide()
-    if not self.visible then return end
+    if not self.visible then
+        return
+    end
     Popup.super.hide(self)
 
     self.visible = false
@@ -82,9 +92,13 @@ function Popup:toggle()
     end
 end
 
-function Popup:handle_leave() self:hide() end
+function Popup:handle_leave()
+    self:hide()
+end
 
-function Popup:draw() self.renderer:draw(self) end
+function Popup:draw()
+    self.renderer:draw(self)
+end
 
 function Popup:update_renderer()
     self.renderer.bufnr = self.bufnr

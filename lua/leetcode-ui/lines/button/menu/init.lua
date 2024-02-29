@@ -25,13 +25,17 @@ function MenuButton:init(text, opts)
     self:append(" ")
     self:append(text)
 
-    if opts.expandable then self:append(" " .. opts.expand_icon, "leetcode_alt") end
+    if opts.expandable then
+        self:append(" " .. opts.expand_icon, "leetcode_alt")
+    end
 
     local len = vim.api.nvim_strwidth(self:content()) + vim.api.nvim_strwidth(opts.sc or "")
     local padding = (" "):rep(opts.width - len)
 
     self:append(padding)
-    if opts.sc then self:append(opts.sc, "leetcode_info") end
+    if opts.sc then
+        self:append(opts.sc, "leetcode_info")
+    end
 end
 
 ---@type fun(text: string, opts: lc.ui.Button.Menu.opts): lc.ui.Button

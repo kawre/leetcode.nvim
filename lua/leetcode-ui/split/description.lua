@@ -23,7 +23,9 @@ function Description:autocmds()
     vim.api.nvim_create_autocmd("WinResized", {
         group = group_id,
         buffer = self.bufnr,
-        callback = function() self:draw() end,
+        callback = function()
+            self:draw()
+        end,
     })
 end
 
@@ -71,7 +73,9 @@ function Description:draw()
 end
 
 function Description:draw_imgs()
-    if not img_sup then return end
+    if not img_sup then
+        return
+    end
 
     local lines = vim.api.nvim_buf_get_lines(self.bufnr, 1, -1, false)
     for i, line in ipairs(lines) do
@@ -86,7 +90,9 @@ function Description:draw_imgs()
                     window = self.winid,
                     with_virtual_padding = true,
                 }, function(image)
-                    if not image then return end
+                    if not image then
+                        return
+                    end
 
                     self.images[link] = image
                     image:render({ y = i + 1 })
@@ -119,7 +125,9 @@ function Description:populate()
 
     header:append(q.frontend_id .. ". ", "leetcode_normal")
     header:append(utils.translate(q.title, q.translated_title))
-    if q.is_paid_only then header:append(" " .. t("Premium"), "leetcode_medium") end
+    if q.is_paid_only then
+        header:append(" " .. t("Premium"), "leetcode_medium")
+    end
     header:endgrp()
 
     local show_stats = self.show_stats
@@ -141,7 +149,9 @@ function Description:populate()
     header:append(likes .. " ", "leetcode_alt")
 
     local dislikes = show_stats and q.dislikes or "___"
-    if not config.is_cn then header:append((" %s "):format(dislikes), "leetcode_alt") end
+    if not config.is_cn then
+        header:append((" %s "):format(dislikes), "leetcode_alt")
+    end
 
     header:append((" %s "):format(config.icons.bar))
 

@@ -17,7 +17,9 @@ function statistics.calendar(cb)
     utils.query(query, variables, {
         endpoint = urls.calendar,
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
 
             local data = res.data
             local calendar = data["matchedUser"]["calendar"]
@@ -42,7 +44,9 @@ function statistics.session_progress(cb)
 
     utils.query(query, variables, {
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
 
             local data = res.data
             local session_progress = data["matchedUser"]["submitStats"]["acSubmissionNum"]
@@ -62,7 +66,9 @@ function statistics.solved(cb)
     utils.query(query, variables, {
         endpoint = urls.solved,
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
 
             local data = res.data
             local questions_count = data["allQuestionsCount"]
@@ -87,7 +93,9 @@ function statistics.skills(cb)
     utils.query(query, variables, {
         endpoint = urls.skills,
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
             local data = res.data
             local tag_problems_counts = data["matchedUser"]["tag_problems_counts"]
             cb(tag_problems_counts)
@@ -106,7 +114,9 @@ function statistics.languages(cb)
     utils.query(query, variables, {
         endpoint = urls.languages,
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
             local data = res.data
             local lang_prob_count = data["matchedUser"]["languageProblemCount"]
             cb(lang_prob_count)
@@ -122,7 +132,9 @@ function statistics.streak(cb)
     utils.query(query, variables, {
         endpoint = urls.streak_counter,
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
             local data = res.data
             local streak = data["streakCounter"]
             cb(streak)
@@ -137,7 +149,9 @@ function statistics.sessions(cb)
     utils.post(url, {
         body = vim.empty_dict(),
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
             config.sessions.update(res.sessions)
             cb(res.sessions)
         end,
@@ -155,7 +169,9 @@ function statistics.change_session(id, cb)
     utils.put(url, {
         body = body,
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
             config.sessions.update(res.sessions)
             cb(res.sessions)
         end,
@@ -173,7 +189,9 @@ function statistics.create_session(name, cb)
     utils.put(url, {
         body = body,
         callback = function(res, err)
-            if err then return cb(nil, err) end
+            if err then
+                return cb(nil, err)
+            end
             config.sessions.update(res.sessions)
             cb(res.sessions)
         end,

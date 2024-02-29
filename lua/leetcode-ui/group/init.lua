@@ -36,7 +36,9 @@ function Group:contents()
     local items = utils.shallowcopy(self._.items)
 
     local contents = Group.super.contents(self)
-    if not vim.tbl_isempty(contents) then table.insert(items, Lines(contents)) end
+    if not vim.tbl_isempty(contents) then
+        table.insert(items, Lines(contents))
+    end
 
     return items
 end
@@ -51,27 +53,35 @@ function Group:draw(layout, opts)
     local toppad = padding and padding.top
     local botpad = padding and padding.bot
 
-    if toppad then Pad(toppad):draw(layout) end
+    if toppad then
+        Pad(toppad):draw(layout)
+    end
 
     local items = self:contents()
     for i, item in ipairs(items) do
         item:draw(layout, options:get())
-        if i ~= #items and spacing then Pad(spacing):draw(layout) end
+        if i ~= #items and spacing then
+            Pad(spacing):draw(layout)
+        end
     end
 
-    if botpad then Pad(botpad):draw(layout) end
+    if botpad then
+        Pad(botpad):draw(layout)
+    end
 end
 
 ---@param item lc.ui.Lines
 function Group:insert(item)
-    if not vim.tbl_isempty(Group.super.contents(self)) then self:endgrp() end
+    if not vim.tbl_isempty(Group.super.contents(self)) then
+        self:endgrp()
+    end
     table.insert(self._.items, item)
 
     return self
 end
 
 function Group:append(content, highlight)
-    if type(content) == "table" and O.is_instance(content, Group) then --
+    if type(content) == "table" and O.is_instance(content, Group) then
         local items = content:contents()
 
         for _, item in ipairs(items) do

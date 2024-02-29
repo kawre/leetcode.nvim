@@ -42,7 +42,9 @@ local spinners = {
 ---@private
 function spinner:spin()
     local stype = self.spinner
-    if not stype then return end
+    if not stype then
+        return
+    end
 
     self:set(nil, nil, {
         icon = stype.frames[self.index + 1],
@@ -51,7 +53,9 @@ function spinner:spin()
     self.index = (self.index + 1) % #stype.frames
 
     local fps = math.floor(1000 / stype.fps)
-    vim.defer_fn(function() self:spin() end, fps)
+    vim.defer_fn(function()
+        self:spin()
+    end, fps)
 end
 
 ---@private
@@ -60,9 +64,13 @@ end
 ---@param lvl? integer
 ---@param opts? table
 function spinner:set(msg, lvl, opts)
-    if not self.spinner then return end
+    if not self.spinner then
+        return
+    end
 
-    if msg then self:update(msg) end
+    if msg then
+        self:update(msg)
+    end
     lvl = lvl or vim.log.levels.INFO
 
     opts = vim.tbl_deep_extend("force", {
@@ -76,10 +84,14 @@ function spinner:set(msg, lvl, opts)
 end
 
 ---@param spinner_type lc.spinner_types
-function spinner:change(spinner_type) self.spinner = spinners[spinner_type] end
+function spinner:change(spinner_type)
+    self.spinner = spinners[spinner_type]
+end
 
 ---@param msg any
-function spinner:update(msg) self.msg = t(tostring(msg)) end
+function spinner:update(msg)
+    self.msg = t(tostring(msg))
+end
 
 function spinner:start()
     self:spin()

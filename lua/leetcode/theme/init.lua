@@ -45,8 +45,12 @@ function theme.load_devicons()
     vim.tbl_map(function(l)
         local icon, color = devicons.get_icon_color(l.ft)
 
-        if icon then l.icon = icon end
-        if color then l.color = color end
+        if icon then
+            l.icon = icon
+        end
+        if color then
+            l.color = color
+        end
 
         return l
     end, config.langs)
@@ -60,7 +64,9 @@ function theme.load()
         vim.api.nvim_set_hl(0, key, t)
     end
 
-    if devicons_ok then theme.load_devicons() end
+    if devicons_ok then
+        theme.load_devicons()
+    end
 
     ---@param lang lc.language
     vim.tbl_map(function(lang)
@@ -82,10 +88,14 @@ end
 
 ---@param tags string[]
 function theme.get_dynamic(tags)
-    if vim.tbl_isempty(tags) then return "leetcode_normal" end
+    if vim.tbl_isempty(tags) then
+        return "leetcode_normal"
+    end
 
     local name = "leetcode_dyn_" .. table.concat(tags, "_")
-    if dynamic_hls[name] then return name end
+    if dynamic_hls[name] then
+        return name
+    end
 
     return theme.create_dynamic(name, tags)
 end
@@ -99,11 +109,15 @@ function theme.create_dynamic(name, tags, defaults)
     local tbl = defaults["normal"]
     for _, tag in ipairs(tags) do
         local hl = highlights[tag]
-        if hl then tbl = vim.tbl_extend("force", tbl, defaults[hl]) end
+        if hl then
+            tbl = vim.tbl_extend("force", tbl, defaults[hl])
+        end
     end
 
     if tbl.italic or tbl.bold then
-        if tbl.fg == defaults["normal"].fg then tbl.fg = defaults[""].fg end
+        if tbl.fg == defaults["normal"].fg then
+            tbl.fg = defaults[""].fg
+        end
     end
 
     if pcall(vim.api.nvim_set_hl, 0, name, tbl) then

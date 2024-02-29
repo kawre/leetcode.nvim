@@ -54,7 +54,9 @@ function ResultLayout:handle_accepted(item)
 
     local lang = utils.get_lang_by_name(item.pretty_lang)
     local lang_text = { item.pretty_lang, "Structure" }
-    if lang then lang_text = { lang.icon .. " " .. lang.lang, lang.hl or "Structure" } end
+    if lang then
+        lang_text = { lang.icon .. " " .. lang.lang, lang.hl or "Structure" }
+    end
 
     if config.translator then
         runtime
@@ -108,7 +110,9 @@ end
 ---
 ---@param item lc.runtime
 function ResultLayout:handle_runtime(item) -- status code = 10
-    if item._.submission then return self:handle_accepted(item) end
+    if item._.submission then
+        return self:handle_accepted(item)
+    end
 
     local header = Header(item)
     self:insert(header)
@@ -249,7 +253,9 @@ function ResultLayout:handle_res(item)
         end,
 
         -- unknown
-        ["unknown"] = function() log.error("unknown runner status code: " .. item.status_code) end,
+        ["unknown"] = function()
+            log.error("unknown runner status code: " .. item.status_code)
+        end,
     }
 
     local handler = handlers[item.status_code]
