@@ -48,14 +48,10 @@ function Question:set_lines(code)
 end
 
 function Question:reset_lines()
-    if not self.reset then
-        return
-    end
-
     local new_lines = self:snippet(true) or ""
 
     vim.schedule(function() --
-        log.info("Previous code found and reseted\nTo undo, simply press `u`")
+        log.info("Previous code found and reset\nTo undo, simply press `u`")
     end)
 
     self:set_lines(new_lines)
@@ -315,14 +311,12 @@ Question.change_lang = vim.schedule_wrap(function(self, lang)
 end)
 
 ---@param problem lc.cache.Question
----@param reset boolean
-function Question:init(problem, reset)
+function Question:init(problem)
     self.cache = problem
     self.lang = config.lang
-    self.reset = reset and true or false
 end
 
----@type fun(question: lc.cache.Question, reset?: boolean): lc.ui.Question
+---@type fun(question: lc.cache.Question): lc.ui.Question
 local LeetQuestion = Question
 
 return LeetQuestion

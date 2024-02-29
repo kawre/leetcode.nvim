@@ -140,7 +140,7 @@ function cmd.qot()
             return log.err(err)
         end
         local problemlist = require("leetcode.cache.problemlist")
-        Question(problemlist.get_by_title_slug(qot.title_slug), true):mount()
+        Question(problemlist.get_by_title_slug(qot.title_slug)):mount()
     end)
 end
 
@@ -168,7 +168,7 @@ function cmd.random_question(opts)
 
     local item = problems.get_by_title_slug(q.title_slug) or {}
     local Question = require("leetcode-ui.question")
-    Question(item, true):mount()
+    Question(item):mount()
 end
 
 function cmd.start_with_cmd()
