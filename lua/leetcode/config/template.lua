@@ -122,8 +122,11 @@ local M = {
         focus_result = "L", ---@type string
     },
 
+    ---@type lc.highlights
+    theme = {},
+
     ---@type boolean
-    image_support = false, -- setting this to `true` will disable question description wrap
+    image_support = false,
 }
 
 return M

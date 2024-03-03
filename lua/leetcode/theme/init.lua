@@ -1,13 +1,15 @@
 local devicons_ok, devicons = pcall(require, "nvim-web-devicons")
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
+local default = require("leetcode.theme.default")
 
 ---@class lc.Theme
-local theme = {}
+local Theme = {}
 
 ---@type table<string, string[]>
 local dynamic_hls = {}
 
+-- by default tags use `normal` theme
 local highlights = {
     strong = "bold",
     b = "bold",
@@ -40,7 +42,7 @@ local highlights = {
     -- div = "",
 }
 
-function theme.load_devicons()
+function Theme.load_devicons()
     ---@param l lc.language
     vim.tbl_map(function(l)
         local icon, color = devicons.get_icon_color(l.ft)
@@ -56,16 +58,16 @@ function theme.load_devicons()
     end, config.langs)
 end
 
-function theme.load()
-    local defaults = require("leetcode.theme.default").get()
+function Theme.load()
+    config.theme = vim.tbl_extend("force", default.get(), config.user.theme)
 
-    for key, t in pairs(defaults) do
+    for key, t in pairs(config.theme) do
         key = "leetcode_" .. key
         vim.api.nvim_set_hl(0, key, t)
     end
 
     if devicons_ok then
-        theme.load_devicons()
+        Theme.load_devicons()
     end
 
     ---@param lang lc.language
@@ -77,17 +79,17 @@ function theme.load()
         return lang
     end, config.langs)
 
-    theme.load_dynamic(defaults)
+    Theme.load_dynamic()
 end
 
-function theme.load_dynamic(defaults)
+function Theme.load_dynamic()
     for name, tags in pairs(dynamic_hls) do
-        theme.create_dynamic(name, tags, defaults)
+        Theme.create_dynamic(name, tags)
     end
 end
 
 ---@param tags string[]
-function theme.get_dynamic(tags)
+function Theme.get_dynamic(tags)
     if vim.tbl_isempty(tags) then
         return "leetcode_normal"
     end
@@ -97,26 +99,25 @@ function theme.get_dynamic(tags)
         return name
     end
 
-    return theme.create_dynamic(name, tags)
+    return Theme.create_dynamic(name, tags)
 end
 
 ---@param name string
 ---@param tags string[]
----@param defaults? table
-function theme.create_dynamic(name, tags, defaults)
-    defaults = defaults or require("leetcode.theme.default").get()
+function Theme.create_dynamic(name, tags)
+    local theme = config.theme
 
-    local tbl = defaults["normal"]
+    local tbl = theme["normal"]
     for _, tag in ipairs(tags) do
         local hl = highlights[tag]
         if hl then
-            tbl = vim.tbl_extend("force", tbl, defaults[hl])
+            tbl = vim.tbl_extend("force", tbl, theme[hl])
         end
     end
 
     if tbl.italic or tbl.bold then
-        if tbl.fg == defaults["normal"].fg then
-            tbl.fg = defaults[""].fg
+        if tbl.fg == theme["normal"].fg then
+            tbl.fg = theme[""].fg
         end
     end
 
@@ -128,14 +129,14 @@ function theme.create_dynamic(name, tags, defaults)
     end
 end
 
-function theme.setup()
+function Theme.setup()
     vim.api.nvim_create_autocmd("ColorScheme", {
         group = vim.api.nvim_create_augroup("lc.colorscheme_sync", {}),
         desc = "Colorscheme Synchronizer",
-        callback = theme.load,
+        callback = Theme.load,
     })
 
-    theme.load()
+    Theme.load()
 end
 
-return theme
+return Theme

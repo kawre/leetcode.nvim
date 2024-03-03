@@ -22,7 +22,8 @@ local function hl(name)
     return highlight
 end
 
----@alias lc.highlights table<string, table>
+---@alias lc.highlights table<string, vim.api.keyset.highlight>
+
 ---@return lc.highlights
 M.get = function()
     return {

@@ -20,6 +20,7 @@ local config = {
     lang = "cpp",
     version = "1.0.1",
     storage = {}, ---@type table<string, Path>
+    theme = {}, ---@type lc.highlights
 
     translator = false,
 

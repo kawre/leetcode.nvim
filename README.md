@@ -157,6 +157,9 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         focus_result = "L", ---@type string
     },
 
+    ---@type lc.highlights
+    theme = {},
+
     ---@type boolean
     image_support = false,
 }
@@ -294,6 +297,24 @@ hooks = {
 
     ---@type fun()[]
     ["leave"] = {},
+},
+```
+
+### theme
+
+Override the [default theme](./lua/leetcode/theme/default.lua).
+
+Each value is the same type as val parameter in `:help nvim_set_hl`
+
+```lua
+---@type lc.highlights
+theme = {
+    ["alt"] = {
+        bg = "#FFFFFF",
+    },
+    ["normal"] = {
+        fg = "#EA4AAA",
+    },
 },
 ```
 

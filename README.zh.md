@@ -159,6 +159,9 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
         focus_result = "L", ---@type string
     },
 
+    ---@type lc.highlights
+    theme = {},
+
     ---@type boolean
     image_support = false,
 }
@@ -293,6 +296,24 @@ hooks = {
 
     ---@type fun()[]
     ["leave"] = {},
+},
+```
+
+### theme
+
+覆盖[默认主题](./lua/leetcode/theme/default.lua)
+
+每个值都与 `:help nvim_set_hl` 中的val参数相同类型
+
+```lua
+---@type lc.highlights
+theme = {
+    ["alt"] = {
+        bg = "#FFFFFF",
+    },
+    ["normal"] = {
+        fg = "#EA4AAA",
+    },
 },
 ```
 
