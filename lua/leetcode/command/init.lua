@@ -81,10 +81,11 @@ function cmd.cookie_prompt(cb)
 end
 
 function cmd.sign_out()
+    cmd.menu()
+
     log.warn("You're now signed out")
     cmd.delete_cookie()
     cmd.set_menu_page("signin")
-    cmd.q_close_all()
 end
 
 ---Sign out
@@ -119,9 +120,7 @@ cmd.expire = vim.schedule_wrap(function()
             end
             log.info("Successful re-login")
         else
-            cmd.delete_cookie()
-            cmd.set_menu_page("signin")
-            cmd.q_close_all()
+            cmd.sign_out()
         end
     end)
 end)
@@ -359,7 +358,6 @@ end
 
 function cmd.restore()
     local utils = require("leetcode.utils")
-    utils.auth_guard()
     local q = utils.curr_question()
     if not q then
         return
@@ -385,7 +383,6 @@ end
 
 function cmd.inject()
     local utils = require("leetcode.utils")
-    utils.auth_guard()
     local q = utils.curr_question()
     if not q then
         return
@@ -439,6 +436,8 @@ function cmd.get_session_by_name(name)
 end
 
 function cmd.change_session(opts)
+    require("leetcode.utils").auth_guard()
+
     local name = opts.name[1] or config.sessions.default
 
     local session = cmd.get_session_by_name(name)
@@ -457,6 +456,8 @@ function cmd.change_session(opts)
 end
 
 function cmd.create_session(opts)
+    require("leetcode.utils").auth_guard()
+
     local name = opts.name[1]
     if not name then
         return log.error("Session name not provided")
@@ -472,6 +473,8 @@ function cmd.create_session(opts)
 end
 
 function cmd.update_sessions()
+    require("leetcode.utils").auth_guard()
+
     config.stats.update_sessions()
 end
 
