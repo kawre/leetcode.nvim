@@ -31,10 +31,9 @@ function Popup:_buf_destory()
 end
 
 function Popup:focus()
-    if not vim.api.nvim_win_is_valid(self.winid) then
-        return
+    if self.winid and vim.api.nvim_win_is_valid(self.winid) then
+        vim.api.nvim_set_current_win(self.winid)
     end
-    vim.api.nvim_set_current_win(self.winid)
 end
 
 function Popup:clear() --

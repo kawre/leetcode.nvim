@@ -58,7 +58,7 @@ end
 
 ---@param layout lc.ui.Renderer
 function utils.win_width(layout)
-    if not vim.api.nvim_win_is_valid(layout.winid) then
+    if not (layout.winid and vim.api.nvim_win_is_valid(layout.winid)) then
         return 0
     end
     return vim.api.nvim_win_get_width(layout.winid)

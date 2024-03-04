@@ -125,9 +125,6 @@ cmd.expire = vim.schedule_wrap(function()
     end)
 end)
 
----Merge configurations into default configurations and set it as user configurations.
----
---@param theme lc-db.Theme
 function cmd.qot()
     require("leetcode.utils").auth_guard()
 
@@ -196,7 +193,10 @@ function cmd.yank()
         return
     end
 
-    if api.nvim_buf_is_valid(q.bufnr) and api.nvim_win_is_valid(q.winid) then
+    if
+        (q.bufnr and api.nvim_buf_is_valid(q.bufnr))
+        and (q.winid and api.nvim_win_is_valid(q.winid))
+    then
         api.nvim_set_current_win(q.winid)
         api.nvim_set_current_buf(q.bufnr)
 
@@ -388,7 +388,7 @@ function cmd.inject()
         return
     end
 
-    if api.nvim_buf_is_valid(q.bufnr) then
+    if q.bufnr and api.nvim_buf_is_valid(q.bufnr) then
         local start_i, end_i = q:range(true)
         local not_found = {}
 

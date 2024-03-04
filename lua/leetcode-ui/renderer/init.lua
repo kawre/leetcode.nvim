@@ -24,7 +24,7 @@ function Renderer:draw(component)
     self.bufnr = component.bufnr
     self.winid = component.winid
 
-    if not vim.api.nvim_buf_is_valid(self.bufnr) then
+    if not (self.bufnr and vim.api.nvim_buf_is_valid(self.bufnr)) then
         return
     end
 

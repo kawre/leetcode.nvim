@@ -128,7 +128,9 @@ function utils.translate(content, translated_content)
 end
 
 function utils.auth_guard()
-    assert(config.auth.is_signed_in, "User not logged-in")
+    if not config.auth.is_signed_in then
+        error("User not logged-in", 0)
+    end
 end
 
 function utils.norm_ins(str)

@@ -35,7 +35,7 @@ end
 
 ---@param code? string
 function Question:set_lines(code)
-    if not vim.api.nvim_buf_is_valid(self.bufnr) then
+    if not (self.bufnr and vim.api.nvim_buf_is_valid(self.bufnr)) then
         return
     end
 
@@ -164,7 +164,7 @@ function Question:_unmount()
         self.console:unmount()
         self.description:unmount()
 
-        if vim.api.nvim_buf_is_valid(self.bufnr) then
+        if self.bufnr and vim.api.nvim_buf_is_valid(self.bufnr) then
             vim.api.nvim_buf_delete(self.bufnr, { force = true, unload = false })
         end
 
@@ -177,7 +177,7 @@ function Question:_unmount()
 end
 
 function Question:unmount()
-    if vim.api.nvim_win_is_valid(self.winid) then
+    if self.winid and vim.api.nvim_win_is_valid(self.winid) then
         vim.api.nvim_win_close(self.winid, true)
     end
 end

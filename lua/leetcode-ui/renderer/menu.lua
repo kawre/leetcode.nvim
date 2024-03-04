@@ -56,7 +56,7 @@ function Menu:autocmds()
 end
 
 function Menu:cursor_move()
-    if not self.winid or not api.nvim_win_is_valid(self.winid) then
+    if not (self.winid and api.nvim_win_is_valid(self.winid)) then
         return
     end
 

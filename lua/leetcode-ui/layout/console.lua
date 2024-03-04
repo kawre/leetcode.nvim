@@ -67,8 +67,10 @@ end
 function ConsoleLayout:run(submit)
     if config.user.console.open_on_runcode then
         self:show()
-        self.result:focus()
     end
+
+    self.result:focus()
+
     Runner:init(self.question):run(submit)
 end
 
