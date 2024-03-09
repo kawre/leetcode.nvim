@@ -102,7 +102,7 @@ function Question:open_buffer(existed)
         pcall(vim.cmd, ("%d,%dfold"):format(1, i))
     end
 
-    if existed then
+    if existed and self.cache.status == "ac" then
         self:reset_lines()
     end
 end
