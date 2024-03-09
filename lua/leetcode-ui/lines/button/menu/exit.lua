@@ -8,7 +8,7 @@ local MenuExitButton = MenuButton:extend("LeetMenuExitButton")
 function MenuExitButton:init()
     MenuExitButton.super.init(self, "Exit", {
         icon = "󰩈",
-        sc = "q",
+        sc = "qa",
         on_press = leetcode.stop,
     })
 end

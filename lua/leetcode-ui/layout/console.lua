@@ -14,7 +14,6 @@ local log = require("leetcode.logger")
 ---@field testcase lc.ui.Console.TestcasePopup
 ---@field result lc.ui.Console.ResultPopup
 ---@field popups lc.ui.Console.Popup[]
----@field prev_winid integer
 local ConsoleLayout = Layout:extend("LeetConsoleLayout")
 
 function ConsoleLayout:unmount() --
@@ -25,19 +24,15 @@ function ConsoleLayout:unmount() --
     self.popups = { self.testcase, self.result }
 end
 
-function ConsoleLayout:show()
-    self.prev_winid = vim.api.nvim_get_current_win()
-
-    ConsoleLayout.super.show(self)
-end
-
 function ConsoleLayout:hide()
     ConsoleLayout.super.hide(self)
 
-    if self.prev_winid and vim.api.nvim_win_is_valid(self.prev_winid) then
-        vim.api.nvim_set_current_win(self.prev_winid)
-        self.prev_winid = nil
-    end
+    pcall(function()
+        local winid = vim.api.nvim_get_current_win()
+        if winid == self.question.description.winid then
+            vim.api.nvim_set_current_win(self.question.winid)
+        end
+    end)
 end
 
 function ConsoleLayout:mount()
@@ -97,7 +92,6 @@ function ConsoleLayout:init(parent)
     self.testcase = Testcase(self)
     self.result = Result(self)
     self.popups = { self.testcase, self.result }
-    self.prev_winid = nil
 
     ConsoleLayout.super.init(
         self,
