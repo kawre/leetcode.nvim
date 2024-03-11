@@ -96,6 +96,7 @@ end
 function Question:open_buffer(existed)
     vim.api.nvim_win_set_buf(self.winid, self.bufnr)
     vim.api.nvim_set_option_value("buflisted", true, { buf = self.bufnr })
+    vim.api.nvim_set_option_value("winfixbuf", true, { win = self.winid })
 
     local i = self:fold_range()
     if i then

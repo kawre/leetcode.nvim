@@ -144,6 +144,7 @@ function Menu:apply_options()
         list = false,
         spell = false,
         signcolumn = "no",
+        winfixbuf = true,
     })
 end
 
@@ -173,7 +174,7 @@ function Menu:remount()
         api.nvim_buf_delete(self.bufnr, { force = true })
     end
 
-    vim.cmd("$tabnew")
+    vim.cmd("0tabnew")
     self.bufnr = api.nvim_get_current_buf()
     self.winid = api.nvim_get_current_win()
 

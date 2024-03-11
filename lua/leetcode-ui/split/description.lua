@@ -57,6 +57,7 @@ function Description:mount()
         spell = false,
         signcolumn = "no",
         linebreak = true,
+        winfixbuf = true,
     })
     if not img_ok and config.user.image_support then
         log.error("image.nvim not found but `image_support` is enabled")

@@ -175,12 +175,11 @@ function cmd.start_with_cmd()
 end
 
 function cmd.menu()
-    local winid, bufnr = _Lc_state.menu.winid, _Lc_state.menu.bufnr
+    local winid = _Lc_state.menu.winid
     local ok, tabp = pcall(api.nvim_win_get_tabpage, winid)
 
     if ok then
         api.nvim_set_current_tabpage(tabp)
-        api.nvim_win_set_buf(winid, bufnr)
     else
         _Lc_state.menu:remount()
     end
