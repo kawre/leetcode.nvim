@@ -72,6 +72,10 @@ local M = {
         update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
     },
 
+    problem = {
+        auto_reset_solved_problem = true, ---@type boolean
+    },
+
     console = {
         open_on_runcode = true, ---@type boolean
 
