@@ -60,6 +60,7 @@ function utils.curl(method, params)
         compressed = false,
         retry = 5,
         endpoint = urls.base,
+        http_version = "HTTP/2",
     }, params or {})
     local url = ("https://leetcode.%s%s"):format(config.domain, params.endpoint)
 
