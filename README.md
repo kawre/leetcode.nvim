@@ -107,6 +107,12 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
     },
 
+    problem = {
+        ---@type boolean
+        --- when open editor, automatically reset code for solved problems
+        auto_reset_solved_problem = true,
+    }
+
     console = {
         open_on_runcode = true, ---@type boolean
 

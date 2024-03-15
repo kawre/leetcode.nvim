@@ -109,6 +109,11 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
         update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
     },
 
+    problem = {
+        ---@type boolean 打开问题时，自动重置已经AC的题目
+        auto_reset_solved_problem = true,
+    }
+
     console = {
         open_on_runcode = true, ---@type boolean
 
