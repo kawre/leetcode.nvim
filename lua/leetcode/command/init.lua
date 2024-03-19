@@ -313,7 +313,7 @@ function cmd.open()
             command = string.format("start \"\" \"%s\"", q.cache.link)
         end
 
-        os.execute(command)
+        vim.fn.jobstart(command, { detach = true })
     end
 end
 
