@@ -1,4 +1,5 @@
 local cmd = require("leetcode.command")
+local config = require("leetcode.config")
 
 local Title = require("leetcode-ui.lines.title")
 local Button = require("leetcode-ui.lines.button.menu")
@@ -33,7 +34,7 @@ local daily = Button("Daily", {
     on_press = cmd.qot,
 })
 
-local companies = Button("By Company", {
+local companies = Button("Companies", {
     icon = "",
     sc = "c",
     on_press = cmd.companies,
@@ -41,13 +42,13 @@ local companies = Button("By Company", {
 
 local back = BackButton("menu")
 
-page:insert(Buttons({
-    list,
-    random,
-    daily,
-    companies,
-    back,
-}))
+button_list = { list, random, daily }
+if config.auth.is_premium then
+    table.insert(button_list, companies)
+end
+table.insert(button_list, back)
+
+page:insert(Buttons(button_list))
 
 page:insert(footer)
 

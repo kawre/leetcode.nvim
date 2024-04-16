@@ -32,6 +32,11 @@ end
 ---@param options table<string, string[]>
 function cmd.companies(options)
     require("leetcode.utils").auth_guard()
+    if not config.auth.is_premium then
+        err.msg = "Selecting problems by company is only for premium."
+        err.lvl = vim.log.levels.WARN
+        return nil, err
+    end
 
     local c = require("leetcode.cache.companylist").get()
     require("leetcode.pickers.company").pick(c, options)

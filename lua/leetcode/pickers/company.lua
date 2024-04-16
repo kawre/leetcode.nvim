@@ -25,13 +25,16 @@ end
 
 ---@param company lc.cache.Company
 local function display_company(company)
-    return { company.name }
+    local question_count = { company.questionCount, "leetcode_ref" }
+    local name = { company.name }
+    return unpack({ name, question_count })
 end
 
 local displayer = entry_display.create({
     separator = " ",
     items = {
-        { width = 78 },
+        { width = 90 },
+        { width = 5 },
     },
 })
 
