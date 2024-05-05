@@ -41,6 +41,17 @@ function Cookie.delete()
     return pcall(path.rm, file)
 end
 
+---@return string|nil
+function Cookie.read()
+    local contents = file:read()
+
+    if not contents or type(contents) ~= "string" then
+        return
+    end
+
+    return select(1, contents:gsub("^%s*(.-)%s*$", "%1"))
+end
+
 ---@return lc.cache.Cookie | nil
 function Cookie.get()
     if not file:exists() then
@@ -55,8 +66,8 @@ function Cookie.get()
         return hcookie
     end
 
-    local contents = file:read()
-    if not contents or type(contents) ~= "string" then
+    local contents = Cookie.read()
+    if not contents then
         require("leetcode.command").delete_cookie()
         return
     end
