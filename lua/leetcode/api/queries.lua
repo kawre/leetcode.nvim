@@ -179,4 +179,56 @@ queries.session_progress = [[
         }
     ]]
 
+queries.favorite_list = [[
+      query myFavoriteList {
+        myCreatedFavoriteList {
+          favorites {
+            coverUrl
+            coverEmoji
+            coverBackgroundColor
+            hasCurrentQuestion
+            isPublicFavorite
+            lastQuestionAddedAt
+            name
+            slug
+          }
+          hasMore
+          totalLength
+        }
+        myCollectedFavoriteList {
+          hasMore
+          totalLength
+          favorites {
+            coverUrl
+            coverEmoji
+            coverBackgroundColor
+            hasCurrentQuestion
+            isPublicFavorite
+            name
+            slug
+            lastQuestionAddedAt
+          }
+        }
+      }
+    ]]
+
+queries.favorite_question_list = [[
+      query favoriteQuestionList($favoriteSlug: String!) {
+        favoriteQuestionList(favoriteSlug: $favoriteSlug) {
+          questions {
+            id
+            questionFrontendId
+            paidOnly
+            title
+            titleSlug
+            difficulty
+            topicTags {
+              name
+              slug
+            }
+          }
+        }
+      }
+    ]]
+
 return queries

@@ -393,6 +393,15 @@
 ---@field lvl integer
 
 ---@alias lc.err lc.Api.err|nil
+--
+--------------------------------------------
+--- Favorite
+--------------------------------------------
+---@class lc.Favorite
+---@field name string
+---@field slug string
+---@field isPublicFavorite boolean
+---@field hasCurrentQuestion boolean
 
 --------------------------------------------
 --- Sessions
