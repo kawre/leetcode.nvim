@@ -141,27 +141,27 @@ function cmd.qot()
 end
 
 function cmd.favorite_list()
-  require("leetcode.utils").auth_guard()
+    require("leetcode.utils").auth_guard()
 
-  local problems = require("leetcode.api.problems")
+    local problems = require("leetcode.api.problems")
 
-  problems.favorite_list(function(favorites, fav_err)
-    if fav_err then
-      return log.err(fav_err)
-    end
-    require("leetcode.pickers.favorite").pick(favorites, function(selection)
-      if not selection then
-        return
-      end
-      local slug = selection.slug
-      problems.favorite_question_list(slug, function(data, fav_q_err)
-        if fav_q_err then
-          return log.err(fav_q_err)
+    problems.favorite_list(function(favorites, fav_err)
+        if fav_err then
+            return log.err(fav_err)
         end
-        require("leetcode.pickers.question").pick(data)
-      end)
+        require("leetcode.pickers.favorite").pick(favorites, function(selection)
+            if not selection then
+                return
+            end
+            local slug = selection.slug
+            problems.favorite_question_list(slug, function(data, fav_q_err)
+                if fav_q_err then
+                    return log.err(fav_q_err)
+                end
+                require("leetcode.pickers.question").pick(data)
+            end)
+        end)
     end)
-  end)
 end
 
 function cmd.random_question(opts)

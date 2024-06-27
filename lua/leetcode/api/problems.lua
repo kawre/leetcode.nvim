@@ -14,150 +14,150 @@ local Problems = {}
 ---
 ---@return lc.cache.Question[], lc.err
 function Problems.all(cb, noti)
-  local endpoint = urls.problems:format("algorithms")
+    local endpoint = urls.problems:format("algorithms")
 
-  local spinner
-  if noti then
-    spinner = Spinner:init("updating problemlist cache...", "points")
-  end
+    local spinner
+    if noti then
+        spinner = Spinner:init("updating problemlist cache...", "points")
+    end
 
-  if cb then
-    utils.get(endpoint, {
-      callback = function(res, err)
+    if cb then
+        utils.get(endpoint, {
+            callback = function(res, err)
+                if err then
+                    if spinner then
+                        spinner:stop(err.msg, false)
+                    end
+                    return cb(nil, err)
+                end
+
+                local problems = utils.normalize_problems(res.stat_status_pairs)
+
+                if config.is_cn then
+                    if spinner then
+                        spinner:update("fetching title translations")
+                    end
+                    Problems.translated_titles(function(titles, terr)
+                        if terr then
+                            if spinner then
+                                spinner:stop(terr.msg, false)
+                            end
+                            return cb(nil, terr)
+                        end
+
+                        problems = utils.translate_titles(problems, titles)
+                        if spinner then
+                            spinner:stop("cache updated")
+                        end
+
+                        cb(problems)
+                    end)
+                else
+                    if spinner then
+                        spinner:stop("cache updated")
+                    end
+
+                    cb(problems)
+                end
+            end,
+        })
+    else
+        local res, err = utils.get(endpoint)
         if err then
-          if spinner then
-            spinner:stop(err.msg, false)
-          end
-          return cb(nil, err)
+            if spinner then
+                spinner:stop(err.msg, false)
+            end
+            return nil, err
         end
 
         local problems = utils.normalize_problems(res.stat_status_pairs)
 
         if config.is_cn then
-          if spinner then
-            spinner:update("fetching title translations")
-          end
-          Problems.translated_titles(function(titles, terr)
+            local titles, terr = Problems.translated_titles()
             if terr then
-              if spinner then
-                spinner:stop(terr.msg, false)
-              end
-              return cb(nil, terr)
+                if spinner then
+                    spinner:stop(terr.msg, false)
+                end
+                return nil, terr
             end
 
-            problems = utils.translate_titles(problems, titles)
             if spinner then
-              spinner:stop("cache updated")
+                spinner:stop("problems cache updated")
             end
-
-            cb(problems)
-          end)
+            return utils.translate_titles(problems, titles)
         else
-          if spinner then
-            spinner:stop("cache updated")
-          end
-
-          cb(problems)
+            if spinner then
+                spinner:stop("problems cache updated")
+            end
+            return problems
         end
-      end,
-    })
-  else
-    local res, err = utils.get(endpoint)
-    if err then
-      if spinner then
-        spinner:stop(err.msg, false)
-      end
-      return nil, err
     end
-
-    local problems = utils.normalize_problems(res.stat_status_pairs)
-
-    if config.is_cn then
-      local titles, terr = Problems.translated_titles()
-      if terr then
-        if spinner then
-          spinner:stop(terr.msg, false)
-        end
-        return nil, terr
-      end
-
-      if spinner then
-        spinner:stop("problems cache updated")
-      end
-      return utils.translate_titles(problems, titles)
-    else
-      if spinner then
-        spinner:stop("problems cache updated")
-      end
-      return problems
-    end
-  end
 end
 
 function Problems.question_of_today(cb)
-  local query = queries.qot
+    local query = queries.qot
 
-  utils.query(query, {}, {
-    callback = function(res, err)
-      if err then
-        return cb(nil, err)
-      end
+    utils.query(query, {}, {
+        callback = function(res, err)
+            if err then
+                return cb(nil, err)
+            end
 
-      local tday_record = res.data["todayRecord"]
-      local question = config.is_cn and tday_record[1].question or tday_record.question
-      cb(question)
-    end,
-  })
+            local tday_record = res.data["todayRecord"]
+            local question = config.is_cn and tday_record[1].question or tday_record.question
+            cb(question)
+        end,
+    })
 end
 
 function Problems.favorite_list(cb)
-  local query = queries.favorite_list
+    local query = queries.favorite_list
 
-  utils.query(query, {}, {
-    callback = function(res, err)
-      if err then
-        return cb(nil, err)
-      end
+    utils.query(query, {}, {
+        callback = function(res, err)
+            if err then
+                return cb(nil, err)
+            end
 
-      local data = res.data
-      cb(data.myCollectedFavoriteList.favorites)
-    end,
-  })
+            local data = res.data
+            cb(data.myCollectedFavoriteList.favorites)
+        end,
+    })
 end
 
 function Problems.favorite_question_list(favorite_slug, cb)
-  local query = queries.favorite_question_list
+    local query = queries.favorite_question_list
 
-  utils.query(query, { favoriteSlug = favorite_slug }, {
-    callback = function(res, err)
-      if err then
-        return cb(nil, err)
-      end
-      local normalized = utils.normalize_favorites(res.data.favoriteQuestionList.questions)
-      cb(normalized)
-    end,
-  })
+    utils.query(query, { favoriteSlug = favorite_slug }, {
+        callback = function(res, err)
+            if err then
+                return cb(nil, err)
+            end
+            local normalized = utils.normalize_favorites(res.data.favoriteQuestionList.questions)
+            cb(normalized)
+        end,
+    })
 end
 
 function Problems.translated_titles(cb)
-  local query = queries.translations
+    local query = queries.translations
 
-  if cb then
-    utils.query(query, {}, {
-      callback = function(res, err)
+    if cb then
+        utils.query(query, {}, {
+            callback = function(res, err)
+                if err then
+                    return cb(nil, err)
+                end
+                cb(res.data.translations)
+            end,
+        })
+    else
+        local res, err = utils.query(query, {})
         if err then
-          return cb(nil, err)
+            return nil, err
         end
-        cb(res.data.translations)
-      end,
-    })
-  else
-    local res, err = utils.query(query, {})
-    if err then
-      return nil, err
+        return res.data.translations
     end
-    return res.data.translations
-  end
 end
 
 return Problems
