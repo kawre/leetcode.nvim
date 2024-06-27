@@ -35,9 +35,9 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
 - [nui.nvim]
 
-- [nvim-treesitter] _**(optional, but highly recommended)**_
+- [tree-sitter-html] _**(optional, but highly recommended)**_
   used for formatting the question description.
-  Make sure to install the parser for `html`.
+  Can be installed with [nvim-treesitter].
 
 - [nvim-notify] _**(optional)**_
 
@@ -497,3 +497,4 @@ You can then exit [leetcode.nvim] using `:Leet exit` command
 [nvim-treesitter]: https://github.com/nvim-treesitter/nvim-treesitter
 [nvim-web-devicons]: https://github.com/nvim-tree/nvim-web-devicons
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
+[tree-sitter-html]: https://github.com/tree-sitter/tree-sitter-html
