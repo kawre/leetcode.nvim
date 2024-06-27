@@ -151,7 +151,7 @@ function utils.check_err(err)
     end
 
     if err.status then
-        if err.status == 401 or err.status == 403 then
+        if (err.status == 401 or err.status == 403) and config.user.show_menu_when_expire then
             require("leetcode.command").expire()
             err.msg = "Session expired? Enter a new cookie to keep using `leetcode.nvim`"
         end
