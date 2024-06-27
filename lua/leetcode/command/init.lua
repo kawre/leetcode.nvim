@@ -29,6 +29,13 @@ function cmd.problems(options)
     require("leetcode.pickers.question").pick(p, options)
 end
 
+function cmd.recent()
+    require("leetcode.utils").auth_guard()
+
+    -- local p = require("leetcode.cache.problemlist").get()
+    require("leetcode.pickers.recent").pick()
+end
+
 ---@param cb? function
 function cmd.cookie_prompt(cb)
     local cookie = require("leetcode.cache.cookie")
@@ -631,6 +638,7 @@ cmd.commands = {
         },
         update = { cmd.update_sessions },
     },
+    recent = { cmd.recent },
     list = {
         cmd.problems,
         _args = arguments.list,

@@ -28,6 +28,9 @@ function ResultPopup:handle(item)
         end
     end
 
+    local Recent = require("leetcode.cache.recent")
+    Recent.add(self.console.question.q.title_slug)
+
     self:draw()
 end
 
