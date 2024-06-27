@@ -248,4 +248,27 @@ function utils.translate_titles(problems, titles)
     end, problems)
 end
 
+--@return lc.cache.Question[]
+function utils.normalize_company_problems(problems)
+    return vim.tbl_map(function(p)
+        return {
+            status = p.status,
+            id = tonumber(p.questionId),
+            frontend_id = tonumber(p.questionFrontendId),
+            title = p.title,
+            title_cn = "",
+            title_slug = p.titleSlug,
+            link = ("https://leetcode.%s/problems/%s/"):format(
+                config.domain,
+                p.titleSlug
+            ),
+            paid_only = p.isPaidOnly,
+            ac_rate = tonumber(p.acRate:sub(1, -2)),
+            difficulty = p.difficulty,
+            starred = false,
+            topic_tags = {},
+        }
+    end, problems)
+end
+
 return utils

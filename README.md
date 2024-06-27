@@ -360,6 +360,8 @@ image_support = false,
 - `daily` opens the question of today
 
 - `list` opens a problem list picker
+- 
+- `companies` opens a list of companies to filter questions by
 
 - `open` opens the current question in a default browser
 

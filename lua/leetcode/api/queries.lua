@@ -179,4 +179,14 @@ queries.session_progress = [[
         }
     ]]
 
+queries.companies = [[
+        query questionCompanyTags {
+            companyTags {
+                name
+                slug
+                questionCount
+            }
+        }
+    ]]
+
 return queries
