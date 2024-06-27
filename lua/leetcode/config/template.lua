@@ -127,6 +127,9 @@ local M = {
 
     ---@type boolean
     image_support = false,
+
+    ---@type boolean
+    show_menu_when_expire = false,
 }
 
 return M
