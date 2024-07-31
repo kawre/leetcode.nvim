@@ -305,7 +305,12 @@ function cmd.open()
         local os_name = vim.loop.os_uname().sysname
 
         if os_name == "Linux" then
-            command = string.format("xdg-open '%s'", q.cache.link)
+            local in_wsl = os.execute("grep -qEi 'microsoft|wsl' /proc/version") == 0
+            if in_wsl then
+                command = string.format("pwsh.exe -command \"Start-Process %s\"", q.cache.link)
+            else
+                command = string.format("xdg-open '%s'", q.cache.link)
+            end
         elseif os_name == "Darwin" then
             command = string.format("open '%s'", q.cache.link)
         else
