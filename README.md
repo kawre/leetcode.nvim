@@ -459,6 +459,11 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4
   }
   ```
 
+### 🪟 Windows
+
+If you are using Windows,
+it is recommended to use [Cygwin](https://www.cygwin.com/) for a more consistent and Unix-like experience.
+
 ## 🧩 Plugins
 
 ### Non-Standalone mode
