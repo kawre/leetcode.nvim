@@ -37,7 +37,7 @@ function Renderer:draw(component)
     self._.line_idx = 1
 
     local c_ok, c = pcall(vim.api.nvim_win_get_cursor, self.winid)
-    self:modifiable(function()
+    self:with_modifiable(function()
         vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
         vim.api.nvim_buf_clear_namespace(self.bufnr, -1, 0, -1)
 
@@ -51,7 +51,7 @@ end
 ---@private
 ---
 ---@param fn function
-function Renderer:modifiable(fn)
+function Renderer:with_modifiable(fn)
     local bufnr = self.bufnr
     if not (bufnr and vim.api.nvim_buf_is_valid(bufnr)) then
         return
@@ -112,7 +112,7 @@ function Renderer:clear()
     self._.line_idx = 1
     self._.buttons = {}
     self:clear_keymaps()
-    self:modifiable(function()
+    self:with_modifiable(function()
         vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
     end)
 end

@@ -5,6 +5,7 @@ local Object = require("nui.object")
 
 local api_question = require("leetcode.api.question")
 local utils = require("leetcode.utils")
+local ui_utils = require("leetcode-ui.utils")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 
@@ -95,8 +96,11 @@ end
 ---@param existed boolean
 function Question:open_buffer(existed)
     vim.api.nvim_win_set_buf(self.winid, self.bufnr)
-    vim.api.nvim_set_option_value("buflisted", true, { buf = self.bufnr })
-    vim.api.nvim_set_option_value("winfixbuf", true, { win = self.winid })
+    ui_utils.set_buf_opts(self.bufnr, { buflisted = true })
+
+    utils.with_version("0.10.0", function()
+        ui_utils.set_win_opts(self.winid, { winfixbuf = true })
+    end)
 
     local i = self:fold_range()
     if i then

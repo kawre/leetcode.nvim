@@ -1,7 +1,8 @@
 local log = require("leetcode.logger")
 local cookie = require("leetcode.cache.cookie")
 local config = require("leetcode.config")
-local utils = require("leetcode-ui.utils")
+local ui_utils = require("leetcode-ui.utils")
+local utils = require("leetcode.utils")
 local Renderer = require("leetcode-ui.renderer")
 local api = vim.api
 
@@ -123,7 +124,7 @@ end
 function Menu:apply_options()
     api.nvim_buf_set_name(self.bufnr, "")
 
-    utils.set_buf_opts(self.bufnr, {
+    ui_utils.set_buf_opts(self.bufnr, {
         modifiable = false,
         buflisted = false,
         matchpairs = "",
@@ -132,7 +133,7 @@ function Menu:apply_options()
         filetype = config.name,
         synmaxcol = 0,
     })
-    utils.set_win_opts(self.winid, {
+    ui_utils.set_win_opts(self.winid, {
         wrap = false,
         colorcolumn = "",
         foldlevel = 999,
@@ -144,8 +145,11 @@ function Menu:apply_options()
         list = false,
         spell = false,
         signcolumn = "no",
-        winfixbuf = true,
     })
+
+    utils.with_version("0.10.0", function()
+        ui_utils.set_win_opts(self.winid, { winfixbuf = true })
+    end)
 end
 
 function Menu:unmount()

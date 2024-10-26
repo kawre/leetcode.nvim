@@ -57,8 +57,12 @@ function Description:mount()
         spell = false,
         signcolumn = "no",
         linebreak = true,
-        winfixbuf = true,
     })
+
+    utils.with_version("0.10.0", function()
+        ui_utils.set_win_opts(self.winid, { winfixbuf = true })
+    end)
+
     if not img_ok and config.user.image_support then
         log.error("image.nvim not found but `image_support` is enabled")
     end
