@@ -135,9 +135,16 @@ function statistics.streak(cb)
             if err then
                 return cb(nil, err)
             end
+
             local data = res.data
             local streak = data["streakCounter"]
-            cb(streak)
+
+            if streak == vim.NIL then
+                err = { msg = "Failed to load streak counter" }
+                cb(nil, err)
+            else
+                cb(streak)
+            end
         end,
     })
 end
