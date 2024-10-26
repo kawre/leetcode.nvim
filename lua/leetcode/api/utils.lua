@@ -151,8 +151,9 @@ function utils.check_err(err)
 
     if err.status then
         if err.status == 401 or err.status == 403 then
-            require("leetcode.command").expire()
-            err.msg = "Session expired? Enter a new cookie to keep using `leetcode.nvim`"
+            -- require("leetcode.command").expire()
+            err.msg =
+                "Your cookie may have expired, or LeetCode has temporarily restricted API access"
         end
     end
 
