@@ -59,6 +59,13 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
         "nvim-treesitter/nvim-treesitter",
         "rcarriga/nvim-notify",
         "nvim-tree/nvim-web-devicons",
+        {
+            "3rd/image.nvim",
+            opts = {
+                max_width_window_percentage = 100,
+                window_overlap_clear_enabled = true,
+            }
+        },
     },
     opts = {
         -- 配置放在这里
