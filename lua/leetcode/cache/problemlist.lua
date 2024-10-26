@@ -32,6 +32,15 @@ function Problemlist.get()
     return Problemlist.read().data
 end
 
+---@return table<string, lc.cache.Question>
+function Problemlist.get_map()
+    local map = {}
+    for _, q in ipairs(Problemlist.get()) do
+        map[q.title_slug] = q
+    end
+    return map
+end
+
 ---@return lc.cache.payload
 function Problemlist.read()
     if not file:exists() then
