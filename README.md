@@ -147,6 +147,12 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         ["leave"] = {},
     },
 
+    ---@type lc.filename
+    filename = function(id, title, alias, extension)
+        local parts = alias and { id, title, alias, extension } or { id, title, extension }
+        return table.concat(parts, ".")
+    end,
+
     keys = {
         toggle = { "q" }, ---@type string|string[]
         confirm = { "<CR>" }, ---@type string|string[]
@@ -298,6 +304,21 @@ hooks = {
     ---@type fun()[]
     ["leave"] = {},
 },
+```
+
+### filename
+
+Custom function to both create and read questions
+
+`alias` can be `nil` and is used for differentiating between `Python` and
+`Python3` languages, since they share the same file extension `.py`
+
+```lua
+---@type lc.filename
+filename = function(id, title, alias, extension)
+    local parts = alias and { id, title, alias, extension } or { id, title, extension }
+    return table.concat(parts, ".")
+end,
 ```
 
 ### theme

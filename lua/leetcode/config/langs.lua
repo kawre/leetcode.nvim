@@ -6,7 +6,7 @@
 ---@field hl? string
 ---@field comment string
 ---@field ft string
----@field alt? string
+---@field alias? string
 
 ---@type lc.language[]
 return {
@@ -33,7 +33,7 @@ return {
         color = "#306998",
         ft = "py",
         comment = "#",
-        alt = "python2",
+        alias = "python2",
     },
     {
         lang = "Python3",

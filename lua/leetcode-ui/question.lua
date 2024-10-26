@@ -60,19 +60,11 @@ end
 ---@return string path, boolean existed
 function Question:path()
     local lang = utils.get_lang(self.lang)
-    local alt = lang.alt and ("." .. lang.alt) or ""
 
-    -- handle legacy file names first
-    local fn_legacy = --
-        ("%s.%s-%s.%s"):format(self.q.frontend_id, self.q.title_slug, lang.slug, lang.ft)
-    self.file = config.storage.home:joinpath(fn_legacy)
+    local id, title, alias, extension = self.q.frontend_id, self.q.title_slug, lang.alias, lang.ft
+    local filename = config.user.filename(id, title, alias, extension)
 
-    if self.file:exists() then
-        return self.file:absolute(), true
-    end
-
-    local fn = ("%s.%s%s.%s"):format(self.q.frontend_id, self.q.title_slug, alt, lang.ft)
-    self.file = config.storage.home:joinpath(fn)
+    self.file = config.storage.home:joinpath(filename)
     local existed = self.file:exists()
 
     if not existed then
