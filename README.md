@@ -308,10 +308,14 @@ hooks = {
 
 ### filename
 
-Custom function to both create and read questions
+This function is used for both creating and finding existing questions
 
-`alias` can be `nil` and is used for differentiating between `Python` and
-`Python3` languages, since they share the same file extension `.py`
+`alias` is an optional parameter used for differentiating between `Python` and
+`Python3` problems, since they share the same file extension `.py`
+
+> [!WARNING]
+> Modifying this function will make questions with old filenames not
+> discoverable
 
 ```lua
 ---@type lc.filename
