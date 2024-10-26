@@ -4,16 +4,11 @@
 
 🔥 Solve [LeetCode] problems within [Neovim] 🔥
 
-🇺🇸 English, 🇨🇳 <a href="README.zh.md">简体中文</a>
+<!-- 🇺🇸 English, 🇨🇳 <a href="README.zh.md">简体中文</a> -->
 
 </div>
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-123cb32b7563
-
-> [!CAUTION]
-> This plugin has been primarily tested with `Java`.
-> If you encounter any errors while using other languages,
-> please open an issue to report them.
 
 ## ✨ Features
 
