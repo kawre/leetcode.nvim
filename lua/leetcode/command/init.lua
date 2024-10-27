@@ -624,17 +624,17 @@ cmd.commands = {
     last_submit = { cmd.last_submit },
     restore = { cmd.restore },
     inject = { cmd.inject },
-    session = {
-        change = {
-            cmd.change_session,
-            _args = arguments.session_change,
-        },
-        create = {
-            cmd.create_session,
-            _args = arguments.session_create,
-        },
-        update = { cmd.update_sessions },
-    },
+    -- session = {
+    --     change = {
+    --         cmd.change_session,
+    --         _args = arguments.session_change,
+    --     },
+    --     create = {
+    --         cmd.create_session,
+    --         _args = arguments.session_create,
+    --     },
+    --     update = { cmd.update_sessions },
+    -- },
     list = {
         cmd.problems,
         _args = arguments.list,

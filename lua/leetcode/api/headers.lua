@@ -13,7 +13,7 @@ function headers.get()
         ["Content-Type"] = "application/json",
         ["Accept"] = "application/json",
         ["Host"] = ("leetcode.%s"):format(config.domain),
-        ["X-Requested-With"] = "XMLHttpRequest",
+        -- ["X-Requested-With"] = "XMLHttpRequest",
     }, cookie and {
         ["Cookie"] = cookie.str,
         ["x-csrftoken"] = cookie.csrftoken,

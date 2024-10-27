@@ -26,13 +26,13 @@ function Stats.update_sessions()
 
     Stats.progress = {}
 
-    stats_api.sessions(function(_, err)
-        if err then
-            return log.err(err)
-        end
-
-        _Lc_state.menu:draw()
-    end)
+    -- stats_api.sessions(function(_, err)
+    --     if err then
+    --         return log.err(err)
+    --     end
+    --
+    --     _Lc_state.menu:draw()
+    -- end)
 
     stats_api.session_progress(function(res, err)
         if err then
