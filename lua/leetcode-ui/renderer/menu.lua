@@ -124,7 +124,7 @@ end
 function Menu:apply_options()
     api.nvim_buf_set_name(self.bufnr, "")
 
-    ui_utils.set_buf_opts(self.bufnr, {
+    ui_utils.buf_set_opts(self.bufnr, {
         modifiable = false,
         buflisted = false,
         matchpairs = "",
@@ -133,7 +133,7 @@ function Menu:apply_options()
         filetype = config.name,
         synmaxcol = 0,
     })
-    ui_utils.set_win_opts(self.winid, {
+    ui_utils.win_set_opts(self.winid, {
         wrap = false,
         colorcolumn = "",
         foldlevel = 999,
@@ -146,10 +146,7 @@ function Menu:apply_options()
         spell = false,
         signcolumn = "no",
     })
-
-    utils.with_version("0.10.0", function()
-        ui_utils.set_win_opts(self.winid, { winfixbuf = true })
-    end)
+    ui_utils.win_set_winfixbuf(self.winid)
 end
 
 function Menu:unmount()

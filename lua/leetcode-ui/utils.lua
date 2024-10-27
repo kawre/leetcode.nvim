@@ -103,7 +103,7 @@ function utils.get_padding(lines, layout)
     return padding
 end
 
-function utils.set_buf_opts(bufnr, options)
+function utils.buf_set_opts(bufnr, options)
     if not vim.api.nvim_buf_is_valid(bufnr) then
         return
     end
@@ -116,7 +116,7 @@ function utils.set_buf_opts(bufnr, options)
     end
 end
 
-function utils.set_win_opts(winid, options)
+function utils.win_set_opts(winid, options)
     if not vim.api.nvim_win_is_valid(winid) then
         return
     end
@@ -128,6 +128,35 @@ function utils.set_win_opts(winid, options)
             log.error(err)
         end
     end
+end
+
+---@param winid number
+function utils.win_set_winfixbuf(winid)
+    local u = require("leetcode.utils")
+    u.with_version("0.10.0", function()
+        utils.win_set_opts(winid, { winfixbuf = true })
+    end)
+end
+
+---@param winid number
+---@param bufnr number
+---@param force? boolean
+function utils.win_set_buf(winid, bufnr, force)
+    local u = require("leetcode.utils")
+
+    u.with_version("0.10.0", function()
+        local wfb = vim.api.nvim_win_get_option(winid, "winfixbuf")
+
+        if not wfb then
+            vim.api.nvim_win_set_buf(winid, bufnr)
+        elseif force then
+            utils.win_set_opts(winid, { winfixbuf = false })
+            vim.api.nvim_win_set_buf(winid, bufnr)
+            utils.win_set_opts(winid, { winfixbuf = true })
+        end
+    end, function()
+        vim.api.nvim_win_set_buf(winid, bufnr)
+    end)
 end
 
 function utils.is_instance(instance, class)

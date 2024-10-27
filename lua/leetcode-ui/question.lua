@@ -89,18 +89,15 @@ function Question:create_buffer()
     vim.cmd("$tabe " .. path)
     self.bufnr = vim.api.nvim_get_current_buf()
     self.winid = vim.api.nvim_get_current_win()
+    ui_utils.win_set_winfixbuf(self.winid)
 
     self:open_buffer(existed)
 end
 
 ---@param existed boolean
 function Question:open_buffer(existed)
-    vim.api.nvim_win_set_buf(self.winid, self.bufnr)
-    ui_utils.set_buf_opts(self.bufnr, { buflisted = true })
-
-    utils.with_version("0.10.0", function()
-        ui_utils.set_win_opts(self.winid, { winfixbuf = true })
-    end)
+    ui_utils.buf_set_opts(self.bufnr, { buflisted = true })
+    ui_utils.win_set_buf(self.winid, self.bufnr, true)
 
     local i = self:fold_range()
     if i then
