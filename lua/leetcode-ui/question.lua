@@ -57,20 +57,36 @@ function Question:reset_lines()
     self:set_lines(new_lines)
 end
 
----@return string path, boolean existed
-function Question:path()
+function Question:filename()
     local lang = utils.get_lang(self.lang)
 
-    ---@type lc.filename
-    local generate_fn = config.user.filename
-        or function(id, title, alias, extension)
-            local parts = alias and { id, title, alias, extension } or { id, title, extension }
-            return table.concat(parts, ".")
+    local id, title, alias, extension = self.q.frontend_id, self.q.title_slug, lang.alias, lang.ft
+
+    local parts = alias and { id, title, alias, extension } or { id, title, extension }
+    local filename = table.concat(parts, ".")
+
+    if config.user.custom_filename then
+        local ok, cfn = pcall(config.user.custom_filename, id, title, alias, extension)
+
+        if ok then
+            return cfn
+        else
+            local err_msg = ("[opts.custom_filename]\n%s\nfalling back to `%s`"):format(
+                cfn,
+                filename
+            )
+            log.error(err_msg, true)
         end
+    end
 
-    local filename = generate_fn(self.q.frontend_id, self.q.title_slug, lang.alias, lang.ft)
+    return filename
+end
 
-    self.file = config.storage.home:joinpath(filename)
+---@return string path, boolean existed
+function Question:path()
+    local fn = self:filename()
+
+    self.file = config.storage.home:joinpath(fn)
     local existed = self.file:exists()
 
     if not existed then

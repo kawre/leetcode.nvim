@@ -115,7 +115,7 @@ local M = {
     },
 
     ---@type lc.filename|nil,
-    filename = nil,
+    custom_filename = nil,
 
     keys = {
         toggle = { "q" }, ---@type string|string[]

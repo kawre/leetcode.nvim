@@ -14,14 +14,10 @@ local function normalize(msg)
     return type(msg) == "string" and t(msg) or vim.inspect(msg)
 end
 
--- ---@private
--- ---@param msg any
--- ---@param lvl? integer
--- ---@return any
--- logger.log = vim.schedule_wrap(function(msg, lvl)
--- end)
-
-function logger.log(msg, lvl)
+---@param msg any
+---@param lvl? integer
+---@param schedule? boolean
+function logger.log(msg, lvl, schedule)
     if not config.user.logging then
         return
     end
@@ -34,27 +30,39 @@ function logger.log(msg, lvl)
         msg = debug.traceback(msg .. "\n")
     end
 
-    vim.notify(msg, lvl, { title = title })
+    local function notify_send()
+        vim.notify(msg, lvl, { title = title })
+    end
+
+    if schedule then
+        vim.schedule(notify_send)
+    else
+        notify_send()
+    end
 end
 
 ---@param msg any
-logger.info = function(msg)
-    logger.log(msg)
+---@param schedule? boolean
+logger.info = function(msg, schedule)
+    logger.log(msg, nil, schedule)
 end
 
 ---@param msg any
-logger.warn = function(msg)
-    logger.log(msg, lvls.WARN)
+---@param schedule? boolean
+logger.warn = function(msg, schedule)
+    logger.log(msg, lvls.WARN, schedule)
 end
 
 ---@param msg any
-logger.error = function(msg)
-    logger.log(msg, lvls.ERROR)
+---@param schedule? boolean
+logger.error = function(msg, schedule)
+    logger.log(msg, lvls.ERROR, schedule)
     logger.debug(msg)
 end
 
 ---@param err lc.err
-logger.err = function(err)
+---@param schedule? boolean
+logger.err = function(err, schedule)
     if not err then
         return logger.error("error")
     end
@@ -62,7 +70,7 @@ logger.err = function(err)
     local msg = err.msg or ""
     local lvl = err.lvl or lvls.ERROR
 
-    logger.log(msg, lvl)
+    logger.log(msg, lvl, schedule)
 end
 
 ---@param msg any

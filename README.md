@@ -303,7 +303,7 @@ hooks = {
 },
 ```
 
-### filename
+### custom filename
 
 This function is used for both creating and finding existing questions
 
@@ -312,7 +312,7 @@ This function is used for both creating and finding existing questions
 
 ```lua
 ---@type lc.filename
-filename = function(id, title, alias, extension)
+custom_filename = function(id, title, alias, extension)
     local parts = alias and { id, title, alias, extension } or { id, title, extension }
     return table.concat(parts, ".")
 end,
