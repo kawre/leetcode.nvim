@@ -19,7 +19,7 @@ icons.hl = {
     status = {
         ac = { icons.status.ac, "leetcode_easy" },
         notac = { icons.status.notac, "leetcode_medium" },
-        todo = { icons.status.todo, "leetcode_alt" },
+        -- todo = { icons.status.todo, "leetcode_alt" },
     },
     lock = { icons.lock, "leetcode_medium" },
     unlock = { icons.unlock, "leetcode_medium" },

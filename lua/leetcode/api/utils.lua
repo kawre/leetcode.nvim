@@ -212,7 +212,7 @@ function utils.normalize_problems(problems)
 
     return vim.tbl_map(function(p)
         return {
-            status = p.status,
+            status = p.status == vim.NIL and "todo" or p.status, -- api returns nil for todo
             id = p.stat.question_id,
             frontend_id = p.stat.frontend_question_id,
             title = p.stat.question__title,
