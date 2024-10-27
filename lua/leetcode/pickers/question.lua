@@ -38,9 +38,6 @@ local function display_user_status(question)
         return config.auth.is_premium and config.icons.hl.unlock or config.icons.hl.lock
     end
 
-    if question.status == vim.NIL then
-        return { "" }
-    end
     return config.icons.hl.status[question.status] or { "" }
 end
 
