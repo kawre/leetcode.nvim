@@ -199,7 +199,9 @@ function cmd.yank()
         and (q.winid and api.nvim_win_is_valid(q.winid))
     then
         api.nvim_set_current_win(q.winid)
-        api.nvim_set_current_buf(q.bufnr)
+        utils.with_version("0.10.0", nil, function()
+            api.nvim_set_current_buf(q.bufnr)
+        end)
 
         local start_i, end_i, lines = q:range()
         vim.cmd(("%d,%dyank"):format(start_i or 1, end_i or #lines))
