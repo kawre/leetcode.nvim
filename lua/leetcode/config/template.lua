@@ -38,7 +38,7 @@
 
 ---@alias lc.storage table<"cache"|"home", string>
 
----@alias lc.filename fun(id: string, title: string, alias: string|nil, extension: string): string
+---@alias lc.filename fun(id: string, title: string, alias?: string, extension: string): string
 
 ---@class lc.UserConfig
 local M = {
@@ -114,11 +114,8 @@ local M = {
         ["leave"] = {},
     },
 
-    ---@type lc.filename
-    filename = function(id, title, alias, extension)
-        local parts = alias and { id, title, alias, extension } or { id, title, extension }
-        return table.concat(parts, ".")
-    end,
+    ---@type lc.filename|nil,
+    filename = nil,
 
     keys = {
         toggle = { "q" }, ---@type string|string[]

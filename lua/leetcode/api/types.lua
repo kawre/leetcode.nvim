@@ -254,7 +254,7 @@
 
 ---@class lc.QuestionResponse
 ---@field id integer
----@field frontend_id integer
+---@field frontend_id string
 ---@field title string
 ---@field translated_title string
 ---@field title_slug string

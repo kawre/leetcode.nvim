@@ -61,8 +61,14 @@ end
 function Question:path()
     local lang = utils.get_lang(self.lang)
 
-    local id, title, alias, extension = self.q.frontend_id, self.q.title_slug, lang.alias, lang.ft
-    local filename = config.user.filename(id, title, alias, extension)
+    ---@type lc.filename
+    local generate_fn = config.user.filename
+        or function(id, title, alias, extension)
+            local parts = alias and { id, title, alias, extension } or { id, title, extension }
+            return table.concat(parts, ".")
+        end
+
+    local filename = generate_fn(self.q.frontend_id, self.q.title_slug, lang.alias, lang.ft)
 
     self.file = config.storage.home:joinpath(filename)
     local existed = self.file:exists()

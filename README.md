@@ -147,11 +147,8 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         ["leave"] = {},
     },
 
-    ---@type lc.filename
-    filename = function(id, title, alias, extension)
-        local parts = alias and { id, title, alias, extension } or { id, title, extension }
-        return table.concat(parts, ".")
-    end,
+    ---@type lc.filename|nil,
+    filename = nil,
 
     keys = {
         toggle = { "q" }, ---@type string|string[]
@@ -312,10 +309,6 @@ This function is used for both creating and finding existing questions
 
 `alias` is an optional parameter used for differentiating between `Python` and
 `Python3` problems, since they share the same file extension `.py`
-
-> [!WARNING]
-> Modifying this function will make questions with old filenames not
-> discoverable
 
 ```lua
 ---@type lc.filename
