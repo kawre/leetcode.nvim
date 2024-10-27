@@ -177,10 +177,11 @@ end
 function cmd.menu()
     local winid, bufnr = _Lc_state.menu.winid, _Lc_state.menu.bufnr
     local ok, tabp = pcall(api.nvim_win_get_tabpage, winid)
+    local ui = require("leetcode-ui.utils")
 
     if ok then
         api.nvim_set_current_tabpage(tabp)
-        api.nvim_win_set_buf(winid, bufnr)
+        ui.win_set_buf(winid, bufnr)
     else
         _Lc_state.menu:remount()
     end
@@ -198,7 +199,9 @@ function cmd.yank()
         and (q.winid and api.nvim_win_is_valid(q.winid))
     then
         api.nvim_set_current_win(q.winid)
-        api.nvim_set_current_buf(q.bufnr)
+        utils.with_version("0.10.0", nil, function()
+            api.nvim_set_current_buf(q.bufnr)
+        end)
 
         local start_i, end_i, lines = q:range()
         vim.cmd(("%d,%dyank"):format(start_i or 1, end_i or #lines))
@@ -358,6 +361,7 @@ end
 
 function cmd.restore()
     local utils = require("leetcode.utils")
+    local ui = require("leetcode-ui.utils")
     local q = utils.curr_question()
     if not q then
         return
@@ -367,7 +371,7 @@ function cmd.restore()
         (q.winid and api.nvim_win_is_valid(q.winid))
         and (q.bufnr and api.nvim_buf_is_valid(q.bufnr))
     then
-        api.nvim_win_set_buf(q.winid, q.bufnr)
+        ui.win_set_buf(q.winid, q.bufnr)
     end
 
     q.description:show()
@@ -377,7 +381,7 @@ function cmd.restore()
         (winid and api.nvim_win_is_valid(winid)) --
         and (bufnr and api.nvim_buf_is_valid(bufnr))
     then
-        api.nvim_win_set_buf(winid, bufnr)
+        ui.win_set_buf(q.winid, q.bufnr)
     end
 end
 

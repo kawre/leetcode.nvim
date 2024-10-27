@@ -5,6 +5,7 @@ local Object = require("nui.object")
 
 local api_question = require("leetcode.api.question")
 local utils = require("leetcode.utils")
+local ui_utils = require("leetcode-ui.utils")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 
@@ -88,14 +89,15 @@ function Question:create_buffer()
     vim.cmd("$tabe " .. path)
     self.bufnr = vim.api.nvim_get_current_buf()
     self.winid = vim.api.nvim_get_current_win()
+    ui_utils.win_set_winfixbuf(self.winid)
 
     self:open_buffer(existed)
 end
 
 ---@param existed boolean
 function Question:open_buffer(existed)
-    vim.api.nvim_win_set_buf(self.winid, self.bufnr)
-    vim.api.nvim_set_option_value("buflisted", true, { buf = self.bufnr })
+    ui_utils.buf_set_opts(self.bufnr, { buflisted = true })
+    ui_utils.win_set_buf(self.winid, self.bufnr, true)
 
     local i = self:fold_range()
     if i then

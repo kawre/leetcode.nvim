@@ -138,4 +138,10 @@ function utils.norm_ins(str)
     return ins:sub(2, #ins - 1)
 end
 
+function utils.with_version(v, with, without)
+    with = with or function() end
+    without = without or function() end
+    return (vim.fn.has("nvim-" .. v) == 1 and with or without)()
+end
+
 return utils

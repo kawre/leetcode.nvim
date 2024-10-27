@@ -34,7 +34,7 @@ function Description:mount()
     self:populate()
 
     local ui_utils = require("leetcode-ui.utils")
-    ui_utils.set_buf_opts(self.bufnr, {
+    ui_utils.buf_set_opts(self.bufnr, {
         modifiable = false,
         buflisted = false,
         matchpairs = "",
@@ -43,7 +43,7 @@ function Description:mount()
         filetype = config.name,
         synmaxcol = 0,
     })
-    ui_utils.set_win_opts(self.winid, {
+    ui_utils.win_set_opts(self.winid, {
         winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
         wrap = not img_sup,
         colorcolumn = "",
@@ -58,6 +58,8 @@ function Description:mount()
         signcolumn = "no",
         linebreak = true,
     })
+    ui_utils.win_set_winfixbuf(self.winid)
+
     if not img_ok and config.user.image_support then
         log.error("image.nvim not found but `image_support` is enabled")
     end

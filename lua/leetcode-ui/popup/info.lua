@@ -134,12 +134,12 @@ function Info:mount()
     local ui_utils = require("leetcode-ui.utils")
     local winhighlight = "Normal:NormalSB,FloatBorder:FloatBorder"
 
-    ui_utils.set_win_opts(self.winid, {
+    ui_utils.win_set_opts(self.winid, {
         winhighlight = winhighlight,
         wrap = true,
     })
 
-    ui_utils.set_win_opts(self.border.winid, {
+    ui_utils.win_set_opts(self.border.winid, {
         winhighlight = winhighlight,
     })
 
