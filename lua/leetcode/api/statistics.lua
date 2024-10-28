@@ -154,6 +154,9 @@ function statistics.sessions(cb)
     local url = urls.session
 
     utils.post(url, {
+        headers = {
+            ["X-Requested-With"] = "XMLHttpRequest",
+        },
         body = vim.empty_dict(),
         callback = function(res, err)
             if err then
@@ -174,6 +177,9 @@ function statistics.change_session(id, cb)
     local url = urls.session
 
     utils.put(url, {
+        headers = {
+            ["X-Requested-With"] = "XMLHttpRequest",
+        },
         body = body,
         callback = function(res, err)
             if err then
@@ -194,6 +200,9 @@ function statistics.create_session(name, cb)
     local url = urls.session
 
     utils.put(url, {
+        headers = {
+            ["X-Requested-With"] = "XMLHttpRequest",
+        },
         body = body,
         callback = function(res, err)
             if err then
