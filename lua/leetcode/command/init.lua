@@ -304,19 +304,23 @@ function cmd.open()
     local q = utils.curr_question()
 
     if q then
-        local command
-        local os_name = vim.loop.os_uname().sysname
-
-        if os_name == "Linux" then
-            command = string.format("xdg-open '%s'", q.cache.link)
-        elseif os_name == "Darwin" then
-            command = string.format("open '%s'", q.cache.link)
+        if vim.ui.open then
+            vim.ui.open(q.cache.link)
         else
-            -- Fallback to Windows if uname is not available or does not match Linux/Darwin.
-            command = string.format("start \"\" \"%s\"", q.cache.link)
-        end
+            local command
+            local os_name = vim.loop.os_uname().sysname
 
-        vim.fn.jobstart(command, { detach = true })
+            if os_name == "Linux" then
+                command = string.format("xdg-open '%s'", q.cache.link)
+            elseif os_name == "Darwin" then
+                command = string.format("open '%s'", q.cache.link)
+            else
+                -- Fallback to Windows if uname is not available or does not match Linux/Darwin.
+                command = string.format("start \"\" \"%s\"", q.cache.link)
+            end
+
+            vim.fn.jobstart(command, { detach = true })
+        end
     end
 end
 
