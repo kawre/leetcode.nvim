@@ -49,7 +49,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     dependencies = {
         "nvim-telescope/telescope.nvim",
         "nvim-lua/plenary.nvim", -- required by telescope
-        "MunifTanjim/nui.nvim",
+        "kawre/markup.nvim",
     },
     opts = {
         -- configuration goes here
