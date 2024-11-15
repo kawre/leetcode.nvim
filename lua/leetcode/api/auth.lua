@@ -48,7 +48,8 @@ function Auth.handle(res, err)
         return nil, err
     end
 
-    config.auth = log.debug(auth) ---@diagnostic disable-line
+    config.auth = auth
+    log.debug(auth)
     return auth
 end
 

@@ -91,8 +91,9 @@ M.get = function()
         -- menu button
         menu_button_icon = hl("Special"),
         menu_button_title = hl("Normal"),
-        menu_button_key = hl("Character"),
-
+        menu_button_nested = { fg = hl("Comment").fg },
+        menu_button_key = { fg = hl("Character").fg, italic = true },
+        -- menu footer
         menu_footer = hl("Comment"),
         menu_footer_username = hl("Label"),
     }
