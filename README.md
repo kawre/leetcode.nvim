@@ -45,16 +45,11 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 ```lua
 {
     "kawre/leetcode.nvim",
-    build = ":TSUpdate html",
+    build = ":TSUpdate html", -- if you have nvim-treesitter installed
     dependencies = {
         "nvim-telescope/telescope.nvim",
         "nvim-lua/plenary.nvim", -- required by telescope
         "MunifTanjim/nui.nvim",
-
-        -- optional
-        "nvim-treesitter/nvim-treesitter",
-        "rcarriga/nvim-notify",
-        "nvim-tree/nvim-web-devicons",
     },
     opts = {
         -- configuration goes here

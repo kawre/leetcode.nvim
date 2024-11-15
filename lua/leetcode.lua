@@ -60,11 +60,12 @@ function leetcode.start(on_vimenter)
         vim.cmd.enew()
     end
 
-    local Menu = require("leetcode-ui.renderer.menu")
+    -- local Menu = require("leetcode-ui.renderer.menu")
+    local Menu = require("leetcode.ui.menu")
     Menu():mount()
 
-    local utils = require("leetcode.utils")
-    utils.exec_hooks("enter")
+    -- local utils = require("leetcode.utils")
+    -- utils.exec_hooks("enter")
 
     return true
 end

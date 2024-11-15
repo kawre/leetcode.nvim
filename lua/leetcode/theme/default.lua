@@ -82,6 +82,19 @@ M.get = function()
 
         all = { fg = hl("Normal").fg },
         all_alt = { fg = "#45475b" },
+
+        -- menu
+        menu_header = { fg = hl("Keyword").fg, bold = true },
+        menu_title = { fg = hl("Function").fg },
+        menu_title_inactive = hl("Comment"),
+        menu_title_separator = { fg = hl("Special").fg },
+        -- menu button
+        menu_button_icon = hl("Special"),
+        menu_button_title = hl("Normal"),
+        menu_button_key = hl("Character"),
+
+        menu_footer = hl("Comment"),
+        menu_footer_username = hl("Label"),
     }
 end
 
