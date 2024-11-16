@@ -1,5 +1,7 @@
 local markup = require("markup")
 
-return function()
-    return markup.Inline("loading...")
-end
+return markup.Component({
+    render = function()
+        return markup.Inline("loading...")
+    end,
+})

@@ -24,16 +24,21 @@ function Menu:set_page(page)
     self:draw()
 end
 
-function Menu:body()
-    return markup.Flex({
-        align = "center",
-        spacing = 3,
-        children = {
-            Header(),
-            Nav(self.page),
-            Footer(),
-        },
+function Menu:render()
+    self:set_body({
+        markup.Flex({
+            margin = { top = 3 },
+            align = "center",
+            spacing = 3,
+            children = {
+                Header(),
+                Nav({ page = self.page }),
+                Footer(),
+            },
+        }),
     })
+
+    Menu.super.render(self)
 end
 
 function Menu:draw()

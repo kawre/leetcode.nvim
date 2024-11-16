@@ -1,14 +1,17 @@
 local markup = require("markup")
 
-return function(history)
-    local titles = {}
+return markup.Component(function(self)
+    local page = self.props.page
 
-    for i, title in ipairs(history or {}) do
+    local titles = {}
+    local parts = vim.split(page, ".", { plain = true })
+
+    for i, title in ipairs(parts) do
         title = title:gsub("^%l", string.upper)
-        local hl = i == #history and "leetcode_menu_title" or "leetcode_menu_title_inactive"
+        local hl = i == #parts and "leetcode_menu_title" or "leetcode_menu_title_inactive"
         table.insert(titles, markup.Inline(title, hl))
 
-        if i ~= #history then
+        if i ~= #parts then
             table.insert(titles, markup.Inline("  ", "leetcode_menu_title_separator"))
         end
     end
@@ -17,4 +20,4 @@ return function(history)
         vertical = false,
         children = titles,
     })
-end
+end)

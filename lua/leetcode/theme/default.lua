@@ -95,7 +95,7 @@ M.get = function()
         menu_button_key = { fg = hl("Character").fg, italic = true },
         -- menu footer
         menu_footer = hl("Comment"),
-        menu_footer_username = hl("Label"),
+        menu_footer_username = hl("Constant"),
     }
 end
 
