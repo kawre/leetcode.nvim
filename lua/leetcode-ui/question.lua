@@ -205,7 +205,7 @@ function Question:handle_mount()
     table.insert(_Lc_state.questions, self)
 
     self:autocmds()
-    utils.exec_hooks("question_enter", self)
+    utils.exec_hook("question_enter", self)
 
     return self
 end
@@ -301,7 +301,7 @@ Question.change_lang = vim.schedule_wrap(function(self, lang)
         self:open_buffer(existed)
 
         if not loaded then
-            utils.exec_hooks("question_enter", self)
+            utils.exec_hook("question_enter", self)
         end
     end)
 

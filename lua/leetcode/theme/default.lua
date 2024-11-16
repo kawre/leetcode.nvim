@@ -87,7 +87,7 @@ M.get = function()
         menu_header = { fg = hl("Keyword").fg, bold = true },
         menu_title = { fg = hl("Function").fg },
         menu_title_inactive = hl("Comment"),
-        menu_title_separator = { fg = hl("Special").fg },
+        menu_title_deli = { fg = hl("Special").fg },
         -- menu button
         menu_button_icon = hl("Special"),
         menu_button_title = hl("Normal"),
@@ -96,6 +96,14 @@ M.get = function()
         -- menu footer
         menu_footer = hl("Comment"),
         menu_footer_username = hl("Constant"),
+
+        -- description
+        description = { fg = hl("Comment").fg },
+        description_header = { fg = hl("Comment").fg },
+        description_header_title = { fg = hl("Normal").fg },
+        description_header_stat = { fg = hl("Comment").fg },
+        description_header_deli = { fg = hl("Normal").fg },
+        description_header_hint = { fg = hl("DiagnosticHint").fg },
     }
 end
 

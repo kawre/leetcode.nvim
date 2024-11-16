@@ -1,6 +1,5 @@
 local markup = require("markup")
 local Title = require("leetcode.ui.menu.title")
-local log = require("leetcode.logger")
 
 return markup.Component(function(self)
     local page = self.props.page

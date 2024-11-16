@@ -3,7 +3,7 @@ local t = require("leetcode.translator")
 local utils = require("leetcode.utils")
 local ui_utils = require("leetcode-ui.utils")
 
-local Question = require("leetcode-ui.question")
+local Problem = require("leetcode.ui.problem")
 
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
@@ -137,7 +137,7 @@ return {
                         end
 
                         actions.close(prompt_bufnr)
-                        Question(q):mount()
+                        Problem(q)
                     end)
 
                     return true

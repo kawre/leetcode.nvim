@@ -13,6 +13,8 @@ local icons = {
     caret = {
         right = "",
     },
+    like = "",
+    dislike = "",
 }
 
 icons.hl = {

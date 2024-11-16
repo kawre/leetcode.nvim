@@ -99,7 +99,7 @@ function utils.get_hooks(event)
 end
 
 ---@param event lc.hook
-function utils.exec_hooks(event, ...)
+function utils.exec_hook(event, ...)
     local fns = utils.get_hooks(event)
     if not fns then
         return log.error("unknown hook event: " .. event)

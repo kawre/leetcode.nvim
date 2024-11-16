@@ -12,7 +12,7 @@ return markup.Component(function(self)
         table.insert(titles, markup.Inline(title, hl))
 
         if i ~= #parts then
-            table.insert(titles, markup.Inline("  ", "leetcode_menu_title_separator"))
+            table.insert(titles, markup.Inline("  ", "leetcode_menu_title_deli"))
         end
     end
 
