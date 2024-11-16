@@ -160,3 +160,13 @@ queries.session_progress = [[
             }
         }
     ]]
+
+queries.streak = [[
+        query questionCompanyTags {
+            companyTags {
+                name
+                slug
+                questionCount
+            }
+        }
+    ]]
