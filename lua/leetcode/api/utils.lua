@@ -185,6 +185,29 @@ function utils.lvl_to_name(lvl)
     return ({ "Easy", "Medium", "Hard" })[lvl]
 end
 
+function utils.normalize_favorites(questions)
+    local diff = {
+        EASY = 1,
+        MEDIUM = 2,
+        HARD = 3,
+    }
+    return vim.tbl_map(function(q)
+        return {
+            id = q.id,
+            frontend_id = tonumber(q.questionFrontendId),
+            title = q.title,
+            title_slug = q.titleSlug,
+            title_cn = "",
+            paid_only = q.paidOnly,
+            link = ("https://leetcode.%s/problems/%s/"):format(config.domain, q.titleSlug),
+            ac_rate = 0,
+            difficulty = utils.lvl_to_name(diff[q.difficulty]),
+            starred = true,
+            topic_tags = {},
+        }
+    end, questions)
+end
+
 ---@return lc.cache.Question[]
 function utils.normalize_problems(problems)
     problems = vim.tbl_filter(function(p)
