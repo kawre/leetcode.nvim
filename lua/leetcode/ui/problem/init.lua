@@ -1,6 +1,6 @@
 local Description = require("leetcode.ui.problem.description")
+local Info = require("leetcode.ui.problem.info")
 local Console = require("leetcode-ui.layout.console")
-local Info = require("leetcode-ui.popup.info")
 local Window = require("leetcode.ui.problem.window")
 local markup = require("markup")
 
@@ -168,7 +168,7 @@ function Problem:handle_mount()
 
     self.description = Description(self)
     -- self.console = Console(self)
-    -- self.info = Info(self)
+    self.info = Info(self)
 
     table.insert(_Lc_state.questions, self)
 

@@ -49,7 +49,7 @@ function Auth.handle(res, err)
     end
 
     config.auth = auth
-    log.debug(auth)
+    -- log.debug(auth)
     return auth
 end
 

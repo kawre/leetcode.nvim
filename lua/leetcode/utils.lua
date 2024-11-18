@@ -144,4 +144,22 @@ function utils.with_version(v, with, without)
     return (vim.fn.has("nvim-" .. v) == 1 and with or without)()
 end
 
+---@param diff string
+function utils.diff_to_hl(diff)
+    local hl = {
+        all = "leetcode_all",
+
+        easy = "leetcode_easy",
+        fundamental = "leetcode_easy",
+
+        medium = "leetcode_medium",
+        intermediate = "leetcode_medium",
+
+        hard = "leetcode_hard",
+        advanced = "leetcode_hard",
+    }
+
+    return hl[diff:lower()] or ""
+end
+
 return utils

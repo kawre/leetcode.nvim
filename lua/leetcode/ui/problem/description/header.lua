@@ -38,11 +38,6 @@ local Stats = markup.Component(function(self)
 
     local ac_rate = info.stats.acRate
     local total_sub = info.stats.totalSubmission
-    -- header:append(("%s %s %s"):format(ac_rate, t("of"), total_sub), "leetcode_alt")
-    -- if not vim.tbl_isempty(info.hints) then
-    --     header:append((" %s "):format(config.icons.bar))
-    --     header:append("󰛨 " .. t("Hints"), "leetcode_hint")
-    -- end
     local hints = info.hints
 
     return markup.HFlex({
@@ -72,7 +67,7 @@ return markup.Component(function(self)
     return markup.Flex({
         align = "center",
         spacing = 1,
-        margin = { 1, 0 },
+        margin = { 1, 0, 2 },
         style = { link = hl() },
         children = {
             Title(info),

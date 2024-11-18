@@ -1,5 +1,6 @@
 local Header = require("leetcode.ui.problem.description.header")
 local Content = require("leetcode.ui.problem.description.content")
+local utils = require("leetcode.utils")
 
 local markup = require("markup")
 
@@ -16,6 +17,9 @@ function Description:init(problem)
             vertical = true,
             width = 0.4,
         },
+        win_opts = {
+            wrap = true,
+        },
     })
 
     self.problem = problem
@@ -28,7 +32,7 @@ function Description:build()
             cache = self.problem.cache,
             info = self.problem.q,
         }),
-        Content(),
+        Content(utils.translate(self.problem.q.content, self.problem.q.translated_content)),
     })
     self:render()
 end

@@ -15,6 +15,7 @@ local icons = {
     },
     like = "",
     dislike = "",
+    list = "",
 }
 
 icons.hl = {

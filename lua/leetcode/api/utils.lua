@@ -105,7 +105,7 @@ end
 ---@return table, lc.err
 function utils.handle_res(out)
     local res, err
-    log.debug(out)
+    -- log.debug(out)
 
     if out.exit ~= 0 then
         err = {

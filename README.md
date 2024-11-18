@@ -24,7 +24,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
 ## 📬 Requirements
 
-- [Neovim] >= 0.9.0
+- [Neovim] >= 0.10.0
 
 - [telescope.nvim]
 

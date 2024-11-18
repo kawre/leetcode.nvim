@@ -72,7 +72,7 @@ end
 function config.validate()
     local utils = require("leetcode.utils")
 
-    assert(vim.fn.has("nvim-0.9.0") == 1, "Neovim >= 0.9.0 required")
+    assert(vim.fn.has("nvim-0.10.0") == 1, "Neovim >= 0.10.0 required")
 
     if not utils.get_lang(config.lang) then
         ---@type lc.lang[]
