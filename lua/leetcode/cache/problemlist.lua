@@ -146,18 +146,9 @@ end
 ---@field problems { id: string, tags: string[] }[] List of problem definitions
 ---@field source string Source file path
 local function parse_custom_list(filepath)
-    print("Attempting to open file: " .. tostring(filepath))
-
-    -- Check if filepath is nil or empty
-    if not filepath or filepath == "" then
-        error("No filepath provided")
-    end
-
-    -- Attempt to resolve and expand the path
     local expanded_path = vim.fn.expand(filepath)
-    print("Expanded path: " .. tostring(expanded_path))
-
-    -- Check file existence before trying to open
+    
+    -- Check file existence 
     if not vim.fn.filereadable(expanded_path) then
         error(("File does not exist or is not readable: %s"):format(expanded_path))
     end
