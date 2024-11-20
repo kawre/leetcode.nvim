@@ -142,4 +142,140 @@ function Problemlist.delete()
     return pcall(path.rm, file)
 end
 
+---@class lc.filter.CustomList
+---@field problems { id: string, tags: string[] }[] List of problem definitions
+---@field source string Source file path
+local function parse_custom_list(filepath)
+    print("Attempting to open file: " .. tostring(filepath))
+
+    -- Check if filepath is nil or empty
+    if not filepath or filepath == "" then
+        error("No filepath provided")
+    end
+
+    -- Attempt to resolve and expand the path
+    local expanded_path = vim.fn.expand(filepath)
+    print("Expanded path: " .. tostring(expanded_path))
+
+    -- Check file existence before trying to open
+    if not vim.fn.filereadable(expanded_path) then
+        error(("File does not exist or is not readable: %s"):format(expanded_path))
+    end
+
+    local file = io.open(expanded_path, "r")
+    if not file then
+        error(("Cannot open custom filter file: %s"):format(filepath))
+    end
+
+    local problems = {}
+    local file_ext = filepath:match("%.([^%.]+)$")
+    
+    if file_ext == "json" then
+        local content = file:read("*all")
+        file:close()
+        
+        local ok, decoded = pcall(vim.json.decode, content)
+        if not ok then
+            error(("Invalid JSON in file: %s"):format(filepath))
+        end
+        
+        -- Support both simple arrays and structured format
+        if type(decoded) == "table" then
+            if decoded[1] then -- Simple array format
+                for _, item in ipairs(decoded) do
+                    problems[#problems + 1] = {
+                        id = tostring(item),
+                        tags = {}
+                    }
+                end
+            else -- Structured format
+                for group, items in pairs(decoded) do
+                    for _, item in ipairs(items) do
+                        problems[#problems + 1] = {
+                            id = tostring(item),
+                            tags = { group }
+                        }
+                    end
+                end
+            end
+        end
+    else -- Assume text file
+        for line in file:lines() do
+            line = line:match("^%s*(.-)%s*$")
+            if line ~= "" and not line:match("^#") then
+                local id, tags = line:match("([^|]+)|?(.*)")
+                if id then
+                    problems[#problems + 1] = {
+                        id = id:match("^%s*(.-)%s*$"),
+                        tags = vim.split(tags, ",")
+                    }
+                end
+            end
+        end
+        file:close()
+    end
+
+    return {
+        problems = problems,
+        source = filepath
+    }
+end
+
+---@param problems lc.cache.Question[]
+---@param custom_list lc.filter.CustomList
+---@param options lc.filter.Options
+---@return lc.cache.Question[]
+local function filter_by_custom_list(problems, custom_list, options)
+    local filtered = {}
+    local problem_map = {}
+    
+    -- Create lookup maps for both title slugs and problem IDs
+    for _, problem in ipairs(problems) do
+        problem_map[problem.title_slug] = problem
+        problem_map[problem.frontend_id] = problem
+    end
+
+    -- Filter problems based on the custom list
+    for _, item in ipairs(custom_list.problems) do
+        local problem = problem_map[item.id]
+        if problem then
+            -- Apply additional filters if specified
+            if options then
+                local matches = true
+                
+                -- Apply difficulty filter
+                if options.difficulty and problem.difficulty ~= options.difficulty then
+                    matches = false
+                end
+                
+                -- Apply status filter
+                if matches and options.status and options.status ~= "any" then
+                    if options.status == "ac" and problem.status ~= "ac" then
+                        matches = false
+                    elseif options.status == "notac" and problem.status == "ac" then
+                        matches = false
+                    end
+                end
+                
+                if matches then
+                    table.insert(filtered, problem)
+                end
+            else
+                table.insert(filtered, problem)
+            end
+        end
+    end
+
+    return filtered
+end
+
+---@param filepath string Path to custom filter file
+---@param options? lc.filter.Options Additional filters to apply
+---@return lc.cache.Question[]
+function Problemlist.filter_by_file(filepath, options)
+    local problems = Problemlist.get()
+    local custom_list = parse_custom_list(filepath)
+    return filter_by_custom_list(problems, custom_list, options)
+end
+
 return Problemlist
