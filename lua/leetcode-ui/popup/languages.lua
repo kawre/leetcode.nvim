@@ -29,10 +29,18 @@ function Languages:handle(res)
 
     if config.translator then
         lines:append("解题数", "leetcode_alt")
-        lines:append(" " .. res.problems_solved)
+        if res.problems_solved == 1 then
+            lines:append(" problem solved", "leetcode_alt")
+        else
+            lines:append(" problems solved", "leetcode_alt")
+        end
     else
         lines:append("" .. res.problems_solved)
-        lines:append(" problems solved", "leetcode_alt")
+        if res.problems_solved == 1 then
+            lines:append(" problem solved", "leetcode_alt")
+        else
+            lines:append(" problems solved", "leetcode_alt")
+        end
     end
 
     return lines
