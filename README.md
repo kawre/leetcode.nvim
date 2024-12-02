@@ -34,8 +34,6 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
   used for formatting the question description.
   Can be installed with [nvim-treesitter].
 
-- [nvim-notify] _**(optional)**_
-
 - [Nerd Font][nerd-font] & [nvim-web-devicons] _**(optional)**_
 
 ## 📦 Installation
@@ -53,7 +51,6 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
         -- optional
         "nvim-treesitter/nvim-treesitter",
-        "rcarriga/nvim-notify",
         "nvim-tree/nvim-web-devicons",
     },
     opts = {
@@ -493,7 +490,6 @@ You can then exit [leetcode.nvim] using `:Leet exit` command
 [neovim]: https://github.com/neovim/neovim
 [nerd-font]: https://www.nerdfonts.com
 [nui.nvim]: https://github.com/MunifTanjim/nui.nvim
-[nvim-notify]: https://github.com/rcarriga/nvim-notify
 [nvim-treesitter]: https://github.com/nvim-treesitter/nvim-treesitter
 [nvim-web-devicons]: https://github.com/nvim-tree/nvim-web-devicons
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim

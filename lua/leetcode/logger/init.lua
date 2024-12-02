@@ -1,8 +1,3 @@
-local n_ok, notify = pcall(require, "notify")
-if n_ok then
-    vim.notify = notify
-end
-
 local config = require("leetcode.config")
 local t = require("leetcode.translator")
 local lvls = vim.log.levels
