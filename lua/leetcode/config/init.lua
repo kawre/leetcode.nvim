@@ -21,6 +21,7 @@ local config = {
     version = "1.0.1",
     storage = {}, ---@type table<string, Path>
     theme = {}, ---@type lc.highlights
+    plugins = {},
 
     translator = false,
 
@@ -98,6 +99,7 @@ function config.validate()
 end
 
 function config.load_plugins()
+    config.plugins = {}
     local plugins = {}
 
     if config.user.cn.enabled then
@@ -119,6 +121,7 @@ function config.load_plugins()
             else
                 table.insert(lazy_plugs, plug.load)
             end
+            config.plugins[plugin] = true
         else
             table.insert(lazy_plugs, function()
                 local log = require("leetcode.logger")

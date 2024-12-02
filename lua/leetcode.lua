@@ -3,38 +3,81 @@ local config = require("leetcode.config")
 ---@class lc.LeetCode
 local leetcode = {}
 
+---@private
+local function log_failed_to_init()
+    local log = require("leetcode.logger")
+    log.warn("Failed to initialize: `neovim` contains listed buffers")
+end
+
+local function log_buf_not_empty(bufname)
+    local log = require("leetcode.logger")
+    if bufname and bufname ~= "" then
+        log.warn(("Failed to initialize: `%s` is not an empty buffer"):format(bufname))
+    else
+        log.warn("Failed to initialize: not an empty buffer")
+    end
+end
+
+local function buf_is_empty(buf)
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, true)
+    return not (#lines > 1 or (#lines == 1 and lines[1]:len() > 0))
+end
+
 ---@param on_vimenter boolean
 ---
----@return boolean
+---@return boolean, boolean? (skip, standalone)
 function leetcode.should_skip(on_vimenter)
     if on_vimenter then
-        if vim.fn.argc() ~= 1 then
+        if vim.fn.argc(-1) ~= 1 then
             return true
         end
 
-        local usr_arg, arg = config.user.arg, vim.fn.argv()[1]
+        local usr_arg, arg = config.user.arg, vim.fn.argv(0, -1)
         if usr_arg ~= arg then
             return true
         end
 
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
-        if #lines > 1 or (#lines == 1 and lines[1]:len() > 0) then
-            local log = require("leetcode.logger")
-            log.warn(("Failed to initialize: `%s` is not an empty buffer"):format(usr_arg))
+        if not buf_is_empty(0) then
+            log_buf_not_empty(usr_arg)
             return true
         end
+
+        return false, true
     else
-        for _, buf_id in pairs(vim.api.nvim_list_bufs()) do
-            local bufinfo = vim.fn.getbufinfo(buf_id)[1]
-            if bufinfo and (bufinfo.listed == 1 and #bufinfo.windows > 0) then
-                local log = require("leetcode.logger")
-                log.warn("Failed to initialize: `neovim` contains listed buffers")
+        local listed_bufs = vim.tbl_filter(function(info)
+            return info.listed == 1
+        end, vim.fn.getbufinfo())
+
+        if #listed_bufs == 0 then
+            return false, true
+        elseif vim.fn.argc(-1) == 0 and #listed_bufs == 1 then
+            local buf = listed_bufs[1]
+
+            if vim.api.nvim_get_current_buf() ~= buf.bufnr then
+                if config.plugins.non_standalone then
+                    return false, false
+                else
+                    log_failed_to_init()
+                    return true
+                end
+            end
+
+            vim.schedule(function()
+                if buf.changed == 1 then
+                    vim.api.nvim_buf_delete(buf.bufnr, { force = true })
+                end
+            end)
+
+            return false, true
+        elseif #listed_bufs >= 1 then
+            if config.plugins.non_standalone then
+                return false, false
+            else
+                log_failed_to_init()
                 return true
             end
         end
     end
-
-    return false
 end
 
 function leetcode.setup_cmds()
@@ -43,7 +86,8 @@ end
 
 ---@param on_vimenter boolean
 function leetcode.start(on_vimenter)
-    if leetcode.should_skip(on_vimenter) then
+    local skip = leetcode.should_skip(on_vimenter)
+    if skip then
         return false
     end
 

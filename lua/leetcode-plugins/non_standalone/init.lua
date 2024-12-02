@@ -5,7 +5,7 @@ non_standalone.opts = {
     lazy = false,
 }
 
-function non_standalone.load() --
+function non_standalone.load()
     require("leetcode-plugins.non_standalone.leetcode")
 end
 
