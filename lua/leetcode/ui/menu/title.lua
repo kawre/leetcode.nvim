@@ -1,7 +1,7 @@
 local markup = require("markup")
 
 return markup.Component(function(self)
-    local page = self.props.page
+    local page = self.props
 
     local titles = {}
     local parts = vim.split(page, ".", { plain = true })

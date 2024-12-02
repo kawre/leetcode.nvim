@@ -3,7 +3,7 @@ local P = require("plenary.path")
 
 _Lc_state = {
     menu = nil, ---@type lc.ui.Menu
-    questions = {}, ---@type lc.ui.Question[]
+    questions = {}, ---@type leet.ui.Problem[]
 }
 
 local lazy_plugs = {}

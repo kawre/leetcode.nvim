@@ -34,22 +34,11 @@ function utils.question_tabs()
     local questions = {}
 
     for _, q in ipairs(_Lc_state.questions) do
-        local tabp = utils.question_tabp(q)
-        if tabp then
-            table.insert(questions, { tabpage = tabp, question = q })
-        end
+        local tabp = q.tabpage
+        table.insert(questions, { tabpage = tabp, question = q })
     end
 
     return questions
-end
-
----@param q lc.ui.Question
----@return integer|nil
-function utils.question_tabp(q)
-    local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, q.winid)
-    if ok then
-        return tabp
-    end
 end
 
 ---@return lc.ui.Question

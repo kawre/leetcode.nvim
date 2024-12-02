@@ -19,22 +19,21 @@ function Description:init(problem)
         },
         win_opts = {
             wrap = true,
+            winhighlight = "Normal:MarkupNormalFloat,FloatBorder:MarkupFloatBorder",
         },
     })
 
     self.problem = problem
-    self:build()
 end
 
-function Description:build()
-    self:set_body({
+function Description:render()
+    Description.super.render(self, {
         Header({
             cache = self.problem.cache,
             info = self.problem.q,
         }),
         Content(utils.translate(self.problem.q.content, self.problem.q.translated_content)),
     })
-    self:render()
 end
 
 -- function Description:

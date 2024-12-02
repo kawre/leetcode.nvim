@@ -29,7 +29,6 @@ function ProblemInfo:init(problem)
         enter = true,
     })
     self.problem = problem
-    self:build()
 end
 
 function ProblemInfo:build_hints()
@@ -105,16 +104,18 @@ function ProblemInfo:build_similar_questions()
     })
 end
 
-function ProblemInfo:build()
-    self:set_body(markup.Flex({
-        spacing = 2,
-        children = {
-            self:build_hints(),
-            self:build_tags(),
-            self:build_similar_questions(),
-        },
-    }))
-    -- self:render()
+function ProblemInfo:render()
+    ProblemInfo.super.render(
+        self,
+        markup.Flex({
+            spacing = 2,
+            children = {
+                self:build_hints(),
+                self:build_tags(),
+                self:build_similar_questions(),
+            },
+        })
+    )
 end
 
 return ProblemInfo

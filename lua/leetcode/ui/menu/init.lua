@@ -25,20 +25,18 @@ function Menu:set_page(page)
 end
 
 function Menu:render()
-    self:set_body({
+    Menu.super.render(self, {
         markup.Flex({
             margin = { top = 3 },
             align = "center",
             spacing = 3,
             children = {
                 Header(),
-                Nav({ page = self.page }),
+                Nav(self.page),
                 Footer(),
             },
         }),
     })
-
-    Menu.super.render(self)
 end
 
 function Menu:draw()

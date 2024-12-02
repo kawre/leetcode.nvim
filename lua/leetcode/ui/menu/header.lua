@@ -11,6 +11,6 @@ local ascii = {
     [[|________/\_______/\_______/  \___/  \______/ \______/ \_______/\_______/]],
 }
 
-return function()
+return markup.Component(function()
     return markup.Block(vim.tbl_map(markup.Block, ascii), "leetcode_menu_header")
-end
+end)

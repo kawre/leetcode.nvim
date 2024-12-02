@@ -2,14 +2,14 @@ local markup = require("markup")
 local Title = require("leetcode.ui.menu.title")
 
 return markup.Component(function(self)
-    local page = self.props.page
+    local page = self.props
     local Items = require("leetcode.ui.menu.nav." .. page)
 
     return markup.Flex({
         spacing = 1,
         align = "center",
         children = {
-            Title({ page = page }),
+            Title(page),
             Items(),
         },
     })
