@@ -1,4 +1,6 @@
 local log = require("leetcode.logger")
+local t = require("leetcode.translator")
+local config = require("leetcode.config")
 local utils = require("leetcode.utils")
 
 local L = {}
@@ -40,6 +42,23 @@ function L.items(content)
         end
         return { entry = L.entry(item), value = item }
     end, content)
+end
+
+function L.select(selection, question, cb, close)
+    if question.lang == selection.slug then
+        return log.warn(("%s: %s"):format(t("Language already set to"), selection.lang))
+    end
+
+    config.lang = selection.slug
+    if close then
+        close()
+    end
+
+    if cb then
+        cb(selection.slug)
+    else
+        question:change_lang(selection.slug)
+    end
 end
 
 return L

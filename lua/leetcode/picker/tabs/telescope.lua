@@ -30,7 +30,12 @@ local function entry_maker(item)
     }
 end
 
-local opts = require("telescope.themes").get_dropdown()
+local opts = require("telescope.themes").get_dropdown({
+    layout_config = {
+        width = tabs_picker.width,
+        height = tabs_picker.height,
+    },
+})
 
 return function(tabs)
     local items = tabs_picker.items(tabs)
@@ -45,16 +50,14 @@ return function(tabs)
             sorter = conf.generic_sorter(opts),
             attach_mappings = function(prompt_bufnr)
                 actions.select_default:replace(function()
-                    actions.close(prompt_bufnr)
                     local selection = action_state.get_selected_entry()
-
                     if not selection then
+                        log.warn("No selection")
                         return
                     end
-                    local ok, err = pcall(vim.api.nvim_set_current_tabpage, selection.value.tabpage)
-                    if not ok then
-                        log.error(err)
-                    end
+                    tabs_picker.select(selection.value, function()
+                        actions.close(prompt_bufnr)
+                    end)
                 end)
                 return true
             end,

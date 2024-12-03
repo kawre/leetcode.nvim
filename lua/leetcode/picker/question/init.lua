@@ -1,6 +1,8 @@
 local config = require("leetcode.config")
+local log = require("leetcode.logger")
 local ui_utils = require("leetcode-ui.utils")
 local utils = require("leetcode.utils")
+local Question = require("leetcode-ui.question")
 local Picker = require("leetcode.picker")
 
 ---@class leet.Picker.Question: leet.Picker
@@ -51,7 +53,7 @@ local function display_user_status(question)
         return config.auth.is_premium and config.icons.hl.unlock or config.icons.hl.lock
     end
 
-    return config.icons.hl.status[question.status] or { " " }
+    return config.icons.hl.status[question.status] or { " " }
 end
 
 ---@param question lc.cache.Question
@@ -85,6 +87,16 @@ function P.ordinal(item)
         item.title_cn,
         item.title_slug
     )
+end
+
+function P.select(selection, close)
+    if selection.paid_only and not config.auth.is_premium then
+        return log.warn("Question is for premium users only")
+    end
+    if close then
+        close()
+    end
+    Question(selection):mount()
 end
 
 return P

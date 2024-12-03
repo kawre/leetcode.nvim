@@ -29,7 +29,12 @@ local function entry_maker(item)
     }
 end
 
-local opts = require("telescope.themes").get_dropdown()
+local opts = require("telescope.themes").get_dropdown({
+    layout_config = {
+        width = language_picker.width,
+        height = language_picker.height,
+    },
+})
 
 ---@param question lc.ui.Question
 return function(question, cb)
@@ -47,24 +52,13 @@ return function(question, cb)
                 actions.select_default:replace(function()
                     local selection = action_state.get_selected_entry()
                     if not selection then
+                        log.warn("No selection")
                         return
                     end
 
-                    local snippet = selection.value
-                    if question.lang == snippet.t.slug then
-                        return log.warn(
-                            ("%s: %s"):format(t("Language already set to"), snippet.t.lang)
-                        )
-                    end
-
-                    config.lang = snippet.t.slug
-                    actions.close(prompt_bufnr)
-
-                    if cb then
-                        cb(snippet)
-                    else
-                        question:change_lang(snippet.t.slug)
-                    end
+                    language_picker.select(selection.value, question, cb, function()
+                        actions.close(prompt_bufnr)
+                    end)
                 end)
 
                 return true

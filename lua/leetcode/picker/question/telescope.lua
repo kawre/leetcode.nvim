@@ -57,18 +57,13 @@ return function(questions, opts)
                 actions.select_default:replace(function()
                     local selection = action_state.get_selected_entry()
                     if not selection then
+                        log.warn("No selection")
                         return
                     end
-
-                    local q = selection.value
-                    if q.paid_only and not config.auth.is_premium then
-                        return log.warn("Question is for premium users only")
-                    end
-
-                    actions.close(prompt_bufnr)
-                    Question(q):mount()
+                    question_picker.select(selection.value, function()
+                        actions.close(prompt_bufnr)
+                    end)
                 end)
-
                 return true
             end,
         })

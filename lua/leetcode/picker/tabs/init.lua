@@ -8,6 +8,9 @@ local icons = config.icons
 
 local T = {}
 
+T.width = 100
+T.height = 20
+
 ---@param q lc.QuestionResponse
 function T.ordinal(q)
     return ("%s. %s %s"):format(q.frontend_id, q.title, q.translated_title)
@@ -16,7 +19,7 @@ end
 local function display_current(entry)
     local tabp = vim.api.nvim_get_current_tabpage()
     if tabp ~= entry.tabpage then
-        return unpack({ "", "" })
+        return " "
     end
 
     return { icons.caret.right, "leetcode_ref" }
@@ -52,6 +55,15 @@ function T.items(content)
     return vim.tbl_map(function(item)
         return { entry = T.entry(item), value = item }
     end, content)
+end
+
+function T.select(selection, close)
+    local ok, err = pcall(vim.api.nvim_set_current_tabpage, selection.tabpage)
+    if not ok then
+        log.error(err)
+    elseif close then
+        close()
+    end
 end
 
 return T

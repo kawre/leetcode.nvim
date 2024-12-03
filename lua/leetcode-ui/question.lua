@@ -229,8 +229,8 @@ function Question:mount()
         log.warn(msg)
 
         local picker = require("leetcode.picker")
-        picker.language(self, function(snippet)
-            self.lang = snippet.t.slug
+        picker.language(self, function(slug)
+            self.lang = slug
             self:handle_mount()
         end)
     end
