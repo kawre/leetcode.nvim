@@ -228,7 +228,8 @@ function Question:mount()
         local msg = ("Snippet for `%s` not found. Select a different language"):format(self.lang)
         log.warn(msg)
 
-        require("leetcode.pickers.language").pick_lang(self, function(snippet)
+        local picker = require("leetcode.picker")
+        picker.language(self, function(snippet)
             self.lang = snippet.t.slug
             self:handle_mount()
         end)
