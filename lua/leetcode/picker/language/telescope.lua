@@ -55,8 +55,7 @@ return function(question, cb)
                         log.warn("No selection")
                         return
                     end
-
-                    language_picker.select(selection.value, question, cb, function()
+                    language_picker.select(selection.value.t, question, cb, function()
                         actions.close(prompt_bufnr)
                     end)
                 end)

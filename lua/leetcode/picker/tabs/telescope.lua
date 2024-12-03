@@ -55,9 +55,8 @@ return function(tabs)
                         log.warn("No selection")
                         return
                     end
-                    tabs_picker.select(selection.value, function()
-                        actions.close(prompt_bufnr)
-                    end)
+                    actions.close(prompt_bufnr)
+                    tabs_picker.select(selection.value)
                 end)
                 return true
             end,

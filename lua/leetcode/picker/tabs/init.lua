@@ -57,12 +57,10 @@ function T.items(content)
     end, content)
 end
 
-function T.select(selection, close)
+function T.select(selection)
     local ok, err = pcall(vim.api.nvim_set_current_tabpage, selection.tabpage)
     if not ok then
         log.error(err)
-    elseif close then
-        close()
     end
 end
 
