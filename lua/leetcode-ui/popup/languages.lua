@@ -32,7 +32,11 @@ function Languages:handle(res)
         lines:append(" " .. res.problems_solved)
     else
         lines:append("" .. res.problems_solved)
-        lines:append(" problems solved", "leetcode_alt")
+        if res.problems_solved == 1 then
+            lines:append(" problem solved", "leetcode_alt")
+        else
+            lines:append(" problems solved", "leetcode_alt")
+        end
     end
 
     return lines
