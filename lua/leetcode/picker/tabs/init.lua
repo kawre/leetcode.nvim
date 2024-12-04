@@ -8,8 +8,8 @@ local icons = config.icons
 
 local T = {}
 
-T.width = 100
-T.height = 20
+T.width = 80
+T.height = 15
 
 ---@param q lc.QuestionResponse
 function T.ordinal(q)

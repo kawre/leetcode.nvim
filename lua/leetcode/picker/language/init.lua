@@ -5,8 +5,8 @@ local utils = require("leetcode.utils")
 
 local L = {}
 
-L.width = 100
-L.height = 20
+L.width = 80
+L.height = 15
 
 ---@param snippet lc.QuestionCodeSnippet
 local function dislay_icon(snippet)

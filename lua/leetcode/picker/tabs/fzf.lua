@@ -25,7 +25,7 @@ return function(tabs)
         },
         actions = {
             ["default"] = function(selected)
-                local tabpage = string.match(selected[1], "([^\t]+)$")
+                local tabpage = Picker.hidden_field(selected[1], deli)
                 tabs_picker.select({ tabpage = tonumber(tabpage) })
             end,
         },

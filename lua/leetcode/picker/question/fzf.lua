@@ -3,7 +3,6 @@ local problemlist = require("leetcode.cache.problemlist")
 local t = require("leetcode.translator")
 local question_picker = require("leetcode.picker.question")
 local Picker = require("leetcode.picker")
-local log = require("leetcode.logger")
 
 local deli = " "
 
@@ -13,7 +12,7 @@ return function(questions, opts)
     for i, item in ipairs(items) do
         items[i] = Picker.normalize({ item })[1]
             .. deli
-            .. Picker.apply_hl(item.value.title_slug, "Comment")
+            .. Picker.apply_hl(item.value.title_slug, "leetcode_alt")
     end
 
     fzf.fzf_exec(items, {
@@ -28,7 +27,7 @@ return function(questions, opts)
         },
         actions = {
             ["default"] = function(selected)
-                local slug = string.match(selected[1], "([^ ]+)$")
+                local slug = Picker.hidden_field(selected[1], deli)
                 local question = problemlist.get_by_title_slug(slug)
                 question_picker.select(question)
             end,

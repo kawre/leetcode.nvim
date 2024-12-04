@@ -70,4 +70,8 @@ function P.tabs()
     P.pick("tabs", tabs)
 end
 
+function P.hidden_field(text, deli)
+    return text:match(("([^%s]+)$"):format(deli))
+end
+
 return P

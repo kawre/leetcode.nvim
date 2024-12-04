@@ -27,7 +27,7 @@ return function(question, cb)
         },
         actions = {
             ["default"] = function(selected)
-                local md = string.match(selected[1], "([^\t]+)$")
+                local md = Picker.hidden_field(selected[1], deli)
                 language_picker.select(load("return " .. md)(), question, cb)
             end,
         },
