@@ -1,4 +1,11 @@
 local log = require("leetcode.logger")
+local config = require("leetcode.config")
+
+---@type string
+local provider = config.user.picker.provider
+assert(pcall(require, provider), ("specified picker provider not found: `%s`"):format(provider))
+provider = provider == "fzf-lua" and "fzf" or provider
+---@cast provider "fzf" | "telescope"
 
 ---@class leet.Picker
 local P = {}
@@ -39,16 +46,8 @@ function P.normalize(items)
 end
 
 function P.pick(path, ...)
-    local type
-
-    if pcall(require, "fzf-lua") then
-        type = "fzf"
-    elseif pcall(require, "telescope") then
-        type = "telescope"
-    end
-    assert(type, "picker not found")
-
-    return require(table.concat({ "leetcode.picker", path, type }, "."))(...)
+    local rpath = table.concat({ "leetcode.picker", path, provider }, ".")
+    return require(rpath)(...)
 end
 
 function P.language(...)
