@@ -28,6 +28,8 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
 - [telescope.nvim] or [fzf-lua]
 
+- [plenary.nvim]
+
 - [nui.nvim]
 
 - [tree-sitter-html] _**(optional, but highly recommended)**_
@@ -47,7 +49,6 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     dependencies = {
         "nvim-telescope/telescope.nvim",
         -- "ibhagwan/fzf-lua",
-
         "nvim-lua/plenary.nvim",
         "MunifTanjim/nui.nvim",
     },
@@ -127,7 +128,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     },
 
     ---@type lc.picker
-    picker = { provider = "telescope" },
+    picker = { provider = nil },
 
     hooks = {
         ---@type fun()[]
@@ -278,11 +279,13 @@ injector = { ---@type table<lc.lang, lc.inject>
 
 ### picker
 
-Supported picker providers are `telescope` and `fzf-lua`
+Supported picker providers are `telescope` and `fzf-lua`.
+When provider is `nil`, [leetcode.nvim] will first try to use `fzf-lua`,
+if not found it will fallback to `telescope`.
 
 ```lua
 ---@type lc.picker
-picker = { provider = "telescope" },
+picker = { provider = nil },
 ```
 
 ### hooks
@@ -505,3 +508,4 @@ You can then exit [leetcode.nvim] using `:Leet exit` command
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
 [fzf-lua]: https://github.com/ibhagwan/fzf-lua
 [tree-sitter-html]: https://github.com/tree-sitter/tree-sitter-html
+[plenary.nvim]: https://github.com/nvim-lua/plenary.nvim

@@ -38,7 +38,7 @@
 
 ---@alias lc.storage table<"cache"|"home", string>
 
----@alias lc.picker { provider: "fzf-lua" | "telescope" }
+---@alias lc.picker { provider?: "fzf-lua" | "telescope" }
 
 ---@class lc.UserConfig
 local M = {
@@ -104,7 +104,7 @@ local M = {
     },
 
     ---@type lc.picker
-    picker = { provider = "telescope" },
+    picker = { provider = nil },
 
     hooks = {
         ---@type fun()[]

@@ -1,14 +1,31 @@
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
 
----@type string
-local provider = config.user.picker.provider
-assert(pcall(require, provider), ("specified picker provider not found: `%s`"):format(provider))
-provider = provider == "fzf-lua" and "fzf" or provider
----@cast provider "fzf" | "telescope"
+---@return "fzf" | "telescope"
+local function resolve_provider()
+    ---@type string
+    local provider = config.user.picker.provider
+
+    if provider == nil then
+        local fzf_ok = pcall(require, "fzf-lua")
+        if fzf_ok then
+            return "fzf"
+        end
+        local telescope_ok = pcall(require, "telescope")
+        if telescope_ok then
+            return "telescope"
+        end
+        error("no supported picker provider found")
+    else
+        local provider_ok = pcall(require, provider)
+        assert(provider_ok, ("specified picker provider not found: `%s`"):format(provider))
+        return provider == "fzf-lua" and "fzf" or provider
+    end
+end
 
 ---@class leet.Picker
 local P = {}
+P.provider = resolve_provider()
 
 function P.hl_to_ansi(hl_group)
     local color = vim.api.nvim_get_hl(0, { name = hl_group })
@@ -46,7 +63,7 @@ function P.normalize(items)
 end
 
 function P.pick(path, ...)
-    local rpath = table.concat({ "leetcode.picker", path, provider }, ".")
+    local rpath = table.concat({ "leetcode.picker", path, P.provider }, ".")
     return require(rpath)(...)
 end
 
