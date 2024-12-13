@@ -409,6 +409,7 @@ function cmd.inject()
             local before = q:inject(true)
             if before then
                 api.nvim_buf_set_lines(q.bufnr, 0, start_i - 1, false, vim.split(before, "\n"))
+                _, end_i = q:range(true)
             end
         end
 
@@ -417,7 +418,7 @@ function cmd.inject()
         else
             local after = q:inject(false)
             if after then
-                api.nvim_buf_set_lines(q.bufnr, end_i + 1, -1, false, vim.split(after, "\n"))
+                api.nvim_buf_set_lines(q.bufnr, end_i, -1, false, vim.split(after, "\n"))
             end
         end
 
