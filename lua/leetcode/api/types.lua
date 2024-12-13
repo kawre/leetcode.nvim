@@ -360,6 +360,12 @@
 ---@field submit_stats lc.Stats.SubmissionStat
 
 --------------------------------------------
+--- Companies
+--------------------------------------------
+---@class lc.Companies.Res
+---@field companyTags {name: string, slug: string, questionCount: number}[]
+
+--------------------------------------------
 --- Skills
 --------------------------------------------
 ---@class lc.Skills.Skill
