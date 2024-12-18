@@ -18,8 +18,8 @@ return function(questions, opts)
     fzf.fzf_exec(items, {
         prompt = t("Select a Question") .. "> ",
         winopts = {
-            win_height = question_picker.height,
-            win_width = question_picker.width,
+            height = question_picker.height,
+            width = question_picker.width,
         },
         fzf_opts = {
             ["--delimiter"] = deli,

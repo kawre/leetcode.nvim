@@ -17,8 +17,8 @@ return function(question, cb)
     fzf.fzf_exec(items, {
         prompt = t("Available Languages") .. "> ",
         winopts = {
-            win_height = language_picker.height,
-            win_width = language_picker.width,
+            height = language_picker.height,
+            width = language_picker.width,
         },
         fzf_opts = {
             ["--delimiter"] = deli,

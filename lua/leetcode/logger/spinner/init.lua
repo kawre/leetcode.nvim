@@ -77,6 +77,7 @@ function spinner:set(msg, lvl, opts)
 
     opts = vim.tbl_deep_extend("force", {
         hide_from_history = true,
+        history = false,
         title = config.name,
         timeout = false,
         replace = id,
