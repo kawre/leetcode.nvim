@@ -73,7 +73,7 @@ function spinner:set(msg, lvl, opts)
     end
     lvl = lvl or vim.log.levels.INFO
 
-    local id = self.noti and (self.noti.id or self.noti)
+    local id = type(self.noti) == "table" and self.noti.id or self.noti
 
     opts = vim.tbl_deep_extend("force", {
         hide_from_history = true,
