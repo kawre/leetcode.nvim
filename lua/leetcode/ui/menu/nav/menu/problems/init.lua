@@ -29,6 +29,6 @@ return markup.Component(function()
             nested = true,
             on_submit = cmd.qot,
         }),
-        BackButton("menu"),
+        BackButton({ page = "menu" }),
     })
 end)

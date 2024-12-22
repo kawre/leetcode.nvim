@@ -9,15 +9,12 @@ return markup.Component(function(self)
     local cmd = require("leetcode.command")
 
     return Buttons({
-        markup.If(
-            not self.state.expanded,
-            Button({
-                title = "Skills",
-                icon = "",
-                key = "s",
-                on_submit = cmd.ui_skills,
-            })
-        ),
+        not config.is_cn and Button({
+            title = "Skills",
+            icon = "",
+            key = "s",
+            on_submit = cmd.ui_skills,
+        }),
         Button({
             icon = "",
             title = "Languages",
@@ -30,6 +27,6 @@ return markup.Component(function(self)
             key = "u",
             on_submit = function() end,
         }),
-        BackButton("menu"),
+        BackButton({ page = "menu" }),
     })
 end)

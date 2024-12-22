@@ -25,18 +25,18 @@ function Menu:set_page(page)
 end
 
 function Menu:render()
-    Menu.super.render(self, {
-        markup.Flex({
+    local menu = markup.Component(function(props)
+        return markup.Flex({
             margin = { top = 3 },
             align = "center",
             spacing = 3,
-            children = {
-                Header(),
-                Nav(self.page),
-                Footer(),
-            },
-        }),
-    })
+            Header(),
+            Nav({ page = self.page }),
+            Footer(),
+        })
+    end)
+
+    Menu.super.render(self, menu())
 end
 
 function Menu:draw()

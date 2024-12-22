@@ -1,7 +1,7 @@
 local markup = require("markup")
 
-return markup.Component(function(self)
-    local page = self.props
+return markup.Component(function(props)
+    local page = props.page
 
     local titles = {}
     local parts = vim.split(page, ".", { plain = true })
@@ -16,8 +16,7 @@ return markup.Component(function(self)
         end
     end
 
-    return markup.Flex({
-        vertical = false,
+    return markup.HFlex({
         children = titles,
     })
 end)

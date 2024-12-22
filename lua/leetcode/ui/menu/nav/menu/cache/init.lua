@@ -13,6 +13,6 @@ return markup.Component(function()
             key = "u",
             on_submit = cmd.cache_update,
         }),
-        BackButton("menu"),
+        BackButton({ page = "menu" }),
     })
 end)

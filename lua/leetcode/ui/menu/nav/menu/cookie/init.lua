@@ -19,6 +19,6 @@ return markup.Component(function()
             title = "Delete / Sign out",
             on_submit = cmd.sign_out,
         }),
-        BackButton("menu"),
+        BackButton({ page = "menu" }),
     })
 end)

@@ -1,8 +1,9 @@
 local markup = require("markup")
 
-return markup.Component(function(self)
+return markup.Component(function(props)
     return markup.Flex({
         spacing = 1,
-        children = self.props,
+        -- horizontal = true,
+        children = props.children,
     })
 end)
