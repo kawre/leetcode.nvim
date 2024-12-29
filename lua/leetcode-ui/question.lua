@@ -99,10 +99,10 @@ function Question:open_buffer(existed)
     ui_utils.buf_set_opts(self.bufnr, { buflisted = true })
     ui_utils.win_set_buf(self.winid, self.bufnr, true)
 
-    local i = self:fold_range()
-    if i then
-        pcall(vim.cmd, ("%d,%dfold"):format(1, i))
-    end
+    -- local i = self:fold_range()
+    -- if i then
+    --     pcall(vim.cmd, ("%d,%dfold"):format(1, i))
+    -- end
 
     if existed and self.cache.status == "ac" then
         self:reset_lines()
