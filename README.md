@@ -399,6 +399,8 @@ image_support = false,
 
   - `update` updates cache
 
+- `top_interview` opens top interview 150 questions
+
 #### Some commands can take optional arguments. To stack argument values separate them by a `,`
 
 - `Leet list`

@@ -131,4 +131,23 @@ function Problems.translated_titles(cb)
     end
 end
 
+function Problems.top_interview_150(cb)
+    local query = queries.study_plan_detail
+
+    utils.query(query, { slug = "top-interview-150"}, {
+        callback = function(res, err)
+            if err then
+                return cb(nil, err)
+            end
+            local title_slugs = {}
+            for _, v in ipairs(res.data["studyPlanV2Detail"]["planSubGroups"]) do
+                for _, q in ipairs(v["questions"]) do
+                    table.insert(title_slugs, q.title_slug)
+                end
+            end
+            return cb(title_slugs)
+        end
+    })
+end
+
 return Problems
