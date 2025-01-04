@@ -13,8 +13,19 @@ local Nav = require("leetcode.ui.menu.nav")
 ---@field body lc.ui.menu.Page
 local Menu = markup.Renderer:extend("leet.menu")
 
+-- local mt = getmetatable(Menu)
+-- local old_index = mt.__index
+-- mt.__index = function(self, key)
+--     if key == "winid" then
+--         return self.id
+--     end
+--
+--     return old_index[key]
+-- end
+-- setmetatable(Menu, mt)
+
 function Menu:init()
-    Menu.super.init(self, { winid = 0, bufnr = 0 })
+    Menu.super.init(self, { id = 0, bufnr = 0 })
 
     _Lc_state.menu = self
 end
@@ -38,6 +49,8 @@ function Menu:render()
 
     Menu.super.render(self, menu())
 end
+
+function Menu:remount() end
 
 function Menu:draw()
     self:render()

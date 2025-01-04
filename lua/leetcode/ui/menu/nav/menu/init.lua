@@ -37,7 +37,7 @@ return markup.Component(function()
         Button({
             icon = "󰩈",
             title = "Exit",
-            key = "q",
+            key = "qa",
             on_submit = function()
                 require("leetcode").stop()
             end,

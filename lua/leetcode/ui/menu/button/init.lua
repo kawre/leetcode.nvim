@@ -28,7 +28,7 @@ return markup.Component(function(props)
         },
         markup.HFlex({
             spacing = 1,
-            -- size = { width = 50 },
+            size = { width = 50 },
             markup.Inline(p.icon, "leetcode_menu_button_icon"),
             markup.Inline(p.title, "leetcode_menu_button_title"),
             p.nested and markup.Inline("", "leetcode_menu_button_nested"),
