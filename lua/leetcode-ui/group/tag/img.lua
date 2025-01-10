@@ -12,7 +12,7 @@ function Img:contents()
     local alt = self.data.attrs.alt
     local link = (self.data.attrs.src or ""):gsub("：", ":")
 
-    grp:append("[", "leetcode_alt")
+    grp:append("![", "leetcode_alt")
     grp:append((alt and alt ~= "") and alt or "img", "leetcode_ref")
     grp:append("]", "leetcode_alt")
     grp:append("(", "leetcode_alt")
