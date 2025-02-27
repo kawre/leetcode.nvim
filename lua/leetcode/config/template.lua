@@ -36,7 +36,8 @@
 
 ---@alias lc.inject { before?: string|string[], after?: string|string[] }
 
----@alias lc.storage table<"cache"|"home", string>
+---@alias lc.storage.format_opts { id : string, slug : string, ft_alt : string, ft : string }
+---@alias lc.storage { cache: string, home: string, format: fun(opts: lc.storage.format_opts): string | nil }
 
 ---@alias lc.picker { provider?: "fzf-lua" | "telescope" }
 
@@ -58,6 +59,9 @@ local M = {
     storage = {
         home = vim.fn.stdpath("data") .. "/leetcode",
         cache = vim.fn.stdpath("cache") .. "/leetcode",
+        format = function()
+            return nil
+        end,
     },
 
     ---@type table<string, boolean>
