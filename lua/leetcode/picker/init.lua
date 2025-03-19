@@ -1,7 +1,7 @@
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
 
----@return "fzf" | "telescope"
+---@return "fzf" | "telescope" | "snacks"
 local function resolve_provider()
     ---@type string
     local provider = config.user.picker.provider
@@ -15,9 +15,18 @@ local function resolve_provider()
         if telescope_ok then
             return "telescope"
         end
+        local snacks_ok = pcall(require, "snacks.picker")
+        if snacks_ok then
+            return "snacks"
+        end
         error("no supported picker provider found")
     else
-        local provider_ok = pcall(require, provider)
+        local mod = provider
+        if provider == "snacks-picker" then
+            provider = "snacks"
+            mod = "snacks.picker"
+        end
+        local provider_ok = pcall(require, mod)
         assert(provider_ok, ("specified picker provider not found: `%s`"):format(provider))
         return provider == "fzf-lua" and "fzf" or provider
     end
