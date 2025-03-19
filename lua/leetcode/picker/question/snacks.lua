@@ -48,7 +48,7 @@ return function(questions, opts)
                 completed = true
                 p:close()
                 vim.schedule(function()
-                    question_picker.select(item.value)
+                    question_picker.select(item.item.value)
                 end)
             end,
         },
