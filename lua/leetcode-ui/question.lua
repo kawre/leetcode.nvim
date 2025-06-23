@@ -48,66 +48,6 @@ function Question:set_lines(code)
     vim.api.nvim_buf_set_lines(self.bufnr, s_i - 1, e_i, false, vim.split(code, "\n"))
 end
 
-function Question:shuffle()
-    local api_question = require("leetcode.api.question")
-    local problems = require("leetcode.cache.problemlist")
-
-    -- Fetch a new random question (minimal info)
-    local q, err = api_question.random()
-    if err then
-        log.err(err)
-        return
-    end
-
-    -- Get full question info by title_slug
-    local full_q = api_question.by_title_slug(q.title_slug)
-    if not full_q then
-        log.err("Failed to fetch full question info for: " .. (q.title_slug or "nil"))
-        return
-    end
-
-    -- Update self fields
-    self.q = full_q
-    self.cache = problems.get_by_title_slug(q.title_slug) or {}
-
-    -- Overwrite buffer contents
-    self:set_lines(self:snippet(true))
-
-    -- (Optionally update info, description, etc. if needed)
-    if self.description and self.description.update then
-        self.description:update(self)
-    end
-    if self.info and self.info.update then
-        self.info:update(self)
-    end
-    if self.console and self.console.update then
-        self.console:update(self)
-    end
-
-    log.info("Shuffled to a new random question: " .. (full_q.title or q.title_slug or "unknown"))
-end
-    -- Update self fields
-    self.q = q
-    self.cache = problems.get_by_title_slug(q.title_slug) or {}
-
-    -- Overwrite buffer contents
-    self:set_lines(self:snippet(true))
-
-    -- (Optionally update info, description, etc. if needed)
-    if self.description and self.description.update then
-        self.description:update(self)
-    end
-    if self.info and self.info.update then
-        self.info:update(self)
-    end
-    if self.console and self.console.update then
-        self.console:update(self)
-    end
-
-    log.info("Shuffled to a new random question: " .. q.title)
-end
-
-
 function Question:reset_lines()
     local new_lines = self:snippet(true) or ""
 
@@ -378,6 +318,47 @@ function Question:init(problem)
     self.cache = problem
     self.lang = config.lang
 end
+
+function Question:shuffle()
+    local api_question = require("leetcode.api.question")
+    local problems = require("leetcode.cache.problemlist")
+
+    -- Fetch a new random question (minimal info)
+    local q, err = api_question.random()
+    if err then
+        log.err(err)
+        return
+    end
+
+    -- Get full question info by title_slug
+    local full_q = api_question.by_title_slug(q.title_slug)
+    if not full_q then
+        log.err("Failed to fetch full question info for: " .. (q.title_slug or "nil"))
+        return
+    end
+
+    -- Update self fields
+    self.q = full_q
+    self.cache = problems.get_by_title_slug(q.title_slug) or {}
+
+    -- Overwrite buffer contents
+    self:set_lines(self:snippet(true))
+
+    -- (Optionally update info, description, etc. if needed)
+    if self.description and self.description.update then
+        self.description:update(self)
+    end
+    if self.info and self.info.update then
+        self.info:update(self)
+    end
+    if self.console and self.console.update then
+        self.console:update(self)
+    end
+
+    log.info("Shuffled to a new random question: " .. (full_q.title or q.title_slug or "unknown"))
+end
+
+
 
 ---@type fun(question: lc.cache.Question): lc.ui.Question
 local LeetQuestion = Question
