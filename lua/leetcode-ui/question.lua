@@ -48,6 +48,39 @@ function Question:set_lines(code)
     vim.api.nvim_buf_set_lines(self.bufnr, s_i - 1, e_i, false, vim.split(code, "\n"))
 end
 
+function Question:shuffle()
+    local api_question = require("leetcode.api.question")
+    local problems = require("leetcode.cache.problemlist")
+
+    -- Fetch a new random question
+    local q, err = api_question.random()
+    if err then
+        log.err(err)
+        return
+    end
+
+    -- Update self fields
+    self.q = q
+    self.cache = problems.get_by_title_slug(q.title_slug) or {}
+
+    -- Overwrite buffer contents
+    self:set_lines(self:snippet(true))
+
+    -- (Optionally update info, description, etc. if needed)
+    if self.description and self.description.update then
+        self.description:update(self)
+    end
+    if self.info and self.info.update then
+        self.info:update(self)
+    end
+    if self.console and self.console.update then
+        self.console:update(self)
+    end
+
+    log.info("Shuffled to a new random question: " .. q.title)
+end
+
+
 function Question:reset_lines()
     local new_lines = self:snippet(true) or ""
 
