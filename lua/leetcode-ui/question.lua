@@ -319,6 +319,8 @@ function Question:init(problem)
     self.lang = config.lang
 end
 
+-- start of shuffle functionality.
+
 function Question:shuffle()
     local api_question = require("leetcode.api.question")
     local problems = require("leetcode.cache.problemlist")
@@ -344,21 +346,23 @@ function Question:shuffle()
     -- Overwrite buffer contents
     self:set_lines(self:snippet(true))
 
-    -- (Optionally update info, description, etc. if needed)
-    if self.description and self.description.update then
-        self.description:update(self)
-    end
-    if self.info and self.info.update then
-        self.info:update(self)
-    end
-    if self.console and self.console.update then
-        self.console:update(self)
-    end
+    -- Unmount and remount description, info, console
+    if self.description and self.description.unmount then self.description:unmount() end
+    if self.info and self.info.unmount then self.info:unmount() end
+    if self.console and self.console.unmount then self.console:unmount() end
+
+    -- Recreate description, info, console for the new question
+    local Description = require("leetcode-ui.split.description")
+    local Console = require("leetcode-ui.layout.console")
+    local Info = require("leetcode-ui.popup.info")
+    self.description = Description(self):mount()
+    self.console = Console(self)
+    self.info = Info(self)
 
     log.info("Shuffled to a new random question: " .. (full_q.title or q.title_slug or "unknown"))
 end
 
-
+-- end of shuffle functionality.
 
 ---@type fun(question: lc.cache.Question): lc.ui.Question
 local LeetQuestion = Question
