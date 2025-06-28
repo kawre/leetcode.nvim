@@ -99,10 +99,10 @@ function Question:open_buffer(existed)
     ui_utils.buf_set_opts(self.bufnr, { buflisted = true })
     ui_utils.win_set_buf(self.winid, self.bufnr, true)
 
-    local i = self:fold_range()
-    if i then
-        pcall(vim.cmd, ("%d,%dfold"):format(1, i))
-    end
+    -- local i = self:fold_range()
+    -- if i then
+    --     pcall(vim.cmd, ("%d,%dfold"):format(1, i))
+    -- end
 
     if existed and self.cache.status == "ac" then
         self:reset_lines()
@@ -110,7 +110,8 @@ function Question:open_buffer(existed)
 end
 
 ---@param before boolean
-function Question:inject(before)
+---@param code string
+function Question:inject(before, code)
     local inject = config.user.injector[self.lang] or {}
     local inj = before and inject.before or inject.after
 
@@ -118,6 +119,10 @@ function Question:inject(before)
 
     if type(inj) == "boolean" and inj == true and before then
         inj = config.imports[self.lang]
+    end
+
+    if type(inj) == "function" then
+        inj = inj(code)
     end
 
     if type(inj) == "table" then
@@ -143,12 +148,12 @@ function Question:injector(code)
         ("%s @leet end"):format(lang.comment),
     }
 
-    local before = self:inject(true)
+    local before = self:inject(true, code)
     if before then
         table.insert(parts, 1, before)
     end
 
-    local after = self:inject(false)
+    local after = self:inject(false, code)
     if after then
         table.insert(parts, after)
     end
