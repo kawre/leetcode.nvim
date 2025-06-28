@@ -19,7 +19,6 @@ return function(question, cb)
     end
 
     picker.pick({
-        source = "select",
         items = finder_items,
         format = function(item)
             local ret = {}
@@ -36,8 +35,10 @@ return function(question, cb)
         title = t("Available Languages"),
         layout = {
             preview = false,
+            preset = "select",
             layout = {
-                height = math.floor(math.min(vim.o.lines * 0.8 - 10, #items + 2) + 0.5),
+                height = language_picker.height,
+                width = language_picker.width,
             },
         },
         actions = {

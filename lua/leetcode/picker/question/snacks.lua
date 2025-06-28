@@ -19,7 +19,6 @@ return function(questions, opts)
     end
 
     picker.pick({
-        source = "select",
         items = finder_items,
         format = function(item)
             local ret = {}
@@ -35,9 +34,11 @@ return function(questions, opts)
         end,
         title = t("Select a Question"),
         layout = {
+            preset = "select",
             preview = false,
             layout = {
-                height = math.floor(math.min(vim.o.lines * 0.8 - 10, #items + 2) + 0.5),
+                height = question_picker.height,
+                width = question_picker.width,
             },
         },
         actions = {

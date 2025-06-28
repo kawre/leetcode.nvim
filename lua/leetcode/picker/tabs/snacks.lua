@@ -21,7 +21,6 @@ return function(tabs)
     end
 
     picker.pick({
-        source = "select",
         items = finder_items,
         format = function(item)
             local ret = {}
@@ -38,8 +37,10 @@ return function(tabs)
         title = t("Select a Question"),
         layout = {
             preview = false,
+            preset = "select",
             layout = {
-                height = math.floor(math.min(vim.o.lines * 0.8 - 10, #items + 2) + 0.5),
+                height = tabs_picker.height,
+                width = tabs_picker.width,
             },
         },
         actions = {
