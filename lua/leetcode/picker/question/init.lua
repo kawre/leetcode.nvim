@@ -9,7 +9,7 @@ local Picker = require("leetcode.picker")
 local P = {}
 
 P.width = 100
-P.height = 20
+P.height = 0.6
 
 ---@param items lc.cache.Question[]
 ---@param opts table<string, string[]>

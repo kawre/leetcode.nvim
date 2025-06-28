@@ -1,26 +1,65 @@
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
 
----@return "fzf" | "telescope"
+local provider_order = { "snacks-picker", "fzf-lua", "telescope" }
+local providers = {
+    ["fzf-lua"] = {
+        name = "fzf",
+        is_available = function()
+            return pcall(require, "fzf-lua")
+        end,
+    },
+    ["snacks-picker"] = {
+        name = "snacks",
+        is_available = function()
+            return pcall(function() ---@diagnostic disable-next-line: undefined-field
+                assert(Snacks.config["picker"].enabled)
+            end)
+        end,
+    },
+    ["telescope"] = {
+        name = "telescope",
+        is_available = function()
+            return pcall(require, "telescope")
+        end,
+    },
+}
+
+local available_pickers = table.concat(
+    vim.tbl_map(function(p)
+        return providers[p].name
+    end, provider_order),
+    ", "
+)
+
+---@return "fzf" | "telescope" | "snacks"
 local function resolve_provider()
     ---@type string
     local provider = config.user.picker.provider
 
     if provider == nil then
-        local fzf_ok = pcall(require, "fzf-lua")
-        if fzf_ok then
-            return "fzf"
+        for _, key in ipairs(provider_order) do
+            local picker = providers[key]
+
+            if picker.is_available() then
+                return picker.name
+            end
         end
-        local telescope_ok = pcall(require, "telescope")
-        if telescope_ok then
-            return "telescope"
-        end
-        error("no supported picker provider found")
-    else
-        local provider_ok = pcall(require, provider)
-        assert(provider_ok, ("specified picker provider not found: `%s`"):format(provider))
-        return provider == "fzf-lua" and "fzf" or provider
+
+        error(("No picker is available. Please install one of the following: `%s`") --
+            :format(available_pickers))
     end
+
+    local picker = providers[provider]
+    assert(
+        picker,
+        ("Picker `%s` is not supported. Available pickers: `%s`") --
+            :format(provider, available_pickers)
+    )
+
+    local ok = picker.is_available()
+    assert(ok, ("Picker `%s` is not available. Make sure it is installed"):format(provider))
+    return picker.name
 end
 
 ---@class leet.Picker
