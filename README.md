@@ -279,9 +279,14 @@ injector = { ---@type table<lc.lang, lc.inject>
 
 ### picker
 
-Supported picker providers are `telescope` and `fzf-lua`.
-When provider is `nil`, [leetcode.nvim] will first try to use `fzf-lua`,
-if not found it will fallback to `telescope`.
+Supported picker providers are:
+
+- `snacks-picker`
+- `fzf-lua`
+- `telescope`
+
+If `provider` is `nil`, [leetcode.nvim] will try to resolve the first
+available one in the order above.
 
 ```lua
 ---@type lc.picker
@@ -377,26 +382,22 @@ image_support = false,
 - `inject` re-inject code for the current question
 
 - `session`
-
   - `create` create a new session
   - `change` change the current session
 
   - `update` update the current session in case it went out of sync
 
 - `desc` toggle question description
-
   - `toggle` same as `Leet desc`
 
   - `stats` toggle description stats visibility
 
 - `cookie`
-
   - `update` opens a prompt to enter a new cookie
 
   - `delete` sign-out
 
 - `cache`
-
   - `update` updates cache
 
 #### Some commands can take optional arguments. To stack argument values separate them by a `,`
