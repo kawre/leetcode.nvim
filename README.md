@@ -26,7 +26,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
 - [Neovim] >= 0.9.0
 
-- [telescope.nvim] or [fzf-lua]
+- [Picker](#picker)
 
 - [plenary.nvim]
 
@@ -47,8 +47,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     "kawre/leetcode.nvim",
     build = ":TSUpdate html", -- if you have `nvim-treesitter` installed
     dependencies = {
-        "nvim-telescope/telescope.nvim",
-        -- "ibhagwan/fzf-lua",
+        -- include a picker of your choice, see picker section for more details
         "nvim-lua/plenary.nvim",
         "MunifTanjim/nui.nvim",
     },
@@ -281,9 +280,9 @@ injector = { ---@type table<lc.lang, lc.inject>
 
 Supported picker providers are:
 
-- `snacks-picker`
-- `fzf-lua`
-- `telescope`
+- [`snacks-picker`][snacks.nvim]
+- [`fzf-lua`][fzf-lua]
+- [`telescope`][telescope.nvim]
 
 If `provider` is `nil`, [leetcode.nvim] will try to resolve the first
 available one in the order above.
@@ -435,7 +434,9 @@ To switch between questions, use `Leet tabs`
 
 ### Sign In
 
-It is **required** to be **signed-in** to use [leetcode.nvim]
+> [!WARNING]
+> Be sure to copy the `Cookie` from request headers, not the `set-cookie` from
+> response headers.
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4ad3abeda5c3
 
@@ -508,5 +509,6 @@ You can then exit [leetcode.nvim] using `:Leet exit` command
 [nvim-web-devicons]: https://github.com/nvim-tree/nvim-web-devicons
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
 [fzf-lua]: https://github.com/ibhagwan/fzf-lua
+[snacks.nvim]: https://github.com/folke/snacks.nvim
 [tree-sitter-html]: https://github.com/tree-sitter/tree-sitter-html
 [plenary.nvim]: https://github.com/nvim-lua/plenary.nvim
