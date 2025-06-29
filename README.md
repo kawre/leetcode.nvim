@@ -436,6 +436,11 @@ This plugin can be initiated in two ways:
   must not have any listed buffers open.
   To bypass this requirement use [`non_standalone`](#non-standalone-mode) plugin.
 
+### Switching between test cases
+
+To switch between test cases, press the number of the test case
+`1` for Case (1), `2` for Case (2), etc
+
 ### Switching between questions
 
 To switch between questions, use `Leet tabs`
