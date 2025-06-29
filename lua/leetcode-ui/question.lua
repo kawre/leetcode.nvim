@@ -113,6 +113,8 @@ function Question:editor_fold_imports(strict)
             ---@diagnostic disable-next-line: param-type-mismatch
             pcall(vim.cmd, ("%d,%dfold"):format(range.start_i or 1, range.end_i))
         end)
+    else
+        log.warn("`@leet imports` section not found in editor.")
     end
 end
 
