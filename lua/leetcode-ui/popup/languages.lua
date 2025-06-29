@@ -63,13 +63,13 @@ end
 function Languages:mount()
     Languages.super.mount(self)
 
-    local spinner = Spinner:init("fetching user languages", "dot")
+    local spinner = Spinner:start("fetching user languages", "dot")
     stats_api.languages(function(res, err)
         if err then
-            spinner:stop(err.msg, false)
+            spinner:error(err.msg)
         else
             self:populate(res)
-            spinner:stop(nil, true, { timeout = 500 })
+            spinner:success("languages fetched")
             Languages.super.draw(self)
         end
     end)

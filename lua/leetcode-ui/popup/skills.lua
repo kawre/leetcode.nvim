@@ -47,13 +47,13 @@ end
 function Skills:mount()
     Skills.super.mount(self)
 
-    local spinner = Spinner:init("fetching user skills", "dot")
+    local spinner = Spinner:start("fetching user skills", "dot")
     stats_api.skills(function(res, err)
         if err then
-            spinner:stop(err.msg, false)
+            spinner:error(err.msg)
         else
             self:populate(res)
-            spinner:stop(nil, true, { timeout = 200 })
+            spinner:success("skills fetched")
             Skills.super.draw(self)
         end
     end)
