@@ -392,21 +392,8 @@ function cmd.inject()
 
     if q.bufnr and api.nvim_buf_is_valid(q.bufnr) then
         local range = q:editor_section_range("code")
-        assert(range, "Code section should be present")
 
-        if not range.start_i or not range.end_i then
-            local missing = {}
-
-            if not range.start_i then
-                local start_tag = utils.section_tag("code", true)
-                table.insert(missing, ("`%s`"):format(start_tag))
-            end
-            if not range.end_i then
-                local end_tag = utils.section_tag("code", false)
-                table.insert(missing, ("`%s`"):format(end_tag))
-            end
-
-            log.error(table.concat(missing, " and ") .. " not found.")
+        if not range:is_valid_or_log() then
             return
         end
 
@@ -424,7 +411,7 @@ function cmd.fold()
         return
     end
 
-    q:editor_fold_imports(false)
+    q:editor_fold_imports(true)
 end
 
 function cmd.get_active_session()

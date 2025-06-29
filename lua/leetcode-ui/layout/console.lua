@@ -60,7 +60,8 @@ function ConsoleLayout:mount()
 end
 
 function ConsoleLayout:run(submit)
-    if not self.question:editor_section_is_present("code") then
+    local range = self.question:editor_section_range("code")
+    if not range:is_valid_or_log() then
         return
     end
 

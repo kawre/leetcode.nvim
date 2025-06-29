@@ -107,14 +107,13 @@ function Question:editor_fold_imports(strict)
         return
     end
 
-    local range = self:editor_section_range("imports", { inclusive = true, strict = strict })
-    if range and range.end_i then
+    local range = self:editor_section_range("imports", true)
+    if range.complete or range.end_i then
         vim.api.nvim_buf_call(self.bufnr, function()
-            ---@diagnostic disable-next-line: param-type-mismatch
-            pcall(vim.cmd, ("%d,%dfold"):format(range.start_i or 1, range.end_i))
+            pcall(vim.cmd, ("%d,%dfold"):format(range.start_i or 1, range.end_i)) ---@diagnostic disable-line: param-type-mismatch
         end)
-    else
-        log.warn("`@leet imports` section not found in editor.")
+    elseif strict then
+        range.log_not_found()
     end
 end
 
@@ -123,8 +122,8 @@ function Question:editor_yank_code()
         return
     end
 
-    local range = self:editor_section_range("code", { strict = true })
-    if range then
+    local range = self:editor_section_range("code")
+    if range:is_valid_or_log() then
         vim.api.nvim_buf_call(self.bufnr, function()
             vim.cmd(("%d,%dyank"):format(range.start_i, range.end_i))
         end)
@@ -218,11 +217,6 @@ function Question:inject(before)
     end
 end
 
-function Question:editor_section_is_present(name)
-    local range = self:editor_section_range(name)
-    return range and true or false
-end
-
 ---@param lines string|string[]
 ---@param name lc.editor.section
 ---@return string
@@ -241,7 +235,7 @@ end
 function Question:editor_section_replace(lines, name)
     local range = self:editor_section_range(name)
 
-    if range then
+    if range:is_valid_or_log() then
         self:editor_set_lines(range.start_i - 1, range.end_i, lines)
     end
 end
@@ -361,10 +355,8 @@ end
 ---@field complete boolean
 
 ---@param name string
----@param opts? { inclusive?: boolean, strict?: boolean }
----@return lc.Question.Editor.Range?
-function Question:editor_section_range(name, opts)
-    opts = vim.tbl_extend("keep", opts or {}, { strict = true, inclusive = false })
+---@param inclusive? boolean
+function Question:editor_section_range(name, inclusive)
     local lines = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, false)
     local start_i, end_i
 
@@ -373,31 +365,59 @@ function Question:editor_section_range(name, opts)
 
     for i, line in ipairs(lines) do
         if line:match(start_tag) then
-            start_i = i + (opts.inclusive and 0 or 1)
+            start_i = i + (inclusive and 0 or 1)
         elseif line:match(end_tag) then
-            end_i = i - (opts.inclusive and 0 or 1)
+            end_i = i - (inclusive and 0 or 1)
         end
     end
 
-    if opts.strict and not (start_i and end_i) then
-        log.error(("Section `@leet %s` not found in editor."):format(name))
-        return nil
+    local res = {
+        start_i = start_i,
+        end_i = end_i,
+        lines = lines,
+        complete = start_i and end_i,
+    }
+
+    res.log_not_found = function()
+        if res.complete then
+            return
+        end
+
+        local missing = {}
+        if not res.start_i then
+            table.insert(missing, ("`%s`"):format(start_tag))
+        end
+        if not res.end_i then
+            table.insert(missing, ("`%s`"):format(end_tag))
+        end
+
+        log.warn(table.concat(missing, " and ") .. " not found.")
     end
 
-    return { start_i = start_i, end_i = end_i, lines = lines, complete = start_i and end_i }
+    res.is_partial = function()
+        return res.complete or (res.start_i or res.end_i)
+    end
+
+    res.is_valid_or_log = function()
+        if res.complete then
+            return true
+        else
+            res.log_not_found()
+            return false
+        end
+    end
+
+    return res
 end
 
 ---@param submit boolean
 ---@return string
 function Question:editor_submit_lines(submit)
     local range = self:editor_section_range("code")
-    assert(range, "Code section not found in editor")
+    assert(range.complete, "Code section not found")
 
-    local start_i = range.start_i or 1
-    local end_i = range.end_i or #range.lines
-
-    local prefix = not submit and ("\n"):rep(start_i - 1) or ""
-    return prefix .. table.concat(range.lines, "\n", start_i, end_i)
+    local prefix = not submit and ("\n"):rep(range.start_i - 1) or ""
+    return prefix .. table.concat(range.lines, "\n", range.start_i, range.end_i)
 end
 
 ---@param self lc.ui.Question
