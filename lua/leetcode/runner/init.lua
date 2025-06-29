@@ -38,7 +38,7 @@ function Runner:handle(submit)
 
     local body = {
         lang = question.lang,
-        typed_code = self.question:lines(submit),
+        typed_code = self.question:editor_submit_lines(submit),
         question_id = question.q.id,
         data_input = not submit and question.console.testcase:content(),
     }

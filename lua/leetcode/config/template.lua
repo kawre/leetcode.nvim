@@ -34,7 +34,7 @@
 
 ---@alias lc.direction "col" | "row"
 
----@alias lc.inject { before?: string|string[], after?: string|string[] }
+---@alias lc.inject { gap?: number, imports?: (fun(default_imports: string[]): string[])|string|string[], before?: string|string[], after?: string|string[] }
 
 ---@alias lc.storage table<"cache"|"home", string>
 
@@ -72,6 +72,11 @@ local M = {
 
     cache = {
         update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
+    },
+
+    editor = {
+        reset_previous_code = true, ---@type boolean
+        fold_imports = true, ---@type boolean
     },
 
     console = {

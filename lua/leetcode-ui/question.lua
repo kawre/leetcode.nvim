@@ -9,6 +9,8 @@ local ui_utils = require("leetcode-ui.utils")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 
+---@alias lc.editor.section "imports" | "code"
+
 ---@class lc.ui.Question
 ---@field file Path
 ---@field q lc.question_res
@@ -34,28 +36,33 @@ function Question:snippet(raw)
     return raw and code or self:injector(code)
 end
 
----@param code? string
-function Question:set_lines(code)
+---@param start_i integer
+---@param end_i integer
+---@param lines string[]|string
+function Question:editor_set_lines(start_i, end_i, lines)
     if not (self.bufnr and vim.api.nvim_buf_is_valid(self.bufnr)) then
         return
     end
 
-    pcall(vim.cmd.undojoin)
-    local s_i, e_i, lines = self:range()
-    s_i = s_i or 1
-    e_i = e_i or #lines
-    code = code and code or (self:snippet(true) or "")
-    vim.api.nvim_buf_set_lines(self.bufnr, s_i - 1, e_i, false, vim.split(code, "\n"))
+    lines = type(lines) == "string" and vim.split(lines, "\n") or lines ---@cast lines string[]
+    vim.api.nvim_buf_set_lines(self.bufnr, start_i, end_i, false, lines)
 end
 
-function Question:reset_lines()
+function Question:editor_reset()
+    local new_lines = self:snippet() or ""
+    self:editor_set_lines(0, -1, new_lines)
+end
+
+function Question:editor_reset_code()
     local new_lines = self:snippet(true) or ""
+    self:editor_section_replace(new_lines, "code")
+end
 
-    vim.schedule(function() --
-        log.info("Previous code found and reset\nTo undo, simply press `u`")
+function Question:reset_previous_code()
+    self:editor_reset_code()
+    vim.schedule(function()
+        log.info("Previous code found and reset. To undo, simply press `u` or use `:undo`.")
     end)
-
-    self:set_lines(new_lines)
 end
 
 ---@return string path, boolean existed
@@ -94,32 +101,108 @@ function Question:create_buffer()
     self:open_buffer(existed)
 end
 
+---@param strict? boolean
+function Question:editor_fold_imports(strict)
+    if not (self.bufnr and vim.api.nvim_buf_is_valid(self.bufnr)) then
+        return
+    end
+
+    local range = self:editor_section_range("imports", { inclusive = true, strict = strict })
+    if range and range.end_i then
+        vim.api.nvim_buf_call(self.bufnr, function()
+            ---@diagnostic disable-next-line: param-type-mismatch
+            pcall(vim.cmd, ("%d,%dfold"):format(range.start_i or 1, range.end_i))
+        end)
+    end
+end
+
+function Question:editor_yank_code()
+    if not (self.bufnr and vim.api.nvim_buf_is_valid(self.bufnr)) then
+        return
+    end
+
+    local range = self:editor_section_range("code", { strict = true })
+    if range then
+        vim.api.nvim_buf_call(self.bufnr, function()
+            vim.cmd(("%d,%dyank"):format(range.start_i, range.end_i))
+        end)
+    end
+end
+
 ---@param existed boolean
 function Question:open_buffer(existed)
     ui_utils.buf_set_opts(self.bufnr, { buflisted = true })
     ui_utils.win_set_buf(self.winid, self.bufnr, true)
 
-    local i = self:fold_range()
-    if i then
-        pcall(vim.cmd, ("%d,%dfold"):format(1, i))
+    vim.cmd([[match DiagnosticHint /@leet/]])
+
+    if config.user.editor.fold_imports then
+        self:editor_fold_imports(false)
     end
 
-    if existed and self.cache.status == "ac" then
-        self:reset_lines()
+    if config.user.editor.reset_previous_code and (existed and self.cache.status == "ac") then
+        self:reset_previous_code()
     end
 end
 
----@param before boolean
-function Question:inject(before)
+---@return string[]?
+function Question:inject_imports()
     local inject = config.user.injector[self.lang] or {}
-    local inj = before and inject.before or inject.after
 
-    local res
+    local imports = inject.imports
+    local default_imports = config.imports[self.lang]
 
-    if type(inj) == "boolean" and inj == true and before then
-        inj = config.imports[self.lang]
+    local function valid_imports(tbl)
+        if vim.tbl_isempty(tbl or {}) then
+            return false
+        end
+        if not vim.islist(tbl) then
+            log.error("Invalid imports format for language: " .. self.lang)
+            return false
+        end
+        return true
     end
 
+    if not imports then
+        return default_imports
+    end
+
+    if type(imports) == "function" then
+        local overriden = imports(vim.deepcopy(default_imports or {}))
+        if not valid_imports(overriden) then
+            return default_imports
+        end
+        return overriden
+    end
+
+    local resolved = type(imports) == "string" and { imports } or imports
+    if not valid_imports(resolved) then
+        return
+    end
+
+    local merged, seen = {}, {}
+    local function add(list)
+        for _, v in ipairs(list) do
+            if not seen[v] then
+                table.insert(merged, v)
+                seen[v] = true
+            end
+        end
+    end
+
+    add(default_imports)
+    add(resolved)
+
+    return not vim.tbl_isempty(merged) and merged or nil
+end
+
+---@param before boolean
+---@return string?
+function Question:inject(before)
+    local inject = config.user.injector[self.lang] or {}
+    local inj = before and (inject.before or {}) or (inject.after or {})
+
+    local res
     if type(inj) == "table" then
         res = table.concat(inj, "\n")
     elseif type(inj) == "string" then
@@ -127,25 +210,54 @@ function Question:inject(before)
     end
 
     if res and res ~= "" then
-        return before and (res .. "\n") or ("\n" .. res)
+        return res
     else
         return nil
     end
 end
 
+function Question:editor_section_is_present(name)
+    local range = self:editor_section_range(name)
+    return range and true or false
+end
+
+---@param lines string|string[]
+---@param name lc.editor.section
+---@return string
+function Question:editor_section(lines, name)
+    local comment = utils.get_lang(self.lang).comment
+
+    local start_tag = comment .. " " .. utils.section_tag(name, true)
+    local end_tag = comment .. " " .. utils.section_tag(name, false)
+
+    local str = type(lines) ~= "string" and table.concat(lines, "\n") or lines
+    return table.concat({ start_tag, str, end_tag }, "\n")
+end
+
+---@param lines string[]|string
+---@param name string
+function Question:editor_section_replace(lines, name)
+    local range = self:editor_section_range(name)
+
+    if range then
+        self:editor_set_lines(range.start_i - 1, range.end_i, lines)
+    end
+end
+
 ---@param code string
 function Question:injector(code)
-    local lang = utils.get_lang(self.lang)
+    local inject = config.user.injector[self.lang] or {}
 
-    local parts = {
-        ("%s @leet start"):format(lang.comment),
-        code,
-        ("%s @leet end"):format(lang.comment),
-    }
+    local parts = { self:editor_section(code, "code") }
 
     local before = self:inject(true)
     if before then
         table.insert(parts, 1, before)
+    end
+
+    local imports = self:inject_imports()
+    if imports then
+        table.insert(parts, 1, self:editor_section(table.concat(imports, "\n"), "imports"))
     end
 
     local after = self:inject(false)
@@ -153,7 +265,8 @@ function Question:injector(code)
         table.insert(parts, after)
     end
 
-    return table.concat(parts, "\n")
+    local gap = (inject.gap or 1) + 1
+    return table.concat(parts, ("\n"):rep(gap))
 end
 
 function Question:_unmount()
@@ -238,49 +351,51 @@ function Question:mount()
     return self
 end
 
----@param inclusive? boolean
----@return integer, integer, string[]
-function Question:range(inclusive)
+---@class lc.Question.Editor.Range
+---@field start_i? number
+---@field end_i? number
+---@field lines string[]
+---@field sliced string[]
+---@field complete boolean
+
+---@param name string
+---@param opts? { inclusive?: boolean, strict?: boolean }
+---@return lc.Question.Editor.Range?
+function Question:editor_section_range(name, opts)
+    opts = vim.tbl_extend("keep", opts or {}, { strict = true, inclusive = false })
     local lines = vim.api.nvim_buf_get_lines(self.bufnr, 0, -1, false)
     local start_i, end_i
 
+    local start_tag = utils.section_tag(name, true)
+    local end_tag = utils.section_tag(name, false)
+
     for i, line in ipairs(lines) do
-        if line:match("@leet start") then
-            start_i = i + (inclusive and 0 or 1)
-        elseif line:match("@leet end") then
-            end_i = i - (inclusive and 0 or 1)
+        if line:match(start_tag) then
+            start_i = i + (opts.inclusive and 0 or 1)
+        elseif line:match(end_tag) then
+            end_i = i - (opts.inclusive and 0 or 1)
         end
     end
 
-    return start_i, end_i, lines
-end
-
-function Question:fold_range()
-    local start_i, _, lines = self:range(true)
-    if start_i == nil or start_i <= 1 then
-        return
+    if opts.strict and not (start_i and end_i) then
+        log.error(("Section `@leet %s` not found in editor."):format(name))
+        return nil
     end
 
-    local i = start_i - 1
-    while lines[i] == "" do
-        i = i - 1
-    end
-
-    if 1 < i then
-        return i
-    end
+    return { start_i = start_i, end_i = end_i, lines = lines, complete = start_i and end_i }
 end
 
 ---@param submit boolean
 ---@return string
-function Question:lines(submit)
-    local start_i, end_i, lines = self:range()
+function Question:editor_submit_lines(submit)
+    local range = self:editor_section_range("code")
+    assert(range, "Code section not found in editor")
 
-    start_i = start_i or 1
-    end_i = end_i or #lines
+    local start_i = range.start_i or 1
+    local end_i = range.end_i or #range.lines
 
     local prefix = not submit and ("\n"):rep(start_i - 1) or ""
-    return prefix .. table.concat(lines, "\n", start_i, end_i)
+    return prefix .. table.concat(range.lines, "\n", start_i, end_i)
 end
 
 ---@param self lc.ui.Question
@@ -320,6 +435,6 @@ function Question:init(problem)
 end
 
 ---@type fun(question: lc.cache.Question): lc.ui.Question
-local LeetQuestion = Question
+local LeetQuestion = Question ---@diagnostic disable-line: assign-type-mismatch
 
 return LeetQuestion

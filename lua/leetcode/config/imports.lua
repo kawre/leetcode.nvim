@@ -1,6 +1,8 @@
 ---@class lc.Imports
 local imports = {}
 
+-- Pull requests are welcome to add more imports for other languages.
+
 imports["python3"] = {
     "from string import *",
     "from re import *",

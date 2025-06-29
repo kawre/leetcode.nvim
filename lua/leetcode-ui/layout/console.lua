@@ -60,6 +60,10 @@ function ConsoleLayout:mount()
 end
 
 function ConsoleLayout:run(submit)
+    if not self.question:editor_section_is_present("code") then
+        return
+    end
+
     if config.user.console.open_on_runcode then
         self:show()
     end

@@ -254,26 +254,26 @@ logging = true
 
 Inject code before or after your solution, injected code won't be submitted or run.
 
-#### default imports
-
-You can also pass `before = true` to inject default imports for the language.
-Supported languages are `python`, `python3`, `java`
-
-Access default imports via `require("leetcode.config.imports")`
+Imports will be injected at the top of the buffer, automatically
+folded by default.
 
 ```lua
 injector = { ---@type table<lc.lang, lc.inject>
     ["python3"] = {
-        before = true
+        imports = function(default_imports)
+            vim.list_extend(default_imports, { "from .leetcode import *" })
+            return default_imports
+        end,
+        after = { "def test():", "    print('test')" },
     },
     ["cpp"] = {
-        before = { "#include <bits/stdc++.h>", "using namespace std;" },
+        imports = function()
+            -- return a different list to omit default imports
+            return { "#include <bits/stdc++.h>", "using namespace std;" }
+        end,
         after = "int main() {}",
     },
-    ["java"] = {
-        before = "import java.util.*;",
-    },
-}
+},
 ```
 
 ### picker
@@ -354,7 +354,7 @@ image_support = false,
 
 - `tabs` opens a picker with all currently opened question tabs
 
-- `yank` yanks the current question solution
+- `yank` yanks the code section
 
 - `lang` opens a picker to change the language of the current question
 
@@ -366,25 +366,27 @@ image_support = false,
 
 - `random` opens a random question
 
-- `daily` opens the question of today
+- `daily` opens the question of today problem
 
-- `list` opens a problem list picker
+- `list` opens a picker with all available leetcode problems
 
 - `open` opens the current question in a default browser
 
-- `reset` reset current question to default code definition
-
-- `last_submit` retrieve last submitted code for the current question
-
 - `restore` try to restore default question layout
 
-- `inject` re-inject code for the current question
+- `last_submit` tries to replace the editor code section with the latest submitted code
 
-- `session`
-  - `create` create a new session
-  - `change` change the current session
+- `reset` resets editor code section to the default snippet
 
-  - `update` update the current session in case it went out of sync
+- `inject` re-injects editor code, keeping the code section intact
+
+- `fold` applies folding to the current question imports section
+
+<!-- - `session` -->
+<!--   - `create` create a new session -->
+<!--   - `change` change the current session -->
+<!---->
+<!--   - `update` update the current session in case it went out of sync -->
 
 - `desc` toggle question description
   - `toggle` same as `Leet desc`
@@ -394,10 +396,10 @@ image_support = false,
 - `cookie`
   - `update` opens a prompt to enter a new cookie
 
-  - `delete` sign-out
+  - `delete` deletes stored cookie and logs out of [leetcode.nvim]
 
 - `cache`
-  - `update` updates cache
+  - `update` fetches all available problems and updates the local cache of [leetcode.nvim]
 
 #### Some commands can take optional arguments. To stack argument values separate them by a `,`
 
@@ -424,9 +426,10 @@ This plugin can be initiated in two ways:
   nvim leetcode.nvim
   ```
 
-- _**(Experimental)**_ Alternatively, you can use `:Leet` command to open [leetcode.nvim]
+- Use `:Leet` command to open [leetcode.nvim]
   within your preferred dashboard plugin. The only requirement is that [Neovim]
   must not have any listed buffers open.
+  To bypass this requirement use [`non_standalone`](#non-standalone-mode) plugin.
 
 ### Switching between questions
 
