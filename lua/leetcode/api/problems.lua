@@ -108,6 +108,35 @@ function Problems.question_of_today(cb)
     })
 end
 
+function Problems.favorite_list(cb)
+    local query = queries.favorite_list
+
+    utils.query(query, {}, {
+        callback = function(res, err)
+            if err then
+                return cb(nil, err)
+            end
+
+            local data = res.data
+            cb(data.myCollectedFavoriteList.favorites)
+        end,
+    })
+end
+
+function Problems.favorite_question_list(favorite_slug, cb)
+    local query = queries.favorite_question_list
+
+    utils.query(query, { favoriteSlug = favorite_slug }, {
+        callback = function(res, err)
+            if err then
+                return cb(nil, err)
+            end
+            local normalized = utils.normalize_favorites(res.data.favoriteQuestionList.questions)
+            cb(normalized)
+        end,
+    })
+end
+
 function Problems.translated_titles(cb)
     local query = queries.translations
 
