@@ -482,6 +482,29 @@ function cmd.fix()
     vim.cmd("qa!")
 end
 
+function cmd.custom_list(options)
+    require("leetcode.utils").auth_guard()
+    
+    if not options.file or #options.file == 0 then
+        return log.error("No file specified for custom list")
+    end
+
+    local filepath = options.file[1]
+    local filter_options = {}
+    
+    -- Apply additional filters if specified
+    if options.filter then
+        for _, filter_type in ipairs(options.filter) do
+            if options[filter_type] then
+                filter_options[filter_type] = options[filter_type][1]
+            end
+        end
+    end
+
+    local problems = require("leetcode.cache.problemlist").filter_by_file(filepath, filter_options)
+    require("leetcode.pickers.question").pick(problems)
+end
+
 ---@return string[], string[]
 function cmd.parse(args)
     local parts = vim.split(vim.trim(args), "%s+")
@@ -654,6 +677,10 @@ cmd.commands = {
     fix = {
         cmd.fix,
         _private = true,
+    },
+    custom = {
+      cmd.custom_list,
+      _args = arguments.list_custom,
     },
 }
 
