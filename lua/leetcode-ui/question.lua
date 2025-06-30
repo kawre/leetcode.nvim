@@ -456,6 +456,51 @@ function Question:init(problem)
     self.lang = config.lang
 end
 
+-- start of shuffle functionality.
+
+function Question:shuffle()
+    local api_question = require("leetcode.api.question")
+    local problems = require("leetcode.cache.problemlist")
+
+    -- Fetch a new random question (minimal info)
+    local q, err = api_question.random()
+    if err then
+        log.err(err)
+        return
+    end
+
+    -- Get full question info by title_slug
+    local full_q = api_question.by_title_slug(q.title_slug)
+    if not full_q then
+        log.err("Failed to fetch full question info for: " .. (q.title_slug or "nil"))
+        return
+    end
+
+    -- Update self fields
+    self.q = full_q
+    self.cache = problems.get_by_title_slug(q.title_slug) or {}
+
+    -- Overwrite buffer contents
+    self:set_lines(self:snippet(true))
+
+    -- Unmount and remount description, info, console
+    if self.description and self.description.unmount then self.description:unmount() end
+    if self.info and self.info.unmount then self.info:unmount() end
+    if self.console and self.console.unmount then self.console:unmount() end
+
+    -- Recreate description, info, console for the new question
+    local Description = require("leetcode-ui.split.description")
+    local Console = require("leetcode-ui.layout.console")
+    local Info = require("leetcode-ui.popup.info")
+    self.description = Description(self):mount()
+    self.console = Console(self)
+    self.info = Info(self)
+
+    log.info("Shuffled to a new random question: " .. (full_q.title or q.title_slug or "unknown"))
+end
+
+-- end of shuffle functionality.
+
 ---@type fun(question: lc.cache.Question): lc.ui.Question
 local LeetQuestion = Question ---@diagnostic disable-line: assign-type-mismatch
 
