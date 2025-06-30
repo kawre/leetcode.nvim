@@ -127,7 +127,9 @@ function Spinner:replace()
         msg = msg .. "…"
     end
 
-    self.notif = vim.notify(msg, self.lvl, self.opts)
+    vim.schedule(function()
+        self.notif = vim.notify(msg, self.lvl, self.opts)
+    end)
 end
 
 ---@private
