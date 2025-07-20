@@ -1,6 +1,6 @@
 local markup = require("markup")
 
-local ascii = vim.tbl_map(markup.Block, {
+local ascii = vim.tbl_map(markup.block, {
     [[ /$$                          /$$     /$$$$$$                /$$         ]],
     [[| $$                         | $$    /$$__  $$              | $$         ]],
     [[| $$       /$$$$$$  /$$$$$$ /$$$$$$ | $$  \__/ /$$$$$$  /$$$$$$$ /$$$$$$ ]],
@@ -12,5 +12,11 @@ local ascii = vim.tbl_map(markup.Block, {
 })
 
 return markup.Component(function()
-    return markup.Block(ascii, "leetcode_menu_header")
+    return markup.block({
+        margin_left = 1,
+        margin_top = 1,
+        margin_bottom = 1,
+        margin_right = 1,
+        ascii,
+    }, "leetcode_menu_header")
 end)

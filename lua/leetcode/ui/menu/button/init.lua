@@ -21,17 +21,17 @@ return markup.Component(function(props)
         end
     end
 
-    return markup.HFlex({
-        on_submit = on_submit,
-        on_key = {
-            [p.key] = on_submit,
-        },
-        markup.HFlex({
+    return markup.block({
+        -- on_submit = on_submit,
+        -- on_key = {
+        --     [p.key] = on_submit,
+        -- },
+        markup.flex({
             spacing = 1,
-            size = { width = 50 },
-            markup.Inline(p.icon, "leetcode_menu_button_icon"),
-            markup.Inline(p.title, "leetcode_menu_button_title"),
-            p.nested and markup.Inline("", "leetcode_menu_button_nested"),
+            markup.inline(p.icon, "leetcode_menu_button_icon"),
+            markup.inline(p.title, "leetcode_menu_button_title"),
+            -- p.nested and markup.inline("", "leetcode_menu_button_nested"),
+            p.nested and markup.inline("E", "leetcode_menu_button_nested"),
         }),
         markup.Inline(p.key, "leetcode_menu_button_key"),
     })

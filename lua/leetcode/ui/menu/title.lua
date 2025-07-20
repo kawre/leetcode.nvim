@@ -12,11 +12,13 @@ return markup.Component(function(props)
         table.insert(titles, markup.Inline(title, hl))
 
         if i ~= #parts then
-            table.insert(titles, markup.Inline("  ", "leetcode_menu_title_deli"))
+            table.insert(titles, markup.Inline("  "))
         end
     end
 
-    return markup.HFlex({
+    return markup.flex({
+        width = 50,
+        justify = "center",
         children = titles,
     })
 end)

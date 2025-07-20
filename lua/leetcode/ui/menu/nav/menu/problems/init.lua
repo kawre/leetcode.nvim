@@ -9,21 +9,24 @@ return markup.Component(function()
 
     return Buttons({
         Button({
-            icon = "",
+            -- icon = "",
+            icon = "1",
             title = "List",
             key = "p",
             nested = true,
             on_submit = cmd.problems,
         }),
         Button({
-            icon = "",
+            -- icon = "",
+            icon = "2",
             title = "Random",
             key = "s",
             nested = true,
             on_submit = cmd.random_question,
         }),
         Button({
-            icon = "󰃭",
+            icon = "3",
+            -- icon = "󰃭",
             title = "Daily",
             key = "i",
             nested = true,

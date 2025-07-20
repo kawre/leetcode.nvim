@@ -37,13 +37,19 @@ end
 
 function Menu:render()
     local menu = markup.Component(function(props)
-        return markup.Flex({
-            margin = { top = 3 },
+        return markup.vflex({
+            -- margin_top = 3,
+            -- margin_bottom = 3,
+            -- margin_right = 3,
+            -- margin_left = 3,
             align = "center",
+            -- style = "Cursor",
             spacing = 3,
-            Header(),
-            Nav({ page = self.page }),
-            Footer(),
+            children = {
+                Header(),
+                Nav({ page = self.page }),
+                Footer(),
+            },
         })
     end)
 
