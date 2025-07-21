@@ -29,7 +29,9 @@ function logger.log(msg, lvl)
         msg = debug.traceback(msg .. "\n")
     end
 
-    vim.notify(msg, lvl, { title = title })
+    vim.schedule(function()
+        vim.notify(msg, lvl, { title = title })
+    end)
 end
 
 ---@param msg any
