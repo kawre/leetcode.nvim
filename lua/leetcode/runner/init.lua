@@ -1,3 +1,5 @@
+---@module 'plenary'
+
 local log = require("leetcode.logger")
 local interpreter = require("leetcode.api.interpreter")
 local config = require("leetcode.config")
@@ -38,7 +40,7 @@ function Runner:handle(submit)
 
     local body = {
         lang = question.lang,
-        typed_code = self.question:lines(submit),
+        typed_code = self.question:editor_submit_lines(submit),
         question_id = question.q.id,
         data_input = not submit and question.console.testcase:content(),
     }
@@ -50,11 +52,15 @@ function Runner:handle(submit)
         end
 
         if item then
-            judge:stop(item.status_msg, item._.success)
+            if item._.success then
+                judge:success(item.status_msg)
+            else
+                judge:error(item.status_msg)
+            end
         elseif state then
             judge:from_state(state)
         elseif err then
-            judge:stop(err.msg or "Something went wrong", false)
+            judge:error(err.msg or "Something went wrong")
         end
 
         if item then

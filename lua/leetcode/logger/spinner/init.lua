@@ -1,13 +1,16 @@
 local config = require("leetcode.config")
 local t = require("leetcode.translator")
+local lvls = vim.log.levels
 
 ---@class lc.Spinner
----@field spinner lc.spinner | nil
+---@field spinner lc.spinner
+---@field stype lc.spinner_types
 ---@field index integer
----@field noti any
+---@field notif any
+---@field timer uv.uv_timer_t
 ---@field msg string
-local spinner = {}
-spinner.__index = spinner
+local Spinner = {}
+Spinner.__index = Spinner
 
 ---@class lc.spinner
 ---@field frames string[]
@@ -39,96 +42,150 @@ local spinners = {
     },
 }
 
----@private
-function spinner:spin()
-    local stype = self.spinner
-    if not stype then
-        return
-    end
+---@param msg? string
+---@param opts? table
+function Spinner:error(msg, opts)
+    self:set_icon("󰅘")
+    self:stop(msg, opts)
+end
 
-    self:set(nil, nil, {
-        icon = stype.frames[self.index + 1],
-    })
-
-    self.index = (self.index + 1) % #stype.frames
-
-    local fps = math.floor(1000 / stype.fps)
-    vim.defer_fn(function()
-        self:spin()
-    end, fps)
+---@param msg? string
+---@param opts? table
+function Spinner:success(msg, opts)
+    self:set_icon("")
+    self:stop(msg, opts)
 end
 
 ---@private
----
 ---@param msg? string
----@param lvl? integer
 ---@param opts? table
-function spinner:set(msg, lvl, opts)
-    if not self.spinner then
-        return
+function Spinner:stop(msg, opts)
+    self:set_message(msg)
+    self.opts.timeout = 2500
+    self:extend(opts)
+
+    if self.timer:is_active() then
+        self.timer:stop()
     end
 
+    if not self._closed then
+        self._closed = true
+        self.timer:close(function()
+            self:replace()
+        end)
+    end
+end
+
+---@private
+function Spinner:set_icon(icon)
+    self:extend({ icon = icon })
+end
+
+---@private
+function Spinner:set_lvl(lvl)
+    if lvl then
+        self.lvl = lvl
+    end
+end
+
+---@private
+function Spinner:set_message(msg)
     if msg then
-        self:update(msg)
+        self.msg = msg
     end
-    lvl = lvl or vim.log.levels.INFO
+end
 
-    local id = type(self.noti) == "table" and self.noti.id or self.noti
+function Spinner:soft_update(msg, lvl, opts)
+    self:set_message(msg)
+    self:set_lvl(lvl)
+    self:extend(opts)
+end
 
-    opts = vim.tbl_deep_extend("force", {
-        hide_from_history = true,
-        history = false,
-        title = config.name,
-        timeout = false,
-        replace = id,
-        id = id,
-    }, opts or {})
+function Spinner:update(msg, lvl, opts)
+    self:soft_update(msg, lvl, opts)
+    self:reset_loop()
+end
 
-    self.noti = vim.notify(self.msg, lvl, opts)
+---@private
+---@param opts? table
+function Spinner:extend(opts)
+    if opts then
+        self.opts = vim.tbl_deep_extend("force", self.opts, opts)
+    end
+end
+
+---@private
+function Spinner:replace()
+    if self.notif then
+        local replace_id = type(self.notif) == "table" and self.notif.id or self.notif
+        assert(replace_id, "Unknown notification format, please open an issue.")
+        self:extend({ replace = replace_id, id = replace_id })
+    end
+
+    local msg = self.msg
+    if self.timer:is_active() then
+        msg = msg .. "…"
+    end
+
+    vim.schedule(function()
+        self.notif = vim.notify(msg, self.lvl, self.opts)
+    end)
+end
+
+---@private
+function Spinner:reset_loop()
+    if self.timer:is_active() then
+        self.timer:stop()
+    end
+    self:loop()
 end
 
 ---@param spinner_type lc.spinner_types
-function spinner:change(spinner_type)
-    self.spinner = spinners[spinner_type]
+function Spinner:use(spinner_type)
+    if self.stype == spinner_type then
+        return
+    end
+    assert(spinners[spinner_type], "Unknown spinner type: " .. spinner_type)
+
+    self.index = 0
+    self.stype = spinner_type
+    self:reset_loop()
 end
 
----@param msg any
-function spinner:update(msg)
-    self.msg = t(tostring(msg))
-end
+---@private
+function Spinner:loop()
+    local fps = math.floor(1000 / spinners[self.stype].fps)
 
-function spinner:start()
-    self:spin()
-    return self
-end
+    local function update_spinner()
+        self.index = (self.index + 1) % #spinners[self.stype].frames
+        self:set_icon(spinners[self.stype].frames[self.index + 1])
+        self:replace()
+    end
 
----@param msg? string
----@param success? boolean
----@param opts? table
-function spinner:stop(msg, success, opts)
-    success = success == nil and true or success
-
-    opts = vim.tbl_deep_extend("force", {
-        icon = success and "" or "󰅘",
-        timeout = 1500,
-    }, opts or {})
-
-    local lvl = vim.log.levels[success and "INFO" or "ERROR"]
-
-    self:set(msg, lvl, opts)
-    self.spinner = nil
+    self.timer:start(0, fps, vim.schedule_wrap(update_spinner))
 end
 
 ---@param msg? string
 ---@param spinner_type? lc.spinner_types
-function spinner:init(msg, spinner_type)
+function Spinner:start(msg, spinner_type)
+    local opts = {
+        hide_from_history = true,
+        history = false,
+        title = config.name,
+        timeout = false,
+    }
+
     self = setmetatable({
         index = 0,
-        spinner = spinners[spinner_type or "dot"],
+        timer = vim.loop.new_timer(),
+        msg = msg,
+        stype = spinner_type or "dot",
+        lvl = lvls.INFO,
+        opts = opts,
     }, self)
 
-    self:update(msg or "")
-    return self:start()
+    self:loop()
+    return self
 end
 
-return spinner
+return Spinner

@@ -8,8 +8,6 @@ local Parser = require("leetcode.parser")
 
 local config = require("leetcode.config")
 local keys = config.user.keys
-local utils = require("leetcode.utils")
-local log = require("leetcode.logger")
 
 ---@class lc.ui.InfoPopup : lc.ui.Popup
 ---@field popup NuiPopup

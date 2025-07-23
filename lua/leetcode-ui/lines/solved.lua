@@ -79,12 +79,12 @@ function Solved:handle_res(res)
 end
 
 function Solved:update()
-    local spinner = Spinner:init("updating solved problems...")
+    local spinner = Spinner:start("updating solved problems")
     statistics.solved(function(res, err)
         if err then
-            spinner:stop(err.msg, false)
+            spinner:error(err.msg)
         else
-            spinner:stop("solved problems updated", true, { timeout = 200 })
+            spinner:success("solved problems updated")
             self:handle_res(res)
         end
     end)

@@ -60,6 +60,11 @@ function ConsoleLayout:mount()
 end
 
 function ConsoleLayout:run(submit)
+    local range = self.question:editor_section_range("code")
+    if not range:is_valid_or_log() then
+        return
+    end
+
     if config.user.console.open_on_runcode then
         self:show()
     end

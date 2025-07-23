@@ -26,7 +26,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
 - [Neovim] >= 0.9.0
 
-- [telescope.nvim] or [fzf-lua]
+- [Picker](#picker)
 
 - [plenary.nvim]
 
@@ -47,8 +47,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     "kawre/leetcode.nvim",
     build = ":TSUpdate html", -- if you have `nvim-treesitter` installed
     dependencies = {
-        "nvim-telescope/telescope.nvim",
-        -- "ibhagwan/fzf-lua",
+        -- include a picker of your choice, see picker section for more details
         "nvim-lua/plenary.nvim",
         "MunifTanjim/nui.nvim",
     },
@@ -96,6 +95,11 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
 
     cache = {
         update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
+    },
+
+    editor = {
+        reset_previous_code = true, ---@type boolean
+        fold_imports = true, ---@type boolean
     },
 
     console = {
@@ -255,33 +259,38 @@ logging = true
 
 Inject code before or after your solution, injected code won't be submitted or run.
 
-#### default imports
-
-You can also pass `before = true` to inject default imports for the language.
-Supported languages are `python`, `python3`, `java`
-
-Access default imports via `require("leetcode.config.imports")`
+Imports will be injected at the top of the buffer, automatically
+folded by default.
 
 ```lua
 injector = { ---@type table<lc.lang, lc.inject>
     ["python3"] = {
-        before = true
+        imports = function(default_imports)
+            vim.list_extend(default_imports, { "from .leetcode import *" })
+            return default_imports
+        end,
+        after = { "def test():", "    print('test')" },
     },
     ["cpp"] = {
-        before = { "#include <bits/stdc++.h>", "using namespace std;" },
+        imports = function()
+            -- return a different list to omit default imports
+            return { "#include <bits/stdc++.h>", "using namespace std;" }
+        end,
         after = "int main() {}",
     },
-    ["java"] = {
-        before = "import java.util.*;",
-    },
-}
+},
 ```
 
 ### picker
 
-Supported picker providers are `telescope` and `fzf-lua`.
-When provider is `nil`, [leetcode.nvim] will first try to use `fzf-lua`,
-if not found it will fallback to `telescope`.
+Supported picker providers are:
+
+- [`snacks-picker`][snacks.nvim]
+- [`fzf-lua`][fzf-lua]
+- [`telescope`][telescope.nvim]
+
+If `provider` is `nil`, [leetcode.nvim] will try to resolve the first
+available one in the order above.
 
 ```lua
 ---@type lc.picker
@@ -350,7 +359,7 @@ image_support = false,
 
 - `tabs` opens a picker with all currently opened question tabs
 
-- `yank` yanks the current question solution
+- `yank` yanks the code section
 
 - `lang` opens a picker to change the language of the current question
 
@@ -362,42 +371,40 @@ image_support = false,
 
 - `random` opens a random question
 
-- `daily` opens the question of today
+- `daily` opens the question of today problem
 
-- `list` opens a problem list picker
+- `list` opens a picker with all available leetcode problems
 
 - `open` opens the current question in a default browser
 
-- `reset` reset current question to default code definition
-
-- `last_submit` retrieve last submitted code for the current question
-
 - `restore` try to restore default question layout
 
-- `inject` re-inject code for the current question
+- `last_submit` tries to replace the editor code section with the latest submitted code
 
-- `session`
+- `reset` resets editor code section to the default snippet
 
-  - `create` create a new session
-  - `change` change the current session
+- `inject` re-injects editor code, keeping the code section intact
 
-  - `update` update the current session in case it went out of sync
+- `fold` applies folding to the current question imports section
+
+<!-- - `session` -->
+<!--   - `create` create a new session -->
+<!--   - `change` change the current session -->
+<!---->
+<!--   - `update` update the current session in case it went out of sync -->
 
 - `desc` toggle question description
-
   - `toggle` same as `Leet desc`
 
   - `stats` toggle description stats visibility
 
 - `cookie`
-
   - `update` opens a prompt to enter a new cookie
 
-  - `delete` sign-out
+  - `delete` deletes stored cookie and logs out of [leetcode.nvim]
 
 - `cache`
-
-  - `update` updates cache
+  - `update` fetches all available problems and updates the local cache of [leetcode.nvim]
 
 #### Some commands can take optional arguments. To stack argument values separate them by a `,`
 
@@ -424,9 +431,15 @@ This plugin can be initiated in two ways:
   nvim leetcode.nvim
   ```
 
-- _**(Experimental)**_ Alternatively, you can use `:Leet` command to open [leetcode.nvim]
+- Use `:Leet` command to open [leetcode.nvim]
   within your preferred dashboard plugin. The only requirement is that [Neovim]
   must not have any listed buffers open.
+  To bypass this requirement use [`non_standalone`](#non-standalone-mode) plugin.
+
+### Switching between test cases
+
+To switch between test cases, press the number of the test case
+`1` for Case (1), `2` for Case (2), etc
 
 ### Switching between questions
 
@@ -434,7 +447,9 @@ To switch between questions, use `Leet tabs`
 
 ### Sign In
 
-It is **required** to be **signed-in** to use [leetcode.nvim]
+> [!WARNING]
+> Be sure to copy the `Cookie` from request headers, not the `set-cookie` from
+> response headers.
 
 https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4ad3abeda5c3
 
@@ -507,5 +522,6 @@ You can then exit [leetcode.nvim] using `:Leet exit` command
 [nvim-web-devicons]: https://github.com/nvim-tree/nvim-web-devicons
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
 [fzf-lua]: https://github.com/ibhagwan/fzf-lua
+[snacks.nvim]: https://github.com/folke/snacks.nvim
 [tree-sitter-html]: https://github.com/tree-sitter/tree-sitter-html
 [plenary.nvim]: https://github.com/nvim-lua/plenary.nvim

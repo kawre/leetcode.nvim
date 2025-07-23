@@ -4,8 +4,6 @@ local config = require("leetcode.config")
 local urls = require("leetcode.api.urls")
 local Spinner = require("leetcode.logger.spinner")
 
-local log = require("leetcode.logger")
-
 ---@class lc.ProblemsApi
 local Problems = {}
 
@@ -18,7 +16,7 @@ function Problems.all(cb, noti)
 
     local spinner
     if noti then
-        spinner = Spinner:init("updating problemlist cache...", "points")
+        spinner = Spinner:start("updating problemlist cache", "points")
     end
 
     if cb then
@@ -26,7 +24,7 @@ function Problems.all(cb, noti)
             callback = function(res, err)
                 if err then
                     if spinner then
-                        spinner:stop(err.msg, false)
+                        spinner:error(err.msg)
                     end
                     return cb(nil, err)
                 end
@@ -40,21 +38,21 @@ function Problems.all(cb, noti)
                     Problems.translated_titles(function(titles, terr)
                         if terr then
                             if spinner then
-                                spinner:stop(terr.msg, false)
+                                spinner:error(terr.msg)
                             end
                             return cb(nil, terr)
                         end
 
                         problems = utils.translate_titles(problems, titles)
                         if spinner then
-                            spinner:stop("cache updated")
+                            spinner:success("cache updated")
                         end
 
                         cb(problems)
                     end)
                 else
                     if spinner then
-                        spinner:stop("cache updated")
+                        spinner:success("cache updated")
                     end
 
                     cb(problems)
@@ -65,7 +63,7 @@ function Problems.all(cb, noti)
         local res, err = utils.get(endpoint)
         if err then
             if spinner then
-                spinner:stop(err.msg, false)
+                spinner:error(err.msg)
             end
             return nil, err
         end
@@ -76,18 +74,18 @@ function Problems.all(cb, noti)
             local titles, terr = Problems.translated_titles()
             if terr then
                 if spinner then
-                    spinner:stop(terr.msg, false)
+                    spinner:error(terr.msg)
                 end
                 return nil, terr
             end
 
             if spinner then
-                spinner:stop("problems cache updated")
+                spinner:success("problems cache updated")
             end
             return utils.translate_titles(problems, titles)
         else
             if spinner then
-                spinner:stop("problems cache updated")
+                spinner:success("problems cache updated")
             end
             return problems
         end

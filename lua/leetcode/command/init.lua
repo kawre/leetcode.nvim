@@ -40,7 +40,7 @@ function cmd.cookie_prompt(cb)
             row = "50%",
             col = "50%",
         },
-        size = 100,
+        size = 40,
         border = {
             style = "rounded",
             text = {
@@ -195,18 +195,7 @@ function cmd.yank()
         return
     end
 
-    if
-        (q.bufnr and api.nvim_buf_is_valid(q.bufnr))
-        and (q.winid and api.nvim_win_is_valid(q.winid))
-    then
-        api.nvim_set_current_win(q.winid)
-        utils.with_version("0.10.0", nil, function()
-            api.nvim_set_current_buf(q.bufnr)
-        end)
-
-        local start_i, end_i, lines = q:range()
-        vim.cmd(("%d,%dyank"):format(start_i or 1, end_i or #lines))
-    end
+    q:editor_yank_code()
 end
 
 ---@param page lc-menu.page
@@ -335,7 +324,7 @@ function cmd.reset()
         return
     end
 
-    q:set_lines()
+    q:editor_reset_code()
 end
 
 function cmd.last_submit()
@@ -359,7 +348,9 @@ function cmd.last_submit()
         end
 
         if type(res) == "table" and res.code then
-            q:set_lines(res.code)
+            ---@type string
+            local lines = res.code
+            q:editor_section_replace(lines, "code")
         else
             log.error("Something went wrong")
         end
@@ -400,32 +391,27 @@ function cmd.inject()
     end
 
     if q.bufnr and api.nvim_buf_is_valid(q.bufnr) then
-        local start_i, end_i = q:range(true)
-        local not_found = {}
+        local range = q:editor_section_range("code")
 
-        if not start_i then
-            table.insert(not_found, "`@leet start`")
-        else
-            local before = q:inject(true)
-            if before then
-                api.nvim_buf_set_lines(q.bufnr, 0, start_i - 1, false, vim.split(before, "\n"))
-                _, end_i = q:range(true)
-            end
+        if not range:is_valid_or_log() then
+            return
         end
 
-        if not end_i then
-            table.insert(not_found, "`@leet end`")
-        else
-            local after = q:inject(false)
-            if after then
-                api.nvim_buf_set_lines(q.bufnr, end_i, -1, false, vim.split(after, "\n"))
-            end
-        end
+        local lines = table.concat(range.lines, "\n", range.start_i, range.end_i)
 
-        if not vim.tbl_isempty(not_found) then
-            log.error(table.concat(not_found, " and ") .. " not found")
-        end
+        q:editor_reset()
+        q:editor_section_replace(lines, "code")
     end
+end
+
+function cmd.fold()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if not q then
+        return
+    end
+
+    q:editor_fold_imports(true)
 end
 
 function cmd.get_active_session()
@@ -632,6 +618,7 @@ cmd.commands = {
     last_submit = { cmd.last_submit },
     restore = { cmd.restore },
     inject = { cmd.inject },
+    fold = { cmd.fold },
     -- session = {
     --     change = {
     --         cmd.change_session,

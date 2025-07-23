@@ -144,4 +144,13 @@ function utils.with_version(v, with, without)
     return (vim.fn.has("nvim-" .. v) == 1 and with or without)()
 end
 
+---@param name lc.editor.section
+---@param start? boolean
+function utils.section_tag(name, start)
+    if name == "code" then
+        return ("@leet %s"):format(start and "start" or "end")
+    end
+    return ("@leet %s %s"):format(name, start and "start" or "end")
+end
+
 return utils
