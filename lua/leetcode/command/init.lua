@@ -603,7 +603,7 @@ function cmd.exec(args)
     end
 
     if cmds and type(cmds[1]) == "function" then
-        cmds1
+        cmds[1](options)
     else
         -- This happens if the command was empty or only contained unknown subcommands
         return log.error(("Invalid command: `:Leet %s`"):format(args.args))
