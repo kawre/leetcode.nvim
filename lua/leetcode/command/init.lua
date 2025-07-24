@@ -574,25 +574,39 @@ function cmd.rec_complete(args, options, cmds)
 end
 
 function cmd.exec(args)
+    local input_args = vim.split(args.args, "%s+", { trimempty = true })
     local cmds = cmd.commands
+    local arg_idx = 1
 
-    local options = vim.empty_dict()
-    for s in vim.gsplit(args.args:lower(), "%s+", { trimempty = true }) do
-        local opt = vim.split(s, "=")
-
-        if opt[2] then
-            options[opt[1]] = vim.split(opt[2], ",", { trimempty = true })
-        elseif cmds then
-            cmds = cmds[s]
+    -- Find the command by consuming parts of the input
+    while arg_idx <= #input_args do
+        local current_part = input_args[arg_idx]:lower()
+        if not string.find(current_part, "=") and cmds[current_part] then
+            cmds = cmds[current_part]
+            arg_idx = arg_idx + 1
         else
+            -- Stop when we hit an option (like status=ac) or an unknown subcommand
             break
         end
     end
 
+    -- The rest are options
+    local options = vim.empty_dict()
+    for i = arg_idx, #input_args do
+        local opt = vim.split(input_args[i], "=")
+        if opt[2] then
+            options[opt[1]:lower()] = vim.split(opt[2], ",", { trimempty = true })
+        else
+            -- This part is not a valid option, and wasn't a valid subcommand
+            return log.error(("Invalid command or argument: `%s`"):format(input_args[i]))
+        end
+    end
+
     if cmds and type(cmds[1]) == "function" then
-        cmds[1](options) ---@diagnostic disable-line
+        cmds1
     else
-        log.error(("Invalid command: `%s %s`"):format(args.name, args.args))
+        -- This happens if the command was empty or only contained unknown subcommands
+        return log.error(("Invalid command: `:Leet %s`"):format(args.args))
     end
 end
 

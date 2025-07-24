@@ -497,6 +497,12 @@ function Question:shuffle()
     self.console = Console(self)
     self.info = Info(self)
 
+    -- HACK: Force LSP client to re-attach to the buffer after renaming it.
+    -- This prevents errors like "trying to get AST for non-added document".
+    if #vim.lsp.get_active_clients({ bufnr = self.bufnr }) > 0 then
+        vim.cmd.doautocmd("BufRead")
+    end
+
     log.info("Shuffled to a new random question: " .. (full_q.title or q.title_slug or "unknown"))
 end
 
