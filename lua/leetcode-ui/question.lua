@@ -472,26 +472,27 @@ function Question:shuffle()
     -- Get full question info by title_slug
     local full_q = api_question.by_title_slug(q.title_slug)
     if not full_q then
-        log.err("Failed to fetch full question info for: " .. (q.title_slug or "nil"))
-        return
+        return log.err("Failed to fetch full question info for: " .. (q.title_slug or "nil"))
     end
 
     -- Update self fields
     self.q = full_q
     self.cache = problems.get_by_title_slug(q.title_slug) or {}
 
-    -- Overwrite buffer contents
-    self:set_lines(self:snippet(true))
+    -- Update buffer path and name. This also writes the file if it doesn't exist.
+    local new_path, existed = self:path()
+    vim.api.nvim_buf_set_name(self.bufnr, new_path)
 
-    -- Unmount and remount description, info, console
-    if self.description and self.description.unmount then self.description:unmount() end
-    if self.info and self.info.unmount then self.info:unmount() end
-    if self.console and self.console.unmount then self.console:unmount() end
+    -- Overwrite buffer contents with new snippet and apply settings
+    self:editor_reset()
+    self:open_buffer(existed)
 
-    -- Recreate description, info, console for the new question
-    local Description = require("leetcode-ui.split.description")
-    local Console = require("leetcode-ui.layout.console")
-    local Info = require("leetcode-ui.popup.info")
+    -- Unmount old UI components. The console unmount was fixed to prevent leaks.
+    self.description:unmount()
+    self.info:unmount()
+    self.console:unmount()
+
+    -- Recreate UI components for the new question
     self.description = Description(self):mount()
     self.console = Console(self)
     self.info = Info(self)

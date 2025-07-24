@@ -277,6 +277,14 @@ function cmd.q_submit()
     end
 end
 
+function cmd.q_shuffle()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if q then
+        q:shuffle()
+    end
+end
+
 function cmd.ui_skills()
     if config.is_cn then
         return
@@ -611,6 +619,7 @@ cmd.commands = {
     run = { cmd.q_run },
     test = { cmd.q_run },
     submit = { cmd.q_submit },
+    shuffle = { cmd.q_shuffle },
     daily = { cmd.qot },
     yank = { cmd.yank },
     open = { cmd.open },
