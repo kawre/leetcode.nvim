@@ -479,6 +479,15 @@ function Question:shuffle()
     self.q = full_q
     self.cache = problems.get_by_title_slug(q.title_slug) or {}
 
+    -- Detach LSP clients before renaming the buffer to prevent errors.
+    -- The clients will be re-attached later.
+    local clients = vim.lsp.get_active_clients({ bufnr = self.bufnr })
+    if #clients > 0 then
+        for _, client in ipairs(clients) do
+            vim.lsp.stop_client(client.id)
+        end
+    end
+
     -- Update buffer path and name. This also writes the file if it doesn't exist.
     local new_path, existed = self:path()
     vim.api.nvim_buf_set_name(self.bufnr, new_path)
@@ -497,9 +506,8 @@ function Question:shuffle()
     self.console = Console(self)
     self.info = Info(self)
 
-    -- HACK: Force LSP client to re-attach to the buffer after renaming it.
-    -- This prevents errors like "trying to get AST for non-added document".
-    if #vim.lsp.get_active_clients({ bufnr = self.bufnr }) > 0 then
+    -- Re-attach LSP clients by triggering the autocommands that lspconfig uses.
+    if #clients > 0 then
         vim.cmd.doautocmd("BufRead")
     end
 
