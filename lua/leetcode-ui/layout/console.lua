@@ -17,11 +17,13 @@ local log = require("leetcode.logger")
 local ConsoleLayout = Layout:extend("LeetConsoleLayout")
 
 function ConsoleLayout:unmount() --
-    ConsoleLayout.super.unmount(self)
-
-    self.testcase = Testcase(self)
-    self.result = Result(self)
-    self.popups = { self.testcase, self.result }
+	if self.testcase and self.testcase.unmount then
+		self.testcase:unmount()
+	end
+	if self.result and self.result.unmount then
+		self.result:unmount()
+	end
+	ConsoleLayout.super.unmount(self)
 end
 
 function ConsoleLayout:hide()
