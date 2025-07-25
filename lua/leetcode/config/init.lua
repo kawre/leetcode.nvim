@@ -19,7 +19,7 @@ local config = {
     debug = false,
     lang = "cpp",
     version = "1.0.1",
-    storage = {}, ---@type table<string, Path>
+    storage = {}, ---@type lc.storage
     theme = {}, ---@type lc.highlights
     plugins = {},
 
@@ -54,7 +54,8 @@ function config.setup()
         config.user.storage.home = config.user.directory
     end
 
-    config.user.storage = vim.tbl_map(vim.fn.expand, config.user.storage)
+    config.user.storage.home = vim.fn.expand(config.user.storage.home)
+    config.user.storage.cache = vim.fn.expand(config.user.storage.cache)
 
     config.debug = config.user.debug or false ---@diagnostic disable-line
     config.lang = config.user.lang
@@ -64,6 +65,8 @@ function config.setup()
 
     config.storage.cache = P:new(config.user.storage.cache) ---@diagnostic disable-line
     config.storage.cache:mkdir()
+
+    config.storage.format = config.user.storage.format
 
     for _, plug_load_fn in ipairs(lazy_plugs) do
         plug_load_fn()
