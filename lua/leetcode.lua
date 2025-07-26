@@ -1,7 +1,10 @@
 local config = require("leetcode.config")
 
----@class lc.LeetCode
+---@class leet
 local leetcode = {}
+
+---@class leet.global
+_G.Leet = { ctx = {}, config = config }
 
 ---@param on_vimenter boolean
 ---
@@ -61,13 +64,14 @@ function leetcode.start(on_vimenter)
     end
 
     -- local Menu = require("leetcode-ui.renderer.menu")
-    local Menu = require("leetcode.ui.menu")
-    Menu():mount()
+    local menu = require("leetcode.ui.menu")
+    menu.win:show()
+    menu:render()
 
-    -- local utils = require("leetcode.utils")
-    -- utils.exec_hooks("enter")
+    local utils = require("leetcode.utils")
+    utils.exec_hook("enter")
 
-    return true
+    return false
 end
 
 function leetcode.stop()

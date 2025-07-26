@@ -1,5 +1,4 @@
-local markup = require("markup")
-local log = require("leetcode.logger")
+local m = require("markup")
 
 ---@class MenuButtonProps
 ---@field title string
@@ -9,30 +8,40 @@ local log = require("leetcode.logger")
 ---@field nested boolean
 ---@field on_submit function
 
----@param props MenuButtonProps
-return markup.Component(function(props)
-    local p = props
+---@param p MenuButtonProps
+return m.Component(function(p)
+    local menu = m.use(Leet.ctx.menu)
+    local view = m.view()
 
-    local on_submit = p.on_submit
-
-    if not on_submit and p.page then
-        on_submit = function()
-            _Lc_state.menu:set_page(p.page)
+    local function change_page()
+        if not p.on_submit and p.page then
+            menu.set_page(p.page)
+        else
+            p.on_submit()
         end
     end
 
-    return markup.block({
-        -- on_submit = on_submit,
-        -- on_key = {
-        --     [p.key] = on_submit,
-        -- },
-        markup.flex({
+    m.effect(function()
+        return view.win:map("n", p.key, change_page, {
+            noremap = false,
+            silent = true,
+            nowait = true,
+        })
+    end, {})
+
+    return m.flex({
+        -- on_confirm = on_submit,
+        justify = "between",
+        margin = 1,
+        -- width = "full",
+        m.flex({
             spacing = 1,
-            markup.inline(p.icon, "leetcode_menu_button_icon"),
-            markup.inline(p.title, "leetcode_menu_button_title"),
+            m.button(p.icon, "leetcode_menu_button_icon"),
+            m.inline(p.title, "leetcode_menu_button_title"),
             -- p.nested and markup.inline("", "leetcode_menu_button_nested"),
-            p.nested and markup.inline("E", "leetcode_menu_button_nested"),
+            p.nested and m.inline("E", "leetcode_menu_button_nested"),
         }),
-        markup.Inline(p.key, "leetcode_menu_button_key"),
+        m.inline(p.key, "leetcode_menu_button_key"),
+        -- markup.inline("cwelllllllllllll"),
     })
 end)

@@ -1,84 +1,64 @@
-local markup = require("markup")
-local log = require("leetcode.logger")
+local m = require("markup")
 local cookie = require("leetcode.cache.cookie")
 local Header = require("leetcode.ui.menu.header")
 local Footer = require("leetcode.ui.menu.footer")
 local Nav = require("leetcode.ui.menu.nav")
 
----@class lc.ui.Menu2.props : markup.Renderer.props
+local menu_ctx = m.context()
+Leet.ctx.menu = menu_ctx
 
----@class lc.ui.Menu2 : markup.Renderer
----@field protected _ lc.ui.Menu2.props
----@field protected super markup.Renderer
----@field body lc.ui.menu.Page
-local Menu = markup.Renderer:extend("leet.menu")
+local renderer = Markup.renderer({
+    position = "right",
+    relative = "editor",
 
--- local mt = getmetatable(Menu)
--- local old_index = mt.__index
--- mt.__index = function(self, key)
---     if key == "winid" then
---         return self.id
---     end
---
---     return old_index[key]
--- end
--- setmetatable(Menu, mt)
+    show = false,
+    width = 150,
+})
 
-function Menu:init()
-    Menu.super.init(self, { id = 0, bufnr = 0 })
+local App = m.Component(function()
+    local menu = m.use(Leet.ctx.menu)
 
-    _Lc_state.menu = self
-end
+    m.effect(function()
+        if cookie.get() then
+            menu.set_page("loading")
 
-function Menu:set_page(page)
-    self.page = page
-    self:draw()
-end
+            local auth_api = require("leetcode.api.auth")
+            auth_api.user(function(_, err)
+                if err then
+                    menu.set_page("signin")
+                    Markup.log.error(err)
+                else
+                    menu.set_page("menu")
+                end
+            end)
+        else
+            menu.set_page("signin")
+        end
+    end, {})
 
-function Menu:render()
-    local menu = markup.Component(function(props)
-        return markup.vflex({
-            -- margin_top = 3,
-            -- margin_bottom = 3,
-            -- margin_right = 3,
-            -- margin_left = 3,
-            align = "center",
-            -- style = "Cursor",
-            spacing = 3,
-            children = {
-                Header(),
-                Nav({ page = self.page }),
-                Footer(),
-            },
-        })
-    end)
+    return m.vflex({
+        align = "center",
+        spacing = 2,
+        width = 100,
+        -- padding = { 1, 2 },
+        Header(),
+        Nav(),
+        Footer(),
+    })
+end)
 
-    Menu.super.render(self, menu())
-end
+local Root = m.Component(function()
+    local page, set_page = m.variable("loading")
 
-function Menu:remount() end
+    return Leet.ctx.menu.provider({
+        value = {
+            page = page,
+            set_page = set_page,
+        },
+        App(),
+    })
+end)
 
-function Menu:draw()
-    self:render()
-end
+renderer:bind(Root)
 
-function Menu:mount()
-    if cookie.get() then
-        self:set_page("loading")
-
-        local auth_api = require("leetcode.api.auth")
-        auth_api.user(function(_, err)
-            if err then
-                self:set_page("signin")
-                log.err(err)
-            else
-                local cmd = require("leetcode.command")
-                cmd.start_user_session()
-            end
-        end)
-    else
-        self:set_page("signin")
-    end
-end
-
-return Menu
+return renderer

@@ -13,10 +13,8 @@ local ascii = vim.tbl_map(markup.block, {
 
 return markup.Component(function()
     return markup.block({
-        margin_left = 1,
-        margin_top = 1,
-        margin_bottom = 1,
-        margin_right = 1,
+        -- width = "fit",
+        margin = 1,
         ascii,
     }, "leetcode_menu_header")
 end)
