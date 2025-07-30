@@ -176,15 +176,12 @@ function cmd.start_with_cmd()
 end
 
 function cmd.menu()
-    local winid, bufnr = _Lc_state.menu.winid, _Lc_state.menu.bufnr
-    local ok, tabp = pcall(api.nvim_win_get_tabpage, winid)
-    local ui = require("leetcode-ui.utils")
-
-    if ok then
+    if Leet.menu.win:valid() then
+        local _, tabp = pcall(api.nvim_win_get_tabpage, Leet.menu.win.win)
         api.nvim_set_current_tabpage(tabp)
-        ui.win_set_buf(winid, bufnr)
+        Leet.menu.win:focus()
     else
-        _Lc_state.menu:remount()
+        Leet.menu.win:show()
     end
 end
 

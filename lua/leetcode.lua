@@ -3,6 +3,8 @@ local config = require("leetcode.config")
 ---@class lc.LeetCode
 local leetcode = {}
 
+_G.Leet = { ctx = {} }
+
 ---@private
 local function log_failed_to_init()
     local log = require("leetcode.logger")
@@ -104,8 +106,10 @@ function leetcode.start(on_vimenter)
         vim.cmd.enew()
     end
 
-    local Menu = require("leetcode-ui.renderer.menu")
-    Menu():mount()
+    local menu = require("leetcode.ui.menu")
+    menu.win.buf = vim.api.nvim_get_current_buf()
+    menu.win:show()
+    menu:render()
 
     local utils = require("leetcode.utils")
     utils.exec_hooks("enter")

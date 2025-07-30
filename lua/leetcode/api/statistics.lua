@@ -27,9 +27,7 @@ function statistics.calendar(cb)
             calendar.submission_calendar =
                 select(2, pcall(utils.decode, calendar.submission_calendar))
 
-            cb({
-                calendar = calendar,
-            }, nil)
+            cb({ calendar = calendar }, nil)
         end,
     })
 end
