@@ -31,7 +31,7 @@ local Cases = m.component(function(props)
             input = case,
             output = item.code_answer[i],
             expected = item.expected_code_answer[i],
-            std_output = item.std_output_list[i],
+            stdout = item.std_output_list[i],
             console = console,
         })
     end)

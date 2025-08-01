@@ -9,6 +9,7 @@
 ---@field hl string
 ---@field submission boolean
 ---@field success boolean
+---@field params? string[]
 
 ---@class lc.Interpreter.Response
 ---@field status_code integer

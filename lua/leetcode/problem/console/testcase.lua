@@ -17,10 +17,11 @@ function M:new(console)
         file = self:path(),
         bo = {
             modifiable = true,
+            buftype = "nofile",
         },
-        on_buf = function()
-            -- self:handle_buf()
-        end,
+        -- on_buf = function()
+        --     -- self:handle_buf()
+        -- end,
     })
     self.win:on({
         "TextChanged",

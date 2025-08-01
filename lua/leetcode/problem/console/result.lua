@@ -21,12 +21,12 @@ function M:clear()
     vim.api.nvim_buf_set_lines(self.win.buf, 0, -1, false, {})
 end
 
+---@param item lc.interpreter_response
 function M:handle(item)
-    -- self.renderer:render({
-    -- 	m.block("123")
-    -- })
-    local renderer = Markup.renderer({ show = false })
+    local renderer = Markup.renderer()
     renderer.win:show()
+    Markup.log(item.status_code)
+    item._.params = self.console.problem.problem.meta_data.params
     renderer:render(Result({ item = item, console = self.console }))
 end
 
