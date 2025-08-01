@@ -1,4 +1,4 @@
-local cmd = require("leetcode.command")
+local cmd = require("leetcode.cmd")
 
 local Title = require("leetcode-ui.lines.title")
 local Buttons = require("leetcode-ui.group.buttons.menu")

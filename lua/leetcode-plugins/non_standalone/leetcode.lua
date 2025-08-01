@@ -49,7 +49,7 @@ leetcode.stop = vim.schedule_wrap(function()
 
     _Lc_state.menu:unmount()
 
-    vim.api.nvim_create_user_command("Leet", require("leetcode.command").start_with_cmd, {
+    vim.api.nvim_create_user_command("Leet", require("leetcode.cmd").start_with_cmd, {
         bar = true,
         bang = true,
         desc = "Open leetcode.nvim",

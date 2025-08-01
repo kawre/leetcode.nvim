@@ -1,7 +1,7 @@
 local Lines = require("leetcode-ui.lines")
 local t = require("leetcode.translator")
 local log = require("leetcode.logger")
-local cmd = require("leetcode.command")
+local cmd = require("leetcode.cmd")
 local config = require("leetcode.config")
 
 ---@class lc.ui.menu.Stats : lc.ui.Lines

@@ -25,7 +25,7 @@ local function handle(res, err)
     end
 
     if err.msg then
-        require("leetcode.command").delete_cookie()
+        require("leetcode.cmd").delete_cookie()
         return nil, err
     end
 

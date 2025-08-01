@@ -156,7 +156,7 @@ function Menu:unmount()
         return
     end
 
-    require("leetcode.command").q_close_all()
+    require("leetcode.cmd").q_close_all()
 
     vim.schedule(function()
         if self.winid and vim.api.nvim_win_is_valid(self.winid) then
@@ -194,7 +194,7 @@ function Menu:mount()
                 self:set_page("signin")
                 log.err(err)
             else
-                local cmd = require("leetcode.command")
+                local cmd = require("leetcode.cmd")
                 cmd.start_user_session()
             end
         end)

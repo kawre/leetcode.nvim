@@ -4,7 +4,7 @@ local question_picker = require("leetcode.picker.question")
 
 local picker = require("snacks.picker")
 
----@param questions lc.cache.Question[]
+---@param questions leet.cache.problem[]
 return function(questions, opts)
     local items = question_picker.items(questions, opts)
     local finder_items = {}

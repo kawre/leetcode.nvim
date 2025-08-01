@@ -5,7 +5,7 @@ local BackButton = require("leetcode.ui.menu.button.back")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 
-local cmd = require("leetcode.command")
+local cmd = require("leetcode.cmd")
 
 return m.component(function()
     return Buttons({

@@ -18,7 +18,7 @@ local log = require("leetcode.logger")
 ---@field bufnr integer
 ---@field console lc.ui.Console
 ---@field lang string
----@field cache lc.cache.Question
+---@field cache leet.cache.problem
 ---@field reset boolean
 local Question = Object("LeetQuestion")
 
@@ -450,13 +450,13 @@ Question.change_lang = vim.schedule_wrap(function(self, lang)
     end
 end)
 
----@param problem lc.cache.Question
+---@param problem leet.cache.problem
 function Question:init(problem)
     self.cache = problem
     self.lang = config.lang
 end
 
----@type fun(question: lc.cache.Question): lc.ui.Question
+---@type fun(question: leet.cache.problem): lc.ui.Question
 local LeetQuestion = Question ---@diagnostic disable-line: assign-type-mismatch
 
 return LeetQuestion

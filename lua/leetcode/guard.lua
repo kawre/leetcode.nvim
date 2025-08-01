@@ -1,14 +1,12 @@
+---@class leet.guard
 local M = {}
 
 function M.auth()
-    local auth_api = require("leetcode.api.auth")
-    local _, aerr = auth_api.user()
-
-    if aerr then
-        return aerr.msg
-    end
-
-    return true
+	local config = require("leetcode.config")
+	if not config.auth.is_signed_in then
+		Markup.log.error("You need to sign in to access this feature.")
+		return false
+	end
 end
 
 -- ---@param problem leet.res.problem

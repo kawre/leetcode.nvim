@@ -1,5 +1,5 @@
 local MenuButton = require("leetcode-ui.lines.button.menu")
-local cmd = require("leetcode.command")
+local cmd = require("leetcode.cmd")
 
 ---@class lc.ui.Button.Menu.Back : lc.ui.Button.Menu
 local MenuBackButton = MenuButton:extend("LeetMenuBackButton")

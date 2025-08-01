@@ -41,7 +41,7 @@ local theme = require("telescope.themes").get_dropdown({
     },
 })
 
----@param questions lc.cache.Question[]
+---@param questions leet.cache.problem[]
 return function(questions, opts)
     local items = question_picker.items(questions, opts)
 

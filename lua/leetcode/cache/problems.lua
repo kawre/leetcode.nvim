@@ -11,7 +11,7 @@ local file = config.storage.cache:joinpath(("problemlist%s"):format(config.is_cn
 ---@type { at: integer, payload: lc.cache.payload }
 local hist = nil
 
----@class lc.cache.Question
+---@class leet.cache.problem
 ---@field id integer
 ---@field frontend_id string
 ---@field link string
@@ -27,7 +27,7 @@ local hist = nil
 ---@class leet.cache.problems
 local M = {}
 
----@return lc.cache.Question[]
+---@return leet.cache.problem[]
 function M.get()
     return M.read().data
 end
@@ -83,7 +83,7 @@ function M.update()
     end, true)
 end
 
----@return lc.cache.Question
+---@return leet.cache.problem
 function M.by_slug(slug)
     local problems = M.get()
 
@@ -111,7 +111,7 @@ function M.write(payload)
     hist = { at = os.time(), payload = payload }
 end
 
----@alias lc.cache.payload { version: string, data: lc.cache.Question[], updated_at: integer, username: string }
+---@alias lc.cache.payload { version: string, data: leet.cache.problem[], updated_at: integer, username: string }
 
 ---@param str string
 ---

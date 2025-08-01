@@ -1,4 +1,4 @@
-local cmd = require("leetcode.command")
+local cmd = require("leetcode.cmd")
 local config = require("leetcode.config")
 
 local Page = require("leetcode-ui.group.page")

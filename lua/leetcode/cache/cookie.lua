@@ -66,13 +66,13 @@ function M.get()
 
     local contents = M.read()
     if not contents then
-        require("leetcode.command").delete_cookie()
+        require("leetcode.cmd").delete_cookie()
         return
     end
 
     local cookie = M.parse(contents)
     if not cookie then
-        require("leetcode.command").delete_cookie()
+        require("leetcode.cmd").delete_cookie()
         return
     end
 
