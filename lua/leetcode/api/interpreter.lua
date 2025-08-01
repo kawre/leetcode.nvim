@@ -2,11 +2,10 @@ local log = require("leetcode.logger")
 local urls = require("leetcode.api.urls")
 
 local config = require("leetcode.config")
-local utils = require("leetcode.api.utils")
 
 local t = require("leetcode.translator")
 
----@class lc.Interpreter
+---@class leet.api.interpreter
 local interpreter = {}
 
 ---@param item lc.interpreter_response
@@ -98,11 +97,11 @@ end
 ---@return lc.Interpreter.Response
 function interpreter.check(id, cb)
     local url = urls.check:format(id)
-    utils.get(url, { callback = cb })
+    Leet.api.get(url, { callback = cb })
 end
 
 function interpreter.fetch(url, opts)
-    utils.post(url, {
+    Leet.api.post(url, {
         body = opts.body,
         callback = opts.callback,
     })

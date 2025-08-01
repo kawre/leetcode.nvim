@@ -8,12 +8,30 @@ local config = require("leetcode.config")
 local menu_ctx = m.hooks.context()
 Leet.ctx.menu = menu_ctx
 
+Leet.auth = m.hooks.store(function(set)
+    return {
+        auth = Markup.list(),
+        set_auth = function(new_auth)
+            set(function(state)
+                state.auth = new_auth
+            end)
+        end,
+        -- c = function(self, new_auth)
+        --     self:set(function(state)
+        --         state.auth = new_auth
+        --     end)
+        -- end,
+    }
+end)
+
 local renderer = Markup.renderer({
     position = "current",
     hijack = true,
     show = false,
 })
+
 Leet.menu = renderer
+Leet.auth:bind(renderer)
 
 local App = m.component(function()
     local menu = m.hooks.use(Leet.ctx.menu)
@@ -38,9 +56,9 @@ local App = m.component(function()
 
     return m.vflex({
         align = "center",
-        spacing = 3,
+        spacing = 2,
         -- padding = { 1, 2 },
-        config.auth.is_signed_in and Header(),
+        Header(),
         Nav(),
         Footer(),
     })
@@ -48,11 +66,14 @@ end)
 
 local Root = m.component(function()
     local page, set_page = m.hooks.variable("loading")
+    local user, set_user = m.hooks.variable({})
 
     return Leet.ctx.menu:provider({
         value = {
             page = page,
             set_page = set_page,
+            user = user,
+            set_user = set_user,
         },
         App(),
     })

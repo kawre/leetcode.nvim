@@ -9,14 +9,14 @@ local Judge = require("leetcode.logger.spinner.judge")
 local leetbody = config.storage.cache:joinpath("body")
 leetbody:touch()
 
----@class lc.Runner
+---@class leet.problem.runner
 ---@field question lc.ui.Question
 local Runner = {}
 Runner.__index = Runner
 
 Runner.running = false
 
----@param self lc.Runner
+---@param self leet.problem.runner
 ---@param submit boolean
 Runner.run = vim.schedule_wrap(function(self, submit)
     if Runner.running then

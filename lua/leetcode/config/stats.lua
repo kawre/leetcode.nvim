@@ -5,7 +5,7 @@ Stats.daily = {} ---@type { streak?: number, today_completed?: boolean }
 Stats.progress = {} ---@type table<string, lc.Stats.QuestionCount>
 
 function Stats.update_streak()
-    local stats_api = require("leetcode.api.statistics")
+    local stats_api = require("leetcode.api.stats")
     local log = require("leetcode.logger")
 
     stats_api.streak(function(res, err)
@@ -21,7 +21,7 @@ function Stats.update_streak()
 end
 
 function Stats.update_sessions()
-    local stats_api = require("leetcode.api.statistics")
+    local stats_api = require("leetcode.api.stats")
     local log = require("leetcode.logger")
 
     Stats.progress = {}

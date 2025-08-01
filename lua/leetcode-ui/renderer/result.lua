@@ -1,6 +1,6 @@
 local Cases = require("leetcode-ui.group.cases")
 local Header = require("leetcode-ui.lines.header")
-local utils = require("leetcode.utils")
+local utils = require("leetcode.util")
 local SimilarQuestions = require("leetcode-ui.group.similar-questions")
 
 local Renderer = require("leetcode-ui.renderer")

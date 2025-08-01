@@ -1,10 +1,17 @@
-local Problemlist = require("leetcode.cache.problemlist")
+local Problemlist = require("leetcode.cache.problems")
 
----@class lc.Cache
-local cache = {}
+---@class leet.cache
+---@field cookie leet.cache.cookie
+---@field problems leet.cache.problems
+local M = setmetatable({}, {
+    __index = function(t, k)
+        t[k] = require("leetcode.cache." .. k)
+        return rawget(t, k)
+    end,
+})
 
-function cache.update()
+function M.update()
     Problemlist.update()
 end
 
-return cache
+return M

@@ -4,7 +4,7 @@ local Info = require("leetcode-ui.popup.info")
 local Object = require("nui.object")
 
 local api_question = require("leetcode.api.question")
-local utils = require("leetcode.utils")
+local utils = require("leetcode.util")
 local ui_utils = require("leetcode-ui.utils")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")

@@ -1,11 +1,10 @@
 local config = require("leetcode.config")
 
----@class lc.LeetCode
-local leetcode = {}
+---@class leet
+local M = {}
 
 _G.Leet = { ctx = {} }
 
----@private
 local function log_failed_to_init()
     local log = require("leetcode.logger")
     log.warn("Failed to initialize: `neovim` contains listed buffers")
@@ -28,7 +27,7 @@ end
 ---@param on_vimenter boolean
 ---
 ---@return boolean, boolean? (skip, standalone)
-function leetcode.should_skip(on_vimenter)
+function M.should_skip(on_vimenter)
     if on_vimenter then
         if vim.fn.argc(-1) ~= 1 then
             return true
@@ -82,22 +81,27 @@ function leetcode.should_skip(on_vimenter)
     end
 end
 
-function leetcode.setup_cmds()
+function M.setup_cmds()
     require("leetcode.command").setup()
 end
 
 ---@param on_vimenter boolean
-function leetcode.start(on_vimenter)
-    local skip = leetcode.should_skip(on_vimenter)
+function M.start(on_vimenter)
+    local skip = M.should_skip(on_vimenter)
     if skip then
         return false
     end
 
     config.setup()
 
+    _G.Leet.util = require("leetcode.util")
+    _G.Leet.api = require("leetcode.api")
+    _G.Leet.cache = require("leetcode.cache")
+    _G.Leet.guard = require("leetcode.guard")
+
     vim.api.nvim_set_current_dir(config.storage.home:absolute())
 
-    leetcode.setup_cmds()
+    M.setup_cmds()
 
     local theme = require("leetcode.theme")
     theme.setup()
@@ -111,18 +115,18 @@ function leetcode.start(on_vimenter)
     menu.win:show()
     menu:render()
 
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     utils.exec_hooks("enter")
 
     return true
 end
 
-function leetcode.stop()
+function M.stop()
     vim.cmd("qa!")
 end
 
 ---@param cfg? lc.UserConfig
-function leetcode.setup(cfg)
+function M.setup(cfg)
     config.apply(cfg or {})
 
     vim.api.nvim_create_user_command("Leet", require("leetcode.command").start_with_cmd, {
@@ -137,9 +141,9 @@ function leetcode.setup(cfg)
         pattern = "*",
         nested = true,
         callback = function()
-            leetcode.start(true)
+            M.start(true)
         end,
     })
 end
 
-return leetcode
+return M

@@ -1,13 +1,13 @@
 local Button = require("leetcode.ui.menu.button")
-local markup = require("markup")
+local m = require("markup")
 
-return markup.Component(function(props)
+return m.component(function(props)
     local page = props.page
 
     return Button({
         icon = "",
         title = "Back",
-        key = "q",
+        lhs = "q",
         page = page,
     })
 end)

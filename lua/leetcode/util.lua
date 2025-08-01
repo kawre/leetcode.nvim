@@ -1,10 +1,10 @@
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 
----@class lc.Utils
-local utils = {}
+---@class leet.util
+local M = {}
 
-function utils.deprecate_usr_cmd(name, new)
+function M.deprecate_usr_cmd(name, new)
     vim.api.nvim_create_user_command(name, function()
         local cmd = require("leetcode.command")
         cmd.deprecate(name, new)
@@ -13,14 +13,14 @@ function utils.deprecate_usr_cmd(name, new)
 end
 
 ---@param fn string
-function utils.cmd(fn)
+function M.cmd(fn)
     return ("<cmd>lua require('leetcode.command').%s()<cr>"):format(fn)
 end
 
 ---@param title_slug string
 ---@param lang lc.lang
-function utils.detect_duplicate_question(title_slug, lang)
-    local tabs = utils.question_tabs()
+function M.detect_duplicate_question(title_slug, lang)
+    local tabs = M.question_tabs()
 
     for _, q in ipairs(tabs) do
         if title_slug == q.question.q.title_slug and lang == q.question.lang then
@@ -30,11 +30,11 @@ function utils.detect_duplicate_question(title_slug, lang)
 end
 
 ---@return { tabpage: integer, question: lc.ui.Question }[]
-function utils.question_tabs()
+function M.question_tabs()
     local questions = {}
 
     for _, q in ipairs(_Lc_state.questions) do
-        local tabp = utils.question_tabp(q)
+        local tabp = M.question_tabp(q)
         if tabp then
             table.insert(questions, { tabpage = tabp, question = q })
         end
@@ -45,7 +45,7 @@ end
 
 ---@param q lc.ui.Question
 ---@return integer|nil
-function utils.question_tabp(q)
+function M.question_tabp(q)
     local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, q.winid)
     if ok then
         return tabp
@@ -53,9 +53,9 @@ function utils.question_tabp(q)
 end
 
 ---@return lc.ui.Question
-function utils.curr_question()
+function M.curr_question()
     local tabp = vim.api.nvim_get_current_tabpage()
-    local tabs = utils.question_tabs()
+    local tabs = M.question_tabs()
 
     local tab = vim.tbl_filter(function(tab)
         return tab.tabpage == tabp
@@ -68,7 +68,7 @@ function utils.curr_question()
 end
 
 ---@return lc.language
-function utils.get_lang(slug)
+function M.get_lang(slug)
     ---@param l lc.language
     return vim.tbl_filter(function(l)
         return l.slug == slug
@@ -76,7 +76,7 @@ function utils.get_lang(slug)
 end
 
 ---@return lc.language
-function utils.get_lang_by_name(name)
+function M.get_lang_by_name(name)
     ---@param l lc.language
     return vim.tbl_filter(function(l)
         return l.lang == name
@@ -85,7 +85,7 @@ end
 
 ---@param event lc.hook
 ---@return fun()[]|nil
-function utils.get_hooks(event)
+function M.get_hooks(event)
     local fns = config.user.hooks[event]
     if not fns then
         return
@@ -99,8 +99,8 @@ function utils.get_hooks(event)
 end
 
 ---@param event lc.hook
-function utils.exec_hooks(event, ...)
-    local fns = utils.get_hooks(event)
+function M.exec_hooks(event, ...)
+    local fns = M.get_hooks(event)
     if not fns then
         return log.error("unknown hook event: " .. event)
     end
@@ -115,7 +115,7 @@ end
 
 ---@param content string
 ---@param translated_content string
-function utils.translate(content, translated_content)
+function M.translate(content, translated_content)
     if config.is_cn then
         if config.user.cn.translate_problems then
             return translated_content or content
@@ -127,18 +127,18 @@ function utils.translate(content, translated_content)
     end
 end
 
-function utils.auth_guard()
+function M.auth_guard()
     if not config.auth.is_signed_in then
         error("User not logged-in", 0)
     end
 end
 
-function utils.norm_ins(str)
+function M.norm_ins(str)
     local ins = vim.inspect(str)
     return ins:sub(2, #ins - 1)
 end
 
-function utils.with_version(v, with, without)
+function M.with_version(v, with, without)
     with = with or function() end
     without = without or function() end
     return (vim.fn.has("nvim-" .. v) == 1 and with or without)()
@@ -146,11 +146,11 @@ end
 
 ---@param name lc.editor.section
 ---@param start? boolean
-function utils.section_tag(name, start)
+function M.section_tag(name, start)
     if name == "code" then
         return ("@leet %s"):format(start and "start" or "end")
     end
     return ("@leet %s %s"):format(name, start and "start" or "end")
 end
 
-return utils
+return M

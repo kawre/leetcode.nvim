@@ -1,4 +1,4 @@
----@class lc.api.urls
+---@class leet.api.urls
 local urls = {}
 
 urls.base = "/graphql/"

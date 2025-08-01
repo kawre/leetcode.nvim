@@ -2,7 +2,7 @@ local log = require("leetcode.logger")
 local cookie = require("leetcode.cache.cookie")
 local config = require("leetcode.config")
 local ui_utils = require("leetcode-ui.utils")
-local utils = require("leetcode.utils")
+local utils = require("leetcode.util")
 local Renderer = require("leetcode-ui.renderer")
 local api = vim.api
 

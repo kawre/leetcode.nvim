@@ -6,7 +6,7 @@ local Popup = require("leetcode-ui.popup")
 
 local config = require("leetcode.config")
 local keys = config.user.keys
-local Runner = require("leetcode.runner")
+local Runner = require("leetcode.problem.runner")
 local log = require("leetcode.logger")
 
 ---@class lc.ui.Console : lc.ui.Layout

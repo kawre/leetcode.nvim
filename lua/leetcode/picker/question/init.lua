@@ -1,8 +1,8 @@
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 local ui_utils = require("leetcode-ui.utils")
-local utils = require("leetcode.utils")
-local Question = require("leetcode-ui.question")
+local utils = require("leetcode.util")
+local Problem = require("leetcode.problem")
 local Picker = require("leetcode.picker")
 
 ---@class leet.Picker.Question: leet.Picker
@@ -96,7 +96,7 @@ function P.select(selection, close)
     if close then
         close()
     end
-    Question(selection):mount()
+    Problem(selection):show()
 end
 
 return P

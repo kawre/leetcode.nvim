@@ -71,7 +71,7 @@ function config.setup()
 end
 
 function config.validate()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
 
     assert(vim.fn.has("nvim-0.9.0") == 1, "Neovim >= 0.9.0 required")
 

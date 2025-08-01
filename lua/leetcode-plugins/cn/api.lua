@@ -1,6 +1,6 @@
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
-local statistics = require("leetcode.api.statistics")
+local statistics = require("leetcode.api.stats")
 local queries = require("leetcode.api.queries")
 local urls = require("leetcode.api.urls")
 local utils = require("leetcode.api.utils")

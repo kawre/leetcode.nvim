@@ -9,11 +9,11 @@ return m.component(function()
 
     for i, title in ipairs(parts) do
         title = title:gsub("^%l", string.upper)
-        local hl = i == #parts and "leetcode_menu_title" or "leetcode_menu_title_inactive"
-        table.insert(titles, m.Inline(title, hl))
+        local hl = i == #parts and "Label" or "Type"
+        table.insert(titles, m.inline(title, hl))
 
         if i ~= #parts then
-            table.insert(titles, m.Inline("  "))
+            table.insert(titles, m.inline("  "))
         end
     end
 

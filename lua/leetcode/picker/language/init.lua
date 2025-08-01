@@ -1,7 +1,7 @@
 local log = require("leetcode.logger")
 local t = require("leetcode.translator")
 local config = require("leetcode.config")
-local utils = require("leetcode.utils")
+local utils = require("leetcode.util")
 
 local L = {}
 

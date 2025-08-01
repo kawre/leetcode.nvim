@@ -2,9 +2,9 @@ local Button = require("leetcode-ui.lines.button")
 local Group = require("leetcode-ui.group")
 local NuiTree = require("nui.tree")
 
-local problemlist = require("leetcode.cache.problemlist")
+local problemlist = require("leetcode.cache.problems")
 local config = require("leetcode.config")
-local utils = require("leetcode.utils")
+local utils = require("leetcode.util")
 local ui_utils = require("leetcode-ui.utils")
 
 local t = require("leetcode.translator")
@@ -19,7 +19,7 @@ function SimilarQuestions:init(questions)
     SimilarQuestions.super.init(self)
 
     for _, q in ipairs(questions) do
-        local ok, p = pcall(problemlist.get_by_title_slug, q.title_slug)
+        local ok, p = pcall(problemlist.by_slug, q.title_slug)
 
         if ok then
             local button = Button({}, {

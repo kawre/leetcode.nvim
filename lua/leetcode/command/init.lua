@@ -16,16 +16,16 @@ function cmd.deprecate(old_name, new_name)
 end
 
 function cmd.cache_update()
-    require("leetcode.utils").auth_guard()
+    require("leetcode.util").auth_guard()
 
     require("leetcode.cache").update()
 end
 
 ---@param options table<string, string[]>
 function cmd.problems(options)
-    require("leetcode.utils").auth_guard()
+    require("leetcode.util").auth_guard()
 
-    local p = require("leetcode.cache.problemlist").get()
+    local p = require("leetcode.cache.problems").get()
     local picker = require("leetcode.picker")
     picker.question(p, options)
 end
@@ -97,7 +97,7 @@ function cmd.delete_cookie()
 end
 
 cmd.q_close_all = function()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     local qs = utils.question_tabs()
 
     for _, tabp in ipairs(qs) do
@@ -127,7 +127,7 @@ cmd.expire = vim.schedule_wrap(function()
 end)
 
 function cmd.qot()
-    require("leetcode.utils").auth_guard()
+    require("leetcode.util").auth_guard()
 
     local problems = require("leetcode.api.problems")
     local Question = require("leetcode-ui.question")
@@ -136,15 +136,15 @@ function cmd.qot()
         if err then
             return log.err(err)
         end
-        local problemlist = require("leetcode.cache.problemlist")
-        Question(problemlist.get_by_title_slug(qot.title_slug)):mount()
+        local problemlist = require("leetcode.cache.problems")
+        Question(problemlist.by_slug(qot.title_slug)):mount()
     end)
 end
 
 function cmd.random_question(opts)
-    require("leetcode.utils").auth_guard()
+    require("leetcode.util").auth_guard()
 
-    local problems = require("leetcode.cache.problemlist")
+    local problems = require("leetcode.cache.problems")
     local question = require("leetcode.api.question")
 
     if opts and opts.difficulty then
@@ -163,7 +163,7 @@ function cmd.random_question(opts)
         return log.err(err)
     end
 
-    local item = problems.get_by_title_slug(q.title_slug) or {}
+    local item = problems.by_slug(q.title_slug) or {}
     local Question = require("leetcode-ui.question")
     Question(item):mount()
 end
@@ -186,7 +186,7 @@ function cmd.menu()
 end
 
 function cmd.yank()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     local q = utils.curr_question()
     if not q then
         return
@@ -211,7 +211,7 @@ function cmd.question_tabs()
 end
 
 function cmd.change_lang()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     local q = utils.curr_question()
     if q then
         local picker = require("leetcode.picker")
@@ -220,7 +220,7 @@ function cmd.change_lang()
 end
 
 function cmd.desc_toggle()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     local q = utils.curr_question()
     if q then
         q.description:toggle()
@@ -228,7 +228,7 @@ function cmd.desc_toggle()
 end
 
 function cmd.desc_toggle_stats()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     local q = utils.curr_question()
     if q then
         q.description:toggle_stats()
@@ -236,7 +236,7 @@ function cmd.desc_toggle_stats()
 end
 
 function cmd.console()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     local q = utils.curr_question()
     if q then
         q.console:toggle()
@@ -244,7 +244,7 @@ function cmd.console()
 end
 
 function cmd.info()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     local q = utils.curr_question()
     if q then
         q.info:toggle()
@@ -257,7 +257,7 @@ function cmd.hints()
 end
 
 function cmd.q_run()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     utils.auth_guard()
     local q = utils.curr_question()
     if q then
@@ -266,7 +266,7 @@ function cmd.q_run()
 end
 
 function cmd.q_submit()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     utils.auth_guard()
     local q = utils.curr_question()
     if q then
@@ -288,7 +288,7 @@ function cmd.ui_languages()
 end
 
 function cmd.open()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     utils.auth_guard()
     local q = utils.curr_question()
 
@@ -314,7 +314,7 @@ function cmd.open()
 end
 
 function cmd.reset()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     utils.auth_guard()
     local q = utils.curr_question()
     if not q then
@@ -325,7 +325,7 @@ function cmd.reset()
 end
 
 function cmd.last_submit()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     utils.auth_guard()
     local q = utils.curr_question()
     if not q then
@@ -355,7 +355,7 @@ function cmd.last_submit()
 end
 
 function cmd.restore()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     local ui = require("leetcode-ui.utils")
     local q = utils.curr_question()
     if not q then
@@ -381,7 +381,7 @@ function cmd.restore()
 end
 
 function cmd.inject()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     local q = utils.curr_question()
     if not q then
         return
@@ -402,7 +402,7 @@ function cmd.inject()
 end
 
 function cmd.fold()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     local q = utils.curr_question()
     if not q then
         return
@@ -431,7 +431,7 @@ function cmd.get_session_by_name(name)
 end
 
 function cmd.change_session(opts)
-    require("leetcode.utils").auth_guard()
+    require("leetcode.util").auth_guard()
 
     local name = opts.name[1] or config.sessions.default
 
@@ -440,7 +440,7 @@ function cmd.change_session(opts)
         return log.error("Session not found")
     end
 
-    local stats_api = require("leetcode.api.statistics")
+    local stats_api = require("leetcode.api.stats")
     stats_api.change_session(session.id, function(_, err)
         if err then
             return log.err(err)
@@ -451,14 +451,14 @@ function cmd.change_session(opts)
 end
 
 function cmd.create_session(opts)
-    require("leetcode.utils").auth_guard()
+    require("leetcode.util").auth_guard()
 
     local name = opts.name[1]
     if not name then
         return log.error("Session name not provided")
     end
 
-    local stats_api = require("leetcode.api.statistics")
+    local stats_api = require("leetcode.api.stats")
     stats_api.create_session(name, function(_, err)
         if err then
             return log.err(err)
@@ -468,14 +468,14 @@ function cmd.create_session(opts)
 end
 
 function cmd.update_sessions()
-    require("leetcode.utils").auth_guard()
+    require("leetcode.util").auth_guard()
 
     config.stats.update_sessions()
 end
 
 function cmd.fix()
     require("leetcode.cache.cookie").delete()
-    require("leetcode.cache.problemlist").delete()
+    require("leetcode.cache.problems").delete()
     vim.cmd("qa!")
 end
 

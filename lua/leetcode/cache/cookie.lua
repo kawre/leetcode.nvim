@@ -1,5 +1,4 @@
 local path = require("plenary.path")
-local log = require("leetcode.logger")
 
 local config = require("leetcode.config")
 ---@type Path
@@ -12,14 +11,13 @@ local hist = {}
 ---@field leetcode_session string
 ---@field str string
 
----@class lc.Cookie
-local Cookie = {}
+---@class leet.cache.cookie
+local M = {}
 
 ---@param str string
----
 ---@return string|nil
-function Cookie.set(str)
-    local _, cerr = Cookie.parse(str)
+function M.set(str)
+    local _, cerr = M.parse(str)
     if cerr then
         return cerr
     end
@@ -34,7 +32,7 @@ function Cookie.set(str)
 end
 
 ---@return boolean
-function Cookie.delete()
+function M.delete()
     if not file:exists() then
         return false
     end
@@ -42,7 +40,7 @@ function Cookie.delete()
 end
 
 ---@return string|nil
-function Cookie.read()
+function M.read()
     local contents = file:read()
 
     if not contents or type(contents) ~= "string" then
@@ -53,7 +51,7 @@ function Cookie.read()
 end
 
 ---@return lc.cache.Cookie | nil
-function Cookie.get()
+function M.get()
     if not file:exists() then
         return
     end
@@ -66,13 +64,13 @@ function Cookie.get()
         return hcookie
     end
 
-    local contents = Cookie.read()
+    local contents = M.read()
     if not contents then
         require("leetcode.command").delete_cookie()
         return
     end
 
-    local cookie = Cookie.parse(contents)
+    local cookie = M.parse(contents)
     if not cookie then
         require("leetcode.command").delete_cookie()
         return
@@ -85,7 +83,7 @@ end
 ---@param str string
 ---
 ---@return lc.cache.Cookie|nil, string|nil
-function Cookie.parse(str)
+function M.parse(str)
     local csrf = str:match("csrftoken=([^;]+)")
     if not csrf or csrf == "" then
         return nil, "Bad csrf token format"
@@ -99,4 +97,4 @@ function Cookie.parse(str)
     return { csrftoken = csrf, leetcode_session = ls, str = str }
 end
 
-return Cookie
+return M

@@ -2,7 +2,7 @@ local ConsolePopup = require("leetcode-ui.popup.console")
 local ResultLayout = require("leetcode-ui.renderer.result")
 local t = require("leetcode.translator")
 
-local problemlist = require("leetcode.cache.problemlist")
+local problemlist = require("leetcode.cache.problems")
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
 

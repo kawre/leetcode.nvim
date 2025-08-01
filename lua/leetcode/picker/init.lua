@@ -115,7 +115,7 @@ function P.question(...)
 end
 
 function P.tabs()
-    local utils = require("leetcode.utils")
+    local utils = require("leetcode.util")
     local tabs = utils.question_tabs()
 
     if vim.tbl_isempty(tabs) then

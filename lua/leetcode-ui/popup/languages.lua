@@ -5,9 +5,9 @@ local Lines = require("leetcode-ui.lines")
 local log = require("leetcode.logger")
 local t = require("leetcode.translator")
 
-local utils = require("leetcode.utils")
+local utils = require("leetcode.util")
 local config = require("leetcode.config")
-local stats_api = require("leetcode.api.statistics")
+local stats_api = require("leetcode.api.stats")
 local Spinner = require("leetcode.logger.spinner")
 
 ---@class lc.ui.LanguagesPopup : lc.ui.SkillsPopup

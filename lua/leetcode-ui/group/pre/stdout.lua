@@ -3,7 +3,7 @@ local t = require("leetcode.translator")
 local Line = require("leetcode-ui.line")
 local Lines = require("leetcode-ui.lines")
 
-local utils = require("leetcode.utils")
+local utils = require("leetcode.util")
 local log = require("leetcode.logger")
 
 ---@class lc.ui.Stdout : lc.ui.Pre

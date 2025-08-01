@@ -1,20 +1,19 @@
-local utils = require("leetcode.api.utils")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 local urls = require("leetcode.api.urls")
 local queries = require("leetcode.api.queries")
 
----@class lc.api.statistics
-local statistics = {}
+---@class leet.api.stats
+local M = {}
 
-function statistics.calendar(cb)
+function M.calendar(cb)
     local variables = {
         username = config.auth.name,
     }
 
     local query = queries.calendar
 
-    utils.query(query, variables, {
+    Leet.api.query(query, variables, {
         endpoint = urls.calendar,
         callback = function(res, err)
             if err then
@@ -24,8 +23,7 @@ function statistics.calendar(cb)
             local data = res.data
             local calendar = data["matchedUser"]["calendar"]
 
-            calendar.submission_calendar =
-                select(2, pcall(utils.decode, calendar.submission_calendar))
+            calendar.submission_calendar = vim.json.decode(calendar.submission_calendar)
 
             cb({ calendar = calendar }, nil)
         end,
@@ -33,14 +31,14 @@ function statistics.calendar(cb)
 end
 
 ---@param cb fun(res: lc.Stats.QuestionCount[], err: lc.err)
-function statistics.session_progress(cb)
+function M.session_progress(cb)
     local variables = {
         username = config.auth.name,
     }
 
     local query = queries.session_progress
 
-    utils.query(query, variables, {
+    Leet.api.query(query, variables, {
         callback = function(res, err)
             if err then
                 return cb(nil, err)
@@ -54,14 +52,14 @@ function statistics.session_progress(cb)
 end
 
 ---@param cb fun(res: lc.Stats.Res, err: lc.err)
-function statistics.solved(cb)
+function M.solved(cb)
     local variables = {
         username = config.auth.name,
     }
 
     local query = queries.solved
 
-    utils.query(query, variables, {
+    Leet.api.query(query, variables, {
         endpoint = urls.solved,
         callback = function(res, err)
             if err then
@@ -81,14 +79,14 @@ function statistics.solved(cb)
 end
 
 ---@param cb fun(res: lc.Skills.Res, err: lc.err)
-function statistics.skills(cb)
+function M.skills(cb)
     local variables = {
         username = config.auth.name,
     }
 
     local query = queries.skills
 
-    utils.query(query, variables, {
+    Leet.api.query(query, variables, {
         endpoint = urls.skills,
         callback = function(res, err)
             if err then
@@ -102,14 +100,14 @@ function statistics.skills(cb)
 end
 
 ---@param cb fun(res: lc.Languages.Res, err: lc.err)
-function statistics.languages(cb)
+function M.languages(cb)
     local variables = {
         username = config.auth.name,
     }
 
     local query = queries.languages
 
-    utils.query(query, variables, {
+    Leet.api.query(query, variables, {
         endpoint = urls.languages,
         callback = function(res, err)
             if err then
@@ -122,12 +120,12 @@ function statistics.languages(cb)
     })
 end
 
-function statistics.streak(cb)
+function M.streak(cb)
     local variables = vim.empty_dict()
 
     local query = queries.streak
 
-    utils.query(query, variables, {
+    Leet.api.query(query, variables, {
         endpoint = urls.streak_counter,
         callback = function(res, err)
             if err then
@@ -148,10 +146,10 @@ function statistics.streak(cb)
 end
 
 ---@param cb fun(res: lc.res.session[], err: lc.err)
-function statistics.sessions(cb)
+function M.sessions(cb)
     local url = urls.session
 
-    utils.post(url, {
+    Leet.api.post(url, {
         body = vim.empty_dict(),
         callback = function(res, err)
             if err then
@@ -163,7 +161,7 @@ function statistics.sessions(cb)
     })
 end
 
-function statistics.change_session(id, cb)
+function M.change_session(id, cb)
     local body = {
         func = "activate",
         target = id,
@@ -171,7 +169,7 @@ function statistics.change_session(id, cb)
 
     local url = urls.session
 
-    utils.put(url, {
+    Leet.api.put(url, {
         body = body,
         callback = function(res, err)
             if err then
@@ -183,7 +181,7 @@ function statistics.change_session(id, cb)
     })
 end
 
-function statistics.create_session(name, cb)
+function M.create_session(name, cb)
     local body = {
         func = "create",
         name = name,
@@ -191,7 +189,7 @@ function statistics.create_session(name, cb)
 
     local url = urls.session
 
-    utils.put(url, {
+    Leet.api.put(url, {
         body = body,
         callback = function(res, err)
             if err then
@@ -203,4 +201,4 @@ function statistics.create_session(name, cb)
     })
 end
 
-return statistics
+return M

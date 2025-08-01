@@ -1,4 +1,4 @@
-local markup = require("markup")
+local m = require("markup")
 local Buttons = require("leetcode.ui.menu.buttons")
 local Button = require("leetcode.ui.menu.button")
 local BackButton = require("leetcode.ui.menu.button.back")
@@ -7,24 +7,24 @@ local log = require("leetcode.logger")
 
 local cmd = require("leetcode.command")
 
-return markup.Component(function()
+return m.component(function()
     return Buttons({
         not config.is_cn and Button({
             title = "Skills",
             icon = "",
-            key = "s",
+            lhs = "s",
             on_submit = cmd.ui_skills,
         }),
         Button({
             icon = "",
             title = "Languages",
-            key = "l",
+            lhs = "l",
             on_submit = cmd.ui_languages,
         }),
         Button({
             icon = "",
             title = "Update",
-            key = "u",
+            lhs = "u",
             on_submit = function() end,
         }),
         BackButton({ page = "menu" }),

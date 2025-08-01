@@ -1,5 +1,5 @@
 local m = require("markup")
-local api = require("leetcode.api.statistics")
+local api = require("leetcode.api.stats")
 
 local ascii = vim.tbl_map(m.block, {
     [[ /$$                          /$$     /$$$$$$                /$$         ]],
@@ -40,10 +40,20 @@ local function get_days_in_month(month, year)
 end
 
 return m.component(function()
+    local store = m.hooks.use(Leet.auth)
     local calendar, set_calendar = m.hooks.variable({})
 
     m.hooks.effect(function()
-        api.calendar(function(data)
+        if store.auth:isempty() then
+            return
+        end
+
+        api.calendar(function(data, err)
+            if err then
+                Markup.log.error(err)
+                return
+            end
+
             local time = os.date("*t")
             local curr = os.time(vim.tbl_extend("force", time, {
                 year = time.year - 1,
@@ -129,10 +139,13 @@ return m.component(function()
                 ordered_keys = ordered_keys, -- ✅ Pass it along
             })
         end)
-    end, {})
+    end, { store.auth })
 
     if vim.tbl_isempty(calendar or {}) then
-        return "loading..."
+        return m.block({
+            margin_top = 3,
+            ascii,
+        }, "Tag")
     end
 
     -- Example: render grouped structure

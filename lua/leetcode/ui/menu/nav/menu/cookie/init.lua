@@ -3,19 +3,19 @@ local Buttons = require("leetcode.ui.menu.buttons")
 local Button = require("leetcode.ui.menu.button")
 local BackButton = require("leetcode.ui.menu.button.back")
 
-return markup.Component(function()
+return markup.component(function()
     local cmd = require("leetcode.command")
 
     return Buttons({
         Button({
             icon = "󱛬",
-            key = "u",
+            lhs = "u",
             title = "Update",
             on_press = cmd.cookie_prompt,
         }),
         Button({
             icon = "󱛪",
-            key = "d",
+            lhs = "d",
             title = "Delete / Sign out",
             on_submit = cmd.sign_out,
         }),

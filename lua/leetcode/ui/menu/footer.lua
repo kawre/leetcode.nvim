@@ -1,22 +1,35 @@
 local m = require("markup")
 local config = require("leetcode.config")
-local api = require("leetcode.api.statistics")
+local api = require("leetcode.api.stats")
 
 return m.component(function()
     local streak, set_streak = m.hooks.variable({})
     local win = m.hooks.window()
     local progress, set_progress = m.hooks.variable({})
+    local store = m.hooks.use(Leet.auth)
 
     m.hooks.effect(function()
-        api.session_progress(set_progress)
-    end, {})
+        if store.auth:isempty() then
+            return
+        end
 
-    m.hooks.effect(function()
-        api.streak(function(data)
+        api.session_progress(function(data, err)
+            if err then
+                Markup.log.error(err)
+                return
+            end
+            set_progress(data)
+        end)
+
+        api.streak(function(data, err)
+            if err then
+                Markup.log.error(err)
+                return
+            end
             set_streak(data)
         end)
 
-        win:map("n", "9", function()
+        return win:map("n", "9", function()
             set_streak(function(v)
                 return {
                     streakCount = (v.streakCount or 0) + 1,
@@ -24,7 +37,7 @@ return m.component(function()
                 }
             end)
         end)
-    end, {})
+    end, { store.auth })
 
     local function stats()
         local res = {}

@@ -1,33 +1,14 @@
-local utils = require("leetcode.api.utils")
 local config = require("leetcode.config")
 local log = require("leetcode.logger")
 local queries = require("leetcode.api.queries")
 local urls = require("leetcode.api.urls")
 
----@class lc.AuthApi
-local Auth = {}
-
----@return lc.UserStatus, lc.err
-function Auth.user(cb)
-    local query = queries.auth
-
-    if cb then
-        utils.query(query, {}, {
-            callback = function(res, err)
-                cb(Auth.handle(res, err))
-            end,
-            endpoint = urls.auth,
-        })
-    else
-        return Auth.handle(utils.query(query, {}, {
-            endpoint = urls.auth,
-        }))
-    end
-end
+---@class leet.api.auth
+local M = {}
 
 ---@private
 ---@return lc.UserStatus, lc.err
-function Auth.handle(res, err)
+local function handle(res, err)
     if err then
         return res, err
     end
@@ -49,7 +30,28 @@ function Auth.handle(res, err)
     end
 
     config.auth = log.debug(auth) ---@diagnostic disable-line
+    Leet.auth:set(function()
+        return { auth = Markup.list(auth) }
+    end)
     return auth
 end
 
-return Auth
+---@return lc.UserStatus, lc.err
+function M.user(cb)
+    local query = queries.auth
+
+    if cb then
+        Leet.api.query(query, {}, {
+            callback = function(res, err)
+                cb(handle(res, err))
+            end,
+            endpoint = urls.auth,
+        })
+    else
+        return handle(Leet.api.query(query, {}, {
+            endpoint = urls.auth,
+        }))
+    end
+end
+
+return M

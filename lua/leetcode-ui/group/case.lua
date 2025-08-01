@@ -1,4 +1,4 @@
-local utils = require("leetcode.utils")
+local utils = require("leetcode.util")
 
 local Pre = require("leetcode-ui.group.pre")
 local Input = require("leetcode-ui.group.pre.input")

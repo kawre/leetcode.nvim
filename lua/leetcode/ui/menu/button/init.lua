@@ -3,7 +3,7 @@ local m = require("markup")
 ---@class MenuButtonProps
 ---@field title string
 ---@field icon string
----@field key string
+---@field lhs string
 ---@field page string
 ---@field nested boolean
 ---@field on_submit function
@@ -22,7 +22,7 @@ return m.component(function(p)
     end
 
     m.hooks.effect(function()
-        return win:map("n", p.key, change_page, {
+        return win:map("n", p.lhs, change_page, {
             noremap = false,
             silent = true,
             nowait = true,
@@ -38,6 +38,6 @@ return m.component(function(p)
             m.inline(p.title, "Tag"),
             p.nested and m.inline("", "leetcode_menu_button_nested"),
         }),
-        m.block(p.key, "Type"),
+        m.block(p.lhs, "Type"),
     })
 end)

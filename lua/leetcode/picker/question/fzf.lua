@@ -1,5 +1,5 @@
 local fzf = require("fzf-lua")
-local problemlist = require("leetcode.cache.problemlist")
+local problemlist = require("leetcode.cache.problems")
 local t = require("leetcode.translator")
 local question_picker = require("leetcode.picker.question")
 local Picker = require("leetcode.picker")
@@ -28,7 +28,7 @@ return function(questions, opts)
         actions = {
             ["default"] = function(selected)
                 local slug = Picker.hidden_field(selected[1], deli)
-                local question = problemlist.get_by_title_slug(slug)
+                local question = problemlist.by_slug(slug)
                 question_picker.select(question)
             end,
         },

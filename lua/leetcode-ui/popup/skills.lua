@@ -2,7 +2,7 @@ local Popup = require("leetcode-ui.popup")
 local Group = require("leetcode-ui.group")
 local Lines = require("leetcode-ui.lines")
 
-local stats_api = require("leetcode.api.statistics")
+local stats_api = require("leetcode.api.stats")
 local config = require("leetcode.config")
 local Spinner = require("leetcode.logger.spinner")
 local utils = require("leetcode-ui.utils")

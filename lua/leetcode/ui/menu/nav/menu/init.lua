@@ -9,35 +9,35 @@ return m.component(function()
         Button({
             icon = "",
             title = "Problems",
-            key = "p",
+            lhs = "p",
             nested = true,
             page = "menu.problems",
         }),
         Button({
             icon = "",
             title = "Statistics",
-            key = "s",
+            lhs = "s",
             nested = true,
             page = "menu.statistics",
         }),
         Button({
             icon = "󰆘",
             title = "Cookie",
-            key = "i",
+            lhs = "i",
             nested = true,
             page = "menu.cookie",
         }),
         Button({
             icon = "",
             title = "Cache",
-            key = "c",
+            lhs = "c",
             nested = true,
             page = "menu.cache",
         }),
         Button({
             icon = "󰩈",
             title = "Exit",
-            key = "qa",
+            lhs = "qa",
             on_submit = function()
                 require("leetcode").stop()
             end,

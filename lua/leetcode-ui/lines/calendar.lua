@@ -1,7 +1,7 @@
 local config = require("leetcode.config")
 local Spinner = require("leetcode.logger.spinner")
 local Lines = require("leetcode-ui.lines")
-local statistics = require("leetcode.api.statistics")
+local statistics = require("leetcode.api.stats")
 local t = require("leetcode.translator")
 
 local Line = require("leetcode-ui.line")

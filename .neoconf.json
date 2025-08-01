@@ -1,25 +1,26 @@
 {
-  "neodev": {
-    "library": {
-      "enabled": true,
-      "plugins": [
-        "telescope.nvim",
-        "plenary.nvim",
-        "nui.nvim",
-        "nvim-web-devicons",
-        "image.nvim",
-        "nvim-treesitter"
-      ]
-    }
-  },
-  "neoconf": {
-    "plugins": {
-      "lua_ls": {
-        "enabled": true
-      }
-    }
-  },
-  "lspconfig": {
-    "sumneko_lua": {}
-  }
+	"neodev": {
+		"library": {
+			"enabled": true,
+			"plugins": [
+				"telescope.nvim",
+				"plenary.nvim",
+				"nui.nvim",
+				"nvim-web-devicons",
+				"image.nvim",
+				"nvim-treesitter",
+				"markup.nvim"
+			]
+		}
+	},
+	"neoconf": {
+		"plugins": {
+			"lua_ls": {
+				"enabled": true
+			}
+		}
+	},
+	"lspconfig": {
+		"sumneko_lua": {}
+	}
 }

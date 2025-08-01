@@ -8,7 +8,7 @@ local Split = require("leetcode-ui.split")
 local Parser = require("leetcode.parser")
 
 local log = require("leetcode.logger")
-local utils = require("leetcode.utils")
+local utils = require("leetcode.util")
 
 local t = require("leetcode.translator")
 
