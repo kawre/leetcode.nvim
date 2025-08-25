@@ -9,11 +9,12 @@ local CompileError = require("leetcode.ui.problem.result.compile-error")
 ---@param props { item: lc.interpreter_response, console: leet.problem.console }
 local App = m.component(function(props)
     local item = props.item ---@type any
+    local console = props.console
     local sc = item.status_code
 
     if sc == 10 then
         ---@cast item lc.runtime
-        return Runtime({ item = item })
+        return Runtime({ item = item, console = console })
     elseif sc == 11 then
         ---@cast item lc.submission
         return SubmissionError({ item = item })

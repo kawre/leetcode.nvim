@@ -1,11 +1,12 @@
 local m = require("markup")
 local Case = require("leetcode.ui.problem.result.cases.case")
 
+---@param props { item: lc.runtime, console: leet.problem.console }
 local Cases = m.component(function(props)
     local active, set_active = m.hooks.variable(1)
 
-    local item = props.item ---@type lc.runtime
-    local console = props.console ---@type leet.problem.console
+    local item = props.item
+    local console = props.console
 
     local total = item.total_testcases ~= vim.NIL and item.total_testcases or 0
     local testcases = console.testcase:by_id(item.submission_id)

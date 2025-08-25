@@ -14,7 +14,7 @@ function M:new(console)
         border = "rounded",
         show = false,
     })
-    -- self.win = self.renderer.win
+    self.renderer = Markup.renderer(self.win)
 end
 
 function M:clear()
@@ -23,11 +23,9 @@ end
 
 ---@param item lc.interpreter_response
 function M:handle(item)
-    local renderer = Markup.renderer()
-    renderer.win:show()
     Markup.log(item.status_code)
     item._.params = self.console.problem.problem.meta_data.params
-    renderer:render(Result({ item = item, console = self.console }))
+    self.renderer:render(Result({ item = item, console = self.console }))
 end
 
 return M

@@ -21,7 +21,7 @@ function M:new(cached, problem)
     table.insert(Leet.active_problems, self)
     self:open_buf()
 
-    -- self.description = Description(self)
+    self.description = Description(self)
     self.console = Console(self)
 end
 

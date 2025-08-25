@@ -14,7 +14,7 @@ local Runtime = m.component(function(props)
     return m.block({
         spacing = 1,
         Header({ item = item }),
-        Cases({ item = item }),
+        Cases({ item = item, console = props.console }),
     })
 end)
 

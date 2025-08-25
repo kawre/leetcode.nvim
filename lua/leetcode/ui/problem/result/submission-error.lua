@@ -3,7 +3,7 @@ local Case = require("leetcode.ui.problem.result.cases.case")
 
 ---@param props { item: lc.submission }
 local SubmissionError = m.component(function(props)
-    local item = props.item ---@type lc.submission
+    local item = props.item
 
     return Case({
         input = vim.split(item.input, "\n"),

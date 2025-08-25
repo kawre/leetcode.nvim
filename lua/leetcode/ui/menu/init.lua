@@ -24,11 +24,12 @@ Leet.auth = m.hooks.store(function(set)
     }
 end)
 
-local renderer = Markup.renderer({
+local win = Markup.window({
     position = "current",
     hijack = true,
     show = false,
 })
+local renderer = Markup.renderer(win)
 
 Leet.menu = renderer
 Leet.auth:bind(renderer)
