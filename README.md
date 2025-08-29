@@ -436,22 +436,42 @@ This plugin can be initiated in two ways:
   must not have any listed buffers open.
   To bypass this requirement use [`non_standalone`](#non-standalone-mode) plugin.
 
-### Switching between test cases
-
-To switch between test cases, press the number of the test case
-`1` for Case (1), `2` for Case (2), etc
-
-### Switching between questions
-
-To switch between questions, use `Leet tabs`
-
 ### Sign In
 
 > [!WARNING]
 > Be sure to copy the `Cookie` from request headers, not the `set-cookie` from
 > response headers.
 
+> [!WARNING]
+> If you are using **brave browser**, see [this
+> issue](https://github.com/kawre/leetcode.nvim/issues/160#issuecomment-2619611920)
+
 https://github.com/kawre/leetcode.nvim/assets/69250723/b7be8b95-5e2c-4153-8845-4ad3abeda5c3
+
+## ❓ FAQ
+
+### I keep getting `cookie expired` error
+
+If you keep getting `Your cookie may have expired, or LeetCode has temporarily
+restricted API access`, it most likely means that LeetCode website is under
+heavy load and is restricting API access (mostly during contests).
+
+All you can do is wait it out, try disabling a VPN if you’re using one, and if
+the problem is persistent, open an issue.
+
+### Switching between test cases
+
+To switch between test cases, just press the number of the corresponding case:  
+`1` for `Case (1)`, `2` for `Case (2)`, and so on.
+
+### Switching between questions
+
+To switch between questions, use `Leet tabs`
+
+### I'm not getting LSP completions
+
+Some languages require additional setup to get LSP completions.  
+For example, Rust needs extra configuration — see [this issue](https://github.com/kawre/leetcode.nvim/issues/86).
 
 ## 🍴 Recipes
 
