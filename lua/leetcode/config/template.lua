@@ -137,6 +137,10 @@ local M = {
 
     ---@type boolean
     image_support = false,
+
+    ---Wipes buffers just before opening with :Leet
+    ---@type boolean
+    allow_bufwipe = true,
 }
 
 return M

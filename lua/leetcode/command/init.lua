@@ -169,6 +169,10 @@ function cmd.random_question(opts)
 end
 
 function cmd.start_with_cmd()
+    if require("leetcode.config").user.allow_bufwipe then
+        vim.cmd([[silent %bd]])
+    end
+
     local leetcode = require("leetcode")
     if leetcode.start(false) then
         cmd.menu()
