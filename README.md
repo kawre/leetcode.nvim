@@ -288,6 +288,7 @@ Supported picker providers are:
 - [`snacks-picker`][snacks.nvim]
 - [`fzf-lua`][fzf-lua]
 - [`telescope`][telescope.nvim]
+- [`mini-picker`][mini-picker]
 
 If `provider` is `nil`, [leetcode.nvim] will try to resolve the first
 available one in the order above.
@@ -545,3 +546,4 @@ You can then exit [leetcode.nvim] using `:Leet exit` command
 [snacks.nvim]: https://github.com/folke/snacks.nvim
 [tree-sitter-html]: https://github.com/tree-sitter/tree-sitter-html
 [plenary.nvim]: https://github.com/nvim-lua/plenary.nvim
+[mini-picker]: https://github.com/nvim-mini/mini.pick
