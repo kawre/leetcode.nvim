@@ -87,6 +87,11 @@ arguments.random = {
     tags = topics,
 }
 
+arguments.list_custom = {
+    file = {}, -- Will be populated with available .txt/.json files
+    filter = { "topics", "difficulty", "status" }, -- Allow combining with existing filters
+}
+
 arguments.session_change = {
     name = config.sessions.names,
 }
