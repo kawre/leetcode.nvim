@@ -70,6 +70,27 @@ function Question:path()
     local lang = utils.get_lang(self.lang)
     local alt = lang.alt and ("." .. lang.alt) or ""
 
+    local fn_user_format = config.storage.format
+    if type(fn_user_format) == "function" then
+        local format_opts = {
+            id = "" .. self.q.frontend_id,
+            slug = self.q.title_slug,
+            ft_alt = alt,
+            ft = lang.ft,
+        }
+        local fn_user = fn_user_format(format_opts)
+        if type(fn_user) == "string" and #fn_user > 0 then
+            self.file = config.storage.home:joinpath(fn_user)
+            local existed = self.file:exists()
+
+            if not existed then
+                self.file:write(self:snippet(), "w")
+            end
+
+            return self.file:absolute(), existed
+        end
+    end
+
     -- handle legacy file names first
     local fn_legacy = --
         ("%s.%s-%s.%s"):format(self.q.frontend_id, self.q.title_slug, lang.slug, lang.ft)
