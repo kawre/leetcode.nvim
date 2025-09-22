@@ -126,6 +126,7 @@ local M = {
         toggle = { "q" }, ---@type string|string[]
         confirm = { "<CR>" }, ---@type string|string[]
 
+        quit = "qa", ---@type string
         reset_testcases = "r", ---@type string
         use_testcase = "U", ---@type string
         focus_testcases = "H", ---@type string
