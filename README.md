@@ -407,6 +407,8 @@ image_support = false,
 - `cache`
   - `update` fetches all available problems and updates the local cache of [leetcode.nvim]
 
+- `top_interview` opens top interview 150 questions
+
 #### Some commands can take optional arguments. To stack argument values separate them by a `,`
 
 - `Leet list`
