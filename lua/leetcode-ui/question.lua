@@ -456,6 +456,66 @@ function Question:init(problem)
     self.lang = config.lang
 end
 
+-- start of shuffle functionality.
+
+function Question:shuffle()
+    local api_question = require("leetcode.api.question")
+    local problems = require("leetcode.cache.problemlist")
+
+    -- Fetch a new random question (minimal info)
+    local q, err = api_question.random()
+    if err then
+        log.err(err)
+        return
+    end
+
+    -- Get full question info by title_slug
+    local full_q = api_question.by_title_slug(q.title_slug)
+    if not full_q then
+        return log.err("Failed to fetch full question info for: " .. (q.title_slug or "nil"))
+    end
+
+    -- Update self fields
+    self.q = full_q
+    self.cache = problems.get_by_title_slug(q.title_slug) or {}
+
+    -- Detach LSP clients before renaming the buffer to prevent errors.
+    -- The clients will be re-attached later.
+    local clients = vim.lsp.get_active_clients({ bufnr = self.bufnr })
+    if #clients > 0 then
+        for _, client in ipairs(clients) do
+            vim.lsp.stop_client(client.id)
+        end
+    end
+
+    -- Update buffer path and name. This also writes the file if it doesn't exist.
+    local new_path, existed = self:path()
+    vim.api.nvim_buf_set_name(self.bufnr, new_path)
+
+    -- Overwrite buffer contents with new snippet and apply settings
+    self:editor_reset()
+    self:open_buffer(existed)
+
+    -- Unmount old UI components. The console unmount was fixed to prevent leaks.
+    self.description:unmount()
+    self.info:unmount()
+    self.console:unmount()
+
+    -- Recreate UI components for the new question
+    self.description = Description(self):mount()
+    self.console = Console(self)
+    self.info = Info(self)
+
+    -- Re-attach LSP clients by triggering the autocommands that lspconfig uses.
+    if #clients > 0 then
+        vim.cmd.doautocmd("BufRead")
+    end
+
+    log.info("Shuffled to a new random question: " .. (full_q.title or q.title_slug or "unknown"))
+end
+
+-- end of shuffle functionality.
+
 ---@type fun(question: lc.cache.Question): lc.ui.Question
 local LeetQuestion = Question ---@diagnostic disable-line: assign-type-mismatch
 
