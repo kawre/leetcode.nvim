@@ -8,7 +8,7 @@ local u = require("leetcode.parser.utils")
 local Plain = Group:extend("LeetParserPlain")
 
 function Plain.normalize(text)
-    return text:gsub("<[^>]+>", "")
+    return text:gsub("<sup>(.-)</sup>", "^%1"):gsub("<sub>(.-)</sub>", "_%1"):gsub("<[^>]+>", "")
 end
 
 ---@param text string
