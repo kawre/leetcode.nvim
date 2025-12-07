@@ -53,7 +53,10 @@ function Runner:handle(submit)
         end
 
         if item then
-            utils.exec_hooks("submit", question, body.typed_code, item.status_msg, item._.success)
+            -- print(vim.inspect(item))
+            -- utils.exec_hooks("submit", question, body.typed_code, item.status_msg, item._.success)
+            utils.exec_hooks("submit", question, body.typed_code, item)
+
             if item._.success then
                 judge:success(item.status_msg)
             else

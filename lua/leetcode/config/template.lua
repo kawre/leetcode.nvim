@@ -122,7 +122,7 @@ local M = {
         ---@type fun()[]
         ["leave"] = {},
 
-        ---@type fun(question: lc.ui.Question, buffer: string, status_msg: string|nil, success: string|nil)[]
+        ---@type fun(question: lc.ui.Question, buffer: string, item_json: table)[]
         ["submit"] = {},
     },
 
