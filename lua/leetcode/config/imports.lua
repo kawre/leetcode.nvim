@@ -8,6 +8,7 @@ imports["python3"] = {
     "from re import *",
     "from datetime import *",
     "from collections import *",
+    "from sortedcontainers import *",
     "from heapq import *",
     "from bisect import *",
     "from copy import *",
