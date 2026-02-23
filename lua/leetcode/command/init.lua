@@ -277,6 +277,24 @@ function cmd.q_submit()
     end
 end
 
+function cmd.q_upload_test_result()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if q then
+        q.console:run(false, true) -- test flow but trigger hook
+    end
+end
+
+function cmd.q_upload_submit_result()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if q then
+        q.console:run(true, true) -- submit flow and trigger hook
+    end
+end
+
 function cmd.ui_skills()
     if config.is_cn then
         return
@@ -610,7 +628,9 @@ cmd.commands = {
     lang = { cmd.change_lang },
     run = { cmd.q_run },
     test = { cmd.q_run },
+    upload_test_result = { cmd.q_upload_test_result },
     submit = { cmd.q_submit },
+    upload_submit_result = { cmd.q_upload_submit_result },
     daily = { cmd.qot },
     yank = { cmd.yank },
     open = { cmd.open },
