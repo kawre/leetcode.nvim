@@ -55,9 +55,9 @@ function Runner:handle(submit, trigger_hook)
 
         if item then
             -- print(vim.inspect(item))
-            -- utils.exec_hooks("submit", question, body.typed_code, item.status_msg, item._.success)
             if trigger_hook then
-                utils.exec_hooks("submit", question, body.typed_code, item)
+                local hook_event = submit and "upload_submit_result" or "upload_test_result"
+                utils.exec_hooks(hook_event, question, body.typed_code, item)
             end
 
             if item._.success then

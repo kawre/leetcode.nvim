@@ -12,4 +12,12 @@ hooks["question_enter"] = {
     end,
 }
 
+hooks["upload_submit_result"] = {}
+
+hooks["upload_test_result"] = {}
+
+hooks["timer_start"] = {}
+
+hooks["question_leave"] = {}
+
 return hooks

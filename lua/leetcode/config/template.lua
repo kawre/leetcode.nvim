@@ -23,8 +23,11 @@
 ---@alias lc.hook
 ---| "enter"
 ---| "question_enter"
+---| "question_leave"
 ---| "leave"
----| "submit"
+---| "upload_submit_result"
+---| "upload_test_result"
+---| "timer_start"
 
 ---@alias lc.size
 ---| string
@@ -118,6 +121,9 @@ local M = {
 
         ---@type fun(question: lc.ui.Question)[]
         ["question_enter"] = {},
+
+        ---@type fun(question: lc.ui.Question)[]
+        ["question_leave"] = {},
 
         ---@type fun()[]
         ["leave"] = {},
