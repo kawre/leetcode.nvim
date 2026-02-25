@@ -270,7 +270,7 @@ function Question:_unmount()
         return
     end
 
-    self:stop_timer_display()
+    utils.exec_hooks("timer_stop", self)
     utils.exec_hooks("question_leave", self)
 
     vim.schedule(function()

@@ -292,7 +292,7 @@ function cmd.timer_stop()
     if not q then
         return
     end
-    utils.exec_hooks("question_leave", q)
+    utils.exec_hooks("timer_stop", q)
 end
 
 function cmd.q_upload_test_result()

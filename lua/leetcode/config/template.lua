@@ -28,6 +28,7 @@
 ---| "upload_submit_result"
 ---| "upload_test_result"
 ---| "timer_start"
+---| "timer_stop"
 
 ---@alias lc.size
 ---| string
