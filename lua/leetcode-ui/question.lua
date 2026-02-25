@@ -316,7 +316,7 @@ function Question:start_timer_display()
         local elapsed_s = math.floor((vim.loop.hrtime() / 1e6 - start_ms) / 1000)
         local mins = math.floor(elapsed_s / 60)
         local secs = elapsed_s % 60
-        local label = string.format(" ⏱ %02d:%02d", mins, secs)
+        local label = string.format(" %%#leetcode_timer#⏱ %02d:%02d%%*", mins, secs)
         vim.schedule(function()
             if not (self.winid and vim.api.nvim_win_is_valid(self.winid)) then
                 self:stop_timer_display()
