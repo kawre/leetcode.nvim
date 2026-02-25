@@ -32,6 +32,7 @@ M.get = function()
         easy = { fg = "#46c6c2" },
         medium = { fg = "#fac31d" },
         hard = { fg = "#f8615c" },
+        timer = { fg = "#f8615c" },
 
         easy_alt = { fg = "#294d35" },
         medium_alt = { fg = "#5e4e25" },

@@ -277,6 +277,42 @@ function cmd.q_submit()
     end
 end
 
+function cmd.timer_start()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if not q then
+        return
+    end
+    utils.exec_hooks("timer_start", q)
+end
+
+function cmd.timer_stop()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if not q then
+        return
+    end
+    utils.exec_hooks("timer_stop", q)
+end
+
+function cmd.q_upload_test_result()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if q then
+        q.console:run(false, true) -- test flow but trigger hook
+    end
+end
+
+function cmd.q_upload_submit_result()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if q then
+        q.console:run(true, true) -- submit flow and trigger hook
+    end
+end
+
 function cmd.ui_skills()
     if config.is_cn then
         return
@@ -610,7 +646,11 @@ cmd.commands = {
     lang = { cmd.change_lang },
     run = { cmd.q_run },
     test = { cmd.q_run },
+    upload_test_result = { cmd.q_upload_test_result },
     submit = { cmd.q_submit },
+    upload_submit_result = { cmd.q_upload_submit_result },
+    timer_start = { cmd.timer_start },
+    timer_stop = { cmd.timer_stop },
     daily = { cmd.qot },
     yank = { cmd.yank },
     open = { cmd.open },
@@ -647,6 +687,10 @@ cmd.commands = {
     cookie = {
         update = { cmd.cookie_prompt },
         delete = { cmd.sign_out },
+    },
+    session = {
+        start = { cmd.timer_start },
+        stop = { cmd.timer_stop },
     },
     cache = {
         update = { cmd.cache_update },

@@ -135,7 +135,7 @@ function Question:open_buffer(existed)
     ui_utils.buf_set_opts(self.bufnr, { buflisted = true })
     ui_utils.win_set_buf(self.winid, self.bufnr, true)
 
-    vim.cmd([[match DiagnosticHint /@leet/]])
+    vim.cmd([[match DiagnosticHint /@leet\|@thought/]])
 
     if config.user.editor.fold_imports then
         self:editor_fold_imports(false)
@@ -270,6 +270,9 @@ function Question:_unmount()
         return
     end
 
+    utils.exec_hooks("timer_stop", self)
+    utils.exec_hooks("question_leave", self)
+
     vim.schedule(function()
         self.info:unmount()
         self.console:unmount()
@@ -302,6 +305,45 @@ function Question:autocmds()
             self:_unmount()
         end,
     })
+end
+
+function Question:start_timer_display()
+    self:stop_timer_display() -- reset if already running
+
+    local start_ms = vim.loop.hrtime() / 1e6 -- milliseconds
+
+    local function update_winbar()
+        local elapsed_s = math.floor((vim.loop.hrtime() / 1e6 - start_ms) / 1000)
+        local mins = math.floor(elapsed_s / 60)
+        local secs = elapsed_s % 60
+        local label = string.format(" %%#leetcode_timer#⏱ %02d:%02d%%*", mins, secs)
+        vim.schedule(function()
+            if not (self.winid and vim.api.nvim_win_is_valid(self.winid)) then
+                self:stop_timer_display()
+                return
+            end
+            vim.api.nvim_set_option_value("winbar", label, { win = self.winid })
+        end)
+    end
+
+    update_winbar() -- render immediately
+    self._session_timer = vim.loop.new_timer()
+    self._session_timer:start(1000, 1000, update_winbar)
+end
+
+function Question:stop_timer_display()
+    if self._session_timer then
+        self._session_timer:stop()
+        if not self._session_timer:is_closing() then
+            self._session_timer:close()
+        end
+        self._session_timer = nil
+    end
+    vim.schedule(function()
+        if self.winid and vim.api.nvim_win_is_valid(self.winid) then
+            vim.api.nvim_set_option_value("winbar", "", { win = self.winid })
+        end
+    end)
 end
 
 function Question:handle_mount()
