@@ -108,6 +108,29 @@ function Problems.question_of_today(cb)
     })
 end
 
+---@param cb function
+function Problems.hot100(cb)
+    local query = queries.hot100
+    local variables = { planSlug = "top-100-liked" }
+
+    utils.query(query, variables, {
+        callback = function(res, err)
+            if err then
+                return cb(nil, err)
+            end
+
+            local groups = res.data.studyPlanV2Detail.planSubGroups
+            local questions = {}
+            for _, group in ipairs(groups) do
+                for _, q in ipairs(group.questions) do
+                    table.insert(questions, q)
+                end
+            end
+            cb(questions)
+        end,
+    })
+end
+
 function Problems.translated_titles(cb)
     local query = queries.translations
 

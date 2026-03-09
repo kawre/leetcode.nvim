@@ -33,12 +33,19 @@ local daily = Button("Daily", {
     on_press = cmd.qot,
 })
 
+local hot100 = Button("Hot 100", {
+    icon = "󱐋",
+    sc = "h",
+    on_press = cmd.hot100,
+})
+
 local back = BackButton("menu")
 
 page:insert(Buttons({
     list,
     random,
     daily,
+    hot100,
     back,
 }))
 

@@ -160,3 +160,15 @@ queries.session_progress = [[
             }
         }
     ]]
+
+queries.hot100 = [[
+        query studyPlanV2Detail($planSlug: String!) {
+            studyPlanV2Detail(planSlug: $planSlug) {
+                planSubGroups {
+                    questions {
+                        titleSlug
+                    }
+                }
+            }
+        }
+    ]]

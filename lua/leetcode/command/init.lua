@@ -168,6 +168,36 @@ function cmd.random_question(opts)
     Question(item):mount()
 end
 
+function cmd.hot100()
+    require("leetcode.utils").auth_guard()
+
+    local problems_api = require("leetcode.api.problems")
+    local problemlist = require("leetcode.cache.problemlist")
+    local picker = require("leetcode.picker")
+
+    problems_api.hot100(function(questions, err)
+        if err then
+            return log.err(err)
+        end
+
+        local slug_order = {}
+        for i, q in ipairs(questions) do
+            slug_order[q.titleSlug] = i
+        end
+
+        local cached = problemlist.get()
+        local questions = vim.tbl_filter(function(q)
+            return slug_order[q.title_slug] ~= nil
+        end, cached)
+
+        table.sort(questions, function(a, b)
+            return slug_order[a.title_slug] < slug_order[b.title_slug]
+        end)
+
+        picker.question(questions, {})
+    end)
+end
+
 function cmd.start_with_cmd()
     local leetcode = require("leetcode")
     if leetcode.start(false) then
@@ -630,6 +660,7 @@ cmd.commands = {
     --     },
     --     update = { cmd.update_sessions },
     -- },
+    hot100 = { cmd.hot100 },
     list = {
         cmd.problems,
         _args = arguments.list,
