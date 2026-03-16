@@ -106,6 +106,8 @@ local M = {
         width = "40%", ---@type lc.size
 
         show_stats = true, ---@type boolean
+
+        filetype = "markdown", ---@type string
     },
 
     ---@type lc.picker
