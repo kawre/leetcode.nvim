@@ -141,6 +141,82 @@ function cmd.qot()
     end)
 end
 
+local function split_num(s)
+    local parts = {}
+    for part in s:gmatch("[%d]+") do
+        table.insert(parts, tonumber(part))
+    end
+    return parts
+end
+
+local function compare_num_strs(a, b)
+    local ta = split_num(a)
+    local tb = split_num(b)
+    for i = 1, math.max(#ta, #tb) do
+        local va = ta[i] or 0
+        local vb = tb[i] or 0
+        if va ~= vb then
+            return va < vb
+        end
+    end
+    return false
+end
+
+local function get_sibling_question(offset)
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if not q then
+        return log.error("No question is currently open")
+    end
+
+    local current_id = q.q.frontend_id
+    local prefix, num_str = string.match(current_id, "^(.-)([%d%.]+)$")
+
+    if not prefix or not num_str then
+        return log.error("Cannot parse frontend_id: " .. tostring(current_id))
+    end
+
+    local problems = require("leetcode.cache.problemlist").get()
+
+    local filtered = {}
+    for _, p in ipairs(problems) do
+        local p_prefix, p_num_str = string.match(p.frontend_id, "^(.-)([%d%.]+)$")
+        if p_prefix == prefix and p_num_str then
+            table.insert(filtered, { p = p, num_str = p_num_str })
+        end
+    end
+
+    table.sort(filtered, function(a, b)
+        return compare_num_strs(a.num_str, b.num_str)
+    end)
+
+    local sibling_item
+    for i, item in ipairs(filtered) do
+        if item.p.frontend_id == current_id then
+            if filtered[i + offset] then
+                sibling_item = filtered[i + offset].p
+            end
+            break
+        end
+    end
+
+    if sibling_item then
+        local Question = require("leetcode-ui.question")
+        Question(sibling_item):mount()
+    else
+        log.warn("No " .. (offset > 0 and "next" or "previous") .. " question found")
+    end
+end
+
+function cmd.next_question()
+    get_sibling_question(1)
+end
+
+function cmd.prev_question()
+    get_sibling_question(-1)
+end
+
 function cmd.random_question(opts)
     require("leetcode.utils").auth_guard()
 
@@ -634,6 +710,8 @@ cmd.commands = {
         cmd.problems,
         _args = arguments.list,
     },
+    next = { cmd.next_question },
+    prev = { cmd.prev_question },
     random = {
         cmd.random_question,
         _args = arguments.random,
