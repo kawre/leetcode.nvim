@@ -160,3 +160,60 @@ queries.session_progress = [[
             }
         }
     ]]
+
+queries.company_list = [[
+        query InterviewHotCompanyCards($in: InterviewHotCompanyCardsInput!) {
+            interviewHotCompanyCards(in: $in) {
+                hasMore
+                total
+                cards {
+                    companyInfo {
+                        companyTag {
+                            name
+                            slug
+                            imgUrl
+                            translatedName
+                            questionCount
+                        }
+                    }
+                }
+            }
+        }
+    ]]
+
+queries.company_questions = [[
+        query favoriteQuestionList($favoriteSlug: String!, $filter: FavoriteQuestionFilterInput, $searchKeyword: String, $filtersV2: QuestionFilterInput, $sortBy: QuestionSortByInput, $limit: Int, $skip: Int, $version: String = "v2") {
+            favoriteQuestionList(
+                favoriteSlug: $favoriteSlug
+                filter: $filter
+                filtersV2: $filtersV2
+                searchKeyword: $searchKeyword
+                sortBy: $sortBy
+                limit: $limit
+                skip: $skip
+                version: $version
+            ) {
+                questions {
+                    difficulty
+                    id
+                    paidOnly
+                    questionFrontendId
+                    status
+                    title
+                    titleSlug
+                    translatedTitle
+                    isInMyFavorites
+                    frequency
+                    acRate
+                    contestPoint
+                    topicTags {
+                        name
+                        nameTranslated
+                        slug
+                    }
+                }
+                totalLength
+                hasMore
+            }
+        }
+    ]]
