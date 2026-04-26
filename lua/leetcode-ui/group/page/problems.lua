@@ -34,7 +34,7 @@ local daily = Button("Daily", {
 })
 
 local company = Button("Company", {
-    icon = "",
+    icon = "",
     sc = "c",
     on_press = cmd.company,
 })
