@@ -335,15 +335,13 @@ theme = {
 
 ### image support
 
-Whether to render question description images using [image.nvim]
+> [!NOTE]
+> Requires [image.nvim] v1.4.0+ which fixed text wrapping support (see https://github.com/3rd/image.nvim/pull/266)
 
-> [!WARNING]
-> Enabling this will disable question description wrap,
-> because of https://github.com/3rd/image.nvim/issues/62#issuecomment-1778082534
 
 ```lua
 ---@type boolean
-image_support = false,
+image_support = true,
 ```
 
 ## 📋 Commands
