@@ -29,6 +29,10 @@ function logger.log(msg, lvl)
         msg = debug.traceback(msg .. "\n")
     end
 
+    if not vim.in_fast_event() then
+        vim.notify(msg, lvl, { title = title })
+        return
+    end
     vim.schedule(function()
         vim.notify(msg, lvl, { title = title })
     end)
