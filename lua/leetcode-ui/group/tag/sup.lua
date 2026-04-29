@@ -1,63 +1,39 @@
-local Tag = require("leetcode-ui.group.tag")
-local Line = require("leetcode-ui.line")
-
-local log = require("leetcode.logger")
-
----@class lc.ui.Tag.sup : lc.ui.Tag
-local Sup = Tag:extend("LeetTagSup")
-
-local superscript = {
-    ["0"] = "⁰",
-    ["1"] = "¹",
-    ["2"] = "²",
-    ["3"] = "³",
-    ["4"] = "⁴",
-    ["5"] = "⁵",
-    ["6"] = "⁶",
-    ["7"] = "⁷",
-    ["8"] = "⁸",
-    ["9"] = "⁹",
-    ["a"] = "ᵃ",
-    ["b"] = "ᵇ",
-    ["c"] = "ᶜ",
-    ["d"] = "ᵈ",
-    ["e"] = "ᵉ",
-    ["f"] = "ᶠ",
-    ["g"] = "ᵍ",
-    ["h"] = "ʰ",
-    ["i"] = "ⁱ",
-    ["j"] = "ʲ",
-    ["k"] = "ᵏ",
-    ["l"] = "ˡ",
-    ["m"] = "ᵐ",
-    ["n"] = "ⁿ",
-    ["o"] = "ᵒ",
-    ["p"] = "ᵖ",
-    ["q"] = "ᵠ",
-    ["r"] = "ʳ",
-    ["s"] = "ˢ",
-    ["t"] = "ᵗ",
-    ["u"] = "ᵘ",
-    ["v"] = "ᵛ",
-    ["w"] = "ʷ",
-    ["x"] = "ˣ",
-    ["y"] = "ʸ",
-    ["z"] = "ᶻ",
-}
-
--- function Sup:append(content, highlight)
---     content = content:gsub(".", function(match) return superscript[match:lower()] or match end)
+-- @/leetcode-ui/group/tag/sup.lua
 --
---     Sup.super.append(self, content, highlight)
--- end
+-- Renders <sup> tags.
+--
+local fn = require("leetcode-ui.utils").fn
+local a = require("leetcode.api")
 
-function Sup:parse_node()
-    self:append("^")
+--- @class leetcode-ui.group.tag.sup
+--- @field render fun(self: leetcode-ui.group.tag.sup, node: table): leetcode.lines
+local Sup = {}
+Sup.__index = Sup
 
-    Sup.super.parse_node(self)
+--- @param node table
+--- @return leetcode.lines
+function Sup:render(node)
+    local lines = require("leetcode-ui.lines")
+    local l = lines.new()
+    l:write("^")
+    l:write(fn.reduce(node.children, function(acc, child)
+        local success, res = pcall(self.render_child, self, child)
+        if not success then
+            return acc
+        end
+        return acc .. res
+    end, ""))
+
+    return l
 end
 
----@type fun(): lc.ui.Tag.sup
-local LeetTagSup = Sup
+--- @param opts leetcode-ui.opts
+--- @return leetcode-ui.group.tag.sup
+function Sup.new(opts)
+    local obj = setmetatable({}, Sup)
+    obj.opts = opts
+    obj.render_child = require("leetcode-ui.group.init").render_child
+    return obj
+end
 
-return LeetTagSup
+return Sup
