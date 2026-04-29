@@ -30,6 +30,68 @@ function cmd.problems(options)
     picker.question(p, options)
 end
 
+---@param options table<string, string[]>
+function cmd.blind75(options)
+    require("leetcode.utils").auth_guard()
+
+    local problem_lists = require("leetcode.config.problem_lists")
+    local problemlist = require("leetcode.cache.problemlist")
+    local all_problems = problemlist.get()
+    
+    -- Create a map of slug -> problem for quick lookup
+    local problems_map = {}
+    for _, problem in ipairs(all_problems) do
+        problems_map[problem.title_slug] = problem
+    end
+    
+    -- Build filtered list maintaining the exact order from blind75 list
+    local filtered = {}
+    for _, slug in ipairs(problem_lists.blind75) do
+        local problem = problems_map[slug]
+        if problem then
+            table.insert(filtered, problem)
+        end
+    end
+    
+    local picker = require("leetcode.picker")
+    picker.question(filtered, options)
+end
+
+---@param section_key string
+function cmd.blind75_section(section_key)
+    require("leetcode.utils").auth_guard()
+
+    local problem_lists = require("leetcode.config.problem_lists")
+    local problemlist = require("leetcode.cache.problemlist")
+    local all_problems = problemlist.get()
+    
+    -- Get problems for the specific section (in order)
+    local section_slugs = problem_lists.get_blind75_section(section_key)
+    if not section_slugs or #section_slugs == 0 then
+        log.warn(("No problems found for section: %s"):format(section_key))
+        return
+    end
+    
+    -- Create a map of slug -> problem for quick lookup
+    local problems_map = {}
+    for _, problem in ipairs(all_problems) do
+        problems_map[problem.title_slug] = problem
+    end
+    
+    -- Build filtered list maintaining the exact order from section_slugs
+    local filtered = {}
+    for _, slug in ipairs(section_slugs) do
+        local problem = problems_map[slug]
+        if problem then
+            table.insert(filtered, problem)
+        end
+    end
+    
+    local picker = require("leetcode.picker")
+    picker.question(filtered, {})
+end
+
+
 ---@param cb? function
 function cmd.cookie_prompt(cb)
     local cookie = require("leetcode.cache.cookie")
@@ -632,6 +694,10 @@ cmd.commands = {
     -- },
     list = {
         cmd.problems,
+        _args = arguments.list,
+    },
+    blind75 = {
+        cmd.blind75,
         _args = arguments.list,
     },
     random = {

@@ -51,6 +51,15 @@ local cache = Button("Cache", {
     expandable = true,
 })
 
+local blind75 = Button("Blind 75", {
+    icon = "󰓹",
+    sc = "b",
+    on_press = function()
+        cmd.set_menu_page("blind75")
+    end,
+    expandable = true,
+})
+
 local exit = ExitButton()
 
 page:insert(Buttons({
@@ -58,6 +67,7 @@ page:insert(Buttons({
     statistics,
     cookie,
     cache,
+    blind75,
     exit,
 }))
 
