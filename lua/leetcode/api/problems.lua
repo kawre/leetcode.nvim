@@ -108,6 +108,75 @@ function Problems.question_of_today(cb)
     })
 end
 
+---@param cb function
+function Problems.company_list(cb)
+    local query = queries.company_list
+    local variables = { ["in"] = { offset = 0, limit = 100 } }
+
+    utils.query(query, variables, {
+        endpoint = "/graphql/noj-go",
+        callback = function(res, err)
+            if err then
+                return cb(nil, err)
+            end
+
+            local data = res.data.interviewHotCompanyCards
+            local companies = {}
+            for _, card in ipairs(data.cards) do
+                local tag = card.companyInfo.companyTag
+                table.insert(companies, {
+                    name = tag.name ~= "" and tag.name or tag.translatedName,
+                    slug = tag.slug,
+                    question_count = tag.questionCount,
+                })
+            end
+            cb(companies)
+        end,
+    })
+end
+
+---@param company_slug string
+---@param cb function
+function Problems.company_questions(company_slug, cb)
+    local query = queries.company_questions
+    local favorite_slug = company_slug .. "-thirty-days"
+    local variables = {
+        favoriteSlug = favorite_slug,
+        skip = 0,
+        limit = 500,
+        filtersV2 = {
+            filterCombineType = "ALL",
+            statusFilter = { questionStatuses = {}, operator = "IS" },
+            difficultyFilter = { difficulties = {}, operator = "IS" },
+            languageFilter = { languageSlugs = {}, operator = "IS" },
+            topicFilter = { topicSlugs = {}, operator = "IS" },
+            acceptanceFilter = vim.empty_dict(),
+            frequencyFilter = vim.empty_dict(),
+            frontendIdFilter = vim.empty_dict(),
+            lastSubmittedFilter = vim.empty_dict(),
+            publishedFilter = vim.empty_dict(),
+            companyFilter = { companySlugs = {}, operator = "IS" },
+            positionFilter = { positionSlugs = {}, operator = "IS" },
+            positionLevelFilter = { positionLevelSlugs = {}, operator = "IS" },
+            contestPointFilter = { contestPoints = {}, operator = "IS" },
+            premiumFilter = { premiumStatus = {} },
+        },
+        searchKeyword = "",
+        sortBy = { sortField = "CUSTOM", sortOrder = "ASCENDING" },
+    }
+
+    utils.query(query, variables, {
+        callback = function(res, err)
+            if err then
+                return cb(nil, err)
+            end
+
+            local data = res.data.favoriteQuestionList
+            cb(data.questions)
+        end,
+    })
+end
+
 function Problems.translated_titles(cb)
     local query = queries.translations
 

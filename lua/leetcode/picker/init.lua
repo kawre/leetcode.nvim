@@ -134,6 +134,23 @@ function P.tabs()
     P.pick("tabs", tabs)
 end
 
+function P.company()
+    local problems_api = require("leetcode.api.problems")
+    local log = require("leetcode.logger")
+
+    problems_api.company_list(function(companies, err)
+        if err then
+            return log.err(err)
+        end
+
+        if not companies or vim.tbl_isempty(companies) then
+            return log.warn("No companies found")
+        end
+
+        P.pick("company", companies)
+    end)
+end
+
 function P.hidden_field(text, deli)
     return text:match(("([^%s]+)$"):format(deli))
 end

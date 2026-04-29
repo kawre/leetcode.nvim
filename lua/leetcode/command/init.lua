@@ -168,6 +168,12 @@ function cmd.random_question(opts)
     Question(item):mount()
 end
 
+function cmd.company()
+    require("leetcode.utils").auth_guard()
+    local picker = require("leetcode.picker")
+    picker.company()
+end
+
 function cmd.start_with_cmd()
     local leetcode = require("leetcode")
     if leetcode.start(false) then
@@ -634,6 +640,7 @@ cmd.commands = {
         cmd.problems,
         _args = arguments.list,
     },
+    company = { cmd.company },
     random = {
         cmd.random_question,
         _args = arguments.random,
