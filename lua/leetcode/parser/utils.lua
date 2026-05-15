@@ -6,6 +6,7 @@ local utils = {}
 
 utils.entities = {
     ["&nbsp;"] = " ",
+    ["&emsp;"] = " ",
     ["&quot;"] = "\"",
     ["&#39;"] = "'",
 
