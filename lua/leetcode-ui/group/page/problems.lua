@@ -21,6 +21,12 @@ local list = Button("List", {
     on_press = cmd.problems,
 })
 
+local favorite = Button("Favorite", {
+    icon = "★",
+    sc = "f",
+    on_press = cmd.favorite_list,
+})
+
 local random = Button("Random", {
     icon = "",
     sc = "r",
@@ -37,6 +43,7 @@ local back = BackButton("menu")
 
 page:insert(Buttons({
     list,
+    favorite,
     random,
     daily,
     back,
