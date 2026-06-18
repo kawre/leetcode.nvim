@@ -73,7 +73,28 @@ imports["java"] = {
 }
 
 imports["cpp"] = {
-    "#include <bits/stdc++.h>",
+    "#include <algorithm> // IWYU pragma: keep",
+    "#include <array> // IWYU pragma: keep",
+    "#include <bitset> // IWYU pragma: keep",
+    "#include <climits> // IWYU pragma: keep",
+    "#include <cmath> // IWYU pragma: keep",
+    "#include <cstdint> // IWYU pragma: keep",
+    "#include <deque> // IWYU pragma: keep",
+    "#include <functional> // IWYU pragma: keep",
+    "#include <iostream> // IWYU pragma: keep",
+    "#include <limits> // IWYU pragma: keep",
+    "#include <list> // IWYU pragma: keep",
+    "#include <map> // IWYU pragma: keep",
+    "#include <numeric> // IWYU pragma: keep",
+    "#include <queue> // IWYU pragma: keep",
+    "#include <set> // IWYU pragma: keep",
+    "#include <stack> // IWYU pragma: keep",
+    "#include <string> // IWYU pragma: keep",
+    "#include <tuple> // IWYU pragma: keep",
+    "#include <unordered_map> // IWYU pragma: keep",
+    "#include <unordered_set> // IWYU pragma: keep",
+    "#include <utility> // IWYU pragma: keep",
+    "#include <vector> // IWYU pragma: keep",
     "using namespace std;",
 }
 
