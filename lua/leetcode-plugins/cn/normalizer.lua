@@ -9,6 +9,7 @@ function Normalizer:cleanup()
         :gsub("<br%s*/>", "\n")
         :gsub("<meta[^>]*/>", "")
         :gsub("&nbsp;", " ")
+        :gsub("<([^/%a!])", "&lt;%1")
         :gsub("<(/?)b>", "<%1strong>")
         :gsub(":", "：")
 end
