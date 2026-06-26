@@ -33,6 +33,8 @@ function Normalizer:fix_indent()
         :gsub("\n*(<ul[^>]*>)\n*", "\n\n%1\n")
         :gsub("\n*(<ol[^>]*>)\n*", "\n\n%1\n")
         :gsub("\n*(<pre[^>]*>)", "\n\n%1\n")
+        :gsub("\n*(<table[^>]*>)\n*", "\n\n%1\n")
+        :gsub("\n*(</table>)\n*", "\n%1\n\n")
         :gsub("\n*(<img[^>]*/?>)\n*", "\n\n%1\n\n")
 end
 

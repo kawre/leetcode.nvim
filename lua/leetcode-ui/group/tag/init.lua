@@ -139,7 +139,13 @@ function Tag:parse_node() --
         if ntype == "text" or ntype == "ERROR" then
             self:append(self:get_text(child))
         elseif ntype == "element" then
-            self:append(self:from(child))
+            local tag = self:get_el_data(child).tag
+            if tag == "div" or tag == "table" then
+                self:endgrp()
+                self:insert(self:from(child))
+            else
+                self:append(self:from(child))
+            end
         elseif ntype == "entity" then
             local text = self:get_text(child)
 
@@ -154,16 +160,33 @@ function Tag:parse_node() --
     end
 end
 
+local function is_empty_line(item)
+    if not (item.class and item.content) then
+        return false
+    end
+
+    if item.class.name == "LeetLine" then
+        return item:content() == ""
+    end
+
+    if item.class.name ~= "LeetLines" then
+        return false
+    end
+
+    local contents = item:contents()
+    return #contents == 1 and contents[1].class.name == "LeetLine" and contents[1]:content() == ""
+end
+
 function Tag.trim(lines) --
     if not lines or vim.tbl_isempty(lines) then
         return {}
     end
 
-    while not vim.tbl_isempty(lines) and lines[1]:content() == "" do
+    while not vim.tbl_isempty(lines) and is_empty_line(lines[1]) do
         table.remove(lines, 1)
     end
 
-    while not vim.tbl_isempty(lines) and lines[#lines]:content() == "" do
+    while not vim.tbl_isempty(lines) and is_empty_line(lines[#lines]) do
         table.remove(lines)
     end
 
@@ -189,6 +212,7 @@ function Tag:from(node)
     local tbl = {
         pre = req_tag("pre"),
         blockquote = req_tag("pre"),
+        table = req_tag("table"),
 
         ul = req_tag("list.ul"),
         ol = req_tag("list.ol"),
