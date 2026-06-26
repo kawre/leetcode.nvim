@@ -22,8 +22,15 @@
 
 ---@alias lc.hook
 ---| "enter"
+---| "problem_description_open"
 ---| "question_enter"
+---| "question_leave"
 ---| "leave"
+---| "on_test_result"
+---| "upload_submit_result"
+---| "upload_test_result"
+---| "timer_start"
+---| "timer_stop"
 
 ---@alias lc.size
 ---| string
@@ -106,20 +113,61 @@ local M = {
         width = "40%", ---@type lc.size
 
         show_stats = true, ---@type boolean
+
+        submissions = {
+            enabled = true, ---@type boolean
+            height = 10, ---@type lc.size
+            limit = 10, ---@type integer
+        },
     },
 
     ---@type lc.picker
     picker = { provider = nil },
+
+    companion = {
+        adapter = "submission_service", ---@type string
+        model = nil, ---@type string|nil
+        auto_submit = true, ---@type boolean
+        auto_fence_code = true, ---@type boolean
+        prompt_user = true, ---@type boolean
+        default_prompt = "Help me understand this problem and my current code.", ---@type string
+        window = nil, ---@type table|nil
+    },
+
+    ai_assist = {
+        enabled = true, ---@type boolean
+    },
 
     hooks = {
         ---@type fun()[]
         ["enter"] = {},
 
         ---@type fun(question: lc.ui.Question)[]
+        ["problem_description_open"] = {},
+
+        ---@type fun(question: lc.ui.Question)[]
         ["question_enter"] = {},
+
+        ---@type fun(question: lc.ui.Question)[]
+        ["question_leave"] = {},
 
         ---@type fun()[]
         ["leave"] = {},
+
+        ---@type fun(question: lc.ui.Question, buffer: string, item_json: table)[]
+        ["on_test_result"] = {},
+
+        ---@type fun(question: lc.ui.Question, buffer: string, item_json: table)[]
+        ["upload_submit_result"] = {},
+
+        ---@type fun(question: lc.ui.Question, buffer: string, item_json: table)[]
+        ["upload_test_result"] = {},
+
+        ---@type fun(question: lc.ui.Question)[]
+        ["timer_start"] = {},
+
+        ---@type fun(question: lc.ui.Question)[]
+        ["timer_stop"] = {},
     },
 
     keys = {

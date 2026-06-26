@@ -93,6 +93,8 @@ function utils.get_hooks(event)
 
     if type(fns) == "function" then
         fns = { fns }
+    else
+        fns = vim.deepcopy(fns)
     end
 
     return vim.list_extend(fns, config.hooks[event] or {})

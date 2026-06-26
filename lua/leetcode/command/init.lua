@@ -264,7 +264,7 @@ function cmd.q_run()
     utils.auth_guard()
     local q = utils.curr_question()
     if q then
-        q.console:run()
+        q.console:run(false, "on_test_result")
     end
 end
 
@@ -273,7 +273,73 @@ function cmd.q_submit()
     utils.auth_guard()
     local q = utils.curr_question()
     if q then
-        q.console:run(true)
+        q.console:run(true, "upload_submit_result")
+    end
+end
+
+function cmd.timer_start()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if not q then
+        return
+    end
+    utils.exec_hooks("timer_start", q)
+end
+
+function cmd.timer_stop()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if not q then
+        return
+    end
+    utils.exec_hooks("timer_stop", q)
+end
+
+local function set_ai_assist(enabled)
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if not q then
+        return
+    end
+
+    q:set_auto_ai_assist_enabled(enabled)
+    log.info(("Auto AI assist %s"):format(enabled and "on" or "off"))
+end
+
+function cmd.ai_assist()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if not q then
+        return
+    end
+
+    local enabled = q:toggle_auto_ai_assist()
+    log.info(("Auto AI assist %s"):format(enabled and "on" or "off"))
+end
+
+function cmd.ai_assist_on()
+    set_ai_assist(true)
+end
+
+function cmd.ai_assist_off()
+    set_ai_assist(false)
+end
+
+function cmd.q_upload_test_result()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if q then
+        q.console:run(false, "upload_test_result")
+    end
+end
+
+function cmd.q_upload_submit_result()
+    local utils = require("leetcode.utils")
+    utils.auth_guard()
+    local q = utils.curr_question()
+    if q then
+        q.console:run(true, "upload_submit_result")
     end
 end
 
@@ -412,6 +478,10 @@ function cmd.fold()
     end
 
     q:editor_fold_imports(true)
+end
+
+function cmd.companion()
+    require("leetcode.integrations.codecompanion").prompt_and_open()
 end
 
 function cmd.get_active_session()
@@ -610,7 +680,11 @@ cmd.commands = {
     lang = { cmd.change_lang },
     run = { cmd.q_run },
     test = { cmd.q_run },
+    upload_test_result = { cmd.q_upload_test_result },
     submit = { cmd.q_submit },
+    upload_submit_result = { cmd.q_upload_submit_result },
+    timer_start = { cmd.timer_start },
+    timer_stop = { cmd.timer_stop },
     daily = { cmd.qot },
     yank = { cmd.yank },
     open = { cmd.open },
@@ -619,6 +693,13 @@ cmd.commands = {
     restore = { cmd.restore },
     inject = { cmd.inject },
     fold = { cmd.fold },
+    companion = { cmd.companion },
+    ai_assist = {
+        cmd.ai_assist,
+        on = { cmd.ai_assist_on },
+        off = { cmd.ai_assist_off },
+        toggle = { cmd.ai_assist },
+    },
     -- session = {
     --     change = {
     --         cmd.change_session,
@@ -647,6 +728,10 @@ cmd.commands = {
     cookie = {
         update = { cmd.cookie_prompt },
         delete = { cmd.sign_out },
+    },
+    session = {
+        start = { cmd.timer_start },
+        stop = { cmd.timer_stop },
     },
     cache = {
         update = { cmd.cache_update },

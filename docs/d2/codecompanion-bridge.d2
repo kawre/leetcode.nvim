@@ -1,0 +1,142 @@
+direction: right
+
+nvim: {
+  label: "nvim\nentry point"
+  shape: cylinder
+  style: {
+    fill: "#fecaca"
+    stroke: "#2563eb"
+    stroke-width: 2
+  }
+}
+
+companion_client: {
+  label: "CodeCompanion\nexternal client"
+  shape: circle
+  style: {
+    fill: "#f5b4fc"
+    stroke: "#2563eb"
+    stroke-width: 2
+  }
+}
+
+local_runtime: {
+  label: "Strict local"
+  direction: down
+  style: {
+    fill: "#fff7ed"
+    stroke: "#fdba74"
+    stroke-width: 2
+  }
+
+  leetcode_nvim: {
+    label: "leetcode.nvim"
+    style: {
+      fill: "#fdba74"
+      stroke: "#2563eb"
+      stroke-width: 2
+    }
+  }
+
+  question_runtime: {
+    label: "question runtime"
+    style: {
+      fill: "#fde68a"
+      stroke: "#2563eb"
+      stroke-width: 2
+    }
+  }
+
+  hook_router: {
+    label: "hook router"
+    style: {
+      fill: "#fde68a"
+      stroke: "#2563eb"
+      stroke-width: 2
+    }
+  }
+
+  codecompanion_bridge: {
+    label: "codecompanion bridge"
+    style: {
+      fill: "#fde68a"
+      stroke: "#2563eb"
+      stroke-width: 2
+    }
+  }
+
+  submission_db_saver: {
+    label: "submission_db_saver"
+    style: {
+      fill: "#fde68a"
+      stroke: "#2563eb"
+      stroke-width: 2
+    }
+  }
+}
+
+service_runtime: {
+  label: "Strict local\nsubmission runtime"
+  direction: down
+  style: {
+    fill: "#eef2ff"
+    stroke: "#93c5fd"
+    stroke-width: 2
+  }
+
+  submission_service: {
+    label: "leetcode-submission-service"
+    style: {
+      fill: "#bfdbfe"
+      stroke: "#2563eb"
+      stroke-width: 2
+    }
+  }
+
+  companion_http: {
+    label: "companion HTTP"
+    style: {
+      fill: "#bfdbfe"
+      stroke: "#2563eb"
+      stroke-width: 2
+    }
+  }
+
+  failure_analysis: {
+    label: "failure analysis"
+    style: {
+      fill: "#bfdbfe"
+      stroke: "#2563eb"
+      stroke-width: 2
+    }
+  }
+
+  session_scope: {
+    label: "active session scope\nin-memory"
+    style: {
+      fill: "#dbeafe"
+      stroke: "#2563eb"
+      stroke-width: 2
+    }
+  }
+}
+
+nvim -> local_runtime.leetcode_nvim: "editor runtime"
+companion_client -> service_runtime.companion_http: "OpenAI-compatible chat"
+
+local_runtime.leetcode_nvim -> local_runtime.question_runtime: "question lifecycle"
+local_runtime.leetcode_nvim -> local_runtime.codecompanion_bridge: ":Leet companion"
+local_runtime.question_runtime -> local_runtime.hook_router: "test / submit hooks"
+local_runtime.hook_router -> local_runtime.submission_db_saver: "failure callbacks"
+local_runtime.codecompanion_bridge -> companion_client: "hidden LeetCode context"
+
+local_runtime.submission_db_saver -> service_runtime.submission_service: "JSON over TCP"
+service_runtime.submission_service -> service_runtime.failure_analysis: "analyze_failure"
+service_runtime.submission_service -> service_runtime.companion_http: "local companion endpoint"
+
+service_runtime.failure_analysis -> service_runtime.session_scope: "write latest failure\nstatic analysis\nevent_id"
+service_runtime.companion_http -> service_runtime.session_scope: "read / write companion memory"
+
+service_runtime.submission_service -> local_runtime.submission_db_saver: "failure event payload"
+local_runtime.submission_db_saver -> local_runtime.codecompanion_bridge: "render failure event"
+local_runtime.codecompanion_bridge -> companion_client: "attach hidden failure context"

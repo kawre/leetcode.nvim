@@ -59,7 +59,7 @@ function ConsoleLayout:mount()
     })
 end
 
-function ConsoleLayout:run(submit)
+function ConsoleLayout:run(submit, trigger_hook)
     local range = self.question:editor_section_range("code")
     if not range:is_valid_or_log() then
         return
@@ -71,7 +71,7 @@ function ConsoleLayout:run(submit)
 
     self.result:focus()
 
-    Runner:init(self.question):run(submit)
+    Runner:init(self.question):run(submit, trigger_hook)
 end
 
 function ConsoleLayout:use_testcase()

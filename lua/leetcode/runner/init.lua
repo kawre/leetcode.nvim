@@ -4,6 +4,7 @@ local log = require("leetcode.logger")
 local interpreter = require("leetcode.api.interpreter")
 local config = require("leetcode.config")
 local Judge = require("leetcode.logger.spinner.judge")
+local utils = require("leetcode.utils")
 
 ---@type Path
 local leetbody = config.storage.cache:joinpath("body")
@@ -18,12 +19,13 @@ Runner.running = false
 
 ---@param self lc.Runner
 ---@param submit boolean
-Runner.run = vim.schedule_wrap(function(self, submit)
+---@param hook_event? lc.hook|boolean
+Runner.run = vim.schedule_wrap(function(self, submit, hook_event)
     if Runner.running then
         return log.warn("Runner is busy")
     end
 
-    local ok, err = pcall(Runner.handle, self, submit)
+    local ok, err = pcall(Runner.handle, self, submit, hook_event)
     if not ok then
         self:stop()
         log.error(err)
@@ -34,7 +36,7 @@ Runner.stop = function()
     Runner.running = false
 end
 
-function Runner:handle(submit)
+function Runner:handle(submit, hook_event)
     Runner.running = true
     local question = self.question
 
@@ -52,6 +54,15 @@ function Runner:handle(submit)
         end
 
         if item then
+            -- print(vim.inspect(item))
+            if hook_event then
+                local event = hook_event
+                if hook_event == true then
+                    event = submit and "upload_submit_result" or "upload_test_result"
+                end
+                utils.exec_hooks(event, question, body.typed_code, item)
+            end
+
             if item._.success then
                 judge:success(item.status_msg)
             else

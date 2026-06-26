@@ -1,4 +1,5 @@
 local Description = require("leetcode-ui.split.description")
+local Submissions = require("leetcode-ui.split.submissions")
 local Console = require("leetcode-ui.layout.console")
 local Info = require("leetcode-ui.popup.info")
 local Object = require("nui.object")
@@ -15,12 +16,62 @@ local log = require("leetcode.logger")
 ---@field file Path
 ---@field q lc.question_res
 ---@field description lc.ui.Description
+---@field submissions? lc.ui.Submissions
+---@field mem0_recall_summary? table
 ---@field bufnr integer
 ---@field console lc.ui.Console
 ---@field lang string
 ---@field cache lc.cache.Question
 ---@field reset boolean
 local Question = Object("LeetQuestion")
+
+local function ai_assist_default_enabled()
+    local ai_assist = config.user.ai_assist or {}
+    return ai_assist.enabled ~= false
+end
+
+local function ai_assist_label(enabled)
+    local state = enabled and "on" or "off"
+    local hl = enabled and "leetcode_easy" or "leetcode_error"
+    return string.format(" %%#leetcode_alt#AI%%*:%%#%s#%s%%*", hl, state)
+end
+
+function Question:is_auto_ai_assist_enabled()
+    if self._auto_ai_assist_enabled == nil then
+        self._auto_ai_assist_enabled = ai_assist_default_enabled()
+    end
+    return self._auto_ai_assist_enabled
+end
+
+function Question:set_auto_ai_assist_enabled(enabled)
+    self._auto_ai_assist_enabled = not not enabled
+    if self._session_timer then
+        self:render_session_winbar()
+    end
+end
+
+function Question:toggle_auto_ai_assist()
+    local enabled = not self:is_auto_ai_assist_enabled()
+    self:set_auto_ai_assist_enabled(enabled)
+    return enabled
+end
+
+function Question:render_session_winbar(elapsed_s)
+    if not (self.winid and vim.api.nvim_win_is_valid(self.winid)) then
+        return
+    end
+
+    elapsed_s = elapsed_s or 0
+    local mins = math.floor(elapsed_s / 60)
+    local secs = elapsed_s % 60
+    local label = string.format(
+        " %%#leetcode_timer#⏱ %02d:%02d%%*%s",
+        mins,
+        secs,
+        ai_assist_label(self:is_auto_ai_assist_enabled())
+    )
+    vim.api.nvim_set_option_value("winbar", label, { win = self.winid })
+end
 
 ---@param raw? boolean
 function Question:snippet(raw)
@@ -135,7 +186,7 @@ function Question:open_buffer(existed)
     ui_utils.buf_set_opts(self.bufnr, { buflisted = true })
     ui_utils.win_set_buf(self.winid, self.bufnr, true)
 
-    vim.cmd([[match DiagnosticHint /@leet/]])
+    vim.cmd([[match DiagnosticHint /@leet\|@thought/]])
 
     if config.user.editor.fold_imports then
         self:editor_fold_imports(false)
@@ -266,6 +317,8 @@ function Question:injector(code)
 end
 
 function Question:_unmount()
+    self:run_leave_hooks()
+
     if vim.v.dying ~= 0 then
         return
     end
@@ -273,6 +326,9 @@ function Question:_unmount()
     vim.schedule(function()
         self.info:unmount()
         self.console:unmount()
+        if self.submissions then
+            self.submissions:unmount()
+        end
         self.description:unmount()
 
         if self.bufnr and vim.api.nvim_buf_is_valid(self.bufnr) then
@@ -294,6 +350,17 @@ function Question:unmount()
 end
 
 local group = vim.api.nvim_create_augroup("leetcode_questions", { clear = true })
+
+function Question:run_leave_hooks()
+    if self._leave_hooks_ran then
+        return
+    end
+
+    self._leave_hooks_ran = true
+    utils.exec_hooks("timer_stop", self)
+    utils.exec_hooks("question_leave", self)
+end
+
 function Question:autocmds()
     vim.api.nvim_create_autocmd("WinClosed", {
         group = group,
@@ -302,12 +369,70 @@ function Question:autocmds()
             self:_unmount()
         end,
     })
+
+    vim.api.nvim_create_autocmd("TabLeave", {
+        group = group,
+        callback = function()
+            local tabp = utils.question_tabp(self)
+            if tabp and tabp == vim.api.nvim_get_current_tabpage() and self._session_timer then
+                utils.exec_hooks("timer_stop", self)
+            end
+        end,
+    })
+
+    vim.api.nvim_create_autocmd("VimLeavePre", {
+        group = group,
+        callback = function()
+            self:run_leave_hooks()
+        end,
+    })
+end
+
+function Question:start_timer_display()
+    self:stop_timer_display() -- reset if already running
+
+    local start_ms = vim.loop.hrtime() / 1e6 -- milliseconds
+
+    local function update_winbar()
+        local elapsed_s = math.floor((vim.loop.hrtime() / 1e6 - start_ms) / 1000)
+        vim.schedule(function()
+            if not (self.winid and vim.api.nvim_win_is_valid(self.winid)) then
+                self:stop_timer_display()
+                return
+            end
+            self:render_session_winbar(elapsed_s)
+        end)
+    end
+
+    update_winbar() -- render immediately
+    self._session_timer = vim.loop.new_timer()
+    self._session_timer:start(1000, 1000, update_winbar)
+end
+
+function Question:stop_timer_display()
+    if self._session_timer then
+        self._session_timer:stop()
+        if not self._session_timer:is_closing() then
+            self._session_timer:close()
+        end
+        self._session_timer = nil
+    end
+    vim.schedule(function()
+        if self.winid and vim.api.nvim_win_is_valid(self.winid) then
+            vim.api.nvim_set_option_value("winbar", "", { win = self.winid })
+        end
+    end)
 end
 
 function Question:handle_mount()
     self:create_buffer()
 
     self.description = Description(self):mount()
+    if config.user.description.submissions.enabled then
+        self.submissions = Submissions(self):mount()
+    end
+    utils.exec_hooks("problem_description_open", self)
+
     self.console = Console(self)
     self.info = Info(self)
 
@@ -317,6 +442,14 @@ function Question:handle_mount()
     utils.exec_hooks("question_enter", self)
 
     return self
+end
+
+---@param submissions table[]
+function Question:set_past_submissions(submissions)
+    self.past_submissions = submissions or {}
+    if self.submissions then
+        self.submissions:update_submissions(self.past_submissions)
+    end
 end
 
 function Question:mount()

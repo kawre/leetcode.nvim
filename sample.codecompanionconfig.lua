@@ -1,0 +1,1 @@
+/home/jingyi/.config/nvim/lua/plugins/codecompanion.lua
