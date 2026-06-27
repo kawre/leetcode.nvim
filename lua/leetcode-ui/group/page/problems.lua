@@ -1,4 +1,5 @@
 local cmd = require("leetcode.command")
+local config = require("leetcode.config")
 
 local Title = require("leetcode-ui.lines.title")
 local Button = require("leetcode-ui.lines.button.menu")
@@ -18,7 +19,9 @@ page:insert(Title({ "Menu" }, "Problems"))
 local list = Button("List", {
     icon = "",
     sc = "p",
-    on_press = cmd.problems,
+    on_press = function()
+        cmd.problems({ status = { config.user.status } })
+    end,
 })
 
 local random = Button("Random", {
