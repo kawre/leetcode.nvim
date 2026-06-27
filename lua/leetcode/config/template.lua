@@ -48,6 +48,9 @@ local M = {
     ---@type lc.lang
     lang = "cpp",
 
+    ---@type "ac" | "notac" | "todo" | nil
+    status = nil,
+
     cn = { -- leetcode.cn
         enabled = false, ---@type boolean
         translator = true, ---@type boolean
