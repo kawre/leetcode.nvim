@@ -20,7 +20,7 @@ local list = Button("List", {
     icon = "",
     sc = "p",
     on_press = function()
-        cmd.problems({ status = config.user.status })
+        cmd.problems({ status = { config.user.status } })
     end,
 })
 
