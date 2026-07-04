@@ -19,12 +19,12 @@ local Cookie = {}
 ---
 ---@return string|nil
 function Cookie.set(str)
-    local _, cerr = Cookie.parse(str)
+    local cookie, cerr = Cookie.parse(str)
     if cerr then
         return cerr
     end
 
-    file:write(str, "w")
+    file:write(cookie.str, "w")
     local auth_api = require("leetcode.api.auth")
     local _, aerr = auth_api.user()
 
@@ -86,6 +86,26 @@ end
 ---
 ---@return lc.cache.Cookie|nil, string|nil
 function Cookie.parse(str)
+    str = str:match("^%s*(.-)%s*$")
+
+    -- Strip text surrounding the cookie line
+    if str:find("[\r\n]") then
+        local cookie_line
+        for line in str:gmatch("[^\r\n]+") do
+            if line:find("csrftoken=") and line:find("LEETCODE_SESSION=") then
+                cookie_line = line:match("^%s*(.-)%s*$")
+                break
+            end
+        end
+
+        if not cookie_line then
+            return nil, "Bad token format"
+        end
+        str = cookie_line
+    end
+
+    str = str:gsub("^[Cc]ookie:%s*", "", 1)
+
     local csrf = str:match("csrftoken=([^;]+)")
     if not csrf or csrf == "" then
         return nil, "Bad csrf token format"
