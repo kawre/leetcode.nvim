@@ -63,6 +63,28 @@ queries.question = [[
         }
     ]]
 
+queries.editorial = [[
+        query ugcArticleOfficialSolutionArticle($questionSlug: String!) {
+            ugcArticleOfficialSolutionArticle(questionSlug: $questionSlug) {
+                uuid
+                title
+                slug
+                is_serialized: isSerialized
+                has_video: hasVideoArticle
+                content
+            }
+        }
+    ]]
+
+queries.playground = [[
+        query fetchPlaygroundCodes($uuid: String!) {
+            all_playground_codes: allPlaygroundCodes(uuid: $uuid) {
+                code
+                lang_slug: langSlug
+            }
+        }
+    ]]
+
 queries.random_question = [[
         query randomQuestion($categorySlug: String, $filters: QuestionListFilterInput) {
             randomQuestion(categorySlug: $categorySlug, filters: $filters) {

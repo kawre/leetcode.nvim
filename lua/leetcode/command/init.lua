@@ -246,6 +246,14 @@ function cmd.console()
     end
 end
 
+function cmd.editorial()
+    local utils = require("leetcode.utils")
+    local q = utils.curr_question()
+    if q then
+        q.editorial:toggle()
+    end
+end
+
 function cmd.info()
     local utils = require("leetcode.utils")
     local q = utils.curr_question()
@@ -604,6 +612,7 @@ cmd.commands = {
     menu = { cmd.menu },
     exit = { cmd.exit },
     console = { cmd.console },
+    editorial = { cmd.editorial },
     info = { cmd.info },
     hints = { cmd.hints },
     tabs = { cmd.question_tabs },

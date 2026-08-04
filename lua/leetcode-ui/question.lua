@@ -1,4 +1,5 @@
 local Description = require("leetcode-ui.split.description")
+local Editorial = require("leetcode-ui.popup.editorial")
 local Console = require("leetcode-ui.layout.console")
 local Info = require("leetcode-ui.popup.info")
 local Object = require("nui.object")
@@ -15,6 +16,7 @@ local log = require("leetcode.logger")
 ---@field file Path
 ---@field q lc.question_res
 ---@field description lc.ui.Description
+---@field editorial lc.ui.Editorial
 ---@field bufnr integer
 ---@field console lc.ui.Console
 ---@field lang string
@@ -274,6 +276,7 @@ function Question:_unmount()
         self.info:unmount()
         self.console:unmount()
         self.description:unmount()
+        self.editorial:unmount()
 
         if self.bufnr and vim.api.nvim_buf_is_valid(self.bufnr) then
             vim.api.nvim_buf_delete(self.bufnr, { force = true, unload = false })
@@ -308,6 +311,7 @@ function Question:handle_mount()
     self:create_buffer()
 
     self.description = Description(self):mount()
+    self.editorial = Editorial(self)
     self.console = Console(self)
     self.info = Info(self)
 
