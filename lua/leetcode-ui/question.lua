@@ -183,7 +183,7 @@ function Question:inject_imports()
 
     local merged, seen = {}, {}
     local function add(list)
-        for _, v in ipairs(list) do
+        for _, v in ipairs(list or {}) do
             if not seen[v] then
                 table.insert(merged, v)
                 seen[v] = true
