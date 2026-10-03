@@ -59,6 +59,7 @@ function utils.curl(method, params)
         headers = headers.get(),
         compressed = false,
         retry = 5,
+        raw = { "--http1.1" }, -- avoid curl's HTTP/2 fingerprint being blocked by Cloudflare (see #167, #138)
         endpoint = urls.base,
     }, params or {})
     local url = ("https://leetcode.%s%s"):format(config.domain, params.endpoint)
