@@ -400,6 +400,8 @@ image_support = true,
 - `cookie`
   - `update` opens a prompt to enter a new cookie
 
+  - `browser` signs in with the session of a browser signed in to LeetCode, see [Sign In](#sign-in)
+
   - `delete` deletes stored cookie and logs out of [leetcode.nvim]
 
 - `cache`
@@ -436,6 +438,17 @@ This plugin can be initiated in two ways:
   To bypass this requirement use [`non_standalone`](#non-standalone-mode) plugin.
 
 ### Sign In
+
+**Sign in (Browser)** reads the session straight from your browser, so there is
+nothing to copy. If no browser is signed in to LeetCode yet, it opens the login
+page in the supported browser you used last and picks the session up once you
+have signed in.
+Currently macOS only, with Chrome, Brave, Edge, Arc, Chromium or Firefox (not
+Safari). macOS asks you to allow access to the browser's "Safe Storage" keychain
+item, which holds the key its cookies are encrypted with. "Allow" is enough;
+"Always Allow" would let any program read it through `security` without asking.
+
+Otherwise, sign in by pasting the cookie:
 
 > [!WARNING]
 > Be sure to copy the `Cookie` from request headers, not the `set-cookie` from

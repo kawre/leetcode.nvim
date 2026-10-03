@@ -18,6 +18,7 @@ local translate = {
     ["delete / sign out"] = "删除 / 退出",
     ["sign in"] = "登录",
     ["sign in (by cookie)"] = "使用Cookie登录",
+    ["sign in (browser)"] = "使用浏览器登录",
     ["enter cookie"] = "输入 Cookie",
     ["sign-in successful"] = "登录成功",
     ["sign-in failed"] = "登录失败",
