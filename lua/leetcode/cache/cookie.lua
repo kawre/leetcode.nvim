@@ -25,6 +25,7 @@ function Cookie.set(str)
     end
 
     file:write(str, "w")
+    vim.fn.setfperm(file.filename, "rw-------")
     local auth_api = require("leetcode.api.auth")
     local _, aerr = auth_api.user()
 

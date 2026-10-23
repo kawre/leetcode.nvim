@@ -30,10 +30,23 @@ function cmd.problems(options)
     picker.question(p, options)
 end
 
+---@param str string
+---@return boolean success
+local function sign_in(str)
+    local err = require("leetcode.cache.cookie").set(str)
+
+    if not err then
+        log.info("Sign-in successful")
+        cmd.start_user_session()
+    else
+        log.error("Sign-in failed: " .. err)
+    end
+
+    return not err
+end
+
 ---@param cb? function
 function cmd.cookie_prompt(cb)
-    local cookie = require("leetcode.cache.cookie")
-
     local popup_options = {
         relative = "editor",
         position = {
@@ -57,16 +70,7 @@ function cmd.cookie_prompt(cb)
     local input = NuiInput(popup_options, {
         prompt = " 󰆘 ",
         on_submit = function(value)
-            local err = cookie.set(value)
-
-            if not err then
-                log.info("Sign-in successful")
-                cmd.start_user_session()
-            else
-                log.error("Sign-in failed: " .. err)
-            end
-
-            pcall(cb, not err and true or false)
+            pcall(cb, sign_in(value))
         end,
     })
 
@@ -79,6 +83,63 @@ function cmd.cookie_prompt(cb)
     input:on(event.BufLeave, function()
         input:unmount()
     end)
+end
+
+local browser_timer
+
+---Sign in with the session of a browser signed in to leetcode. If no supported
+---browser is signed in yet, opens the login page and picks the session up once you
+---have signed in; falls back to the cookie prompt.
+---@param cb? function
+function cmd.browser_sign_in(cb)
+    local ok, browser = pcall(require, "leetcode.cache.browser") -- needs LuaJIT's ffi
+    local app = ok and browser.app()
+    if not app then
+        return cmd.cookie_prompt(cb)
+    end
+    if browser_timer then
+        return log.info("Already waiting for a browser session")
+    end
+
+    -- a stored session that gets rejected is stale: wait for a fresh one
+    local stale = browser.get()
+    if stale and sign_in(stale) then
+        return pcall(cb, true)
+    end
+
+    browser.open(app, ("https://leetcode.%s/accounts/login/"):format(config.domain))
+
+    -- browsers flush new cookies to disk only periodically, so poll for a while
+    local spinner = require("leetcode.logger.spinner"):start(
+        ("Waiting for you to sign in to leetcode in %s"):format(app),
+        "points"
+    )
+
+    local tries = 0 -- every 3s, gives up after 3min
+    browser_timer = vim.loop.new_timer()
+    browser_timer:start(
+        3000,
+        3000,
+        vim.schedule_wrap(function()
+            if not browser_timer then
+                return
+            end
+            tries = tries + 1
+            local str = browser.get()
+            local fresh = str ~= nil and str ~= stale and str or nil
+            if fresh or tries >= 60 then
+                browser_timer:close()
+                browser_timer = nil
+                if fresh then
+                    spinner:success(("Found your leetcode session in %s"):format(app))
+                    pcall(cb, sign_in(fresh))
+                else
+                    spinner:error("No leetcode session found in any browser")
+                    cmd.cookie_prompt(cb)
+                end
+            end
+        end)
+    )
 end
 
 function cmd.sign_out()
@@ -646,6 +707,7 @@ cmd.commands = {
     },
     cookie = {
         update = { cmd.cookie_prompt },
+        browser = { cmd.browser_sign_in },
         delete = { cmd.sign_out },
     },
     cache = {
