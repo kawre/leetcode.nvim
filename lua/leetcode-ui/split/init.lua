@@ -25,8 +25,8 @@ function Split:_buf_create()
     self:update_renderer()
 end
 
-function Split:_buf_destory()
-    Split.super._buf_destory(self)
+function Split:_buf_destroy()
+    Split.super._buf_destroy(self)
     self:update_renderer()
 end
 

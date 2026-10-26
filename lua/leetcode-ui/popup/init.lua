@@ -25,8 +25,8 @@ function Popup:_buf_create()
     self:update_renderer()
 end
 
-function Popup:_buf_destory()
-    Popup.super._buf_destory(self)
+function Popup:_buf_destroy()
+    Popup.super._buf_destroy(self)
     self:update_renderer()
 end
 
