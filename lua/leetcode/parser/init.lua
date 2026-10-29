@@ -10,7 +10,8 @@ local Parser = Object("LeetParser")
 ---@param text string
 ---@return lc.ui.Group
 function Parser.static:parse(text)
-    if #vim.api.nvim_get_runtime_file("parser/html.so", true) > 0 then
+    -- Let Neovim resolve the parser: it can be `html.so`, `html.dylib` or `html.dll`.
+    if pcall(vim.treesitter.language.add, "html") then
         return Tag:parse(text)
     else
         return Plain:parse(text)
