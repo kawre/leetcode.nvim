@@ -14,12 +14,39 @@ local ts = vim.treesitter
 ---@class leet.ui.html
 local M = {}
 
+M.LINK_ICON = "\u{f0c1}"
+
+--- Tags that start a collapsible section.
+local section_tags = { example = true, constraints = true, followup = true }
+
 local border = {
 	tl = "┌", tr = "┐", bl = "└", br = "┘",
 	h = "─", v = "│",
 	th = "┬", bh = "┴",
 	lv = "├", rv = "┤", cross = "┼",
 }
+
+--- A heading that shows or hides what follows it. Open until pressed.
+M.Section = m.component(function(props)
+	local open = m.signal(true)
+
+	return m.block({
+		margin_top = 1,
+		m.block({
+			width = "fit",
+			on_press = function()
+				open(not open())
+			end,
+			m.inline(function()
+				return open() and "▾ " or "▸ "
+			end, "leetcode_list"),
+			m.inline(props.title, props.hl),
+		}),
+		m.show(open, function()
+			return m.block({ padding = { 1, 0, 0, 2 }, props.body })
+		end),
+	})
+end)
 
 --- Collects spans into lines, and lines into a list of blocks.
 ---@class leet.ui.html.builder
@@ -37,14 +64,28 @@ function Builder:push(text, hl)
 		return
 	end
 	local last = self.spans[#self.spans]
-	if last and last.hl == hl then
+	if last and last.hl == hl and not last.element then
 		last.text = last.text .. text
 	else
 		self.spans[#self.spans + 1] = { text = text, hl = hl }
 	end
 end
 
+function Builder:is_blank()
+	for _, span in ipairs(self.spans) do
+		if span.text:find("%S") then
+			return false
+		end
+	end
+	return true
+end
+
 --- Ends the current line, dropping it when it is only blanks.
+--- Adds an element to the current line.
+function Builder:inline(element)
+	self.spans[#self.spans + 1] = { element = element, text = "x" }
+end
+
 function Builder:line()
 	local spans = self.spans
 	self.spans = {}
@@ -70,6 +111,12 @@ function Builder:element(element)
 	self.items[#self.items + 1] = { element = element }
 end
 
+--- Starts a collapsible section, which runs until the next one.
+function Builder:section(title, hl)
+	self:line()
+	self.items[#self.items + 1] = { section = title, hl = hl }
+end
+
 --- Blocks without blank lines at the ends. `prefix` starts every line.
 ---@param prefix? { text: string, hl: string }
 function Builder:finish(prefix)
@@ -79,7 +126,7 @@ function Builder:finish(prefix)
 		table.remove(self.items)
 	end
 
-	return vim.tbl_map(function(item)
+	local function render(item)
 		if item.gap then
 			return m.newl()
 		elseif item.element then
@@ -91,10 +138,44 @@ function Builder:finish(prefix)
 			spans[1] = m.inline(prefix.text, prefix.hl)
 		end
 		for _, span in ipairs(item.spans) do
-			spans[#spans + 1] = m.inline(span.text, span.hl)
+			spans[#spans + 1] = span.element or m.inline(span.text, span.hl)
 		end
 		return m.block(spans)
-	end, self.items)
+	end
+
+	local result, section = {}, nil
+	for index, item in ipairs(self.items) do
+		local next_item = self.items[index + 1]
+		if item.gap and next_item and next_item.section then
+			-- Sections bring their own margin.
+		elseif item.section then
+			section = { title = item.section, hl = item.hl, body = {} }
+			result[#result + 1] = section
+		elseif section then
+			section.body[#section.body + 1] = item
+		else
+			result[#result + 1] = render(item)
+		end
+	end
+
+	return vim.tbl_map(function(entry)
+		if not entry.body then
+			return entry
+		end
+
+		while #entry.body > 0 and entry.body[#entry.body].gap do
+			table.remove(entry.body)
+		end
+		while #entry.body > 0 and entry.body[1].gap do
+			table.remove(entry.body, 1)
+		end
+
+		return M.Section({
+			title = entry.title,
+			hl = entry.hl,
+			body = vim.tbl_map(render, entry.body),
+		})
+	end, result)
 end
 
 ---@class leet.ui.html.context
@@ -173,21 +254,23 @@ local function norm_url(url)
 	return url:lower():gsub("/$", ""):gsub("#.-$", "")
 end
 
+--- The label and a small icon. Pressing it opens the url, so the url itself
+--- does not have to be on screen.
 local function render_link(b, node, attrs, ctx)
-	local text = text_of(node, ctx)
-	local href = attrs.href or ""
+	local href = (attrs.href or ""):gsub("：", ":")
+	local text = vim.trim(text_of(node, ctx))
 
 	if norm_url(text) == norm_url(href) then
-		b:push((text:gsub("：", ":")), "leetcode_link")
-		return
+		text = href:gsub("^https?://", ""):gsub("/$", "")
 	end
 
-	b:push("[", "leetcode_alt")
-	b:push(text, "leetcode_ref")
-	b:push("]", "leetcode_alt")
-	b:push("(", "leetcode_alt")
-	b:push((href:gsub("：", ":")), "leetcode_link")
-	b:push(")", "leetcode_alt")
+	b:inline(m.inline({
+		on_press = function()
+			vim.ui.open(href)
+		end,
+		m.inline(text, "leetcode_ref"),
+		m.inline(" " .. M.LINK_ICON, "leetcode_link"),
+	}))
 end
 
 local function render_image(b, attrs)
@@ -336,7 +419,9 @@ local function render_element(b, node, ctx)
 
 	ctx.tags[#ctx.tags + 1] = tag
 
-	if tag == "ul" or tag == "ol" then
+	if section_tags[tag] then
+		b:section(vim.trim(text_of(node, ctx)), highlight(ctx))
+	elseif tag == "ul" or tag == "ol" then
 		render_list(b, node, tag, ctx)
 	elseif tag == "pre" or tag == "blockquote" then
 		render_pre(b, node, ctx)
@@ -370,7 +455,12 @@ walk = function(node, ctx, b)
 		elseif kind == "entity" then
 			local text = get_text(child, ctx)
 			if text == "&lcnl;" then
-				b:line()
+				-- A blank line in the source is a gap between paragraphs.
+				if b:is_blank() then
+					b:gap()
+				else
+					b:line()
+				end
 			elseif text == "&lcpad;" then
 				b:gap()
 			else

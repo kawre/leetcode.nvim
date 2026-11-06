@@ -42,6 +42,7 @@ function M:new(problem)
 	})
 
 	self.view = Markup.view(self.win)
+	self:bind_keys()
 	self.view:render(self:content())
 	self:draw_images()
 
@@ -50,17 +51,28 @@ function M:new(problem)
 	end
 end
 
+function M:bind_keys()
+	for _, lhs in ipairs(vim.iter({ config.user.keys.confirm }):flatten():totable()) do
+		self.win:map("n", lhs, function()
+			self.view:press()
+		end)
+	end
+
+	self.win:map("n", "gx", function()
+		self:open_link()
+	end)
+end
+
+--- Opens the problem, since the fixed header cannot be pressed.
+function M:open_link()
+	local link = self.problem.cached.link
+	if link then
+		vim.ui.open(link)
+	end
+end
+
 function M:header()
 	local q, cached = self.problem.problem, self.problem.cached
-
-	local function title()
-		return m.block({
-			width = "fit",
-			m.inline(q.frontend_id .. ". ", "leetcode_normal"),
-			m.inline(Leet.util.translate(q.title, q.translated_title)),
-			q.is_paid_only and m.inline(" " .. t("Premium"), "leetcode_medium"),
-		})
-	end
 
 	local function stats()
 		local visible = self.stats_visible()
@@ -100,25 +112,37 @@ function M:header()
 			add("󰛨 " .. t("Hints"), "leetcode_hint")
 		end
 
-		return m.block({ width = "fit", spans })
+		return m.block(spans)
 	end
 
 	return m.vflex({
-		align = "center",
-		m.block({ width = "fit", cached.link or "", style = "leetcode_alt" }),
-		m.newl(),
-		title(),
+		position = "fixed",
+		top = 0,
+		style = "leetcode_description_header",
+		padding = { 1, 2 },
+		m.flex({
+			justify = "between",
+			m.block({
+				shrink = 1,
+				m.inline(q.frontend_id .. ". ", "leetcode_alt"),
+				m.inline(Leet.util.translate(q.title, q.translated_title), "Title"),
+				q.is_paid_only and m.inline(" " .. t("Premium"), "leetcode_medium"),
+			}),
+			m.inline({ " " .. html.LINK_ICON, style = "leetcode_link", shrink = 0 }),
+		}),
 		stats,
 	})
 end
 
 function M:content()
 	local q = self.problem.problem
-	return m.vflex({
-		padding = { 1, 2 },
-		spacing = 2,
+	return m.block({
 		self:header(),
-		html.parse(Leet.util.translate(q.content, q.translated_content)),
+		m.vflex({
+			padding = { 1, 2 },
+			spacing = 1,
+			html.parse(Leet.util.translate(q.content, q.translated_content)),
+		}),
 	})
 end
 

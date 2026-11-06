@@ -50,6 +50,7 @@ M.get = function()
 
         normal = { fg = hl("Conceal").fg },
         alt = { fg = hl("Comment").fg },
+        description_header = { bg = hl("CursorLine").bg },
 
         italic = { italic = true },
         bold = { bold = true },

@@ -43,7 +43,7 @@ function Normalizer:tags() --
         :gsub("<strong>(Output:?%s*)</strong>", "<output>%1</output>")
         :gsub("<strong>(Explanation:?%s*)</strong>", "<explanation>%1</explanation>")
         :gsub("<strong>(Note:?%s*)</strong>", "<explanation>%1</explanation>")
-        :gsub("<strong>(Follow-up:?%s*)</strong>", "<followup>%1</followup>")
+        :gsub("<strong>(Follow%-up:?%s*)</strong>", "<followup>%1</followup>")
         :gsub("<strong>(Follow up:?%s*)</strong>", "<followup>%1</followup>")
         :gsub(
             "\n*<p>%s*<strong[^>]*>(Example%s*%d*:?)%s*</strong>%s*</p>\n*",

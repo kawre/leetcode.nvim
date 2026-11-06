@@ -35,13 +35,111 @@ local function description_has(text)
 	return child.lua_get(("contains(problem.description.win.buf, %q)"):format(text))
 end
 
+local function header_has(text)
+	return child.lua_get(("contains(problem.description.view.fixed[1].win.buf, %q)"):format(text))
+end
+
+--- Presses the first line holding `text` in the description.
+local function press(text)
+	run(([[
+		vim.api.nvim_set_current_win(problem.description.win.win)
+		for i, line in ipairs(buffer_text(problem.description.win.buf)) do
+			local col = line:find(%q, 1, true)
+			if col then
+				vim.api.nvim_win_set_cursor(0, { i, col - 1 })
+				break
+			end
+		end
+	]]):format(text))
+	child.type_keys("<CR>")
+	run("reactive.flush()")
+end
+
 T["description"] = new_set()
 
-T["description"]["shows the header"] = function()
+T["description"]["pins the header in a band"] = function()
 	run("open_problem()")
-	eq(description_has("1. Two Sum"), true)
-	eq(description_has("100"), true)
-	eq(description_has("leetcode.com/problems/two-sum"), true)
+	eq(header_has("1. Two Sum"), true)
+	eq(header_has("100"), true)
+	eq(description_has("1. Two Sum"), false)
+	eq(child.lua_get("vim.wo[problem.description.view.fixed[1].win.win].winhighlight"), "Normal:leetcode_description_header")
+end
+
+T["description"]["the band has its own color"] = function()
+	run([[
+		vim.api.nvim_set_hl(0, "CursorLine", { bg = "#222233" })
+		require("leetcode.theme").load()
+	]])
+	eq(child.lua_get("vim.api.nvim_get_hl(0, { name = 'leetcode_description_header' }).bg"), 0x222233)
+end
+
+T["description"]["does not print the problem url"] = function()
+	run("open_problem()")
+	eq(header_has("leetcode.com"), false)
+	eq(description_has("leetcode.com"), false)
+end
+
+T["description"]["gx opens the problem"] = function()
+	run([[
+		opened = nil
+		vim.ui.open = function(url) opened = url end
+		open_problem()
+		vim.api.nvim_set_current_win(problem.description.win.win)
+	]])
+	child.type_keys("gx")
+	eq(child.lua_get("opened"), "https://leetcode.com/problems/two-sum/")
+end
+
+T["description"]["links show a label and open on enter"] = function()
+	run([[
+		opened = nil
+		vim.ui.open = function(url) opened = url end
+		open_problem()
+	]])
+	eq(description_has("example.com"), false)
+	eq(description_has("the docs"), true)
+
+	press("the docs")
+	eq(child.lua_get("opened"), "https://example.com/docs")
+end
+
+T["description"]["sections start open"] = function()
+	run("open_problem()")
+	eq(description_has("▾"), true)
+	eq(description_has("nums = [2,7,11,15]"), true)
+end
+
+T["description"]["sections collapse and expand"] = function()
+	run("open_problem()")
+
+	press("Example 1:")
+	eq(description_has("nums = [2,7,11,15]"), false)
+	eq(description_has("Constraints:"), true)
+	eq(description_has("▸"), true)
+
+	press("Example 1:")
+	eq(description_has("nums = [2,7,11,15]"), true)
+end
+
+T["description"]["sections are independent"] = function()
+	run("open_problem()")
+
+	press("Constraints:")
+	eq(description_has("nums.length"), false)
+	eq(description_has("nums = [2,7,11,15]"), true)
+end
+
+T["description"]["follow up is a section"] = function()
+	run([[
+		fixture.problem.content = fixture.problem.content
+			.. "<p><strong>Follow-up: </strong>Can you do better than O(n^2)?</p>"
+		open_problem()
+	]])
+	eq(description_has("Follow-up:"), true)
+	eq(description_has("better than"), true)
+
+	press("Follow-up:")
+	eq(description_has("better than"), false)
 end
 
 T["description"]["wraps paragraphs inside the window"] = function()
@@ -54,7 +152,7 @@ end
 
 T["description"]["renders links, sections and code"] = function()
 	run("open_problem()")
-	eq(description_has("[the docs](https://example.com/docs)"), true)
+	eq(description_has("the docs"), true)
 	eq(description_has("Example 1:"), true)
 	eq(description_has("nums = [2,7,11,15]"), true)
 	eq(description_has("Constraints:"), true)
@@ -92,11 +190,11 @@ end
 
 T["description"]["hides and shows stats"] = function()
 	run("open_problem()")
-	eq(description_has("????"), false)
+	eq(header_has("????"), false)
 
 	run("problem.description:toggle_stats(); reactive.flush()")
-	eq(description_has("????"), true)
-	eq(description_has("___"), true)
+	eq(header_has("????"), true)
+	eq(header_has("___"), true)
 end
 
 T["description"]["toggles its window"] = function()
@@ -108,8 +206,9 @@ T["description"]["toggles its window"] = function()
 	eq(child.lua_get("not problem.description.win:win_valid()"), true)
 
 	run("problem.description:toggle(); reactive.flush()")
-	eq(child.lua_get("problem.description.win:win_valid()"), true)
-	eq(description_has("1. Two Sum"), true)
+	eq(child.lua_get("problem.description.win:win_valid() and true"), true)
+	eq(header_has("1. Two Sum"), true)
+	eq(description_has("nums = [2,7,11,15]"), true)
 end
 
 T["console"] = new_set()
