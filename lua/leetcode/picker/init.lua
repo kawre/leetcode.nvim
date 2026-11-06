@@ -1,7 +1,7 @@
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
 
-local provider_order = { "snacks-picker", "fzf-lua", "telescope" }
+local provider_order = { "snacks-picker", "fzf-lua", "telescope", "mini-picker" }
 local providers = {
     ["fzf-lua"] = {
         name = "fzf",
@@ -23,6 +23,15 @@ local providers = {
             return pcall(require, "telescope")
         end,
     },
+    ["mini-picker"] = {
+        name = "mini",
+        is_available = function()
+            return pcall(function()
+                -- If MiniPick is set up correctly, :Pick command should be available
+                return assert(vim.api.nvim_get_commands({})["Pick"])
+            end)
+        end,
+    },
 }
 
 local available_pickers = table.concat(
@@ -32,7 +41,7 @@ local available_pickers = table.concat(
     ", "
 )
 
----@return "fzf" | "telescope" | "snacks"
+---@return "fzf" | "telescope" | "snacks" | "mini"
 local function resolve_provider()
     ---@type string
     local provider = config.user.picker.provider

@@ -199,6 +199,8 @@ function Tag:from(node)
 
         sub = req_tag("sub"),
         sup = req_tag("sup"),
+
+        table = req_tag("table"),
     }
 
     local tags = self.tags

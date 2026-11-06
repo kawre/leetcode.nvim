@@ -39,6 +39,7 @@ end
 function Normalizer:tags() --
     self.text = self
         .text --
+        :gsub("<div.-class=[\"']example%-block[\"'].->(.-)</div>", "<pre>%1</pre>")
         :gsub("<strong>(Input:?%s*)</strong>", "<input>%1</input>")
         :gsub("<strong>(Output:?%s*)</strong>", "<output>%1</output>")
         :gsub("<strong>(Explanation:?%s*)</strong>", "<explanation>%1</explanation>")

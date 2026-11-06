@@ -72,4 +72,9 @@ imports["java"] = {
     "import java.math.*;",
 }
 
+imports["cpp"] = {
+    "#include <bits/stdc++.h>",
+    "using namespace std;",
+}
+
 return imports
