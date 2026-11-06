@@ -1,5 +1,24 @@
 local M = {}
 
+---Mixes two colors evenly, or returns whichever one exists.
+---
+---@param a? integer
+---@param b? integer
+---@return integer?
+local function blend(a, b)
+    if not a or not b then
+        return a or b
+    end
+
+    local mixed = 0
+    for shift = 0, 16, 8 do
+        local channel_a = math.floor(a / 2 ^ shift) % 256
+        local channel_b = math.floor(b / 2 ^ shift) % 256
+        mixed = mixed + math.floor((channel_a + channel_b) / 2) * 2 ^ shift
+    end
+    return mixed
+end
+
 ---Get highlight group value by name.
 ---
 ---@param name string String for looking up highlight group.
@@ -51,6 +70,7 @@ M.get = function()
         normal = { fg = hl("Conceal").fg },
         alt = { fg = hl("Comment").fg },
         description_header = { bg = hl("CursorLine").bg },
+        section = { bg = blend(hl("NormalFloat").bg or hl("Normal").bg, hl("CursorLine").bg) },
 
         italic = { italic = true },
         bold = { bold = true },

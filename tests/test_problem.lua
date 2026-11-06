@@ -103,6 +103,50 @@ T["description"]["links show a label and open on enter"] = function()
 	eq(child.lua_get("opened"), "https://example.com/docs")
 end
 
+T["description"]["sections sit on their own background"] = function()
+	run([[
+		vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#000000" })
+		vim.api.nvim_set_hl(0, "CursorLine", { bg = "#202020" })
+		require("leetcode.theme").load()
+		open_problem()
+		desc = problem.description
+		rows = {}
+		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(desc.win.buf, desc.view.ns, 0, -1, { details = true })) do
+			if mark[4].hl_group == "leetcode_section" then
+				rows[mark[2] + 1] = mark[4].end_col
+			end
+		end
+		for i, line in ipairs(buffer_text(desc.win.buf)) do
+			if line:find("nums = [2,7,11,15]", 1, true) then example_row = i end
+			if line:find("Given an array", 1, true) then intro_row = i end
+		end
+	]])
+	eq(child.lua_get("vim.api.nvim_get_hl(0, { name = 'leetcode_section' }).bg"), 0x101010)
+	eq(child.lua_get("rows[example_row] ~= nil"), true)
+	eq(child.lua_get("rows[intro_row] == nil"), true)
+end
+
+T["description"]["a collapsed section stays one tinted row"] = function()
+	run("open_problem()")
+	press("Example 1:")
+	run([[
+		desc = problem.description
+		count = 0
+		for _, line in ipairs(buffer_text(desc.win.buf)) do
+			if line:find("Example 1:", 1, true) then
+				row = _
+			end
+		end
+		tinted = {}
+		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(desc.win.buf, desc.view.ns, { row - 1, 0 }, { row - 1, -1 }, { details = true })) do
+			if mark[4].hl_group == "leetcode_section" then
+				tinted[#tinted + 1] = mark[2] + 1
+			end
+		end
+	]])
+	eq(child.lua_get("tinted"), { child.lua_get("row") })
+end
+
 T["description"]["sections start open"] = function()
 	run("open_problem()")
 	eq(description_has("\u{eab4} Example 1:"), true)
