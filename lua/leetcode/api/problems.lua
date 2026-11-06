@@ -195,6 +195,8 @@ function M.by_slug(title_slug)
     end
 
     local q = res.data.question
+    require("leetcode.dev").save_problem(q)
+
     q.meta_data = vim.json.decode(q.meta_data)
     q.stats = vim.json.decode(q.stats)
     if type(q.similar) == "string" then

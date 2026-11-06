@@ -1,2 +1,5 @@
 /.luarc.json
 README.zh.md
+
+# Local development files
+/.dev/

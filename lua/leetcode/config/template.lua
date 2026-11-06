@@ -54,6 +54,9 @@ local M = {
         translate_problems = true, ---@type boolean
     },
 
+    ---Save the html of fetched problems to `.dev/problems`, for working on the plugin.
+    dev = false, ---@type boolean
+
     ---@type lc.storage
     storage = {
         home = vim.fn.stdpath("data") .. "/leetcode",

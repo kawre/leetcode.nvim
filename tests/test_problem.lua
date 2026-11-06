@@ -504,6 +504,67 @@ T["popups"]["languages sort by solved"] = function()
 	eq(child.lua_get("contains(languages.win.buf, '1 problem solved')"), true)
 end
 
+T["dev"] = new_set()
+
+local function fetch(content, translated)
+	run(([[
+		dev = require("leetcode.dev")
+		dev.problems_dir = vim.fn.tempname()
+		Leet.api.query = function()
+			return { data = { question = {
+				frontend_id = "1", title_slug = "two-sum", content = %s, translated_content = %s,
+				meta_data = "{}", stats = "{}",
+			} } }
+		end
+		fetched = require("leetcode.api.problems").by_slug("two-sum")
+	]]):format(content, translated))
+end
+
+local function saved(name)
+	return child.lua_get(("vim.fn.filereadable(dev.problems_dir .. %q) == 1 and table.concat(vim.fn.readfile(dev.problems_dir .. %q), '\\n') or nil"):format(name, name))
+end
+
+T["dev"]["is off by default"] = function()
+	fetch([["<p>x</p>"]], "vim.NIL")
+	eq(saved("/1.two-sum.html"), vim.NIL)
+end
+
+T["dev"]["saves the raw html of fetched problems"] = function()
+	run([[require("leetcode.config").user.dev = true]])
+	fetch([["<p>raw &amp; html</p>"]], "vim.NIL")
+	eq(saved("/1.two-sum.html"), "<p>raw &amp; html</p>")
+	eq(saved("/1.two-sum.cn.html"), vim.NIL)
+end
+
+T["dev"]["saves translations separately"] = function()
+	run([[require("leetcode.config").user.dev = true]])
+	fetch([["<p>en</p>"]], [["<p>cn</p>"]])
+	eq(saved("/1.two-sum.cn.html"), "<p>cn</p>")
+end
+
+T["dev"]["a failed save does not stop the fetch"] = function()
+	run([[
+		require("leetcode.config").user.dev = true
+		warned = nil
+		require("leetcode.logger").warn = function(message) warned = message end
+		dev = require("leetcode.dev")
+		dev.problems_dir = "/proc/nope/nope"
+		Leet.api.query = function()
+			return { data = { question = {
+				frontend_id = "1", title_slug = "two-sum", content = "x", meta_data = "{}", stats = "{}",
+			} } }
+		end
+		fetched = require("leetcode.api.problems").by_slug("two-sum")
+	]])
+	eq(child.lua_get("fetched ~= nil"), true)
+	eq(child.lua_get("warned ~= nil"), true)
+end
+
+T["dev"]["the folder is ignored by git"] = function()
+	local result = vim.fn.system({ "git", "check-ignore", ".dev/problems/1.two-sum.html" })
+	eq(vim.trim(result), ".dev/problems/1.two-sum.html")
+end
+
 T["problem"] = new_set()
 
 T["problem"]["opens the editor with the snippet"] = function()
