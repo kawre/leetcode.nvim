@@ -35,6 +35,7 @@ M.Section = m.component(function(props)
 		margin_top = 1,
 		padding = { 0, 1 },
 		style = "leetcode_section",
+		border = "half",
 		m.block({
 			width = "fit",
 			on_press = function()
@@ -46,7 +47,7 @@ M.Section = m.component(function(props)
 			m.inline(props.title, props.hl),
 		}),
 		m.show(open, function()
-			return m.block({ padding = { 1, 0, 1, 2 }, props.body })
+			return m.block({ padding = { 1, 0, 0, 2 }, props.body })
 		end),
 	})
 end)

@@ -62,7 +62,8 @@ T["description"]["pins the header in a band"] = function()
 	eq(header_has("1. Two Sum"), true)
 	eq(header_has("100"), true)
 	eq(description_has("1. Two Sum"), false)
-	eq(child.lua_get("vim.wo[problem.description.view.fixed[1].win.win].winhighlight"), "Normal:leetcode_description_header")
+	eq(header_has("▄▄▄"), true)
+	eq(header_has("▀▀▀"), true)
 end
 
 T["description"]["the band has its own color"] = function()
@@ -124,6 +125,12 @@ T["description"]["sections sit on their own background"] = function()
 	eq(child.lua_get("vim.api.nvim_get_hl(0, { name = 'leetcode_section' }).bg"), 0x101010)
 	eq(child.lua_get("rows[example_row] ~= nil"), true)
 	eq(child.lua_get("rows[intro_row] == nil"), true)
+end
+
+T["description"]["sections have half cell edges"] = function()
+	run("open_problem()")
+	eq(description_has("▄▄▄"), true)
+	eq(description_has("▀▀▀"), true)
 end
 
 T["description"]["a collapsed section stays one tinted row"] = function()

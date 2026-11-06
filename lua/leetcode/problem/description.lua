@@ -119,7 +119,8 @@ function M:header()
 		position = "fixed",
 		top = 0,
 		style = "leetcode_description_header",
-		padding = { 1, 2 },
+		border = "half",
+		padding = { 0, 2 },
 		m.flex({
 			justify = "between",
 			m.block({
