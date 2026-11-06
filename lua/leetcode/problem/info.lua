@@ -15,8 +15,8 @@ local function Section(title, hl, children)
 				open(not open())
 			end,
 			m.inline(function()
-				return open() and "▾ " or "▸ "
-			end, "leetcode_list"),
+				return ui.chevron(open())
+			end, "leetcode_alt"),
 			m.inline(title, hl),
 		}),
 		m.show(open, function()
@@ -38,7 +38,7 @@ local function Hints(hints)
 	for i, hint in ipairs(hints) do
 		rows[i] = Section(("%d/%d"):format(i, #hints), "leetcode_list", html.parse(hint))
 	end
-	return Section(t("Hints") .. " 󰛨", "leetcode_hint", rows)
+	return Section(t("Hints"), "leetcode_hint", rows)
 end
 
 local function Topics(topics)
@@ -47,7 +47,7 @@ local function Topics(topics)
 	end
 
 	return Section(
-		t("Topics") .. " ",
+		t("Topics"),
 		"Number",
 		vim.tbl_map(function(topic)
 			return m.block({ m.inline("* ", "leetcode_list"), m.inline(topic.name) })
@@ -87,7 +87,7 @@ local function Similar(similar)
 	if vim.tbl_isempty(rows) then
 		return Empty(t("No similar questions available"))
 	end
-	return Section(t("Similar Questions") .. " ", "leetcode_ref", rows)
+	return Section(t("Similar Questions"), "leetcode_ref", rows)
 end
 
 ---@param problem leet.problem

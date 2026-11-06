@@ -8,6 +8,7 @@ local config = require("leetcode.config")
 local theme = require("leetcode.theme")
 local Normalizer = require("leetcode.parser.normalizer")
 local entities = require("leetcode.parser.utils")
+local ui = require("leetcode.ui.util")
 
 local ts = vim.treesitter
 
@@ -38,8 +39,8 @@ M.Section = m.component(function(props)
 				open(not open())
 			end,
 			m.inline(function()
-				return open() and "▾ " or "▸ "
-			end, "leetcode_list"),
+				return ui.chevron(open())
+			end, "leetcode_alt"),
 			m.inline(props.title, props.hl),
 		}),
 		m.show(open, function()

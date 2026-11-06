@@ -47,11 +47,11 @@ function Normalizer:tags() --
         :gsub("<strong>(Follow up:?%s*)</strong>", "<followup>%1</followup>")
         :gsub(
             "\n*<p>%s*<strong[^>]*>(Example%s*%d*:?)%s*</strong>%s*</p>\n*",
-            "\n\n<example>󰛨 %1</example>\n\n"
+            "\n\n<example>%1</example>\n\n"
         )
         :gsub(
             "\n*<p>%s*<strong[^>]*>(Constraints:?)%s*</strong>%s*</p>\n*",
-            "\n\n<constraints> %1</constraints>\n\n"
+            "\n\n<constraints>%1</constraints>\n\n"
         )
 end
 

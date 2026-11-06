@@ -1,5 +1,6 @@
 local m = require("markup")
 local CaseBlock = require("leetcode.ui.problem.result.cases.block")
+local ui = require("leetcode.ui.util")
 
 ---@param props { stdout: string }
 local Stdout = m.component(function(props)
@@ -18,9 +19,9 @@ local Stdout = m.component(function(props)
                 expanded(not expanded())
             end,
             m.inline(function()
-                return expanded() and "" or ""
-            end),
-            " Stdout ",
+                return ui.chevron(expanded())
+            end, "leetcode_alt"),
+            "Stdout",
         }),
         m.show(expanded, function()
             return CaseBlock(std_lines:map(function(line)

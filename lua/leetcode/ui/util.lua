@@ -14,6 +14,13 @@ local difficulty_hl = {
 	advanced = "leetcode_hard",
 }
 
+--- The one marker of everything that collapses.
+---@param open boolean
+---@return string
+function M.chevron(open)
+	return open and "\u{eab4} " or "\u{eab6} "
+end
+
 ---@param difficulty string
 ---@return string
 function M.diff_to_hl(difficulty)

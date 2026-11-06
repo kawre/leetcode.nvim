@@ -105,8 +105,14 @@ end
 
 T["description"]["sections start open"] = function()
 	run("open_problem()")
-	eq(description_has("▾"), true)
+	eq(description_has("\u{eab4} Example 1:"), true)
 	eq(description_has("nums = [2,7,11,15]"), true)
+end
+
+T["description"]["section headings have a single marker"] = function()
+	run("open_problem()")
+	eq(description_has("\u{eab4} Constraints:"), true)
+	eq(description_has("▾"), false)
 end
 
 T["description"]["sections collapse and expand"] = function()
@@ -115,7 +121,7 @@ T["description"]["sections collapse and expand"] = function()
 	press("Example 1:")
 	eq(description_has("nums = [2,7,11,15]"), false)
 	eq(description_has("Constraints:"), true)
-	eq(description_has("▸"), true)
+	eq(description_has("\u{eab6} Example 1:"), true)
 
 	press("Example 1:")
 	eq(description_has("nums = [2,7,11,15]"), true)
@@ -375,7 +381,7 @@ end
 
 T["popups"]["info starts collapsed"] = function()
 	open_info()
-	eq(info_has("Hints"), true)
+	eq(child.lua_get("buffer_text(problem.info.win.buf)[2]"):match("Hints$") ~= nil, true)
 	eq(info_has("Topics"), true)
 	eq(info_has("Array"), false)
 end
