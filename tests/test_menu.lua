@@ -104,6 +104,39 @@ T["the cursor only stops on buttons"] = function()
 	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1] > button_row + 1"), true)
 end
 
+T["statistics shows solved progress"] = function()
+	open(true)
+	child.type_keys("s")
+	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+	eq(child.lua_get("menu.page()"), "menu.statistics")
+	eq(contains("30/300"), true)
+	eq(contains("20/100"), true)
+	eq(contains("Languages"), true)
+end
+
+T["every module loads"] = function()
+	local failed = child.lua_get([[(function()
+		local failed = {}
+		local skip = { telescope = true, fzf = true, snacks = true, mini = true }
+		for _, file in ipairs(vim.fn.glob("lua/leetcode/**/*.lua", true, true)) do
+			local name = file:gsub("^lua/", ""):gsub("%.lua$", ""):gsub("/init$", ""):gsub("/", ".")
+			if not skip[name:match("[^.]+$")] then
+				local ok, err = pcall(require, name)
+				-- The tests run without a picker plugin, which is a valid refusal,
+				-- and Lua reports it differently the second time around.
+				local message = tostring(err)
+				local refused = message:find("No picker is available", 1, true)
+					or message:find("previous error loading module 'leetcode.picker'", 1, true)
+				if not ok and not refused then
+					failed[#failed + 1] = name .. ": " .. message:sub(1, 120)
+				end
+			end
+		end
+		return failed
+	end)()]])
+	eq(failed, {})
+end
+
 T["titles follow the page"] = function()
 	open(true)
 	child.lua([[menu.set_page("menu.cache"); reactive.flush()]])

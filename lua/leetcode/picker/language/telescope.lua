@@ -38,7 +38,7 @@ local opts = require("telescope.themes").get_dropdown({
 
 ---@param question lc.ui.Question
 return function(question, cb)
-    local items = language_picker.items(question.q.code_snippets)
+    local items = language_picker.items(question.problem.code_snippets)
 
     pickers
         .new(opts, {

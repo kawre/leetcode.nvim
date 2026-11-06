@@ -1,6 +1,6 @@
 local log = require("leetcode.logger")
 local utils = require("leetcode.util")
-local ui_utils = require("leetcode-ui.utils")
+local ui_utils = require("leetcode.ui.util")
 local t = require("leetcode.translator")
 
 local config = require("leetcode.config")

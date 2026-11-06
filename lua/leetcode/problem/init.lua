@@ -3,6 +3,7 @@
 local config = require("leetcode.config")
 local Description = require("leetcode.problem.description")
 local Console = require("leetcode.problem.console")
+local Info = require("leetcode.problem.info")
 
 ---@class leet.problem
 ---@field cached leet.cache.problem
@@ -23,6 +24,66 @@ function M:new(cached, problem)
 
     self.description = Description(self)
     self.console = Console(self)
+    self.info = Info(self)
+end
+
+--- Closes the problem and everything that belongs to it.
+function M:unmount()
+    if vim.v.dying ~= 0 then
+        return
+    end
+
+    self.info:close()
+    self.console:close()
+    self.description:unmount()
+
+    if self.win and vim.api.nvim_win_is_valid(self.win) then
+        vim.api.nvim_win_close(self.win, true)
+    end
+    if self.buf and vim.api.nvim_buf_is_valid(self.buf) then
+        vim.api.nvim_buf_delete(self.buf, { force = true, unload = false })
+    end
+
+    Leet.active_problems = vim.tbl_filter(function(problem)
+        return problem ~= self
+    end, Leet.active_problems)
+end
+
+--- Swaps the editor to the same problem in another language.
+M.change_lang = vim.schedule_wrap(function(self, lang)
+    local old_lang, old_buf = self.lang, self.buf
+
+    local ok, err = pcall(function()
+        self.lang = lang
+        local path = self:path()
+
+        self.buf = vim.fn.bufadd(path)
+        assert(self.buf ~= 0, "Failed to create buffer " .. path)
+
+        local loaded = vim.api.nvim_buf_is_loaded(self.buf)
+        vim.fn.bufload(self.buf)
+
+        vim.bo[old_buf].buflisted = false
+        vim.bo[self.buf].buflisted = true
+
+        vim.wo[self.win].winfixbuf = false
+        vim.api.nvim_win_set_buf(self.win, self.buf)
+        vim.wo[self.win].winfixbuf = true
+
+        if not loaded then
+            Leet.util.exec_hooks("question_enter", self)
+        end
+    end)
+
+    if not ok then
+        Markup.log.error("Failed to change language\n" .. err)
+        self.lang = old_lang
+        self.buf = old_buf
+    end
+end)
+
+function M:editor_reset()
+    self:editor_set_lines(0, -1, self:snippet() or "")
 end
 
 function M:tabpage()
@@ -81,7 +142,7 @@ function M:path()
     local existed = self.file:exists()
 
     if not existed then
-        self.file:write(self:snippet(), "w")
+        self.file:write(self:snippet() or "", "w")
     end
 
     return self.file:absolute(), existed

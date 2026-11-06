@@ -6,7 +6,7 @@ local Picker = require("leetcode.picker")
 local deli = "\t"
 
 return function(question, cb)
-    local items = language_picker.items(question.q.code_snippets)
+    local items = language_picker.items(question.problem.code_snippets)
 
     for i, item in ipairs(items) do
         local md = vim.inspect({ slug = item.value.t.slug, lang = item.value.t.lang })

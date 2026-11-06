@@ -30,7 +30,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
 - [plenary.nvim]
 
-- [nui.nvim]
+- [markup.nvim]
 
 - [tree-sitter-html] _**(optional, but highly recommended)**_
   used for formatting the question description.
@@ -49,7 +49,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     dependencies = {
         -- include a picker of your choice, see picker section for more details
         "nvim-lua/plenary.nvim",
-        "MunifTanjim/nui.nvim",
+        { "kawre/markup.nvim", build = "make build" },
     },
     opts = {
         -- configuration goes here
@@ -536,7 +536,7 @@ You can then exit [leetcode.nvim] using `:Leet exit` command
 [leetcode.nvim]: https://github.com/kawre/leetcode.nvim
 [neovim]: https://github.com/neovim/neovim
 [nerd-font]: https://www.nerdfonts.com
-[nui.nvim]: https://github.com/MunifTanjim/nui.nvim
+[markup.nvim]: https://github.com/kawre/markup.nvim
 [nvim-treesitter]: https://github.com/nvim-treesitter/nvim-treesitter
 [nvim-web-devicons]: https://github.com/nvim-tree/nvim-web-devicons
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim

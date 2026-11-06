@@ -6,7 +6,7 @@ local language_picker = require("leetcode.picker.language")
 
 ---@param question lc.ui.Question
 return function(question, cb)
-    local items = language_picker.items(question.q.code_snippets)
+    local items = language_picker.items(question.problem.code_snippets)
     local finder_items = {}
     local completed = false
 

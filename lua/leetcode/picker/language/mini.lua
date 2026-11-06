@@ -6,7 +6,7 @@ local langage_picker = require("leetcode.picker.language")
 
 ---@param question lc.ui.Question
 return function(question, cb)
-    local language_items = langage_picker.items(question.q.code_snippets)
+    local language_items = langage_picker.items(question.problem.code_snippets)
     local ns_id = vim.api.nvim_create_namespace("MiniPick LeetCode Language Picker")
     local finder_items = {}
     local completed = false

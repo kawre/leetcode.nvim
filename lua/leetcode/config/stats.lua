@@ -16,7 +16,6 @@ function Stats.update_streak()
         Stats.daily.streak = res.streakCount
         Stats.daily.today_completed = res.todayCompleted
 
-        _Lc_state.menu:draw()
     end)
 end
 
@@ -31,7 +30,6 @@ function Stats.update_sessions()
     --         return log.err(err)
     --     end
     --
-    --     _Lc_state.menu:draw()
     -- end)
 
     stats_api.session_progress(function(res, err)
@@ -46,7 +44,6 @@ function Stats.update_sessions()
             Stats.progress[p.difficulty:lower()] = p
         end
 
-        _Lc_state.menu:draw()
     end)
 end
 
@@ -54,7 +51,6 @@ function Stats.update()
     Stats.update_streak()
     Stats.update_sessions()
 
-    _Lc_state.menu:draw()
 end
 
 return Stats

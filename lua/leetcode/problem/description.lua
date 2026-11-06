@@ -1,21 +1,177 @@
+local m = require("markup")
+local config = require("leetcode.config")
+local html = require("leetcode.ui.problem.description.html")
+local t = require("leetcode.translator")
+
+local img_ok, image_api = pcall(require, "image")
+local img_sup = img_ok and config.user.image_support
+
 ---@class leet.problem.description
+---@field problem leet.problem
+---@field win markup.window
+---@field view markup.view
+---@overload fun(problem: leet.problem): leet.problem.description
 local M = Markup.object()
+
+--- `"40%"` to `0.4`, which is what windows expect.
+local function size(value)
+	if type(value) == "string" then
+		return (tonumber((value:gsub("%%", ""))) or 40) / 100
+	end
+	return value
+end
 
 ---@param problem leet.problem
 function M:new(problem)
-    self.problem = problem
-    self.win = Markup.window({
-        relative = "win",
-        position = "left",
-        width = 0.4,
-        enter = false,
-        focusable = true,
-    })
+	local opts = config.user.description
 
-    self.renderer = Markup.renderer(self.win)
-    local parsed = Markup.parser(problem.problem.content, "html"):parse()
-    Markup.log(parsed)
-    self.renderer:render(parsed)
+	self.problem = problem
+	self.images = {}
+	self.stats_visible = m.signal(opts.show_stats)
+
+	self.win = Markup.window({
+		win = problem.win,
+		relative = "win",
+		position = opts.position,
+		width = size(opts.width),
+		enter = false,
+		focusable = true,
+		minimal = true,
+		bo = { filetype = config.name },
+		wo = { winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder" },
+	})
+
+	self.view = Markup.view(self.win)
+	self.view:render(self:content())
+	self:draw_images()
+
+	if config.user.image_support and not img_ok then
+		Markup.log.error("image.nvim not found but `image_support` is enabled")
+	end
+end
+
+function M:header()
+	local q, cached = self.problem.problem, self.problem.cached
+
+	local function title()
+		return m.block({
+			width = "fit",
+			m.inline(q.frontend_id .. ". ", "leetcode_normal"),
+			m.inline(Leet.util.translate(q.title, q.translated_title)),
+			q.is_paid_only and m.inline(" " .. t("Premium"), "leetcode_medium"),
+		})
+	end
+
+	local function stats()
+		local visible = self.stats_visible()
+		local spans = {}
+
+		local function add(text, hl)
+			spans[#spans + 1] = m.inline(text, hl)
+		end
+
+		local separator = (" %s "):format(config.icons.bar)
+
+		if visible then
+			add(t(q.difficulty), "leetcode_" .. q.difficulty:lower())
+		else
+			add("????", "leetcode_list")
+		end
+
+		local status = config.icons.hl.status[cached.status]
+		if status then
+			add(" ")
+			add(status[1], status[2])
+		end
+
+		add(separator)
+		add((visible and q.likes or "___") .. " ", "leetcode_alt")
+		if not config.is_cn then
+			add((" %s "):format(visible and q.dislikes or "___"), "leetcode_alt")
+		end
+
+		add(separator)
+		local ac_rate = visible and q.stats.acRate or "__%"
+		local total = visible and q.stats.totalSubmission or "__"
+		add(("%s %s %s"):format(ac_rate, t("of"), total), "leetcode_alt")
+
+		if not vim.tbl_isempty(q.hints) then
+			add(separator)
+			add("󰛨 " .. t("Hints"), "leetcode_hint")
+		end
+
+		return m.block({ width = "fit", spans })
+	end
+
+	return m.vflex({
+		align = "center",
+		m.block({ width = "fit", cached.link or "", style = "leetcode_alt" }),
+		m.newl(),
+		title(),
+		stats,
+	})
+end
+
+function M:content()
+	local q = self.problem.problem
+	return m.vflex({
+		padding = { 1, 2 },
+		spacing = 2,
+		self:header(),
+		html.parse(Leet.util.translate(q.content, q.translated_content)),
+	})
+end
+
+function M:draw_images()
+	if not img_sup then
+		return
+	end
+
+	vim.schedule(function()
+		if not self.win:valid() then
+			return
+		end
+
+		local lines = vim.api.nvim_buf_get_lines(self.win.buf, 0, -1, false)
+		for i, line in ipairs(lines) do
+			for link in line:gmatch("%((http[s]?://%S+)%)") do
+				if not self.images[link] then
+					self.images[link] = {}
+					image_api.from_url(link, {
+						buffer = self.win.buf,
+						window = self.win.win,
+						with_virtual_padding = true,
+					}, function(image)
+						if image then
+							self.images[link] = image
+							image:render({ y = i + 1 })
+						end
+					end)
+				end
+			end
+		end
+	end)
+end
+
+function M:show()
+	if not self.win:valid() then
+		self.win:show()
+	end
+end
+
+function M:toggle()
+	self.win:toggle()
+end
+
+function M:toggle_stats()
+	self.stats_visible(function(visible)
+		return not visible
+	end)
+end
+
+function M:unmount()
+	self.view:destroy()
+	self.win:close()
 end
 
 return M

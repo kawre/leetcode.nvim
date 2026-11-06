@@ -14,6 +14,14 @@ function M:new(problem)
 	self.result = Result(self)
 	self.testcase = Testcase(self)
 
+end
+
+--- Splits cannot be hidden, so the layout is rebuilt each time it opens.
+function M:open()
+	if self:is_open() then
+		return
+	end
+
 	self.layout = Markup.layout({
 		wins = {
 			["result"] = self.result.win,
@@ -29,6 +37,12 @@ function M:new(problem)
 			{ win = "result" },
 		},
 	})
+	self.layout:show()
+end
+
+---@return boolean
+function M:is_open()
+	return self.layout ~= nil and self.layout:valid()
 end
 
 function M:run(submit)
@@ -38,7 +52,7 @@ function M:run(submit)
 	end
 
 	if Leet.config.user.console.open_on_runcode then
-		self.layout:show()
+		self:open()
 	end
 
 	self.result.win:focus()
@@ -46,8 +60,25 @@ function M:run(submit)
 	Runner.run(self.problem, submit)
 end
 
-function M:snapshot(id, res)
+function M:toggle()
+	if self:is_open() then
+		self:close()
+	else
+		self:open()
+	end
+end
 
+function M:close()
+	if self:is_open() then
+		-- Plain closing keeps the keymaps and events of the windows.
+		self.result.win:close()
+		self.testcase.win:close()
+		self.layout:close({ wins = false })
+	end
+end
+
+function M:snapshot(id, data)
+	self.testcase:snapshot(id, data)
 end
 
 return M

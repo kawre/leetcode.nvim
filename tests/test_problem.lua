@@ -1,0 +1,374 @@
+---@module 'mini.test'
+
+local helpers = dofile("tests/helpers.lua")
+local new_set = MiniTest.new_set
+local eq = MiniTest.expect.equality
+local child = MiniTest.new_child_neovim()
+
+local T = new_set({
+	hooks = {
+		pre_case = function()
+			helpers.boot(child)
+			child.lua([[
+				errors = {}
+				vim.notify = function(message, level)
+					if level == vim.log.levels.ERROR then
+						errors[#errors + 1] = message
+					end
+				end
+			]])
+		end,
+		post_case = function()
+			eq(child.lua_get("errors"), {})
+		end,
+		post_once = function()
+			child.stop()
+		end,
+	},
+})
+
+local function run(code)
+	child.lua(code)
+end
+
+local function description_has(text)
+	return child.lua_get(("contains(problem.description.win.buf, %q)"):format(text))
+end
+
+T["description"] = new_set()
+
+T["description"]["shows the header"] = function()
+	run("open_problem()")
+	eq(description_has("1. Two Sum"), true)
+	eq(description_has("100"), true)
+	eq(description_has("leetcode.com/problems/two-sum"), true)
+end
+
+T["description"]["wraps paragraphs inside the window"] = function()
+	run("open_problem()")
+	local width = child.lua_get("vim.api.nvim_win_get_width(problem.description.win.win)")
+	for _, line in ipairs(child.lua_get("buffer_text(problem.description.win.buf)")) do
+		eq(child.lua_get(("vim.fn.strdisplaywidth(%q)"):format(line)) <= width, true)
+	end
+end
+
+T["description"]["renders links, sections and code"] = function()
+	run("open_problem()")
+	eq(description_has("[the docs](https://example.com/docs)"), true)
+	eq(description_has("Example 1:"), true)
+	eq(description_has("nums = [2,7,11,15]"), true)
+	eq(description_has("Constraints:"), true)
+end
+
+T["description"]["renders lists with markers"] = function()
+	run("open_problem()")
+	eq(description_has("* 2 <= nums.length <= 10^4"), true)
+	eq(description_has("1. First"), true)
+	eq(description_has("2. Second"), true)
+end
+
+T["description"]["list items wrap with a hanging indent"] = function()
+	run("open_problem()")
+	run([[
+		for i, line in ipairs(buffer_text(problem.description.win.buf)) do
+			if line:find("Only one valid", 1, true) then
+				marker_col = line:find("*", 1, true)
+				next_line = buffer_text(problem.description.win.buf)[i + 1]
+			end
+		end
+	]])
+	local col = child.lua_get("marker_col")
+	local next_line = child.lua_get("next_line")
+	eq(next_line:sub(1, col + 1):match("^%s*$") ~= nil, true)
+end
+
+T["description"]["renders tables with borders"] = function()
+	run("open_problem()")
+	eq(description_has("┌────┬──────┐"), true)
+	eq(description_has("│ id │ name │"), true)
+	eq(description_has("├────┼──────┤"), true)
+	eq(description_has("│ 1  │ Joe  │"), true)
+end
+
+T["description"]["hides and shows stats"] = function()
+	run("open_problem()")
+	eq(description_has("????"), false)
+
+	run("problem.description:toggle_stats(); reactive.flush()")
+	eq(description_has("????"), true)
+	eq(description_has("___"), true)
+end
+
+T["description"]["toggles its window"] = function()
+	run([[
+		open_problem()
+		problem.description:toggle()
+		reactive.flush()
+	]])
+	eq(child.lua_get("not problem.description.win:win_valid()"), true)
+
+	run("problem.description:toggle(); reactive.flush()")
+	eq(child.lua_get("problem.description.win:win_valid()"), true)
+	eq(description_has("1. Two Sum"), true)
+end
+
+T["console"] = new_set()
+
+local function show_result(item)
+	run(([[
+		open_problem()
+		problem.console:open()
+		reactive.flush()
+		item = %s
+		problem.console.testcase:snapshot("run1", { test_case = "[2,7]\n9\n[3,3]\n6" })
+		problem.console.result:handle(item)
+		reactive.flush()
+	]]):format(item))
+end
+
+local function result_has(text)
+	return child.lua_get(("contains(problem.console.result.win.buf, %q)"):format(text))
+end
+
+local accepted = [[{
+	_ = { title = "Accepted", hl = "leetcode_ok", success = true, submission = false },
+	status_code = 10, status_runtime = "0 ms", submission_id = "run1", total_testcases = 2,
+	code_answer = { "[0,1]", "[0,1]" }, expected_code_answer = { "[0,1]", "[0,1]" },
+	std_output_list = { "hello\n", "" },
+}]]
+
+T["console"]["shows run results"] = function()
+	show_result(accepted)
+	eq(result_has("Accepted"), true)
+	eq(result_has("Case"), true)
+	eq(result_has("nums ="), true)
+	eq(result_has("[2,7]"), true)
+	eq(result_has("Expected"), true)
+end
+
+T["console"]["switches cases with number keys"] = function()
+	show_result(accepted)
+	eq(result_has("[3,3]"), false)
+
+	run("vim.api.nvim_set_current_win(problem.console.result.win.win)")
+	child.type_keys("2")
+	run("reactive.flush()")
+	eq(result_has("[3,3]"), true)
+end
+
+T["console"]["stdout collapses"] = function()
+	show_result(accepted)
+	eq(result_has("hello"), true)
+
+	run([[
+		vim.api.nvim_set_current_win(problem.console.result.win.win)
+		for i, line in ipairs(buffer_text(problem.console.result.win.buf)) do
+			if line:find("Stdout", 1, true) then
+				vim.api.nvim_win_set_cursor(0, { i, #line:match("^%s*") })
+			end
+		end
+		problem.console.result.view:press()
+		reactive.flush()
+	]])
+	eq(result_has("hello"), false)
+end
+
+T["console"]["shows a submission"] = function()
+	show_result([[{
+		_ = { title = "Accepted", hl = "leetcode_ok", success = true, submission = true },
+		status_code = 10, status_runtime = "12 ms", display_runtime = "12", pretty_lang = "Python3",
+		status_memory = "18.9MB", runtime_percentile = 80.5, memory_percentile = 33.2,
+	}]])
+	eq(result_has("Runtime"), true)
+	eq(result_has("Memory"), true)
+	eq(result_has("18.9MB"), true)
+	eq(result_has("Beats 80.50%"), true)
+end
+
+T["console"]["shows a compile error"] = function()
+	show_result([[{ _ = {}, status_code = 20, full_compile_error = "Line 1: bad\nLine 2: worse" }]])
+	eq(result_has("Line 2: worse"), true)
+end
+
+T["console"]["shows a runtime error"] = function()
+	show_result([[{
+		_ = { title = "Runtime Error", hl = "leetcode_error", submission = false, params = {} },
+		status_code = 15, full_runtime_error = "IndentationError\nLine 45", std_output_list = { "" },
+	}]])
+	eq(result_has("Runtime Error"), true)
+	eq(result_has("Line 45"), true)
+end
+
+T["console"]["shows limits and internal errors"] = function()
+	show_result([[{ _ = { submission = false }, status_code = 14, std_output_list = { "out" } }]])
+	eq(result_has("out"), true)
+
+	run([[problem.console.result:handle({ _ = {}, status_code = 16 }); reactive.flush()]])
+	eq(result_has("internal error"), true)
+end
+
+T["console"]["shows a failed submission"] = function()
+	show_result([[{
+		_ = { title = "Wrong Answer", hl = "leetcode_error", submission = true, params = {} },
+		status_code = 11, input = "[1]\n2", code_output = "[]", expected_output = "[1]", std_output = "",
+	}]])
+	eq(result_has("Expected"), true)
+	eq(result_has("[1]"), true)
+end
+
+T["console"]["clears"] = function()
+	show_result(accepted)
+	run("problem.console.result:clear(); reactive.flush()")
+	eq(result_has("Accepted"), false)
+end
+
+T["console"]["toggles"] = function()
+	run([[
+		open_problem()
+		problem.console:toggle()
+		reactive.flush()
+	]])
+	eq(child.lua_get("problem.console:is_open()"), true)
+
+	run("problem.console:toggle(); reactive.flush()")
+	eq(child.lua_get("problem.console:is_open()"), false)
+end
+
+T["console"]["keeps results and testcases when reopened"] = function()
+	show_result(accepted)
+	run([[
+		problem.console:toggle()
+		reactive.flush()
+		problem.console:toggle()
+		reactive.flush()
+	]])
+	eq(result_has("Accepted"), true)
+	eq(child.lua_get("contains(problem.console.testcase.win.buf, '[2,7]')"), true)
+end
+
+T["console"]["keeps its keys when reopened"] = function()
+	show_result(accepted)
+	run([[
+		problem.console:toggle()
+		reactive.flush()
+		problem.console:toggle()
+		reactive.flush()
+		vim.api.nvim_set_current_win(problem.console.result.win.win)
+	]])
+	child.type_keys("2")
+	run("reactive.flush()")
+	eq(result_has("[3,3]"), true)
+end
+
+T["popups"] = new_set()
+
+local function open_info()
+	run([[
+		open_problem()
+		problem.info:show()
+		reactive.flush()
+	]])
+end
+
+local function info_has(text)
+	return child.lua_get(("contains(problem.info.win.buf, %q)"):format(text))
+end
+
+T["popups"]["info starts collapsed"] = function()
+	open_info()
+	eq(info_has("Hints"), true)
+	eq(info_has("Topics"), true)
+	eq(info_has("Array"), false)
+end
+
+T["popups"]["info sections expand with enter"] = function()
+	open_info()
+	run([[
+		for i, line in ipairs(buffer_text(problem.info.win.buf)) do
+			if line:find("Topics", 1, true) then
+				vim.api.nvim_win_set_cursor(0, { i, #line:match("^%s*") })
+			end
+		end
+	]])
+	child.type_keys("<CR>")
+	run("reactive.flush()")
+	eq(info_has("* Array"), true)
+end
+
+T["popups"]["info parses hints"] = function()
+	open_info()
+	run([[
+		local function press(text)
+			for i, line in ipairs(buffer_text(problem.info.win.buf)) do
+				if line:find(text, 1, true) then
+					vim.api.nvim_win_set_cursor(0, { i, #line:match("^%s*") })
+					problem.info.view:press()
+					reactive.flush()
+					return
+				end
+			end
+		end
+		press("Hints")
+		press("1/1")
+	]])
+	eq(info_has("Try a hash map."), true)
+end
+
+T["popups"]["close with the toggle key"] = function()
+	open_info()
+	child.type_keys("q")
+	eq(child.lua_get("not problem.info:is_open()"), true)
+end
+
+T["popups"]["info reopens"] = function()
+	open_info()
+	run("problem.info:toggle(); problem.info:toggle(); reactive.flush()")
+	eq(info_has("Hints"), true)
+end
+
+T["popups"]["skills"] = function()
+	run([[
+		skills = require("leetcode.ui.popup.skills")
+		skills:show()
+		reactive.flush()
+	]])
+	eq(child.lua_get("contains(skills.win.buf, 'advanced')"), true)
+	eq(child.lua_get("contains(skills.win.buf, 'Dynamic Programming x5')"), true)
+end
+
+T["popups"]["languages sort by solved"] = function()
+	run([[
+		languages = require("leetcode.ui.popup.languages")
+		languages:show()
+		reactive.flush()
+		first = buffer_text(languages.win.buf)[2]
+	]])
+	eq(child.lua_get("first"):find("Python", 1, true) ~= nil, true)
+	eq(child.lua_get("contains(languages.win.buf, '12 problems solved')"), true)
+	eq(child.lua_get("contains(languages.win.buf, '1 problem solved')"), true)
+end
+
+T["problem"] = new_set()
+
+T["problem"]["opens the editor with the snippet"] = function()
+	run("open_problem()")
+	eq(child.lua_get("problem:valid()"), true)
+	eq(child.lua_get("contains(problem.buf, 'class Solution')"), true)
+end
+
+T["problem"]["is found from its tab"] = function()
+	run("open_problem()")
+	eq(child.lua_get("Leet.util.curr_question() == problem"), true)
+end
+
+T["problem"]["unmounts"] = function()
+	run([[
+		open_problem()
+		problem:unmount()
+		reactive.flush()
+	]])
+	eq(child.lua_get("#Leet.active_problems"), 0)
+	eq(child.lua_get("problem:valid()"), false)
+end
+
+return T

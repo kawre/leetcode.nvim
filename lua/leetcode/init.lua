@@ -92,6 +92,18 @@ function M.should_skip(on_vimenter)
 	end
 end
 
+function M.setup_globals()
+	_G.Leet = setmetatable({
+		ctx = {},
+		active_problems = {},
+	}, {
+		__index = function(t, k)
+			t[k] = require("leetcode." .. k)
+			return rawget(t, k)
+		end,
+	})
+end
+
 function M.setup_cmds()
 	require("leetcode.cmd").setup()
 end
@@ -104,16 +116,7 @@ function M.start(on_vimenter)
 	end
 
 	config.setup()
-
-	_G.Leet = setmetatable({
-		ctx = {},
-		active_problems = {},
-	}, {
-		__index = function(t, k)
-			t[k] = require("leetcode." .. k)
-			return rawget(t, k)
-		end,
-	})
+	M.setup_globals()
 
 	vim.api.nvim_set_current_dir(config.storage.home:absolute())
 

@@ -1,7 +1,6 @@
 local log = require("leetcode.logger")
 local arguments = require("leetcode.cmd.arguments")
 local config = require("leetcode.config")
-local event = require("nui.utils.autocmd").event
 local api = vim.api
 
 local t = require("leetcode.translator")
@@ -34,50 +33,21 @@ end
 function cmd.cookie_prompt(cb)
 	local cookie = require("leetcode.cache.cookie")
 
-	local popup_options = {
-		relative = "editor",
-		position = {
-			row = "50%",
-			col = "50%",
-		},
-		size = 40,
-		border = {
-			style = "rounded",
-			text = {
-				top = (" %s "):format(t("Enter cookie")),
-				top_align = "left",
-			},
-		},
-		win_options = {
-			winhighlight = "Normal:Normal",
-		},
-	}
+	vim.ui.input({ prompt = t("Enter cookie") .. ": " }, function(value)
+		if not value or value == "" then
+			return
+		end
 
-	local NuiInput = require("nui.input")
-	local input = NuiInput(popup_options, {
-		prompt = " 󰆘 ",
-		on_submit = function(value)
-			local err = cookie.set(value)
+		local err = cookie.set(value)
 
-			if not err then
-				log.info("Sign-in successful")
-				cmd.start_user_session()
-			else
-				log.error("Sign-in failed: " .. err)
-			end
+		if not err then
+			log.info("Sign-in successful")
+			cmd.start_user_session()
+		else
+			log.error("Sign-in failed: " .. err)
+		end
 
-			pcall(cb, not err and true or false)
-		end,
-	})
-
-	input:mount()
-
-	local keys = config.user.keys
-	input:map("n", keys.toggle, function()
-		input:unmount()
-	end)
-	input:on(event.BufLeave, function()
-		input:unmount()
+		pcall(cb, not err and true or false)
 	end)
 end
 
@@ -130,14 +100,13 @@ function cmd.qot()
 	require("leetcode.util").auth_guard()
 
 	local problems = require("leetcode.api.problems")
-	local Question = require("leetcode-ui.question")
 
 	problems.question_of_today(function(qot, err)
 		if err then
 			return log.err(err)
 		end
 		local problemlist = require("leetcode.cache.problems")
-		Question(problemlist.by_slug(qot.title_slug)):mount()
+		cmd.open(problemlist.by_slug(qot.title_slug))
 	end)
 end
 
@@ -164,8 +133,7 @@ function cmd.random_question(opts)
 	end
 
 	local item = problems.by_slug(q.title_slug) or {}
-	local Question = require("leetcode-ui.question")
-	Question(item):mount()
+	cmd.open(item)
 end
 
 function cmd.start_with_cmd()
@@ -278,13 +246,11 @@ function cmd.ui_skills()
 	if config.is_cn then
 		return
 	end
-	local skills = require("leetcode-ui.popup.skills")
-	skills:show()
+	require("leetcode.ui.popup.skills"):show()
 end
 
 function cmd.ui_languages()
-	local languages = require("leetcode-ui.popup.languages")
-	languages:show()
+	require("leetcode.ui.popup.languages"):show()
 end
 
 function cmd.current()
@@ -318,18 +284,18 @@ function cmd.browser_open()
 
 	if q then
 		if vim.ui.open then
-			vim.ui.open(q.cache.link)
+			vim.ui.open(q.cached.link)
 		else
 			local command
 			local os_name = vim.loop.os_uname().sysname
 
 			if os_name == "Linux" then
-				command = string.format("xdg-open '%s'", q.cache.link)
+				command = string.format("xdg-open '%s'", q.cached.link)
 			elseif os_name == "Darwin" then
-				command = string.format("open '%s'", q.cache.link)
+				command = string.format("open '%s'", q.cached.link)
 			else
 				-- Fallback to Windows if uname is not available or does not match Linux/Darwin.
-				command = string.format("start \"\" \"%s\"", q.cache.link)
+				command = string.format("start \"\" \"%s\"", q.cached.link)
 			end
 
 			vim.fn.jobstart(command, { detach = true })
@@ -357,7 +323,7 @@ function cmd.last_submit()
 	end
 
 	local question_api = require("leetcode.api.question")
-	question_api.latest_submission(q.q.id, q.lang, function(res, err) --
+	question_api.latest_submission(q.problem.id, q.lang, function(res, err) --
 		if err then
 			if err.status == 404 then
 				log.error("You haven't submitted any code!")
@@ -380,28 +346,16 @@ end
 
 function cmd.restore()
 	local utils = require("leetcode.util")
-	local ui = require("leetcode-ui.utils")
 	local q = utils.curr_question()
 	if not q then
 		return
 	end
 
-	if
-		(q.winid and api.nvim_win_is_valid(q.winid))
-		and (q.bufnr and api.nvim_buf_is_valid(q.bufnr))
-	then
-		ui.win_set_buf(q.winid, q.bufnr)
+	if q:valid() then
+		api.nvim_win_set_buf(q.win, q.buf)
 	end
 
 	q.description:show()
-	local winid, bufnr = q.description.winid, q.description.bufnr
-
-	if
-		(winid and api.nvim_win_is_valid(winid)) --
-		and (bufnr and api.nvim_buf_is_valid(bufnr))
-	then
-		ui.win_set_buf(q.winid, q.bufnr)
-	end
 end
 
 function cmd.inject()
@@ -411,7 +365,7 @@ function cmd.inject()
 		return
 	end
 
-	if q.bufnr and api.nvim_buf_is_valid(q.bufnr) then
+	if q.buf and api.nvim_buf_is_valid(q.buf) then
 		local range = q:editor_section_range("code")
 
 		if not range:is_valid_or_log() then

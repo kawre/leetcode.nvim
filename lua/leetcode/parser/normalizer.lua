@@ -1,10 +1,9 @@
-local Object = require("nui.object")
 local u = require("leetcode.parser.utils")
 
 local log = require("leetcode.logger")
 
 ---@class lc.Normalizer
-local Normalizer = Object("LeetNormalizer")
+local Normalizer = Markup.object()
 
 function Normalizer:cleanup() --
     self.text = self
@@ -71,7 +70,7 @@ function Normalizer:entities()
 end
 
 ---@param text string
-function Normalizer:init(text) --
+function Normalizer:new(text) --
     log.debug(text)
 
     self.text = text
@@ -83,12 +82,9 @@ function Normalizer:init(text) --
     log.debug(self.text:gsub("&lcnl;", "\n"), false)
 end
 
----@type fun(text: string): lc.Normalizer
-local LeetNormalizer = Normalizer
-
 ---@param text string
 function Normalizer:norm(text)
-    return LeetNormalizer(text).text
+    return Normalizer(text).text
 end
 
-return LeetNormalizer
+return Normalizer

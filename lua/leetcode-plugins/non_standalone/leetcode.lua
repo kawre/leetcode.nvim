@@ -14,6 +14,7 @@ leetcode.start = function(on_vimenter)
     end
 
     config.setup()
+    leetcode.setup_globals()
 
     leetcode.setup_cmds()
 
@@ -33,8 +34,10 @@ leetcode.start = function(on_vimenter)
 
     vim.api.nvim_set_current_dir(config.storage.home:absolute())
 
-    local Menu = require("leetcode-ui.renderer.menu")
-    Menu():mount()
+    local menu = require("leetcode.ui.menu")
+    menu.win.buf = vim.api.nvim_get_current_buf()
+    menu.win:show()
+    menu.render()
 
     local utils = require("leetcode.util")
     utils.exec_hooks("enter")
@@ -47,7 +50,7 @@ leetcode.stop = vim.schedule_wrap(function()
         return vim.cmd("qa!")
     end
 
-    _Lc_state.menu:unmount()
+    Leet.menu.view:unmount()
 
     vim.api.nvim_create_user_command("Leet", require("leetcode.cmd").start_with_cmd, {
         bar = true,
