@@ -11,7 +11,7 @@ return markup.component(function()
             icon = "󱛬",
             lhs = "u",
             title = "Update",
-            on_press = cmd.cookie_prompt,
+            on_submit = cmd.cookie_prompt,
         }),
         Button({
             icon = "󱛪",

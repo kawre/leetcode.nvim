@@ -8,7 +8,7 @@ local Runtime = m.component(function(props)
     local item = props.item
 
     if item._.submission then
-        return Accepted(item)
+        return Accepted({ item = item })
     end
 
     return m.block({

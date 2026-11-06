@@ -129,7 +129,7 @@ function M.start(on_vimenter)
 	local menu = require("leetcode.ui.menu")
 	menu.win.buf = vim.api.nvim_get_current_buf()
 	menu.win:show()
-	menu:render()
+	menu.render()
 
 	local utils = require("leetcode.util")
 	utils.exec_hooks("enter")

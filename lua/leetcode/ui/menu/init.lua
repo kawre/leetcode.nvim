@@ -5,81 +5,61 @@ local Footer = require("leetcode.ui.menu.footer")
 local Nav = require("leetcode.ui.menu.nav")
 local config = require("leetcode.config")
 
-local menu_ctx = m.hooks.context()
-Leet.ctx.menu = menu_ctx
+---@class leet.menu
+local M = {
+    page = m.signal("loading"),
+    win = Markup.window({
+        position = "current",
+        hijack = true,
+        show = false,
+    }),
+}
 
-Leet.auth = m.hooks.store(function(set)
-    return {
-        auth = Markup.list(),
-        set_auth = function(new_auth)
-            set(function(state)
-                state.auth = new_auth
-            end)
-        end,
-        -- c = function(self, new_auth)
-        --     self:set(function(state)
-        --         state.auth = new_auth
-        --     end)
-        -- end,
-    }
-end)
+Leet.menu = M
 
-local win = Markup.window({
-    position = "current",
-    hijack = true,
-    show = false,
-})
-local renderer = Markup.renderer(win)
+---@param page string
+function M.set_page(page)
+    M.page(page)
+end
 
-Leet.menu = renderer
-Leet.auth:bind(renderer)
+local function sign_in()
+    if not cookie.get() then
+        return M.set_page("signin")
+    end
+
+    M.set_page("loading")
+
+    require("leetcode.api.auth").user(function(_, err)
+        if err then
+            M.set_page("signin")
+            Markup.log.error(err)
+        else
+            M.set_page("menu")
+        end
+    end)
+end
 
 local App = m.component(function()
-    local menu = m.hooks.use(Leet.ctx.menu)
+    local view = m.use_view()
 
-    m.hooks.effect(function()
-        if cookie.get() then
-            menu.set_page("loading")
+    m.use_key("<CR>", function()
+        view:press()
+    end)
 
-            local auth_api = require("leetcode.api.auth")
-            auth_api.user(function(_, err)
-                if err then
-                    menu.set_page("signin")
-                    Markup.log.error(err)
-                else
-                    menu.set_page("menu")
-                end
-            end)
-        else
-            menu.set_page("signin")
-        end
-    end, {})
+    sign_in()
 
     return m.vflex({
         align = "center",
         spacing = 2,
-        -- padding = { 1, 2 },
         Header(),
         Nav(),
         Footer(),
     })
 end)
 
-local Root = m.component(function()
-    local page, set_page = m.hooks.variable("loading")
-    local user, set_user = m.hooks.variable({})
+function M.render()
+    M.view = M.view or Markup.view(M.win, { snap = true })
+    M.view:render(App())
+end
 
-    return Leet.ctx.menu:provider({
-        value = {
-            page = page,
-            set_page = set_page,
-            user = user,
-            set_user = set_user,
-        },
-        App(),
-    })
-end)
-
-renderer:bind(Root)
-
-return renderer
+return M

@@ -5,8 +5,6 @@ local Input = require("leetcode.ui.problem.result.input")
 
 ---@param props { input: string[], output: string, expected: string, stdout: string, params: string[] }
 local Case = m.component(function(props)
-    local expanded, set_expanded = m.hooks.variable(true)
-
     local output = props.output
     local expected = props.expected
     local params = props.params

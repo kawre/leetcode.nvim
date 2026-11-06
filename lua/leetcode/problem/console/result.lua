@@ -14,18 +14,17 @@ function M:new(console)
         border = "rounded",
         show = false,
     })
-    self.renderer = Markup.renderer(self.win)
+    self.view = Markup.view(self.win)
 end
 
 function M:clear()
-    vim.api.nvim_buf_set_lines(self.win.buf, 0, -1, false, {})
+    self.view:render(nil)
 end
 
 ---@param item lc.interpreter_response
 function M:handle(item)
-    Markup.log(item.status_code)
     item._.params = self.console.problem.problem.meta_data.params
-    self.renderer:render(Result({ item = item, console = self.console }))
+    self.view:render(Result({ item = item, console = self.console }))
 end
 
 return M

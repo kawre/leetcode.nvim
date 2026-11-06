@@ -3,7 +3,7 @@ local CaseBlock = require("leetcode.ui.problem.result.cases.block")
 
 ---@param props { stdout: string }
 local Stdout = m.component(function(props)
-    local expanded, set_expanded = m.hooks.variable(true)
+    local expanded = m.signal(true)
 
     local std_lines = Markup.list(vim.split(props.stdout or "", "\n", { trimempty = true }))
 
@@ -13,12 +13,20 @@ local Stdout = m.component(function(props)
 
     return m.block({
         m.block({
-            m.button(expanded and "" or ""),
+            width = "fit",
+            on_press = function()
+                expanded(not expanded())
+            end,
+            m.inline(function()
+                return expanded() and "" or ""
+            end),
             " Stdout ",
         }),
-        expanded and CaseBlock(std_lines:map(function(line)
-            return m.block(line)
-        end)),
+        m.show(expanded, function()
+            return CaseBlock(std_lines:map(function(line)
+                return m.block(line)
+            end))
+        end),
     })
 end)
 

@@ -1,15 +1,12 @@
 local m = require("markup")
-local config = require("leetcode.config")
 local api = require("leetcode.api.stats")
 
 return m.component(function()
-    local streak, set_streak = m.hooks.variable({})
-    local win = m.hooks.window()
-    local progress, set_progress = m.hooks.variable({})
-    local store = m.hooks.use(Leet.auth)
+    local streak = m.signal({})
+    local progress = m.signal({})
 
-    m.hooks.effect(function()
-        if store.auth:isempty() then
+    m.effect(function()
+        if not Leet.auth() then
             return
         end
 
@@ -18,7 +15,7 @@ return m.component(function()
                 Markup.log.error(err)
                 return
             end
-            set_progress(data)
+            progress(data)
         end)
 
         api.streak(function(data, err)
@@ -26,18 +23,9 @@ return m.component(function()
                 Markup.log.error(err)
                 return
             end
-            set_streak(data)
+            streak(data)
         end)
-
-        return win:map("n", "9", function()
-            set_streak(function(v)
-                return {
-                    streakCount = (v.streakCount or 0) + 1,
-                    todayCompleted = v.todayCompleted,
-                }
-            end)
-        end)
-    end, { store.auth })
+    end)
 
     local function stats()
         local res = {}
@@ -48,7 +36,7 @@ return m.component(function()
             ["Hard"] = "DiagnosticVirtualTextError",
         }
 
-        for _, p in ipairs(progress or {}) do
+        for _, p in ipairs(progress() or {}) do
             if p.difficulty ~= "All" then
                 table.insert(
                     res,
@@ -64,7 +52,7 @@ return m.component(function()
     end
 
     return m.vflex({
-        stats(),
+        stats,
         spacing = 1,
         align = "center",
         m.flex({
@@ -72,12 +60,17 @@ return m.component(function()
             m.block({
                 m.inline("  ", "DiagnosticVirtualTextError"),
                 " ",
-                m.inline(streak.streakCount or "󰨕"),
+                m.inline(function()
+                    return streak().streakCount or "󰨕"
+                end),
             }),
             m.block({
                 m.inline("  ", "DiagnosticVirtualTextInfo"),
                 " ",
-                m.inline(config.auth.name or "no user", "Statement"),
+                m.inline(function()
+                    local auth = Leet.auth()
+                    return auth and auth.name or "no user"
+                end, "Statement"),
             }),
         }),
     })

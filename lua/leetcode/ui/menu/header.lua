@@ -40,11 +40,10 @@ local function get_days_in_month(month, year)
 end
 
 return m.component(function()
-    local store = m.hooks.use(Leet.auth)
-    local calendar, set_calendar = m.hooks.variable({})
+    local calendar_data = m.signal({})
 
-    m.hooks.effect(function()
-        if store.auth:isempty() then
+    m.effect(function()
+        if not Leet.auth() then
             return
         end
 
@@ -127,7 +126,7 @@ return m.component(function()
                 months[month_key][week_num][osdate.day] = count
             end
 
-            set_calendar({
+            calendar_data({
                 calendar = data.calendar,
                 curr_time = curr,
                 months = months,
@@ -139,8 +138,10 @@ return m.component(function()
                 ordered_keys = ordered_keys, -- ✅ Pass it along
             })
         end)
-    end, { store.auth })
+    end)
 
+    return function()
+    local calendar = calendar_data()
     if vim.tbl_isempty(calendar or {}) then
         return m.block({
             margin_top = 3,
@@ -227,4 +228,5 @@ return m.component(function()
             end, calendar.ordered_keys),
         }),
     })
+    end
 end)

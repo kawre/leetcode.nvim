@@ -30,9 +30,7 @@ local function handle(res, err)
     end
 
     config.auth = log.debug(auth) ---@diagnostic disable-line
-    Leet.auth:set(function()
-        return { auth = Markup.list(auth) }
-    end)
+    Leet.auth(auth)
     return auth
 end
 

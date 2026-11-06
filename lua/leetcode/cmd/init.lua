@@ -197,7 +197,7 @@ end
 
 ---@param page lc-menu.page
 function cmd.set_menu_page(page)
-	_Lc_state.menu:set_page(page)
+	Leet.menu.set_page(page)
 end
 
 function cmd.start_user_session() --
