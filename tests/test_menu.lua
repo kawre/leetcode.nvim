@@ -57,6 +57,32 @@ T["today shows the daily challenge"] = function()
 	open(true)
 	eq(contains("Today"), true)
 	eq(contains("15. 3Sum"), true)
+	eq(contains("Not solved · Medium"), true)
+end
+
+T["today has the date and how many pass"] = function()
+	child.lua([[
+		local problems = package.loaded["leetcode.cache.problems"]
+		local by_slug = problems.by_slug
+		problems.by_slug = function(slug)
+			local problem = by_slug(slug)
+			problem.status, problem.ac_rate = "ac", 41.25
+			return problem
+		end
+	]])
+	open(true)
+	eq(contains(child.lua_get("os.date('%b %-d')")), true)
+	eq(contains("Solved · Medium · 41.2% accepted"), true)
+end
+
+T["today opens with t"] = function()
+	open(true)
+	child.lua([[
+		daily = false
+		require("leetcode.cmd").qot = function() daily = true end
+	]])
+	child.type_keys("t")
+	eq(child.lua_get("daily"), true)
 end
 
 T["the launcher keeps its shape when narrow"] = function()
@@ -223,15 +249,17 @@ T["a short window can still show the whole dashboard"] = function()
 	]])
 	eq(child.lua_get("visible('hard')"), false)
 
-	for _ = 1, 25 do
+	for _ = 1, 40 do
 		child.type_keys("j")
 	end
 	eq(child.lua_get("visible('hard')"), true)
 
-	for _ = 1, 40 do
+	for _ = 1, 60 do
 		child.type_keys("k")
 	end
-	eq(child.lua_get("visible('Problems')"), true)
+	-- Back at the top, where the greeting is.
+	eq(child.lua_get("vim.fn.line('w0')"), 1)
+	eq(child.lua_get("visible('leetcode.nvim')"), true)
 end
 
 T["navigation explains itself"] = function()

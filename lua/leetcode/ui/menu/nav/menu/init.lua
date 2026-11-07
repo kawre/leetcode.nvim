@@ -1,36 +1,52 @@
 local m = require("markup")
 local Items = require("leetcode.ui.menu.items")
 local Item = require("leetcode.ui.menu.item")
-local Continue = require("leetcode.ui.menu.continue")
+local ProblemCard = require("leetcode.ui.menu.problem_card")
 local data = require("leetcode.ui.menu.data")
-local kit = require("leetcode.ui.kit")
+local recent = require("leetcode.ui.menu.recent")
+local t = require("leetcode.translator")
 
---- The daily challenge, by number and title.
-local function today()
-    local problem = data.daily()
-    if not problem then
-        return kit.Loading()
+--- The problem worked on last, if any.
+local function Continue(width)
+    local item = recent.list(1)[1]
+    if not item then
+        return
     end
 
-    return m.inline({
-        m.inline(problem.frontend_id .. ". ", "leetcode_muted"),
-        m.inline(kit.truncate(Leet.util.translate(problem.title, problem.title_cn), 30)),
+    return ProblemCard({
+        label = t("Continue"),
+        lhs = "c",
+        width = width,
+        problem = item.problem,
+        extra = recent.ago(item.time),
+        on_press = function()
+            require("leetcode.cmd").open(item.problem)
+        end,
     })
+end
+
+--- The daily challenge, which arrives a moment after the menu.
+local function Today(width)
+    return function()
+        local problem = data.daily()
+
+        return ProblemCard({
+            label = ("%s · %s"):format(t("Today"), os.date("%b %-d")),
+            lhs = "t",
+            width = width,
+            problem = problem,
+            extra = problem and problem.ac_rate and ("%.1f%% accepted"):format(problem.ac_rate),
+            on_press = function()
+                require("leetcode.cmd").qot()
+            end,
+        })
+    end
 end
 
 return m.component(function(props)
     return m.block({
-        Continue({ width = props.width }),
-        Items({
-            Item({
-                title = "Today",
-                desc = today,
-                lhs = "t",
-                on_submit = function()
-                    require("leetcode.cmd").qot()
-                end,
-            }),
-        }),
+        -- Half cell edges are the space between the cards.
+        m.vflex({ Continue(props.width), Today(props.width) }),
         m.block({ margin = { 1, 0 }, padding = { 0, 1 }, m.inline(("─"):rep(props.width - 2), "leetcode_divider") }),
         Items({
             Item({ title = "Problems", desc = "browse, random, recent", lhs = "p", page = "menu.problems" }),
