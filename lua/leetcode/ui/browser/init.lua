@@ -38,6 +38,7 @@ local Choice = m.component(function(props)
 	local hovered = m.signal(false)
 
 	return m.inline({
+		click = "double",
 		on_press = props.press,
 		on_hover = hovered,
 		white_space = "nowrap",
@@ -106,6 +107,7 @@ local SearchField = m.component(function(props)
 	state.field_style = fill
 
 	return m.flex({
+		click = "double",
 		on_press = state.search,
 		on_hover = hovered,
 		white_space = "nowrap",
@@ -177,6 +179,7 @@ local Row = m.component(function(props)
 	local locked = problem.paid_only and not config.auth.is_premium
 
 	return m.flex({
+		click = "double",
 		on_press = function()
 			state.open(problem)
 		end,
@@ -446,8 +449,8 @@ function M.open(problems)
 	end, { buf = true })
 
 	-- The marked row shows where the cursor is, so it only shows while typing.
-	M.filters_view = Markup.view(M.filters, { snap = true, hide_cursor = true, click = "double" })
-	M.list_view = Markup.view(M.list, { snap = true, hide_cursor = true, click = "double" })
+	M.filters_view = Markup.view(M.filters, { snap = true, hide_cursor = true })
+	M.list_view = Markup.view(M.list, { snap = true, hide_cursor = true })
 
 	local function set_filter(signal, value)
 		signal(value)

@@ -193,7 +193,7 @@ end)
 
 function M.render()
     if not M.view then
-        M.view = Markup.view(M.win, { snap = true, hide_cursor = true, click = "double" })
+        M.view = Markup.view(M.win, { snap = true, hide_cursor = true })
         M.view:on_commit(function()
             if M.win:valid() then
                 M.width(vim.api.nvim_win_get_width(M.win.win))

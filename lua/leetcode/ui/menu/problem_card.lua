@@ -63,6 +63,7 @@ return m.component(function(props)
 
     return kit.Card({
         width = props.width,
+        click = "double",
         on_press = props.on_press,
         on_hover = function(hovered)
             focus(hovered and 1 or 0)

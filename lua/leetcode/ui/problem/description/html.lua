@@ -37,6 +37,7 @@ M.Section = m.component(function(props)
 		border = "half",
 		m.block({
 			width = "fit",
+			click = "double",
 			on_press = function()
 				open(not open())
 			end,
@@ -261,6 +262,7 @@ local function render_link(b, node, attrs, ctx)
 	end
 
 	b:inline(m.inline({
+		click = "double",
 		on_press = function()
 			vim.ui.open(href)
 		end,

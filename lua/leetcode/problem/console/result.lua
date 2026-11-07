@@ -18,7 +18,7 @@ function M:new(console)
         win = console.problem.win,
         anchor = "SE",
     })
-    self.view = Markup.view(self.win, { click = "double" })
+    self.view = Markup.view(self.win)
 end
 
 function M:clear()

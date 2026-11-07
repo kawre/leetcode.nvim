@@ -64,6 +64,7 @@ return m.component(function(p)
     end
 
     return m.flex({
+        click = "double",
         on_press = press,
         on_hover = function(hovered)
             focus(hovered and 1 or 0)

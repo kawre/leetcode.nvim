@@ -659,7 +659,9 @@ T["clicks"]["leetcode presses on a double click everywhere"] = function()
 	open_browser(3)
 	child.lua([[
 		modes = {}
-		for view in pairs(Markup.views) do modes[#modes + 1] = view.click_mode end
+		for view in pairs(Markup.views) do
+			for _, mode in pairs(view.clicks) do modes[#modes + 1] = mode end
+		end
 	]])
 	eq(child.lua_get("#modes") > 0, true)
 	eq(child.lua_get("vim.tbl_count(vim.tbl_filter(function(mode) return mode ~= 'double' end, modes))"), 0)

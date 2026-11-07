@@ -35,6 +35,7 @@ local Cases = m.component(function(props)
 		local kind = failed and "error" or "ok"
 
 		return m.inline({
+			click = "double",
 			on_press = function()
 				active(i)
 			end,

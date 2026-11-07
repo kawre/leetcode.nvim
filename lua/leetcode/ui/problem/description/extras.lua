@@ -17,6 +17,7 @@ local function Hint(index, total, hint)
 	return m.block({
 		m.block({
 			width = "fit",
+			click = "double",
 			on_press = function()
 				open(not open())
 			end,
@@ -58,6 +59,7 @@ local function SimilarRow(props)
 	local hovered = m.signal(false)
 
 	return m.flex({
+		click = "double",
 		on_press = function()
 			Leet.cmd.open(props.problem)
 		end,

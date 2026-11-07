@@ -8,6 +8,7 @@ local Action = m.component(function(props)
 	m.use_key(props.lhs, props.press, { nowait = true })
 
 	return m.inline({
+		click = "double",
 		on_press = props.press,
 		on_hover = hovered,
 		white_space = "nowrap",

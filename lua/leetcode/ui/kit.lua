@@ -65,6 +65,7 @@ function M.HoverCard(props)
 
 	return M.Card(vim.tbl_extend("force", props, {
 		style = tint,
+		click = "double",
 		on_press = props.on_press or function() end,
 		on_hover = function(hovered)
 			focus(hovered and 1 or 0)

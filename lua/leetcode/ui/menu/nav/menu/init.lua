@@ -21,6 +21,7 @@ local function Continue(width)
         width = width,
         problem = item.problem,
         extra = recent.ago(item.time),
+        click = "double",
         on_press = function()
             require("leetcode.cmd").open(item.problem)
         end,
@@ -41,6 +42,7 @@ local function Today(width)
             width = width,
             problem = problem,
             extra = problem and problem.ac_rate and ("%.1f%% accepted"):format(problem.ac_rate),
+            click = "double",
             on_press = function()
                 require("leetcode.cmd").qot()
             end,

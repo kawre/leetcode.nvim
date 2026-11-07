@@ -14,6 +14,7 @@ local Stdout = m.component(function(props)
 	return m.block({
 		m.block({
 			width = "fit",
+			click = "double",
 			on_press = function()
 				expanded(not expanded())
 			end,
