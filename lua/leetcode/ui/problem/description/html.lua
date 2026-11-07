@@ -32,7 +32,6 @@ M.Section = m.component(function(props)
 	local open = props.open or m.signal(true)
 
 	return m.block({
-		margin_top = 1,
 		padding = { 0, 1 },
 		style = "leetcode_section",
 		border = "half",
@@ -144,11 +143,8 @@ function Builder:finish()
 	end
 
 	local result, section = {}, nil
-	for index, item in ipairs(self.items) do
-		local next_item = self.items[index + 1]
-		if item.gap and next_item and next_item.section then
-			-- Sections bring their own margin.
-		elseif item.section then
+	for _, item in ipairs(self.items) do
+		if item.section then
 			section = { title = item.section, hl = item.hl, body = {} }
 			result[#result + 1] = section
 		elseif section then

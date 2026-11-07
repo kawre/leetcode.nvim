@@ -272,6 +272,19 @@ T["description"]["renders lists with markers"] = function()
 	eq(description_has("2. Second"), true)
 end
 
+T["description"]["half cell edges are the only gap between sections"] = function()
+	run([[
+		open_problem()
+		rows = buffer_text(problem.description.win.buf)
+		for i, line in ipairs(rows) do
+			if line:find("See", 1, true) then after_text = rows[i + 1] end
+			if line:find("▀▀▀", 1, true) and not after_card then after_card = rows[i + 1] end
+		end
+	]])
+	eq(child.lua_get("after_text"), "")
+	eq(child.lua_get("after_card:find('▄', 1, true) ~= nil"), true)
+end
+
 T["extras"] = new_set()
 
 T["extras"]["follow the problem, all closed"] = function()

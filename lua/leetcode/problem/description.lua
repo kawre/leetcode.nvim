@@ -199,7 +199,6 @@ function M:content()
 			spacing = 1,
 			m.block({
 				html.parse(Leet.util.translate(q.content, q.translated_content)),
-				-- Sections bring their own margin.
 				sections,
 			}),
 		}),
