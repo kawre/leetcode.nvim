@@ -11,7 +11,7 @@ local Nav = m.component(function()
             Leet.menu.rows = 0
             Leet.menu.rows_enter = mounted or not Leet.menu.settled()
             mounted = true
-            return require("leetcode.ui.menu.nav." .. Leet.menu.page())()
+            return require("leetcode.ui.menu.nav." .. Leet.menu.home_page())()
         end,
     })
 end)

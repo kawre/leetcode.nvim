@@ -226,14 +226,160 @@ T["the row under the cursor is marked"] = function()
 	eq(child.lua_get("buffer_text(menu.win.buf)[row]:find('▌', 1, true) ~= nil"), true)
 end
 
-T["statistics shows solved progress"] = function()
+local function open_stats()
 	open(true)
 	child.type_keys("s")
 	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+end
+
+T["statistics"] = new_set()
+
+T["statistics"]["replace the dashboard"] = function()
+	open_stats()
 	eq(child.lua_get("menu.page()"), "menu.statistics")
-	eq(contains("30 / 300"), true)
-	eq(contains("20/100"), true)
+	eq(contains("Statistics"), true)
+	eq(contains("Fundamental"), true)
+	eq(contains("day streak"), false)
+end
+
+T["statistics"]["show skills by level, most solved first"] = function()
+	open(true)
+	child.lua([[
+		package.loaded["leetcode.api.stats"].skills = function(cb)
+			cb({
+				fundamental = { { tag = "Array", problems_solved = 2 }, { tag = "String", problems_solved = 9 } },
+				intermediate = {},
+				advanced = {},
+			})
+		end
+	]])
+	child.type_keys("s")
+	child.lua([[
+		vim.wait(50, function() reactive.flush(); return false end, 5)
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("String", 1, true) then string_row = i end
+			if line:find("Array", 1, true) then array_row = i end
+		end
+	]])
+	eq(child.lua_get("string_row < array_row"), true)
+	eq(contains("Nothing yet"), true)
+end
+
+T["statistics"]["count what does not fit"] = function()
+	open(true)
+	child.lua([[
+		local many = {}
+		for i = 1, 9 do many[i] = { tag = "Tag " .. i, problems_solved = 10 - i } end
+		package.loaded["leetcode.api.stats"].skills = function(cb)
+			cb({ fundamental = many, intermediate = {}, advanced = {} })
+		end
+	]])
+	child.type_keys("s")
+	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+	eq(contains("Tag 6"), true)
+	eq(contains("Tag 7"), false)
+	eq(contains("+3 more"), true)
+end
+
+T["statistics"]["show languages, most solved first"] = function()
+	open_stats()
 	eq(contains("Languages"), true)
+	child.lua([[
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("12", 1, true) and line:find("█", 1, true) then python = i end
+			if line:find("C++", 1, true) then cpp = i end
+		end
+	]])
+	eq(child.lua_get("python ~= nil and python < cpp"), true)
+end
+
+T["statistics"]["survive a user without languages"] = function()
+	open(true)
+	child.lua([[
+		package.loaded["leetcode.api.stats"].languages = function(cb) cb(vim.NIL) end
+	]])
+	child.type_keys("s")
+	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+	eq(contains("Nothing yet"), true)
+end
+
+T["statistics"]["q goes back to where the menu was"] = function()
+	open_stats()
+	child.type_keys("q")
+	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+	eq(child.lua_get("menu.page()"), "menu")
+	eq(contains("day streak"), true)
+	eq(contains("Fundamental"), false)
+	eq(contains("Problems"), true)
+end
+
+T["statistics"]["update fetches everything again"] = function()
+	open_stats()
+	child.lua("fetches = streak_fetches")
+	child.type_keys("u")
+	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+	eq(child.lua_get("streak_fetches > fetches"), true)
+end
+
+T["statistics"]["are fetched once, until updated"] = function()
+	open(true)
+	child.lua([[
+		fetched = 0
+		local stats = package.loaded["leetcode.api.stats"]
+		local skills = stats.skills
+		stats.skills = function(cb)
+			fetched = fetched + 1
+			skills(cb)
+		end
+		package.loaded["leetcode.ui.menu.data"].skills(nil)
+	]])
+
+	local function wait()
+		child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+	end
+
+	child.type_keys("s")
+	wait()
+	child.type_keys("q")
+	wait()
+	child.type_keys("s")
+	wait()
+	eq(child.lua_get("fetched"), 1)
+
+	child.type_keys("u")
+	wait()
+	eq(child.lua_get("fetched"), 2)
+end
+
+T["statistics"]["open no popups"] = function()
+	open(true)
+	child.lua("wins = #vim.api.nvim_list_wins()")
+	child.type_keys("s")
+	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+	eq(child.lua_get("#vim.api.nvim_list_wins()"), child.lua_get("wins"))
+end
+
+T["statistics"]["slide in and out"] = function()
+	open(true)
+	child.lua([[
+		Markup.animate.enabled = true
+		Markup.animate.manual = true
+	]])
+	child.type_keys("s")
+	child.lua([[
+		reactive.flush()
+		Markup.animate.tick(160)
+		reactive.flush()
+		reactive.flush()
+	]])
+	eq(child.lua_get("Markup.animate.running()"), true)
+	child.lua([[
+		Markup.animate.tick(3000)
+		reactive.flush()
+		reactive.flush()
+	]])
+	eq(contains("Fundamental"), true)
+	eq(contains("day streak"), false)
 end
 
 T["every module loads"] = function()

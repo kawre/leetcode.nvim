@@ -5,7 +5,7 @@ local names = { signin = "Welcome", loading = "Welcome" }
 
 return m.component(function()
     local function titles()
-        local page = Leet.menu.page()
+        local page = Leet.menu.home_page()
         local titles = {}
         local parts = vim.split(page, ".", { plain = true })
 

@@ -7,10 +7,16 @@ local Daily = require("leetcode.ui.menu.daily")
 local Heatmap = require("leetcode.ui.menu.heatmap")
 local solved = require("leetcode.ui.menu.solved")
 local data = require("leetcode.ui.menu.data")
+local Stats = require("leetcode.ui.menu.stats")
+
+--- The page that is not part of the navigation, but slides in beside it.
+local STATISTICS = "menu.statistics"
 
 ---@class leet.menu
 local M = {
     page = m.signal("loading"),
+    --- The page of the navigation, which stays put while statistics are open.
+    home_page = m.signal("loading"),
     stats_version = m.signal(0),
     width = m.signal(vim.o.columns),
     rows = 0,
@@ -27,6 +33,9 @@ Leet.menu = M
 
 ---@param page string
 function M.set_page(page)
+    if page ~= STATISTICS then
+        M.home_page(page)
+    end
     M.page(page)
 end
 
@@ -64,6 +73,7 @@ end
 --- Below this the dashboard stacks into one column, such as beside the browser.
 local WIDE = 80
 local WIDTH = 78
+local NARROW = 46
 
 local function Brand(width)
     return m.flex({
@@ -95,7 +105,6 @@ local Wide = m.component(function()
 
     return m.vflex({
         align = "center",
-        Brand(WIDTH),
         m.flex({
             margin_top = 1,
             width = WIDTH,
@@ -115,12 +124,9 @@ end)
 local Narrow = m.component(function()
     M.dashboards = M.dashboards + 1
 
-    local width = 46
-
     return m.vflex({
         align = "center",
-        Brand(width),
-        m.block({ margin_top = 1, width = width, Menu(width), solved.Solved({ width = width }) }),
+        m.block({ margin_top = 1, width = NARROW, Menu(NARROW), solved.Solved({ width = NARROW }) }),
     })
 end)
 
@@ -160,7 +166,28 @@ local App = m.component(function()
     return m.block({
         margin_top = math.max(math.floor((vim.o.lines - 30) / 2), 1),
         m.show(gated, Gate, function()
-            return m.show(wide, Wide, Narrow)
+            return m.block({
+                m.vflex({
+                    align = "center",
+                    function()
+                        return Brand(wide() and WIDTH or NARROW)
+                    end,
+                }),
+                m.slide(function()
+                    return M.page() == STATISTICS and "stats" or "home"
+                end, function(key)
+                    if key == "home" then
+                        return m.show(wide, Wide, Narrow)
+                    end
+                    return function()
+                        return Stats({ width = wide() and WIDTH or NARROW, columns = wide() })
+                    end
+                end, {
+                    forward = function(_, to)
+                        return to == "stats"
+                    end,
+                }),
+            })
         end),
     })
 end)

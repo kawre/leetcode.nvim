@@ -234,17 +234,6 @@ function cmd.q_submit()
 	end
 end
 
-function cmd.ui_skills()
-	if config.is_cn then
-		return
-	end
-	require("leetcode.ui.popup.skills"):show()
-end
-
-function cmd.ui_languages()
-	require("leetcode.ui.popup.languages"):show()
-end
-
 function cmd.current()
 	return Leet.util.curr_question()
 end

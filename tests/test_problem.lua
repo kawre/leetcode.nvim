@@ -989,30 +989,6 @@ T["console"]["keeps its keys when reopened"] = function()
 	eq(result_has("[3,3]"), true)
 end
 
-T["popups"] = new_set()
-
-T["popups"]["skills"] = function()
-	run([[
-		skills = require("leetcode.ui.popup.skills")
-		skills:show()
-		reactive.flush()
-	]])
-	eq(child.lua_get("contains(skills.win.buf, 'advanced')"), true)
-	eq(child.lua_get("contains(skills.win.buf, 'Dynamic Programming x5')"), true)
-end
-
-T["popups"]["languages sort by solved"] = function()
-	run([[
-		languages = require("leetcode.ui.popup.languages")
-		languages:show()
-		reactive.flush()
-		first = buffer_text(languages.win.buf)[2]
-	]])
-	eq(child.lua_get("first"):find("Python", 1, true) ~= nil, true)
-	eq(child.lua_get("contains(languages.win.buf, '12 problems solved')"), true)
-	eq(child.lua_get("contains(languages.win.buf, '1 problem solved')"), true)
-end
-
 T["dev"] = new_set()
 
 local function fetch(content, translated)
