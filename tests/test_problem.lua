@@ -886,7 +886,7 @@ T["console"] = new_set()
 local function show_result(item)
 	run(([[
 		open_problem()
-		problem.console:open()
+		problem.console:show("result")
 		reactive.flush()
 		item = %s
 		problem.console.testcase:snapshot("run1", { test_case = "[2,7]\n9\n[3,3]\n6" })
@@ -1062,7 +1062,7 @@ end
 T["console"]["shows the judge at work until the result"] = function()
 	run([[
 		open_problem()
-		problem.console:open()
+		problem.console:show("result")
 		problem.console.result:judging(true)
 		reactive.flush()
 	]])
@@ -1130,7 +1130,8 @@ T["console"]["keeps results and testcases when reopened"] = function()
 		reactive.flush()
 	]])
 	eq(result_has("Accepted"), true)
-	eq(child.lua_get("contains(problem.console.testcase.win.buf, '[2,7]')"), true)
+	run([[problem.console.tab("testcase"); reactive.flush()]])
+	eq(result_has("[2,7]"), true)
 end
 
 T["console"]["keeps its keys when reopened"] = function()
@@ -1145,6 +1146,121 @@ T["console"]["keeps its keys when reopened"] = function()
 	child.type_keys("2")
 	run("reactive.flush()")
 	eq(result_has("[3,3]"), true)
+end
+
+local function open_console()
+	run([[
+		open_problem()
+		problem.console:open()
+		reactive.flush()
+		vim.api.nvim_set_current_win(problem.console.win.win)
+	]])
+end
+
+local function console_has(text)
+	return child.lua_get(("contains(problem.console.win.buf, %q)"):format(text))
+end
+
+T["console"]["is one split below the editor"] = function()
+	open_console()
+	run([[
+		local editor, console = problem.win, problem.console.win.win
+		editor_pos, console_pos = vim.fn.win_screenpos(editor), vim.fn.win_screenpos(console)
+		floating = vim.api.nvim_win_get_config(console).relative ~= ""
+		same_width = vim.api.nvim_win_get_width(editor) == vim.api.nvim_win_get_width(console)
+		below = console_pos[1] > editor_pos[1] and console_pos[2] == editor_pos[2]
+	]])
+	eq(child.lua_get("floating"), false)
+	eq(child.lua_get("same_width"), true)
+	eq(child.lua_get("below"), true)
+end
+
+T["console"]["switches between testcases and results"] = function()
+	open_console()
+	eq(console_has("Testcase"), true)
+	eq(console_has("Result"), true)
+	eq(console_has("nums ="), true)
+
+	child.type_keys("<Tab>")
+	run("reactive.flush()")
+	eq(child.lua_get("problem.console.tab()"), "result")
+	eq(console_has("nums ="), false)
+	eq(console_has("Run your code"), true)
+
+	child.type_keys("<S-Tab>")
+	run("reactive.flush()")
+	eq(child.lua_get("problem.console.tab()"), "testcase")
+end
+
+T["console"]["running shows the results"] = function()
+	open_console()
+	run([[
+		require("leetcode.problem.runner").run = function() ran = true end
+		problem.console:run()
+		reactive.flush()
+	]])
+	eq(child.lua_get("ran"), true)
+	eq(child.lua_get("problem.console.tab()"), "result")
+end
+
+T["console"]["shows each parameter of a case"] = function()
+	open_console()
+	eq(console_has("Case 1"), true)
+	eq(console_has("Case 2"), true)
+	eq(console_has("target ="), true)
+	eq(console_has("[2,7]"), true)
+	eq(console_has("[3,3]"), false)
+
+	child.type_keys("2")
+	run("reactive.flush()")
+	eq(console_has("[3,3]"), true)
+	eq(console_has("[2,7]"), false)
+end
+
+T["console"]["adds, removes and resets cases"] = function()
+	open_console()
+	child.type_keys("2", "a")
+	run("reactive.flush()")
+	eq(console_has("Case 3"), true)
+	eq(child.lua_get("problem.console.testcase.selected()"), 3)
+	-- A new case starts from the one shown.
+	eq(child.lua_get("problem.console.testcase.cases()[3]"), { "[3,3]", "6" })
+
+	child.type_keys("d", "d", "d", "d")
+	run("reactive.flush()")
+	-- One always stays.
+	eq(child.lua_get("#problem.console.testcase.cases()"), 1)
+
+	child.type_keys("r")
+	run("reactive.flush()")
+	eq(child.lua_get("#problem.console.testcase.cases()"), 2)
+end
+
+T["console"]["types a value over its field"] = function()
+	open_console()
+	run([[
+		problem.console.testcase:edit(2)
+		reactive.flush()
+		input = vim.api.nvim_get_current_win()
+		floating = vim.api.nvim_win_get_config(input).relative == "win"
+		-- Over the field, on the row of its value.
+		local row = vim.api.nvim_win_get_config(input).row
+		over = vim.api.nvim_buf_get_lines(problem.console.win.buf, row, row + 1, false)[1]
+		typing = problem.console.typing()
+		vim.api.nvim_buf_set_lines(0, 0, -1, false, { "42" })
+		vim.cmd("doautocmd TextChanged")
+		vim.cmd("stopinsert")
+	]])
+	eq(child.lua_get("floating"), true)
+	eq(child.lua_get("over"):find("9", 1, true) ~= nil, true)
+	eq(child.lua_get("typing"), 2)
+
+	child.type_keys("<Esc>")
+	run("reactive.flush()")
+	eq(child.lua_get("vim.api.nvim_win_is_valid(input)"), false)
+	eq(child.lua_get("vim.api.nvim_get_current_win() == problem.console.win.win"), true)
+	eq(console_has("42"), true)
+	eq(child.lua_get("problem.console.testcase:content()"), "[2,7]\n42\n[3,3]\n6")
 end
 
 T["dev"] = new_set()

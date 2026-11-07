@@ -156,6 +156,7 @@ M.get = function()
         -- buttons
         tab = { fg = muted, bg = surface },
         tab_active = { fg = bg, bg = accent, bold = true },
+        tab_hover = { fg = fg, bg = raised },
         tab_ok = { fg = ok, bg = surface },
         tab_error = { fg = err, bg = surface },
         tab_ok_active = { fg = bg, bg = ok, bold = true },

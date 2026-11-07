@@ -1,48 +1,67 @@
+local m = require("markup")
 local Result = require("leetcode.problem.console.result")
 local Testcase = require("leetcode.problem.console.testcase")
 local Runner = require("leetcode.problem.runner")
+local Panel = require("leetcode.ui.problem.console")
 
+--- How much of the editor the console takes, below it.
+local HEIGHT = 0.35
+
+--- A split below the editor with two tabs: the testcases to run, and what the
+--- last run or submission came to.
 ---@class leet.problem.console
+---@field problem leet.problem
+---@field win markup.window
+---@field view markup.view
 ---@field result leet.problem.console.result
 ---@field testcase leet.problem.console.testcase
+---@field tab markup.reactive.signal "testcase"|"result"
+---@field typing markup.reactive.signal integer? the parameter being typed
 local M = Markup.object()
 
 ---@param problem leet.problem
 function M:new(problem)
 	self.problem = problem
+	self.tab = m.signal("testcase")
+	self.typing = m.signal(nil)
 
-	self.result = Result(self)
+	self.win = Markup.window({
+		position = "bottom",
+		relative = "win",
+		win = problem.win,
+		height = HEIGHT,
+		enter = false,
+		show = false,
+		focusable = true,
+		minimal = true,
+		bo = { filetype = Leet.config.name },
+		wo = { winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder" },
+	})
+	self.view = Markup.view(self.win, { snap = true, hide_cursor = true })
+
 	self.testcase = Testcase(self)
+	self.result = Result(self)
 
+	self.view:render(Panel({ console = self }))
 end
 
---- Splits cannot be hidden, so the layout is rebuilt each time it opens.
 function M:open()
 	if self:is_open() then
 		return
 	end
-
-	self.layout = Markup.layout({
-		wins = {
-			["result"] = self.result.win,
-			["testcase"] = self.testcase.win,
-		},
-		show = false,
-		layout = {
-			box = "horizontal",
-			focusable = true,
-			position = "bottom",
-			height = 0.3,
-			{ win = "testcase", width = 0.4 },
-			{ win = "result" },
-		},
-	})
-	self.layout:show()
+	self.win:show()
 end
 
 ---@return boolean
 function M:is_open()
-	return self.layout ~= nil and self.layout:valid()
+	return self.win:valid() == true
+end
+
+--- Opens the console on a tab.
+---@param tab "testcase"|"result"
+function M:show(tab)
+	self.tab(tab)
+	self:open()
 end
 
 function M:run(submit)
@@ -51,11 +70,13 @@ function M:run(submit)
 		return
 	end
 
+	self.tab("result")
 	if Leet.config.user.console.open_on_runcode then
 		self:open()
 	end
-
-	self.result.win:focus()
+	if self:is_open() then
+		self.win:focus()
+	end
 
 	Runner.run(self.problem, submit)
 end
@@ -70,10 +91,7 @@ end
 
 function M:close()
 	if self:is_open() then
-		-- Plain closing keeps the keymaps and events of the windows.
-		self.result.win:close()
-		self.testcase.win:close()
-		self.layout:close({ wins = false })
+		self.win:close()
 	end
 end
 

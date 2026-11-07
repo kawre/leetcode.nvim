@@ -2,35 +2,40 @@ local m = require("markup")
 local Result = require("leetcode.ui.problem.result")
 local Judging = require("leetcode.ui.problem.result.judging")
 
+--- What the result tab of the console shows: nothing yet, the judge at work, or
+--- what it decided. The console draws it.
 ---@class leet.problem.console.result
+---@field console leet.problem.console
+---@field win markup.window the console's
+---@field view markup.view the console's
 ---@overload fun(): leet.problem.console.result
 local M = Markup.object()
 
 ---@param console leet.problem.console
 function M:new(console)
     self.console = console
-    self.win = Markup.window({
-        box = "horizontal",
-        title = "Results",
-        border = "rounded",
-        show = false,
-        relative = "win",
-        win = console.problem.win,
-        anchor = "SE",
-    })
-    self.view = Markup.view(self.win)
+    self.win = console.win
+    self.view = console.view
+    --- `{ render = fun(): element }`, or nil before the first run. A table, as a
+    --- signal given a function would call it to update its value.
+    self.content = m.signal(nil)
 end
 
 function M:clear()
     self.state = nil
-    self.view:render(nil)
+    self.content(nil)
 end
 
 --- Shows the progress of the judge, until a result replaces it.
 ---@param submit boolean
 function M:judging(submit)
-    self.state = m.signal("PENDING")
-    self.view:render(Judging({ state = self.state, submit = submit }))
+    local state = m.signal("PENDING")
+    self.state = state
+    self.content({
+        render = function()
+            return Judging({ state = state, submit = submit })
+        end,
+    })
 end
 
 ---@param state string
@@ -44,7 +49,11 @@ end
 function M:handle(item)
     self.state = nil
     item._.params = self.console.problem.problem.meta_data.params
-    self.view:render(Result({ item = item, console = self.console }))
+    self.content({
+        render = function()
+            return Result({ item = item, console = self.console })
+        end,
+    })
 
     if item._.submission then
         local accepted = item.status_code == 10
