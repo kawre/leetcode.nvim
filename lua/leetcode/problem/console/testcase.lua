@@ -33,13 +33,14 @@ end
 ---@return string path, boolean existed
 function M:path()
     local fn = self.console.problem:filename("txt")
-    vim.fn.mkdir(Leet.config.storage.home .. "/testcase", "p")
-    self.file = Leet.config.storage.home:joinpath("testcase/" .. fn)
-    local existed = self.file:exists()
+    local dir = vim.fs.joinpath(Leet.config.storage.home, "testcase")
+    vim.fn.mkdir(dir, "p")
+    self.file = vim.fs.joinpath(dir, fn)
+    local existed = vim.uv.fs_stat(self.file) ~= nil
 
-    self.file:write(self:build_lines(), "w")
+    Leet.util.write_file(self.file, self:build_lines())
 
-    return self.file:absolute(), existed
+    return self.file, existed
 end
 
 function M:build_lines()

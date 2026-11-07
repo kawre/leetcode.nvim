@@ -1,7 +1,6 @@
 local Cookie = require("leetcode.cache.cookie")
 local config = require("leetcode.config")
 local urls = require("leetcode.api.urls")
-local curl = require("plenary.curl")
 
 ---@alias leet.api.method
 ---| fun(endpoint: string, opts?: table)
@@ -73,7 +72,7 @@ local function handle_res(out)
 	if out.exit ~= 0 then
 		err = {
 			code = out.exit,
-			msg = "curl failed",
+			msg = "curl failed" .. (out.stderr and out.stderr ~= "" and (": " .. vim.trim(out.stderr)) or ""),
 		}
 	elseif out.status >= 300 then
 		local ok, msg = pcall(function()
@@ -106,6 +105,54 @@ local function handle_res(out)
 	return res, check_err(err)
 end
 
+---@class leet.api.response
+---@field exit integer exit code of curl
+---@field status integer http status, 0 when there was no response
+---@field body string
+---@field stderr? string
+
+--- What curl printed: the body, then the status on a line of its own.
+---@param proc vim.SystemCompleted
+---@return leet.api.response
+local function parse(proc)
+	local stdout = proc.stdout or ""
+	local body, status = stdout:match("^(.*)\n(%d+)$")
+	return {
+		exit = proc.code,
+		status = tonumber(status) or 0,
+		body = body or stdout,
+		stderr = proc.stderr,
+	}
+end
+
+--- Runs curl, waiting for it without `done`.
+---@param method string
+---@param url string
+---@param params { headers: table<string, string>, body?: string }
+---@param done? fun(out: leet.api.response)
+---@return leet.api.response?
+function M.request(method, url, params, done)
+	local args = { "curl", "--silent", "--show-error", "--location", "--request", method:upper() }
+	for name, value in pairs(params.headers) do
+		vim.list_extend(args, { "--header", ("%s: %s"):format(name, value) })
+	end
+
+	-- The body goes through stdin, so no file is needed and nothing lands in argv.
+	if params.body then
+		vim.list_extend(args, { "--data-binary", "@-" })
+	end
+	vim.list_extend(args, { "--write-out", "\n%{http_code}", url })
+
+	local opts = { text = true, stdin = params.body }
+	if done then
+		vim.system(args, opts, vim.schedule_wrap(function(proc)
+			done(parse(proc))
+		end))
+	else
+		return parse(vim.system(args, opts):wait())
+	end
+end
+
 ---@private
 ---@param method string
 ---@param params table
@@ -114,7 +161,6 @@ function M.curl(method, params)
 
 	params = vim.tbl_deep_extend("force", {
 		headers = headers(),
-		compressed = false,
 		retry = 5,
 		endpoint = urls.base,
 	}, params or {})
@@ -126,12 +172,13 @@ function M.curl(method, params)
 
 	local tries = params.retry
 	local function should_retry(err)
-		return err and err.status >= 500 and tries > 0
+		-- Without a response there is no status, and nothing to retry for.
+		return err and (err.status or 0) >= 500 and tries > 0
 	end
 
 	if params.callback then
-		local cb = vim.schedule_wrap(params.callback)
-		params.callback = function(out, _)
+		local cb = params.callback
+		M.request(method, url, params, function(out)
 			local res, err = handle_res(out)
 
 			if should_retry(err) then
@@ -141,20 +188,17 @@ function M.curl(method, params)
 			else
 				cb(res, err)
 			end
-		end
-
-		curl[method](url, params)
+		end)
 	else
-		local out = curl[method](url, params)
+		local out = M.request(method, url, params)
 		local res, err = handle_res(out)
 
 		if should_retry(err) then
 			Markup.log.debug("retry " .. tries)
 			params_cpy.retry = tries - 1
-			M.curl(method, params_cpy)
-		else
-			return res, err
+			return M.curl(method, params_cpy)
 		end
+		return res, err
 	end
 end
 

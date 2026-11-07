@@ -77,7 +77,7 @@ end
 
 ---@param submit boolean
 ---@param problem leet.problem
----@param body lc.Interpret.body|string
+---@param body lc.Interpret.body
 ---@param callback function
 function interpreter.run(submit, problem, body, callback)
 	local url = (submit and urls.submit or urls.interpret):format(problem.problem.title_slug)

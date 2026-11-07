@@ -1,12 +1,12 @@
-local path = require("plenary.path")
 local problems_api = require("leetcode.api.problems")
 
 local log = require("leetcode.logger")
 local config = require("leetcode.config")
 local interval = config.user.cache.update_interval
 
----@type Path
-local file = config.storage.cache:joinpath(("problemlist%s"):format(config.is_cn and "_cn" or ""))
+local util = require("leetcode.util")
+
+local file = vim.fs.joinpath(config.storage.cache, ("problemlist%s"):format(config.is_cn and "_cn" or ""))
 
 ---@type { at: integer, payload: lc.cache.payload }
 local hist = nil
@@ -34,7 +34,7 @@ end
 
 ---@return lc.cache.payload
 function M.read()
-    if not file:exists() then
+    if not vim.uv.fs_stat(file) then
         return M.populate()
     end
 
@@ -43,7 +43,7 @@ function M.read()
         return hist.payload
     end
 
-    local contents = file:read()
+    local contents = util.read_file(file)
     if not contents or type(contents) ~= "string" then
         return M.populate()
     end
@@ -107,7 +107,7 @@ function M.write(payload)
         payload.data = M.get()
     end
 
-    file:write(vim.json.encode(payload), "w")
+    util.write_file(file, vim.json.encode(payload))
     hist = { at = os.time(), payload = payload }
 end
 
@@ -136,10 +136,10 @@ M.change_status = vim.schedule_wrap(function(title_slug, status)
 end)
 
 function M.delete()
-    if not file:exists() then
+    if not vim.uv.fs_stat(file) then
         return false
     end
-    return pcall(path.rm, file)
+    return pcall(vim.fs.rm, file)
 end
 
 return M

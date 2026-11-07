@@ -135,14 +135,14 @@ end
 ---@return string path, boolean existed
 function M:path()
     local fn = self:filename()
-    self.file = config.storage.home:joinpath(fn)
-    local existed = self.file:exists()
+    self.file = vim.fs.joinpath(config.storage.home, fn)
+    local existed = vim.uv.fs_stat(self.file) ~= nil
 
     if not existed then
-        self.file:write(self:snippet() or "", "w")
+        Leet.util.write_file(self.file, self:snippet() or "")
     end
 
-    return self.file:absolute(), existed
+    return self.file, existed
 end
 
 ---@param raw? boolean

@@ -1,8 +1,7 @@
-local path = require("plenary.path")
-
 local config = require("leetcode.config")
----@type Path
-local file = config.storage.cache:joinpath(("cookie%s"):format(config.is_cn and "_cn" or ""))
+local util = require("leetcode.util")
+
+local file = vim.fs.joinpath(config.storage.cache, ("cookie%s"):format(config.is_cn and "_cn" or ""))
 
 local hist = {}
 
@@ -22,7 +21,7 @@ function M.set(str)
         return cerr
     end
 
-    file:write(str, "w")
+    util.write_file(file, str)
     local auth_api = require("leetcode.api.auth")
     local _, aerr = auth_api.user()
 
@@ -33,15 +32,15 @@ end
 
 ---@return boolean
 function M.delete()
-    if not file:exists() then
+    if not vim.uv.fs_stat(file) then
         return false
     end
-    return pcall(path.rm, file)
+    return pcall(vim.fs.rm, file)
 end
 
 ---@return string|nil
 function M.read()
-    local contents = file:read()
+    local contents = util.read_file(file)
 
     if not contents or type(contents) ~= "string" then
         return
@@ -52,12 +51,12 @@ end
 
 ---@return lc.cache.Cookie | nil
 function M.get()
-    if not file:exists() then
+    local stat = vim.uv.fs_stat(file)
+    if not stat then
         return
     end
 
-    local fstats = file:_stat()
-    local ftime = fstats.mtime.sec
+    local ftime = stat.mtime.sec
 
     local hcookie = hist[ftime]
     if hcookie then

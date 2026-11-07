@@ -14,7 +14,7 @@ local M = {}
 --- The newest file of each problem.
 ---@return table<string, { time: integer, ext: string }>
 local function solutions()
-	local home = config.storage.home:absolute()
+	local home = config.storage.home
 	local newest = {}
 
 	for name, kind in vim.fs.dir(home) do

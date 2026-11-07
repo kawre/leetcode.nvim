@@ -45,7 +45,7 @@ end
 T["recent"]["keeps the newest file of a problem"] = function()
 	child.lua([[
 		_G.cached_problems = { { title = "Two Sum", title_slug = "two-sum", frontend_id = "1" } }
-		local home = require("leetcode.config").storage.home:absolute()
+		local home = require("leetcode.config").storage.home
 		for ext, age in pairs({ py = 100, cpp = 5 }) do
 			local path = home .. "/1.two-sum." .. ext
 			vim.fn.writefile({ "x" }, path)
@@ -60,7 +60,7 @@ end
 T["recent"]["finds solutions with a language in their name"] = function()
 	child.lua([[
 		_G.cached_problems = { { title = "Two Sum", title_slug = "two-sum", frontend_id = "1" } }
-		local home = require("leetcode.config").storage.home:absolute()
+		local home = require("leetcode.config").storage.home
 		vim.fn.writefile({ "x" }, home .. "/1.two-sum.python2.py")
 		items = require("leetcode.ui.menu.recent").list(5)
 	]])
@@ -71,7 +71,7 @@ end
 T["recent"]["skips files that are not solutions"] = function()
 	child.lua([[
 		_G.cached_problems = { { title = "Two Sum", title_slug = "two-sum", frontend_id = "1" } }
-		local home = require("leetcode.config").storage.home:absolute()
+		local home = require("leetcode.config").storage.home
 		vim.fn.writefile({ "x" }, home .. "/notes.md")
 		vim.fn.writefile({ "x" }, home .. "/9.unknown-problem.py")
 		items = require("leetcode.ui.menu.recent").list(5)

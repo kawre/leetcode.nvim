@@ -46,6 +46,21 @@ function M.curr_question()
 end
 
 ---@return lc.language
+--- Contents of a file, or nil when it cannot be read.
+---@param path string
+---@return string?
+function M.read_file(path)
+	local ok, lines = pcall(vim.fn.readfile, path)
+	return ok and table.concat(lines, "\n") or nil
+end
+
+---@param path string
+---@param text string
+function M.write_file(path, text)
+	vim.fn.writefile(vim.split(text, "\n", { plain = true }), path)
+end
+
+---@param slug string
 function M.get_lang(slug)
 	---@param l lc.language
 	return vim.tbl_filter(function(l)

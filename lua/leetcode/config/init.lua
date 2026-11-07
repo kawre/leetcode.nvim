@@ -1,5 +1,4 @@
 local template = require("leetcode.config.template")
-local P = require("plenary.path")
 
 local lazy_plugs = {}
 
@@ -14,7 +13,7 @@ local config = {
 	debug = false,
 	lang = "cpp",
 	version = "1.0.1",
-	storage = {}, ---@type table<string, Path>
+	storage = {}, ---@type { home: string, cache: string } absolute paths
 	theme = {}, ---@type lc.highlights
 	plugins = {},
 
@@ -54,11 +53,11 @@ function config.setup()
 	config.debug = config.user.debug or false ---@diagnostic disable-line
 	config.lang = config.user.lang
 
-	config.storage.home = P:new(config.user.storage.home) ---@diagnostic disable-line
-	config.storage.home:mkdir()
-
-	config.storage.cache = P:new(config.user.storage.cache) ---@diagnostic disable-line
-	config.storage.cache:mkdir()
+	for _, name in ipairs({ "home", "cache" }) do
+		local dir = vim.fs.abspath(config.user.storage[name])
+		vim.fn.mkdir(dir, "p")
+		config.storage[name] = dir
+	end
 
 	for _, plug_load_fn in ipairs(lazy_plugs) do
 		plug_load_fn()
@@ -68,7 +67,7 @@ end
 function config.validate()
 	local utils = require("leetcode.util")
 
-	assert(vim.fn.has("nvim-0.9.0") == 1, "Neovim >= 0.9.0 required")
+	assert(vim.fn.has("nvim-0.11.0") == 1, "Neovim >= 0.11.0 required")
 
 	if not utils.get_lang(config.lang) then
 		---@type lc.lang[]

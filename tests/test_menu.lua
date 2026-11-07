@@ -261,7 +261,7 @@ T["problems"] = new_set()
 local function worked_on(problems)
 	child.lua(([[
 		_G.cached_problems = %s
-		local home = require("leetcode.config").storage.home:absolute()
+		local home = require("leetcode.config").storage.home
 		for i, problem in ipairs(_G.cached_problems) do
 			local path = ("%%s/%%s.%%s.py"):format(home, problem.frontend_id, problem.title_slug)
 			vim.fn.writefile({ "x" }, path)

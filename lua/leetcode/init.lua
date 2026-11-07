@@ -117,7 +117,7 @@ function M.start(on_vimenter)
 	config.setup()
 	M.setup_globals()
 
-	vim.api.nvim_set_current_dir(config.storage.home:absolute())
+	vim.api.nvim_set_current_dir(config.storage.home)
 
 	M.setup_cmds()
 

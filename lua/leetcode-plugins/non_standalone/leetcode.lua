@@ -32,7 +32,7 @@ leetcode.start = function(on_vimenter)
         is_standalone = standalone ---@diagnostic disable-line: cast-local-type
     end
 
-    vim.api.nvim_set_current_dir(config.storage.home:absolute())
+    vim.api.nvim_set_current_dir(config.storage.home)
 
     local menu = require("leetcode.ui.menu")
     menu.win.buf = vim.api.nvim_get_current_buf()
