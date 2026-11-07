@@ -46,6 +46,40 @@ local function topics(problem)
 	end, problem.topic_tags or {})
 end
 
+--- The key that presses things, as it reads on screen.
+---@return string
+local function confirm_key()
+	local lhs = vim.iter({ config.user.keys.confirm }):flatten():next()
+	return lhs == "<CR>" and "⏎" or lhs
+end
+
+--- A similar problem, which says how to open it when the cursor is on it.
+local function SimilarRow(props)
+	local hovered = m.signal(false)
+
+	return m.flex({
+		on_press = function()
+			Leet.cmd.open(props.problem)
+		end,
+		on_hover = hovered,
+		style = function()
+			return hovered() and "leetcode_row_active" or nil
+		end,
+		justify = "between",
+		white_space = "nowrap",
+		m.inline({ shrink = 1, props.children }),
+		m.show(hovered, function()
+			return m.inline({
+				shrink = 0,
+				margin_left = 2,
+				margin_right = 1,
+				m.inline(confirm_key(), "leetcode_key"),
+				m.inline(" " .. t("open"), "leetcode_muted"),
+			})
+		end),
+	})
+end
+
 local function similar(problem)
 	local cache = require("leetcode.cache.problems")
 	local rows = {}
@@ -59,15 +93,14 @@ local function similar(problem)
 					or ((" %s "):format(config.icons.lock) .. t("Premium"))
 			end
 
-			rows[#rows + 1] = m.block({
-				width = "fit",
-				on_press = function()
-					Leet.cmd.open(p)
-				end,
-				m.inline(config.icons.square .. " ", ui.diff_to_hl(p.difficulty)),
-				m.inline(p.frontend_id .. ". ", "leetcode_normal"),
-				m.inline(Leet.util.translate(p.title, p.title_cn)),
-				premium and m.inline(premium, "leetcode_medium"),
+			rows[#rows + 1] = SimilarRow({
+				problem = p,
+				children = {
+					m.inline(config.icons.square .. " ", ui.diff_to_hl(p.difficulty)),
+					m.inline(p.frontend_id .. ". ", "leetcode_normal"),
+					m.inline(Leet.util.translate(p.title, p.title_cn)),
+					premium and m.inline(premium, "leetcode_medium"),
+				},
 			})
 		end
 	end

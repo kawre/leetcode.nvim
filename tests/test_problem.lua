@@ -495,6 +495,43 @@ T["extras"]["similar problems open"] = function()
 	eq(child.lua_get("opened"), "3sum")
 end
 
+local function hover_similar()
+	run([[
+		open_problem()
+	]])
+	press("Similar Questions")
+	run([[
+		vim.api.nvim_set_current_win(problem.description.win.win)
+		for i, line in ipairs(buffer_text(problem.description.win.buf)) do
+			local col = line:find("3Sum", 1, true)
+			if col then
+				row = i
+				vim.api.nvim_win_set_cursor(0, { i, col })
+			end
+		end
+		vim.api.nvim_exec_autocmds("CursorMoved", { buffer = problem.description.win.buf })
+		reactive.flush()
+	]])
+end
+
+T["extras"]["similar problems say how to open them"] = function()
+	hover_similar()
+	eq(description_has("⏎ open"), true)
+
+	run([[
+		vim.api.nvim_win_set_cursor(0, { 1, 0 })
+		vim.api.nvim_exec_autocmds("CursorMoved", { buffer = problem.description.win.buf })
+		reactive.flush()
+	]])
+	eq(description_has("⏎ open"), false)
+end
+
+T["extras"]["the hint follows the confirm key"] = function()
+	run([[Leet.config.user.keys.confirm = { "o", "<CR>" }]])
+	hover_similar()
+	eq(description_has("o open"), true)
+end
+
 T["extras"]["leet hints jumps to them"] = function()
 	run([[
 		open_problem()
