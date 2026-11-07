@@ -302,7 +302,7 @@ local function render_list(b, node, tag, ctx)
 		end
 	end
 
-	b:element(m.block({ padding_left = 2, items }))
+	b:element(m.block(items))
 end
 
 local function render_pre(b, node, ctx)

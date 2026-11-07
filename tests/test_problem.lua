@@ -62,8 +62,54 @@ T["description"]["pins the header in a band"] = function()
 	eq(header_has("1. Two Sum"), true)
 	eq(header_has("100"), true)
 	eq(description_has("1. Two Sum"), false)
-	eq(header_has("▄▄▄"), true)
-	eq(header_has("▀▀▀"), true)
+	eq(header_has("▄▄▄"), false)
+	eq(header_has("▀▀▀"), false)
+end
+
+local function hint_has(text)
+	return child.lua_get(("contains(problem.description.view.fixed[2].win.buf, %q)"):format(text))
+end
+
+local function scroll_description(top)
+	run(([[
+		local description = problem.description
+		vim.api.nvim_win_call(description.win.win, function()
+			vim.api.nvim_win_set_cursor(0, { %d, 0 })
+			vim.cmd("normal! zt")
+		end)
+		description.view:update_scroll()
+		reactive.flush()
+		reactive.flush()
+	]]):format(top))
+end
+
+T["description"]["says when text is hidden above"] = function()
+	run("open_problem()")
+	run([[vim.api.nvim_win_set_height(problem.description.win.win, 8)]])
+	eq(child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[2].win.win).hide"), true)
+
+	-- Rows: the header, then a blank one, and then the text.
+	scroll_description(4)
+	eq(hint_has("── 3+ ──"), true)
+	eq(child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[2].win.win).hide"), false)
+
+	scroll_description(1)
+	eq(child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[2].win.win).hide"), true)
+end
+
+T["description"]["blank rows alone do not count as hidden"] = function()
+	run("open_problem()")
+	scroll_description(2)
+	eq(hint_has("── 1+ ──"), true)
+end
+
+T["description"]["the hint does not move the text"] = function()
+	run([[
+		open_problem()
+		before = buffer_text(problem.description.win.buf)
+	]])
+	scroll_description(4)
+	eq(child.lua_get("buffer_text(problem.description.win.buf)"), child.lua_get("before"))
 end
 
 T["description"]["the band has its own color"] = function()
@@ -220,6 +266,42 @@ T["description"]["renders lists with markers"] = function()
 	eq(description_has("* 2 <= nums.length <= 10^4"), true)
 	eq(description_has("1. First"), true)
 	eq(description_has("2. Second"), true)
+end
+
+T["description"]["lists start at the margin of their section"] = function()
+	run([[
+		open_problem()
+		local function column(line, text)
+			local start = line:find(text, 1, true)
+			return start and vim.fn.strdisplaywidth(line:sub(1, start - 1))
+		end
+
+		for _, line in ipairs(buffer_text(problem.description.win.buf)) do
+			title_col = title_col or column(line, "Constraints")
+			marker_col = marker_col or column(line, "* 2 <=")
+			order_col = order_col or column(line, "1. First")
+		end
+	]])
+	eq(child.lua_get("marker_col"), child.lua_get("title_col"))
+	eq(child.lua_get("order_col"), child.lua_get("title_col"))
+end
+
+T["description"]["nested lists step in under their parent"] = function()
+	run([[
+		local html = require("leetcode.ui.problem.description.html")
+		local win = Markup.window({ position = "float", width = 40, height = 10, enter = false })
+		local view = Markup.view(win)
+		view:render(m.block(html.parse("<ul><li>outer<ul><li>inner</li></ul></li></ul>")))
+		reactive.flush()
+		rows = buffer_text(win.buf)
+	]])
+	local rows = child.lua_get("rows")
+	local outer, inner
+	for _, row in ipairs(rows) do
+		outer = outer or row:find("* outer", 1, true)
+		inner = inner or row:find("* inner", 1, true)
+	end
+	eq(inner, outer + 2)
 end
 
 T["description"]["list items wrap with a hanging indent"] = function()

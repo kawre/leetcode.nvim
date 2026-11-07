@@ -120,7 +120,6 @@ function M:header()
 		position = "fixed",
 		top = 0,
 		style = "leetcode_description_header",
-		border = "half",
 		padding = { 0, 2 },
 		m.flex({
 			justify = "between",
@@ -136,10 +135,54 @@ function M:header()
 	})
 end
 
+--- Lines of text out of sight above the header. The row of the indicator counts,
+--- since it covers a line too, and rows without text do not.
+---@return integer
+function M:hidden_lines()
+	local top = self.view:scroll()
+	if top == 0 or not self.win:valid() then
+		return 0
+	end
+
+	local header = self.view.fixed[1] and self.view.fixed[1].height or 0
+	local lines = vim.api.nvim_buf_get_lines(self.win.buf, header, top + header + 1, false)
+
+	local count = 0
+	for _, line in ipairs(lines) do
+		if line:gsub("[▄▀]", ""):find("%S") then
+			count = count + 1
+		end
+	end
+	return count
+end
+
+--- Tells that there is more above, under the header.
+function M:scroll_hint()
+	local hidden = m.memo(function()
+		return self:hidden_lines()
+	end)
+
+	return m.block({
+		position = "fixed",
+		overlay = true,
+		m.show(function()
+			return hidden() > 0
+		end, function()
+			return m.flex({
+				justify = "center",
+				m.inline(function()
+					return ("── %d+ ──"):format(hidden())
+				end, "leetcode_muted"),
+			})
+		end),
+	})
+end
+
 function M:content()
 	local q = self.problem.problem
 	return m.block({
 		self:header(),
+		self:scroll_hint(),
 		m.vflex({
 			padding = { 1, 2 },
 			spacing = 1,
