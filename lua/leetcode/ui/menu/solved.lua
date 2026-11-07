@@ -59,7 +59,7 @@ local function Row(difficulty, index)
 	end)
 	local solved = kit.counter(function()
 		return stat().solved
-	end, { delay = delay })
+	end, { delay = delay, instant = Leet.menu.settled() })
 
 	return m.flex({
 		justify = "between",
@@ -68,6 +68,7 @@ local function Row(difficulty, index)
 		kit.Bar({
 			width = BAR_WIDTH,
 			delay = delay,
+			instant = Leet.menu.settled(),
 			style = "leetcode_bar_" .. difficulty:lower(),
 			value = function()
 				local current = stat()
@@ -94,7 +95,7 @@ M.Solved = m.component(function(props)
 
 	local total = kit.counter(function()
 		return stat_of("All").solved
-	end)
+	end, { instant = Leet.menu.settled() })
 
 	return kit.Card({
 		width = props.width,

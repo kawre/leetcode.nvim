@@ -111,6 +111,34 @@ T["enter presses the button under the cursor"] = function()
 	eq(child.lua_get("menu.page()"), "menu.statistics")
 end
 
+T["reflowing keeps the data and skips the intro"] = function()
+	open(true)
+	child.lua([[
+		Markup.animate.enabled = true
+		Markup.animate.manual = true
+		fetches = streak_fetches
+		vim.cmd("vnew")
+		vim.api.nvim_win_set_width(menu.win.win, 60)
+		menu.view:request_commit()
+		reactive.flush()
+		reactive.flush()
+	]])
+	eq(contains("Solved"), true)
+	eq(child.lua_get("streak_fetches"), child.lua_get("fetches"))
+	eq(child.lua_get("Markup.animate.running()"), false)
+end
+
+T["a new page still makes an entrance"] = function()
+	open(true)
+	child.lua([[
+		Markup.animate.enabled = true
+		Markup.animate.manual = true
+	]])
+	child.type_keys("p")
+	child.lua("reactive.flush()")
+	eq(child.lua_get("Markup.animate.running()"), true)
+end
+
 T["the cursor only stops on buttons"] = function()
 	open(true)
 	child.lua([[

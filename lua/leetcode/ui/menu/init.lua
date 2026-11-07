@@ -6,6 +6,7 @@ local Streak = require("leetcode.ui.menu.streak")
 local Daily = require("leetcode.ui.menu.daily")
 local Heatmap = require("leetcode.ui.menu.heatmap")
 local solved = require("leetcode.ui.menu.solved")
+local data = require("leetcode.ui.menu.data")
 
 ---@class leet.menu
 local M = {
@@ -13,6 +14,8 @@ local M = {
     stats_version = m.signal(0),
     width = m.signal(vim.o.columns),
     rows = 0,
+    rows_enter = true,
+    dashboards = 0,
     win = Markup.window({
         position = "current",
         hijack = true,
@@ -25,6 +28,13 @@ Leet.menu = M
 ---@param page string
 function M.set_page(page)
     M.page(page)
+end
+
+--- Whether the dashboard already played its intro. Reflowing mounts it again,
+--- and that should not look like opening it for the first time.
+---@return boolean
+function M.settled()
+    return M.dashboards > 1
 end
 
 --- Fetches the stats shown around the menu again.
@@ -78,6 +88,8 @@ local function Menu(width)
 end
 
 local Wide = m.component(function()
+    M.dashboards = M.dashboards + 1
+
     return m.vflex({
         align = "center",
         Brand(WIDTH),
@@ -93,6 +105,8 @@ local Wide = m.component(function()
 end)
 
 local Narrow = m.component(function()
+    M.dashboards = M.dashboards + 1
+
     local width = 46
 
     return m.vflex({
@@ -104,6 +118,8 @@ end)
 
 --- Everything before there is a user.
 local Gate = m.component(function()
+    M.dashboards = 0
+
     local width = 36
     return m.vflex({ align = "center", margin_top = 6, Brand(width), m.block({ margin_top = 1, Menu(width) }) })
 end)
@@ -116,6 +132,13 @@ local App = m.component(function()
     end)
 
     sign_in()
+
+    m.effect(function()
+        M.stats_version()
+        if Leet.auth() then
+            m.untrack(data.load)
+        end
+    end)
 
     local gated = m.memo(function()
         local page = M.page()

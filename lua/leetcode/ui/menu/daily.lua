@@ -1,28 +1,8 @@
 local m = require("markup")
 local kit = require("leetcode.ui.kit")
+local data = require("leetcode.ui.menu.data")
 
 return m.component(function(props)
-	local daily = m.signal(nil)
-
-	m.effect(function()
-		Leet.menu.stats_version()
-
-		if not Leet.auth() then
-			return
-		end
-
-		require("leetcode.api.problems").question_of_today(function(res, err)
-			if err then
-				return Markup.log.error(err)
-			end
-
-			local ok, problem = pcall(function()
-				return require("leetcode.cache.problems").by_slug(res.title_slug)
-			end)
-			daily(ok and problem or nil)
-		end)
-	end)
-
 	local function open()
 		require("leetcode.cmd").qot()
 	end
@@ -41,7 +21,7 @@ return m.component(function(props)
 			kit.Key("t"),
 		}),
 		function()
-			local problem = daily()
+			local problem = data.daily()
 			if not problem then
 				return m.block("Loading...", "leetcode_muted")
 			end

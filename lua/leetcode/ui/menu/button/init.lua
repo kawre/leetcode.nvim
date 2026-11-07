@@ -28,11 +28,13 @@ return m.component(function(p)
     local delay = Leet.menu.rows * 35
     local surface = kit.color("leetcode_surface", "bg")
 
+    local enter = Leet.menu.rows_enter
+
     local function fade(group)
-        return animate.fade_in(group, surface, { delay = delay, duration = 200 })
+        return enter and animate.fade_in(group, surface, { delay = delay, duration = 200 }) or group
     end
 
-    local slide = m.animated(2, { delay = delay, duration = 200 })
+    local slide = m.animated(enter and 2 or 0, { delay = delay, duration = 200 })
     slide(0)
 
     local focus = m.animated(0, { duration = 110 })

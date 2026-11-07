@@ -68,10 +68,12 @@ end
 
 --- A number that counts up to `value`.
 ---@param value fun(): number
----@param opts? { delay?: number, duration?: number }
+---@param opts? { delay?: number, duration?: number, instant?: boolean } `instant`
+--- starts at the value, so only later changes count
 ---@return fun(): number
 function M.counter(value, opts)
-	local shown = m.animated(0, {
+	local instant = opts and opts.instant
+	local shown = m.animated(instant and (m.untrack(value) or 0) or 0, {
 		duration = opts and opts.duration or 900,
 		delay = opts and opts.delay,
 		easing = "out_quint",
@@ -124,9 +126,10 @@ function M.BigNumber(props)
 end
 
 --- A bar that fills up when it appears.
----@param props { value: fun(): number, width: integer, style: string, delay?: number }
+---@param props { value: fun(): number, width: integer, style: string, delay?: number, instant?: boolean }
 function M.Bar(props)
-	local filled = m.animated(0, { duration = 800, delay = props.delay, easing = "out_cubic" })
+	local start = props.instant and (m.untrack(props.value) or 0) or 0
+	local filled = m.animated(start, { duration = 800, delay = props.delay, easing = "out_cubic" })
 
 	m.effect(function()
 		filled(props.value() or 0)

@@ -1,6 +1,6 @@
 local m = require("markup")
 local kit = require("leetcode.ui.kit")
-local api = require("leetcode.api.stats")
+local data = require("leetcode.ui.menu.data")
 
 local WEEKS = 53
 local DAY = 24 * 60 * 60
@@ -73,8 +73,11 @@ end
 
 --- Rows of half blocks: two days fit in each cell, and the cells are square.
 local function Grid(summary)
-	local reveal = m.animated(0, { duration = 900, delay = 100, easing = "out_cubic" })
-	reveal(WEEKS)
+	local settled = Leet.menu.settled()
+	local reveal = m.animated(settled and WEEKS or 0, { duration = 900, delay = 100, easing = "out_cubic" })
+	if not settled then
+		reveal(WEEKS)
+	end
 
 	local visible = {}
 	for week = 1, WEEKS do
@@ -108,7 +111,7 @@ end
 local function Stat(value, label)
 	local shown = kit.counter(function()
 		return value
-	end, { delay = 200 })
+	end, { delay = 200, instant = Leet.menu.settled() })
 
 	return m.block({
 		m.inline(function()
@@ -138,28 +141,14 @@ local Content = m.component(function(props)
 end)
 
 return m.component(function(props)
-	local summary = m.signal(nil)
-
-	m.effect(function()
-		Leet.menu.stats_version()
-
-		if not Leet.auth() then
-			return
-		end
-
-		api.calendar(function(data, err)
-			if err then
-				return Markup.log.error(err)
-			end
-			summary(summarize(data.calendar.submission_calendar, os.time()))
-		end)
-	end)
-
 	return kit.Card({
 		width = props.width,
 		function()
-			local current = summary()
-			return current and Content({ summary = current }) or m.block("Loading...", "leetcode_muted")
+			local calendar = data.calendar()
+			if not calendar then
+				return m.block("Loading...", "leetcode_muted")
+			end
+			return Content({ summary = summarize(calendar, os.time()) })
 		end,
 	})
 end)

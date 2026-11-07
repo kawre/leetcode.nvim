@@ -1,28 +1,13 @@
 local m = require("markup")
 local kit = require("leetcode.ui.kit")
-local api = require("leetcode.api.stats")
+local data = require("leetcode.ui.menu.data")
 
 return m.component(function(props)
-	local streak = m.signal({})
-
-	m.effect(function()
-		Leet.menu.stats_version()
-
-		if not Leet.auth() then
-			return
-		end
-
-		api.streak(function(data, err)
-			if err then
-				return Markup.log.error(err)
-			end
-			streak(data)
-		end)
-	end)
+	local streak = data.streak
 
 	local count = kit.counter(function()
 		return streak().streakCount
-	end, { duration = 1100 })
+	end, { duration = 1100, instant = Leet.menu.settled() })
 
 	return kit.Card({
 		width = props.width,
