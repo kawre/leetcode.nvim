@@ -348,11 +348,11 @@ end
 local function meter()
 	return child.lua_get([[(function()
 		local rows = buffer_text(problem.description.view.fixed[1].win.buf)
-		return select(2, rows[#rows]:gsub("▂", ""))
+		return select(2, rows[1]:gsub("▔", ""))
 	end)()]])
 end
 
-T["header"]["ends in a meter across the band"] = function()
+T["header"]["starts with a meter across the band"] = function()
 	run("open_problem()")
 	eq(meter(), child.lua_get("vim.api.nvim_win_get_width(problem.description.win.win)"))
 end
@@ -362,8 +362,7 @@ T["header"]["the meter fills to the acceptance rate"] = function()
 		open_problem()
 		band = problem.description.view.fixed[1]
 		marks = {}
-		local rows = vim.api.nvim_buf_line_count(band.win.buf)
-		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(band.win.buf, band.view.ns, { rows - 1, 0 }, -1, { details = true })) do
+		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(band.win.buf, band.view.ns, 0, { 0, -1 }, { details = true })) do
 			if mark[4].hl_group == "leetcode_easy" then
 				filled = mark[4].end_col - mark[3]
 			end
@@ -381,8 +380,7 @@ T["header"]["the meter empties while stats are hidden"] = function()
 		reactive.flush()
 		band = problem.description.view.fixed[1]
 		filled = nil
-		local rows = vim.api.nvim_buf_line_count(band.win.buf)
-		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(band.win.buf, band.view.ns, { rows - 1, 0 }, -1, { details = true })) do
+		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(band.win.buf, band.view.ns, 0, { 0, -1 }, { details = true })) do
 			if mark[4].hl_group == "leetcode_easy" then filled = mark[4].end_col - mark[3] end
 		end
 	]])
@@ -400,6 +398,61 @@ T["description"]["half cell edges are the only gap between sections"] = function
 	]])
 	eq(child.lua_get("after_text"), "")
 	eq(child.lua_get("after_card:find('▄', 1, true) ~= nil"), true)
+end
+
+T["cursor"] = new_set()
+
+local function line()
+	return child.lua_get("vim.trim(vim.api.nvim_get_current_line())")
+end
+
+local function enter_description()
+	run([[
+		open_problem()
+		local description = problem.description
+		description.win:focus()
+		vim.api.nvim_win_set_cursor(0, { 1, 0 })
+		description.view.cursor = nil
+		description.view:snap_cursor()
+	]])
+end
+
+T["cursor"]["starts on the first text"] = function()
+	enter_description()
+	eq(line():find("Given an array", 1, true), 1)
+end
+
+T["cursor"]["skips blank rows and card edges"] = function()
+	enter_description()
+	local seen = {}
+	for _ = 1, 30 do
+		seen[#seen + 1] = line()
+		child.type_keys("j")
+	end
+
+	for _, row in ipairs(seen) do
+		eq(row ~= "", true)
+		eq(row:find("▄", 1, true), nil)
+		eq(row:find("▀", 1, true), nil)
+	end
+	eq(vim.tbl_contains(seen, line()), true)
+end
+
+T["cursor"]["stays out of the padding"] = function()
+	enter_description()
+	child.type_keys("0")
+	local start = child.lua_get("vim.fn.virtcol('.')")
+	child.type_keys("h")
+	eq(child.lua_get("vim.fn.virtcol('.')"), start)
+	eq(start > 1, true)
+end
+
+T["cursor"]["reaches both ends of the page"] = function()
+	enter_description()
+	child.type_keys("G")
+	eq(line():find("Similar Questions", 1, true) ~= nil, true)
+	child.type_keys("gg")
+	eq(line():find("Given an array", 1, true), 1)
 end
 
 T["extras"] = new_set()

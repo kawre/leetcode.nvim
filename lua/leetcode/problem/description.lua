@@ -43,7 +43,7 @@ function M:new(problem)
 		wo = { winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder" },
 	})
 
-	self.view = Markup.view(self.win)
+	self.view = Markup.view(self.win, { snap = "text" })
 	self:bind_keys()
 	self.view:render(self:content())
 	self:draw_images()
@@ -165,8 +165,8 @@ function M:stats()
 	})
 end
 
---- How many submissions pass, as the last row of the band. It takes the place of
---- the padding, so it adds no height.
+--- How many submissions pass, along the top edge of the band. It takes the place
+--- of the padding, so it adds no height.
 function M:meter()
 	local q = self.problem.problem
 	local rate = (tonumber((tostring(q.stats.acRate):gsub("%%", ""))) or 0) / 100
@@ -183,10 +183,10 @@ function M:meter()
 	return m.block({
 		white_space = "nowrap",
 		m.inline(function()
-			return ("▂"):rep(cells())
+			return ("▔"):rep(cells())
 		end, "leetcode_" .. q.difficulty:lower()),
 		m.inline(function()
-			return ("▂"):rep(self.view:columns() - cells())
+			return ("▔"):rep(self.view:columns() - cells())
 		end, "leetcode_header_track"),
 	})
 end
@@ -198,8 +198,9 @@ function M:header()
 		position = "fixed",
 		top = 0,
 		style = "leetcode_description_header",
+		self:meter(),
 		m.vflex({
-			padding = { 1, 2, 0, 2 },
+			padding = { 0, 2, 1, 2 },
 			m.flex({
 				justify = "between",
 				m.block({
@@ -219,7 +220,6 @@ function M:header()
 				return self:stats()
 			end,
 		}),
-		self:meter(),
 	})
 end
 
