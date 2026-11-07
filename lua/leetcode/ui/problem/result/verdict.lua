@@ -14,7 +14,7 @@ return m.component(function(props)
 
 	local style = animate.enabled
 			and animate.highlight({ bg = bright }, { bg = band }, {
-				duration = 450,
+				duration = 310,
 				easing = "out_quad",
 				base = vim.api.nvim_get_hl(0, { name = group, link = false }),
 				link = group,
@@ -24,7 +24,7 @@ return m.component(function(props)
 	local shake = m.signal(0)
 	if props.kind ~= "ok" then
 		animate.run({
-			duration = 380,
+			duration = 270,
 			easing = "linear",
 			update = function(t)
 				shake(math.sin(t * math.pi * 6) * (1 - t) * SHAKE_CELLS)

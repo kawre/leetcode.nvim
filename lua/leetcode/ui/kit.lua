@@ -75,7 +75,7 @@ end
 function M.counter(value, opts)
 	local instant = opts and opts.instant
 	local shown = m.animated(instant and (m.untrack(value) or 0) or 0, {
-		duration = opts and opts.duration or 900,
+		duration = opts and opts.duration or 620,
 		delay = opts and opts.delay,
 		easing = "out_quint",
 	})
@@ -130,7 +130,7 @@ end
 ---@param props { value: fun(): number, width: integer, style: string, delay?: number, instant?: boolean }
 function M.Bar(props)
 	local start = props.instant and (m.untrack(props.value) or 0) or 0
-	local filled = m.animated(start, { duration = 800, delay = props.delay, easing = "out_cubic" })
+	local filled = m.animated(start, { duration = 560, delay = props.delay, easing = "out_cubic" })
 
 	m.effect(function()
 		filled(props.value() or 0)

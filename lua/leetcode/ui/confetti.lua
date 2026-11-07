@@ -12,7 +12,9 @@ local M = {}
 local GLYPHS = { "▪", "●", "◆", "▴", "•", "■" }
 local COLORS = { "#46c6c2", "#fac31d", "#f8615c", "#ffa116", "#89b4fa", "#cba6f7" }
 local COUNT = 56
-local DURATION = 1700
+local DURATION = 1200
+--- Seconds of flight per second on screen, so that a shorter burst still lands.
+local PACE = 1700 / DURATION
 local GRAVITY = 42
 
 --- Fired from the bottom, spreading out and falling back down.
@@ -110,7 +112,7 @@ function M.burst(origin)
 		easing = "linear",
 		update = function(t)
 			for _, particle in ipairs(items) do
-				move(particle, t * DURATION / 1000, width, height)
+				move(particle, t * DURATION / 1000 * PACE, width, height)
 			end
 		end,
 		done = function()
