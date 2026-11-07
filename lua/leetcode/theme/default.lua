@@ -64,13 +64,9 @@ M.get = function()
     local err = hl("DiagnosticError").fg or 0xf8615c
     local warn = hl("DiagnosticWarn").fg or 0xfac31d
     local header = mix(hl("CursorLine").bg or raised, 0xffffff, 0.06)
-    -- Cards of the description: the color the colorscheme gives indent guides,
-    -- which it picks to sit quietly on the background, such as `surface0`.
-    local subtle
-    for _, group in ipairs({ "SnacksIndent", "IblIndent", "IndentBlanklineChar" }) do
-        subtle = subtle or hl(group).fg
-    end
-    subtle = subtle or blend(hl("NormalFloat").bg or hl("Normal").bg, hl("CursorLine").bg)
+    -- Cards of the description, between `surface` and `raised`: on catppuccin
+    -- this lands on its `surface0`.
+    local subtle = mix(bg, fg, 0.11)
     local difficulty = {
         easy = readable(0x46c6c2),
         medium = readable(0xfac31d),

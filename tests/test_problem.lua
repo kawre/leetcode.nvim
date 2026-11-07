@@ -156,8 +156,7 @@ end
 
 T["description"]["sections sit on their own background"] = function()
 	run([[
-		vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#000000" })
-		vim.api.nvim_set_hl(0, "CursorLine", { bg = "#202020" })
+		vim.api.nvim_set_hl(0, "Normal", { bg = "#1e1e2e", fg = "#cdd6f4" })
 		require("leetcode.theme").load()
 		open_problem()
 		desc = problem.description
@@ -172,7 +171,8 @@ T["description"]["sections sit on their own background"] = function()
 			if line:find("Given an array", 1, true) then intro_row = i end
 		end
 	]])
-	eq(child.lua_get("vim.api.nvim_get_hl(0, { name = 'leetcode_section' }).bg"), 0x101010)
+	-- A tenth or so of the way from the background to the text: catppuccin's surface0.
+	eq(child.lua_get("vim.api.nvim_get_hl(0, { name = 'leetcode_section' }).bg"), 0x313244)
 	eq(child.lua_get("rows[example_row] ~= nil"), true)
 	eq(child.lua_get("rows[intro_row] == nil"), true)
 end
