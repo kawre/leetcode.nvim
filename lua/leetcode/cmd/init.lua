@@ -113,8 +113,8 @@ end
 function cmd.random_question(opts)
 	require("leetcode.util").auth_guard()
 
-	local problems = require("leetcode.cache.problems")
-	local question = require("leetcode.api.question")
+	local problems_cache = require("leetcode.cache.problems")
+	local problems = require("leetcode.api.problems")
 
 	if opts and opts.difficulty then
 		opts.difficulty = opts.difficulty[1]:upper()
@@ -127,12 +127,12 @@ function cmd.random_question(opts)
 		})[opts.status[1]]
 	end
 
-	local q, err = question.random(opts)
+	local q, err = problems.random(opts)
 	if err then
 		return log.err(err)
 	end
 
-	local item = problems.by_slug(q.title_slug) or {}
+	local item = problems_cache.by_slug(q.title_slug) or {}
 	cmd.open(item)
 end
 
