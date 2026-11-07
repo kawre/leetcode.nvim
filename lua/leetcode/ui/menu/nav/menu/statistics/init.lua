@@ -3,12 +3,12 @@ local Buttons = require("leetcode.ui.menu.buttons")
 local Button = require("leetcode.ui.menu.button")
 local BackButton = require("leetcode.ui.menu.button.back")
 local config = require("leetcode.config")
-local solved = require("leetcode.ui.menu.nav.menu.statistics.solved")
+local solved = require("leetcode.ui.menu.solved")
 
 local cmd = require("leetcode.cmd")
 
 return m.component(function()
-    return m.vflex({ align = "center", spacing = 2, solved.Solved(), Buttons({
+    return Buttons({
         not config.is_cn and Button({
             title = "Skills",
             icon = "",
@@ -31,5 +31,5 @@ return m.component(function()
             end,
         }),
         BackButton({ page = "menu" }),
-    }) })
+    })
 end)

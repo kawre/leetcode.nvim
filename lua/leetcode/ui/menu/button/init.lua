@@ -1,4 +1,7 @@
 local m = require("markup")
+local kit = require("leetcode.ui.kit")
+
+local animate = Markup.animate
 
 ---@class MenuButtonProps
 ---@field title string
@@ -20,15 +23,45 @@ return m.component(function(p)
 
     m.use_key(p.lhs, press, { noremap = false, silent = true, nowait = true })
 
+    -- Rows of a page arrive one after another.
+    Leet.menu.rows = Leet.menu.rows + 1
+    local delay = Leet.menu.rows * 35
+    local surface = kit.color("leetcode_surface", "bg")
+
+    local function fade(group)
+        return animate.fade_in(group, surface, { delay = delay, duration = 200 })
+    end
+
+    local slide = m.animated(2, { delay = delay, duration = 200 })
+    slide(0)
+
+    local focus = m.animated(0, { duration = 110 })
+    local row = animate.tint(
+        { bg = surface },
+        { bg = kit.color("leetcode_row_active", "bg") },
+        focus
+    )
+
     return m.flex({
         on_press = press,
+        on_hover = function(hovered)
+            focus(hovered and 1 or 0)
+        end,
+        style = row,
         justify = "between",
         m.flex({
-            spacing = 1,
-            m.inline(p.icon, "Character"),
-            m.inline(p.title, "Tag"),
-            p.nested and m.inline("", "leetcode_menu_button_nested"),
+            m.inline(function()
+                return focus() > 0.5 and "▌" or " "
+            end, "leetcode_accent"),
+            m.inline({
+                margin_left = function()
+                    return math.floor(slide() + 0.5)
+                end,
+            }),
+            m.inline(p.icon .. " ", fade("Character")),
+            m.inline(p.title, fade("leetcode_strong")),
+            p.nested and m.inline(" \u{eab6}", fade("leetcode_muted")),
         }),
-        m.block(p.lhs, "Type"),
+        m.inline({ margin_right = 1, kit.Key(p.lhs) }),
     })
 end)

@@ -13,7 +13,9 @@ return m.component(function()
             title = "List",
             lhs = "p",
             nested = true,
-            on_submit = cmd.problems,
+            on_submit = function()
+                require("leetcode.ui.browser").open(require("leetcode.cache.problems").get())
+            end,
         }),
         Button({
             icon = "",

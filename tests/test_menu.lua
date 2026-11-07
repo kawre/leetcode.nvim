@@ -46,10 +46,34 @@ T["signed in shows the main page"] = function()
 	eq(contains("Exit"), true)
 end
 
-T["the footer follows the signed in user"] = function()
+T["the dashboard follows the signed in user"] = function()
 	open(true)
 	eq(contains("tester"), true)
-	eq(contains("42"), true)
+	eq(contains("day streak"), true)
+	eq(contains("done for today"), true)
+end
+
+T["the daily challenge has a card"] = function()
+	open(true)
+	eq(contains("Daily challenge"), true)
+	eq(contains("3Sum"), true)
+	eq(contains("Medium"), true)
+end
+
+T["the dashboard stacks when it gets narrow"] = function()
+	open(true)
+	eq(contains("Daily challenge"), true)
+
+	child.lua([[
+		vim.cmd("vnew")
+		vim.api.nvim_win_set_width(menu.win.win, 60)
+		menu.view:request_commit()
+		reactive.flush()
+		reactive.flush()
+	]])
+	eq(contains("Daily challenge"), false)
+	eq(contains("Problems"), true)
+	eq(contains("Solved"), true)
 end
 
 T["the header swaps to the calendar"] = function()
@@ -101,7 +125,27 @@ T["the cursor only stops on buttons"] = function()
 		menu.view:snap_cursor()
 	]])
 	child.type_keys("j")
-	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1] > button_row + 1"), true)
+	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1]"), child.lua_get("button_row + 1"))
+
+	-- Past the last button there is nowhere to go.
+	child.type_keys("jjjjjj")
+	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1]"), child.lua_get("button_row + 4"))
+end
+
+T["the row under the cursor is marked"] = function()
+	open(true)
+	child.lua([[
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("Statistics", 1, true) then
+				vim.api.nvim_win_set_cursor(0, { i, #line - 20 })
+				row = i
+			end
+		end
+		menu.view.cursor = nil
+		vim.api.nvim_exec_autocmds("CursorMoved", { buffer = menu.win.buf })
+		reactive.flush()
+	]])
+	eq(child.lua_get("buffer_text(menu.win.buf)[row]:find('▌', 1, true) ~= nil"), true)
 end
 
 T["statistics shows solved progress"] = function()
@@ -109,7 +153,7 @@ T["statistics shows solved progress"] = function()
 	child.type_keys("s")
 	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
 	eq(child.lua_get("menu.page()"), "menu.statistics")
-	eq(contains("30/300"), true)
+	eq(contains("30 / 300"), true)
 	eq(contains("20/100"), true)
 	eq(contains("Languages"), true)
 end

@@ -21,7 +21,7 @@ function H.boot(child)
 		vim.fn.mkdir(root .. "/cache", "p")
 
 		local config = require("leetcode.config")
-		config.apply({ lang = "python3", storage = { home = root .. "/home", cache = root .. "/cache" } })
+		config.apply({ ui = { animations = false }, lang = "python3", storage = { home = root .. "/home", cache = root .. "/cache" } })
 		config.setup()
 		require("leetcode.theme").setup()
 
@@ -70,6 +70,10 @@ function H.boot(child)
 				cb({ calendar = { submission_calendar = { [tostring(now)] = 3 } } })
 			end,
 		}
+
+		require("leetcode.api.problems").question_of_today = function(cb)
+			cb({ title_slug = "two-sum" })
+		end
 
 		package.loaded["leetcode.cache.problems"] = {
 			change_status = function(slug, status)

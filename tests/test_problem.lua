@@ -353,8 +353,8 @@ T["console"]["shows a submission"] = function()
 	}]])
 	eq(result_has("Runtime"), true)
 	eq(result_has("Memory"), true)
-	eq(result_has("18.9MB"), true)
-	eq(result_has("Beats 80.50%"), true)
+	eq(result_has("18.9 MB"), true)
+	eq(result_has("beats 80.5%"), true)
 end
 
 T["console"]["an accepted submission updates the problem and the stats"] = function()
@@ -408,7 +408,7 @@ T["console"]["shows limits and internal errors"] = function()
 	eq(result_has("out"), true)
 
 	run([[problem.console.result:handle({ _ = {}, status_code = 16 }); reactive.flush()]])
-	eq(result_has("internal error"), true)
+	eq(result_has("The judge failed"), true)
 end
 
 T["console"]["shows a failed submission"] = function()
@@ -418,6 +418,92 @@ T["console"]["shows a failed submission"] = function()
 	}]])
 	eq(result_has("Expected"), true)
 	eq(result_has("[1]"), true)
+end
+
+T["console"]["marks what differs from the expected output"] = function()
+	show_result([[{
+		_ = { title = "Wrong Answer", hl = "leetcode_error", submission = true, params = {} },
+		status_code = 11, input = "[1]", code_output = "[0,2]", expected_output = "[0,1]", std_output = "",
+		total_correct = 3, total_testcases = 4,
+	}]])
+	eq(result_has("3/4 passed"), true)
+	eq(result_has("Wrong Answer"), true)
+
+	local marked = function(group)
+		return child.lua_get(([[(function()
+			local result, buf = problem.console.result, problem.console.result.win.buf
+			local found = {}
+			for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, result.view.ns, 0, -1, { details = true })) do
+				if mark[4].hl_group == %q then
+					found[#found + 1] = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[4].end_row, mark[4].end_col, {})[1]
+				end
+			end
+			return found
+		end)()]]):format(group))
+	end
+
+	eq(marked("leetcode_diff_delete"), { "2" })
+	eq(marked("leetcode_diff_add"), { "1" })
+end
+
+T["console"]["tabs show which cases passed"] = function()
+	show_result([[{
+		_ = { title = "Wrong Answer", hl = "leetcode_error", success = false, submission = false },
+		status_code = 10, status_runtime = "1 ms", submission_id = "run1", total_testcases = 2,
+		compare_result = "10", code_answer = { "[0,1]", "[0,2]" },
+		expected_code_answer = { "[0,1]", "[0,1]" }, std_output_list = { "", "" },
+	}]])
+	run([[
+		local rows = buffer_text(problem.console.result.win.buf)
+		for _, line in ipairs(rows) do
+			if line:find("Case 1", 1, true) then tabs = line end
+		end
+	]])
+	eq(child.lua_get("tabs:find('Case 2', 1, true) ~= nil"), true)
+end
+
+T["console"]["shows the judge at work until the result"] = function()
+	run([[
+		open_problem()
+		problem.console:open()
+		problem.console.result:judging(true)
+		reactive.flush()
+	]])
+	eq(result_has("Submitting your solution"), true)
+	eq(result_has("Queued"), true)
+
+	run([[
+		problem.console.result:set_state("STARTED")
+		reactive.flush()
+		problem.console.result:handle({ _ = {}, status_code = 16 })
+		reactive.flush()
+	]])
+	eq(result_has("Queued"), false)
+end
+
+T["console"]["celebrates accepted submissions only"] = function()
+	run([[
+		bursts = 0
+		require("leetcode.ui.confetti").burst = function() bursts = bursts + 1 end
+		require("leetcode.ui.menu").refresh = function() end
+	]])
+	show_result(accepted)
+	eq(child.lua_get("bursts"), 0)
+
+	run([[problem.console.result:handle({
+		_ = { title = "Accepted", hl = "leetcode_ok", success = true, submission = true },
+		status_code = 10, status_runtime = "12 ms", display_runtime = "12", pretty_lang = "Python3",
+		status_memory = "18.9MB", runtime_percentile = 80.5, memory_percentile = 33.2,
+	})]])
+	eq(child.lua_get("bursts"), 1)
+
+	run([[Leet.config.user.ui.confetti = false]])
+	run([[problem.console.result:handle({
+		_ = { title = "Accepted", hl = "leetcode_ok", success = true, submission = true },
+		status_code = 10, status_runtime = "12 ms", display_runtime = "12", pretty_lang = "Python3",
+		status_memory = "18.9MB", runtime_percentile = 80.5, memory_percentile = 33.2,
+	})]])
+	eq(child.lua_get("bursts"), 1)
 end
 
 T["console"]["clears"] = function()
@@ -651,7 +737,7 @@ T["real problems"] = function()
 
 				for i, line in ipairs(lines) do
 					assert(not line:find("\t", 1, true), "tab in line " .. i)
-					local has_box = line:find("┌", 1, true) or line:find("│ ", 1, true) or line:find("├", 1, true)
+					local has_box = line:find("[┌├└]") or line:find("│ ", 1, true)
 					local width = vim.fn.strdisplaywidth(line)
 					if width > description_width and not has_box then
 						table.insert(failures, ("%s: line %d is %d wide"):format(name, i, width))

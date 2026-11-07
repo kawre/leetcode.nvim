@@ -140,6 +140,11 @@ local M = {
 
     ---@type boolean
     image_support = false,
+
+    ui = {
+        animations = true, ---@type boolean Set to false to make everything jump to its end
+        confetti = true, ---@type boolean Celebrate accepted submissions
+    },
 }
 
 return M

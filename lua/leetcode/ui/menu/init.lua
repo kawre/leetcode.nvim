@@ -1,14 +1,18 @@
 local m = require("markup")
 local cookie = require("leetcode.cache.cookie")
-local Header = require("leetcode.ui.menu.header")
-local Footer = require("leetcode.ui.menu.footer")
+local kit = require("leetcode.ui.kit")
 local Nav = require("leetcode.ui.menu.nav")
-local config = require("leetcode.config")
+local Streak = require("leetcode.ui.menu.streak")
+local Daily = require("leetcode.ui.menu.daily")
+local Heatmap = require("leetcode.ui.menu.heatmap")
+local solved = require("leetcode.ui.menu.solved")
 
 ---@class leet.menu
 local M = {
     page = m.signal("loading"),
     stats_version = m.signal(0),
+    width = m.signal(vim.o.columns),
+    rows = 0,
     win = Markup.window({
         position = "current",
         hijack = true,
@@ -47,6 +51,63 @@ local function sign_in()
     end)
 end
 
+--- Below this the dashboard stacks into one column, such as beside the browser.
+local WIDE = 80
+local WIDTH = 78
+
+local function Brand(width)
+    return m.flex({
+        width = width,
+        justify = "between",
+        padding = { 0, 1 },
+        m.inline({
+            m.inline(kit.icons.code .. " ", "leetcode_accent"),
+            m.inline("leetcode.nvim", "leetcode_strong"),
+        }),
+        m.inline(function()
+            local auth = Leet.auth()
+            local hour = tonumber(os.date("%H"))
+            local part = hour < 5 and "night" or hour < 12 and "morning" or hour < 18 and "afternoon" or "evening"
+            return auth and ("Good %s, %s"):format(part, auth.name) or ""
+        end, "leetcode_muted"),
+    })
+end
+
+local function Menu(width)
+    return kit.Card({ width = width, padding = { 0, 1 }, Nav() })
+end
+
+local Wide = m.component(function()
+    return m.vflex({
+        align = "center",
+        Brand(WIDTH),
+        m.flex({ margin_top = 1, width = WIDTH, justify = "between", Streak({ width = 30 }), Daily({ width = 46 }) }),
+        Heatmap({ width = WIDTH }),
+        m.flex({
+            width = WIDTH,
+            justify = "between",
+            solved.Solved({ width = 44 }),
+            Menu(32),
+        }),
+    })
+end)
+
+local Narrow = m.component(function()
+    local width = 46
+
+    return m.vflex({
+        align = "center",
+        Brand(width),
+        m.block({ margin_top = 1, width = width, Menu(width), solved.Solved({ width = width }) }),
+    })
+end)
+
+--- Everything before there is a user.
+local Gate = m.component(function()
+    local width = 36
+    return m.vflex({ align = "center", margin_top = 6, Brand(width), m.block({ margin_top = 1, Menu(width) }) })
+end)
+
 local App = m.component(function()
     local view = m.use_view()
 
@@ -56,17 +117,33 @@ local App = m.component(function()
 
     sign_in()
 
-    return m.vflex({
-        align = "center",
-        spacing = 2,
-        Header(),
-        Nav(),
-        Footer(),
+    local gated = m.memo(function()
+        local page = M.page()
+        return page == "loading" or page == "signin"
+    end)
+
+    local wide = m.memo(function()
+        return M.width() >= WIDE
+    end)
+
+    return m.block({
+        margin_top = math.max(math.floor((vim.o.lines - 30) / 2), 1),
+        m.show(gated, Gate, function()
+            return m.show(wide, Wide, Narrow)
+        end),
     })
 end)
 
 function M.render()
-    M.view = M.view or Markup.view(M.win, { snap = true })
+    if not M.view then
+        M.view = Markup.view(M.win, { snap = true })
+        M.view:on_commit(function()
+            if M.win:valid() then
+                M.width(vim.api.nvim_win_get_width(M.win.win))
+            end
+        end)
+    end
+    M.width(vim.api.nvim_win_get_width(M.win.win))
     M.view:render(App())
 end
 

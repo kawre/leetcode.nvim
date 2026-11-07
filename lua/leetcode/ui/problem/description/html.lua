@@ -45,7 +45,7 @@ M.Section = m.component(function(props)
 			end, "leetcode_alt"),
 			m.inline(props.title, props.hl),
 		}),
-		m.show(open, function()
+		m.collapse(open, function()
 			return m.block({ padding = { 1, 0, 0, 2 }, props.body })
 		end),
 	})

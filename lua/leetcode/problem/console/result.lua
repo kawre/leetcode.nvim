@@ -1,5 +1,6 @@
 local m = require("markup")
 local Result = require("leetcode.ui.problem.result")
+local Judging = require("leetcode.ui.problem.result.judging")
 
 ---@class leet.problem.console.result
 ---@overload fun(): leet.problem.console.result
@@ -18,11 +19,27 @@ function M:new(console)
 end
 
 function M:clear()
+    self.state = nil
     self.view:render(nil)
+end
+
+--- Shows the progress of the judge, until a result replaces it.
+---@param submit boolean
+function M:judging(submit)
+    self.state = m.signal("PENDING")
+    self.view:render(Judging({ state = self.state, submit = submit }))
+end
+
+---@param state string
+function M:set_state(state)
+    if self.state then
+        self.state(state)
+    end
 end
 
 ---@param item lc.interpreter_response
 function M:handle(item)
+    self.state = nil
     item._.params = self.console.problem.problem.meta_data.params
     self.view:render(Result({ item = item, console = self.console }))
 
@@ -33,6 +50,10 @@ function M:handle(item)
 
         if accepted then
             require("leetcode.ui.menu").refresh()
+
+            if Leet.config.user.ui.confetti then
+                require("leetcode.ui.confetti").burst()
+            end
         end
     end
 end

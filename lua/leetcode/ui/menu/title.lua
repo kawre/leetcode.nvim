@@ -8,19 +8,16 @@ return m.component(function()
 
         for i, title in ipairs(parts) do
             title = title:gsub("^%l", string.upper)
-            local hl = i == #parts and "Label" or "Type"
-            table.insert(titles, m.inline(title, hl))
+            local last = i == #parts
+            table.insert(titles, m.inline(title, last and "leetcode_strong" or "leetcode_muted"))
 
-            if i ~= #parts then
-                table.insert(titles, m.inline("  "))
+            if not last then
+                table.insert(titles, m.inline(" \u{eab6} ", "leetcode_muted"))
             end
         end
 
         return titles
     end
 
-    return m.flex({
-        justify = "center",
-        titles,
-    })
+    return m.flex({ margin_bottom = 1, padding = { 0, 1 }, titles })
 end)

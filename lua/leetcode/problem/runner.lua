@@ -31,6 +31,7 @@ function M.run(problem, submit)
 		Markup.log("body:", body)
 
 		local judge = Judge:init()
+		problem.console.result:judging(submit)
 		local function callback(item, state, err)
 			if err or item then
 				M.running = false
@@ -44,8 +45,10 @@ function M.run(problem, submit)
 				end
 			elseif state then
 				judge:from_state(state)
+				problem.console.result:set_state(state)
 			elseif err then
 				judge:error(err.msg or "Something went wrong")
+				problem.console.result:clear()
 			end
 
 			if item then

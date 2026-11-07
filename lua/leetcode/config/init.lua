@@ -40,6 +40,8 @@ end
 function config.setup()
 	config.validate()
 
+	Markup.animate.enabled = config.user.ui.animations
+
 	-- deprecate `directory` config
 	if config.user.directory then
 		local log = require("leetcode.logger")
