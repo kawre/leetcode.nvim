@@ -377,6 +377,14 @@ function M.to_top()
 	M.select_row(1)
 end
 
+--- Goes to the filters on purpose, which moving between windows does not.
+function M.focus_filters()
+	if M.filters and M.filters:valid() then
+		M.entering_filters = true
+		M.filters:focus()
+	end
+end
+
 function M.is_open()
 	return M.layout ~= nil and M.layout:valid()
 end
@@ -414,6 +422,29 @@ function M.open(problems)
 	})
 	M.layout:show()
 
+	-- Moving between windows lands on the list. The windows float over a split
+	-- of the layout, which is what moving into the column reaches, and the
+	-- filters are reached on purpose, with Tab.
+	local function to_list(win)
+		vim.schedule(function()
+			if M.list and M.list:valid() and api.nvim_get_current_win() == win then
+				M.list:focus()
+			end
+		end)
+	end
+
+	M.layout.root:on("WinEnter", function()
+		to_list(M.layout.root.win)
+	end, { buf = true })
+
+	M.filters:on("WinEnter", function()
+		if M.entering_filters then
+			M.entering_filters = false
+			return
+		end
+		to_list(M.filters.win)
+	end, { buf = true })
+
 	-- The marked row shows where the cursor is, so it only shows while typing.
 	M.filters_view = Markup.view(M.filters, { snap = true, hide_cursor = true })
 	M.list_view = Markup.view(M.list, { snap = true, hide_cursor = true })
@@ -428,8 +459,11 @@ function M.open(problems)
 		f = state.toggle_free,
 		q = M.close,
 		["<Tab>"] = function()
-			local target = api.nvim_get_current_win() == M.list.win and M.filters or M.list
-			target:focus()
+			if api.nvim_get_current_win() == M.list.win then
+				M.focus_filters()
+			else
+				M.list:focus()
+			end
 		end,
 		r = function()
 			local filtered = state.filtered()

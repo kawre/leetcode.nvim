@@ -79,7 +79,7 @@ function M:mount_header()
 		wo = {
 			winhighlight = table.concat({
 				"Normal:leetcode_description_header",
-				"WinSeparator:leetcode_description_header",
+				"WinSeparator:leetcode_header_separator",
 				"StatusLine:leetcode_description_header",
 				"StatusLineNC:leetcode_description_header",
 			}, ","),
@@ -103,6 +103,16 @@ function M:mount_header()
 	self.win:on_show(function()
 		self:show_header()
 	end)
+
+	-- There is nothing to do in it, so moving into it lands on the description.
+	-- Neovim moves between splits whether they are focusable or not.
+	win:on("WinEnter", function()
+		vim.schedule(function()
+			if self.win:win_valid() and vim.api.nvim_get_current_win() == win.win then
+				self.win:focus()
+			end
+		end)
+	end, { buf = true })
 
 	self:show_header()
 	view:render(self:header_content())

@@ -268,7 +268,7 @@ end
 T["browser"]["filters are reached with h and l"] = function()
 	open_browser(9)
 	child.lua([[
-		browser.filters:focus()
+		browser.focus_filters()
 		for i, line in ipairs(buffer_text(browser.filters.buf)) do
 			local col = line:find("All", 1, true)
 			if col then vim.api.nvim_win_set_cursor(0, { i, col - 2 }) end
@@ -301,7 +301,7 @@ end
 T["browser"]["filters can be pressed"] = function()
 	open_browser(9)
 	child.lua([[
-		browser.filters:focus()
+		browser.focus_filters()
 		for i, line in ipairs(buffer_text(browser.filters.buf)) do
 			local col = line:find("Solved", 1, true)
 			if col then vim.api.nvim_win_set_cursor(0, { i, col }) end
@@ -353,6 +353,25 @@ T["browser"]["insert keys start the search"] = function()
 		child.type_keys("<Esc>")
 		child.lua("browser.close()")
 	end
+end
+
+T["browser"]["moving between windows skips the filters"] = function()
+	child.lua("origin = vim.api.nvim_get_current_win()")
+	open_browser(5)
+	-- From the window beside the column, into it.
+	child.lua("vim.api.nvim_set_current_win(origin)")
+	child.type_keys("<C-w>l")
+	child.lua("vim.wait(20, function() return false end, 5)")
+	eq(child.lua_get("vim.api.nvim_get_current_win() == browser.list.win"), true)
+
+	-- Cycling through every window, floats included.
+	child.type_keys("<C-w>w")
+	child.lua("vim.wait(20, function() return false end, 5)")
+	eq(child.lua_get("vim.api.nvim_get_current_win() ~= browser.filters.win"), true)
+
+	child.type_keys("<Tab>")
+	child.lua("vim.wait(20, function() return false end, 5)")
+	eq(child.lua_get("vim.api.nvim_get_current_win() == browser.filters.win"), true)
 end
 
 T["browser"]["the search starts from the filters too"] = function()

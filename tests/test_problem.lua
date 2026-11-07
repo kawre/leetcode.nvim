@@ -729,9 +729,28 @@ T["description"]["no border between the header and the description"] = function(
 		hl = vim.wo[header].winhighlight
 		fill = vim.wo[header].fillchars
 	]])
-	eq(child.lua_get("hl:find('WinSeparator:leetcode_description_header', 1, true) ~= nil"), true)
+	eq(child.lua_get("hl:find('WinSeparator:leetcode_header_separator', 1, true) ~= nil"), true)
 	eq(child.lua_get("hl:find('StatusLine:leetcode_description_header', 1, true) ~= nil"), true)
 	eq(child.lua_get("fill:find('horiz: ', 1, true) ~= nil"), true)
+end
+
+T["description"]["moving between windows skips the header"] = function()
+	run("open_problem()")
+	child.type_keys("<C-w>k")
+	child.lua("vim.wait(20, function() return false end, 5)")
+	eq(child.lua_get("vim.api.nvim_get_current_win() == problem.description.win.win"), true)
+end
+
+T["description"]["the separator beside the header keeps its color"] = function()
+	run([[
+		open_problem()
+		hl = vim.wo[problem.description.header.win.win].winhighlight
+		separator = vim.api.nvim_get_hl(0, { name = "leetcode_header_separator", link = false })
+		header = vim.api.nvim_get_hl(0, { name = "leetcode_description_header", link = false })
+	]])
+	eq(child.lua_get("hl:find('WinSeparator:leetcode_header_separator', 1, true) ~= nil"), true)
+	eq(child.lua_get("separator.bg == header.bg"), true)
+	eq(child.lua_get("separator.fg ~= nil"), true)
 end
 
 T["description"]["has the focus when a problem opens"] = function()

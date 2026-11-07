@@ -96,6 +96,8 @@ M.get = function()
         alt = { fg = hl("Comment").fg },
         description_header = { bg = header },
         header_track = { fg = mix(header, fg, 0.15) },
+        -- Separators beside the header keep their own color on its background.
+        header_separator = { fg = hl("WinSeparator").fg or muted, bg = header },
         section = { bg = blend(hl("NormalFloat").bg or hl("Normal").bg, hl("CursorLine").bg) },
 
         italic = { italic = true },
