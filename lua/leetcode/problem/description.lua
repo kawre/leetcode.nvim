@@ -50,6 +50,11 @@ function M:new(problem)
 	self:bind_keys()
 	self:mount_header()
 	self.view:render(self:content())
+
+	-- Reading the problem comes before writing the solution.
+	if self.win:valid() then
+		self.win:focus()
+	end
 	self:draw_images()
 
 	if config.user.image_support and not img_ok then
@@ -69,7 +74,19 @@ function M:mount_header()
 		show = false,
 		minimal = true,
 		bo = { filetype = config.name },
-		wo = { winhighlight = "Normal:leetcode_description_header", winfixheight = true },
+		-- The row Neovim keeps below a split, a separator or a status line, takes
+		-- the color of the header and nothing else, so it reads as its padding.
+		wo = {
+			winhighlight = table.concat({
+				"Normal:leetcode_description_header",
+				"WinSeparator:leetcode_description_header",
+				"StatusLine:leetcode_description_header",
+				"StatusLineNC:leetcode_description_header",
+			}, ","),
+			fillchars = "horiz: ,horizup: ,horizdown: ,eob: ",
+			statusline = " ",
+			winfixheight = true,
+		},
 	})
 
 	local view = Markup.view(win)
@@ -250,7 +267,8 @@ function M:header_content()
 		style = "leetcode_description_header",
 		self:meter(),
 		m.vflex({
-			padding = { 0, 2, 1, 2 },
+			-- No padding below: the row below the split is the padding.
+			padding = { 0, 2 },
 			m.flex({
 				justify = "between",
 				m.block({

@@ -718,8 +718,25 @@ T["description"]["the header is a window above it"] = function()
 	eq(child.lua_get("vim.api.nvim_win_get_config(header).relative"), "")
 	eq(child.lua_get("header_pos[2] == body_pos[2]"), true)
 	eq(child.lua_get("header_pos[1] < body_pos[1]"), true)
-	-- As tall as the meter, the title, the stats and the padding.
-	eq(child.lua_get("vim.api.nvim_win_get_height(header)"), 4)
+	-- The meter, the title and the stats. The row below the split is the padding.
+	eq(child.lua_get("vim.api.nvim_win_get_height(header)"), 3)
+end
+
+T["description"]["no border between the header and the description"] = function()
+	run([[
+		open_problem()
+		header = problem.description.header.win.win
+		hl = vim.wo[header].winhighlight
+		fill = vim.wo[header].fillchars
+	]])
+	eq(child.lua_get("hl:find('WinSeparator:leetcode_description_header', 1, true) ~= nil"), true)
+	eq(child.lua_get("hl:find('StatusLine:leetcode_description_header', 1, true) ~= nil"), true)
+	eq(child.lua_get("fill:find('horiz: ', 1, true) ~= nil"), true)
+end
+
+T["description"]["has the focus when a problem opens"] = function()
+	run("open_problem()")
+	eq(child.lua_get("vim.api.nvim_get_current_win() == problem.description.win.win"), true)
 end
 
 T["description"]["the header comes and goes with it"] = function()
