@@ -43,7 +43,7 @@ function M:new(problem)
 		end,
 	})
 
-	self.view = Markup.view(self.win, { snap = "text" })
+	self.view = Markup.view(self.win, { snap = "text", click = "double" })
 	self:bind_keys()
 	self:mount_header()
 	self.view:render(self:content())
@@ -84,7 +84,7 @@ function M:mount_header()
 		},
 	})
 
-	local view = Markup.view(win)
+	local view = Markup.view(win, { click = "double" })
 	self.header = { win = win, view = view }
 
 	view:on_commit(function()

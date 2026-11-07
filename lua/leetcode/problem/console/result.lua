@@ -14,8 +14,11 @@ function M:new(console)
         title = "Results",
         border = "rounded",
         show = false,
+        relative = "win",
+        win = console.problem.win,
+        anchor = "SE",
     })
-    self.view = Markup.view(self.win)
+    self.view = Markup.view(self.win, { click = "double" })
 end
 
 function M:clear()

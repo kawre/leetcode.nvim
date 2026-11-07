@@ -446,8 +446,8 @@ function M.open(problems)
 	end, { buf = true })
 
 	-- The marked row shows where the cursor is, so it only shows while typing.
-	M.filters_view = Markup.view(M.filters, { snap = true, hide_cursor = true })
-	M.list_view = Markup.view(M.list, { snap = true, hide_cursor = true })
+	M.filters_view = Markup.view(M.filters, { snap = true, hide_cursor = true, click = "double" })
+	M.list_view = Markup.view(M.list, { snap = true, hide_cursor = true, click = "double" })
 
 	local function set_filter(signal, value)
 		signal(value)

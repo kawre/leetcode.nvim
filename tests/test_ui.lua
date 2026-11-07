@@ -653,6 +653,18 @@ T["picker"]["needs no picker plugin"] = function()
 	eq(#picker_rows(), 3)
 end
 
+T["clicks"] = new_set()
+
+T["clicks"]["leetcode presses on a double click everywhere"] = function()
+	open_browser(3)
+	child.lua([[
+		modes = {}
+		for view in pairs(Markup.views) do modes[#modes + 1] = view.click_mode end
+	]])
+	eq(child.lua_get("#modes") > 0, true)
+	eq(child.lua_get("vim.tbl_count(vim.tbl_filter(function(mode) return mode ~= 'double' end, modes))"), 0)
+end
+
 T["browser"]["leet list still uses the picker"] = function()
 	child.lua([[
 		picked = false

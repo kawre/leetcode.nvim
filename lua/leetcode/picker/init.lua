@@ -59,6 +59,7 @@ end
 ---@param opts? table<string, string[]>
 function P.question(problems, opts)
 	Markup.picker({
+		click = "double",
 		title = t("Select a Question"),
 		width = 100,
 		height = 20,
@@ -89,6 +90,7 @@ function P.language(problem, cb)
 	end
 
 	Markup.picker({
+		click = "double",
 		title = t("Available Languages"),
 		width = 50,
 		height = math.min(#items, 15),
@@ -134,6 +136,7 @@ function P.tabs()
 	end, tabs)
 
 	Markup.picker({
+		click = "double",
 		title = t("Select a Question"),
 		width = 80,
 		height = math.min(#items, 15),
