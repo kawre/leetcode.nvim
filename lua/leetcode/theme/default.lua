@@ -163,6 +163,10 @@ M.get = function()
         groups["bar_" .. name] = { fg = color, bg = raised }
     end
 
+    groups.pill_accent = { fg = bg, bg = accent, bold = true }
+    groups.pill_accent_cap = { fg = accent }
+    groups.rule = { fg = mix(bg, accent, 0.45) }
+
     -- Heatmap cells are half blocks, so each pair of levels is a group. Level 0
     -- is a day without activity, and -1 is no day at all.
     local heat = { [-1] = surface, [0] = raised }

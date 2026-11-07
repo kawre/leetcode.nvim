@@ -168,12 +168,19 @@ function M:scroll_hint()
 		m.show(function()
 			return hidden() > 0
 		end, function()
-			return m.flex({
-				justify = "center",
-				m.inline(function()
-					return ("── %d+ ──"):format(hidden())
-				end, "leetcode_muted"),
-			})
+			return function()
+				local label = (" %s %d+ "):format(kit.icons.arrow_up, hidden())
+				-- The pill has a cap on each side.
+				local rule = vim.api.nvim_win_get_width(self.win.win) - vim.api.nvim_strwidth(label) - 2
+				local left = math.floor(rule / 2)
+
+				return m.block({
+					white_space = "nowrap",
+					m.inline(("─"):rep(left), "leetcode_rule"),
+					kit.Pill(label, "accent"),
+					m.inline(("─"):rep(rule - left), "leetcode_rule"),
+				})
+			end
 		end),
 	})
 end

@@ -90,7 +90,8 @@ T["description"]["says when text is hidden above"] = function()
 
 	-- Rows: the header, then a blank one, and then the text.
 	scroll_description(4)
-	eq(hint_has("── 3+ ──"), true)
+	eq(hint_has(" 3+ "), true)
+	eq(hint_has("───"), true)
 	eq(child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[2].win.win).hide"), false)
 
 	scroll_description(1)
@@ -100,7 +101,7 @@ end
 T["description"]["blank rows alone do not count as hidden"] = function()
 	run("open_problem()")
 	scroll_description(2)
-	eq(hint_has("── 1+ ──"), true)
+	eq(hint_has(" 1+ "), true)
 end
 
 T["description"]["the hint does not move the text"] = function()

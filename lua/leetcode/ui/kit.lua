@@ -15,6 +15,7 @@ M.icons = {
 	clock = "\u{f0150}",
 	memory = "\u{f035b}",
 	calendar = "\u{f00f6}",
+	arrow_up = "\u{f005d}",
 	trophy = "\u{f0538}",
 	code = "\u{f0174}",
 	dot = "\u{f0766}",
@@ -49,7 +50,7 @@ end
 
 --- A rounded label.
 ---@param text string
----@param kind string one of `easy`, `medium`, `hard`
+---@param kind string one of `easy`, `medium`, `hard`, `accent`
 function M.Pill(text, kind)
 	local group = "leetcode_pill_" .. kind:lower()
 	return m.inline({
