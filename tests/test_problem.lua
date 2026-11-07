@@ -1161,6 +1161,51 @@ local function console_has(text)
 	return child.lua_get(("contains(problem.console.win.buf, %q)"):format(text))
 end
 
+T["console"]["shows the judge's progress through a whole run"] = function()
+	open_console()
+	run([[
+		local interpreter = require("leetcode.api.interpreter")
+		local api = Leet.api
+		seen = {}
+		local function shown()
+			reactive.flush()
+			local text = table.concat(vim.api.nvim_buf_get_lines(problem.console.win.buf, 0, -1, false), "\n")
+			return text
+		end
+		-- LeetCode takes the run, then reports it queued, then judging, then done.
+		local checks = {
+			{ state = "PENDING" },
+			{ state = "STARTED" },
+			{ status_code = 16, status_msg = "Internal Error" },
+		}
+		api.post = function(_, opts)
+			opts.callback({ interpret_id = "run1", test_case = "[2,7]\n9" })
+		end
+		api.get = function(_, opts)
+			local item = table.remove(checks, 1)
+			if item.state then
+				seen[#seen + 1] = item.state .. ": " .. tostring(shown():find(item.state == "PENDING" and "Queued" or "Judging", 1, true) ~= nil)
+			end
+			opts.callback(item)
+			seen[#seen + 1] = (item.state or "done") .. " after: " .. (shown():find("Run your code", 1, true) and "placeholder" or "progress or result")
+		end
+		vim.defer_fn = function(fn) fn() end
+		require("leetcode.problem.runner").running = false
+		problem.console:run()
+		vim.wait(200, function() return #checks == 0 end, 10)
+		final = shown()
+	]])
+	for _, entry in ipairs(child.lua_get("seen")) do
+		eq(entry:find("placeholder", 1, true), nil)
+	end
+	eq(child.lua_get("final"):find("The judge failed", 1, true) ~= nil, true)
+	-- The next check runs inside the last one here, so the order is nested.
+	local seen = child.lua_get("seen")
+	eq(#seen, 5)
+	eq(vim.tbl_contains(seen, "PENDING: true"), true)
+	eq(vim.tbl_contains(seen, "STARTED: true"), true)
+end
+
 T["console"]["is one split below the editor"] = function()
 	open_console()
 	run([[
