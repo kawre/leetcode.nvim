@@ -64,9 +64,9 @@ M.get = function()
     local err = hl("DiagnosticError").fg or 0xf8615c
     local warn = hl("DiagnosticWarn").fg or 0xfac31d
     local header = mix(hl("CursorLine").bg or raised, 0xffffff, 0.06)
-    -- Cards of the description, between `surface` and `raised`: on catppuccin
-    -- this lands on its `surface0`.
-    local subtle = mix(bg, fg, 0.11)
+    -- Cards of the description: barely lighter than the panel they sit on,
+    -- which is a float.
+    local subtle = mix(hl("NormalFloat").bg or bg, fg, 0.035)
     local difficulty = {
         easy = readable(0x46c6c2),
         medium = readable(0xfac31d),
