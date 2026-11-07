@@ -121,9 +121,8 @@ function Builder:section(title, hl)
 	self.items[#self.items + 1] = { section = title, hl = hl }
 end
 
---- Blocks without blank lines at the ends. `prefix` starts every line.
----@param prefix? { text: string, hl: string }
-function Builder:finish(prefix)
+--- Blocks without blank lines at the ends.
+function Builder:finish()
 	self:line()
 
 	while #self.items > 0 and self.items[#self.items].gap do
@@ -138,9 +137,6 @@ function Builder:finish(prefix)
 		end
 
 		local spans = {}
-		if prefix then
-			spans[1] = m.inline(prefix.text, prefix.hl)
-		end
 		for _, span in ipairs(item.spans) do
 			spans[#spans + 1] = span.element or m.inline(span.text, span.hl)
 		end
@@ -310,10 +306,18 @@ local function render_list(b, node, tag, ctx)
 	b:element(m.block({ padding_left = 2, items }))
 end
 
+--- A real left border, so the bar runs beside wrapped lines too.
 local function render_pre(b, node, ctx)
 	local content = builder()
 	walk(node, ctx, content)
-	b:element(m.block(content:finish({ text = config.icons.indent, hl = "leetcode_indent" })))
+	b:element(m.block({
+		margin_left = 2,
+		padding_left = 1,
+		border = { chars = config.icons.bar:rep(8) },
+		border_sides = { "left" },
+		border_style = "leetcode_indent",
+		content:finish(),
+	}))
 end
 
 local function table_rows(node, ctx)

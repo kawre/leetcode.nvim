@@ -237,6 +237,21 @@ T["description"]["list items wrap with a hanging indent"] = function()
 	eq(next_line:sub(1, col + 1):match("^%s*$") ~= nil, true)
 end
 
+T["description"]["code keeps its bar and indent when it wraps"] = function()
+	run([[
+		fixture.problem.content = "<pre><strong>Input:</strong> " .. ("words "):rep(30) .. "</pre>"
+		open_problem()
+		code = vim.tbl_filter(function(line)
+			return line:find("%S") ~= nil
+		end, buffer_text(problem.description.win.buf))
+	]])
+	local rows = child.lua_get("code")
+	eq(#rows > 2, true)
+	for _, row in ipairs(rows) do
+		eq(row:match("^%s*│ ") ~= nil, true)
+	end
+end
+
 T["description"]["renders tables with borders"] = function()
 	run("open_problem()")
 	eq(description_has("┌────┬──────┐"), true)
@@ -563,6 +578,65 @@ end
 T["dev"]["the folder is ignored by git"] = function()
 	local result = vim.fn.system({ "git", "check-ignore", ".dev/problems/1.two-sum.html" })
 	eq(vim.trim(result), ".dev/problems/1.two-sum.html")
+end
+
+--- Real pages saved by dev mode. Each one opened adds coverage, and without any
+--- this simply has nothing to check.
+T["real problems"] = function()
+	local failures = child.lua_get([[(function()
+		local failures = {}
+		local description_width = 60
+
+		for _, path in ipairs(vim.fn.glob(".dev/problems/*.html", true, true)) do
+			local name = vim.fn.fnamemodify(path, ":t")
+			local content = table.concat(vim.fn.readfile(path), "\n")
+
+			local ok, err = xpcall(function()
+				local html = require("leetcode.ui.problem.description.html")
+				local win = Markup.window({
+					position = "float", width = description_width, height = 20, enter = false,
+				})
+				local view = Markup.view(win)
+				view:render(m.block({ padding = { 1, 2 }, html.parse(content) }))
+				reactive.flush()
+
+				local lines = vim.api.nvim_buf_get_lines(win.buf, 0, -1, false)
+				local tinted = {}
+				for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(win.buf, view.ns, 0, -1, { details = true })) do
+					if mark[4].hl_group == "leetcode_section" then
+						local before = lines[mark[2] + 1]:sub(1, mark[4].end_col)
+						tinted[#tinted + 1] = vim.fn.strdisplaywidth(before)
+					end
+				end
+
+				for i = 2, #tinted do
+					if tinted[i] ~= tinted[1] then
+						table.insert(failures, ("%s: card rows end at %d and %d"):format(name, tinted[1], tinted[i]))
+						break
+					end
+				end
+
+				for i, line in ipairs(lines) do
+					assert(not line:find("\t", 1, true), "tab in line " .. i)
+					local has_box = line:find("┌", 1, true) or line:find("│ ", 1, true) or line:find("├", 1, true)
+					local width = vim.fn.strdisplaywidth(line)
+					if width > description_width and not has_box then
+						table.insert(failures, ("%s: line %d is %d wide"):format(name, i, width))
+					end
+				end
+
+				view:destroy()
+				win:close()
+			end, debug.traceback)
+
+			if not ok then
+				table.insert(failures, name .. ": " .. tostring(err):sub(1, 200))
+			end
+		end
+
+		return failures
+	end)()]])
+	eq(failures, {})
 end
 
 T["problem"] = new_set()
