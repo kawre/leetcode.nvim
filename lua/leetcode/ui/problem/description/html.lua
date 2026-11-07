@@ -269,7 +269,33 @@ local function render_link(b, node, attrs, ctx)
 	}))
 end
 
+--- Pixels a cell is wide, about, to turn the size of an image into cells.
+local CELL_PIXELS = 9
+
+--- Room an image may take: the description, less its padding and that of a
+--- section around it, which an image wider than that would be cut by.
+local IMAGE_MARGIN = 8
+
+local Image = m.component(function(props)
+	local view = m.use_view()
+	local pixels = tonumber((props.style or ""):match("width:%s*(%d+)px"))
+	local wanted = pixels and math.ceil(pixels / CELL_PIXELS)
+
+	return m.image({
+		data = require("leetcode.image").load(props.src),
+		width = function()
+			local room = view:columns() - IMAGE_MARGIN
+			return math.max(math.min(wanted or room, room), 1)
+		end,
+	})
+end)
+
 local function render_image(b, attrs)
+	local src = (attrs.src or ""):gsub("：", ":")
+	if require("leetcode.image").enabled() and src:match("^https?://") then
+		return b:element(Image({ src = src, style = attrs.style }))
+	end
+
 	local alt = attrs.alt
 	b:push("[", "leetcode_alt")
 	b:push((alt and alt ~= "") and alt or "img", "leetcode_ref")

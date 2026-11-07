@@ -455,6 +455,99 @@ T["cursor"]["reaches both ends of the page"] = function()
 	eq(line():find("Given an array", 1, true), 1)
 end
 
+T["images"] = new_set()
+
+local function with_images(enabled)
+	run(([[
+		shown = {}
+		local next_id = 0
+		Markup.image.backend = {
+			set = function(data_or_id, opts)
+				if type(data_or_id) == "number" then shown[data_or_id] = opts; return data_or_id end
+				next_id = next_id + 1
+				shown[next_id] = opts
+				return next_id
+			end,
+			del = function(id) shown[id] = nil; return true end,
+		}
+		Leet.config.user.image_support = %s
+
+		local function u32(n)
+			return string.char(math.floor(n / 16777216) %% 256, math.floor(n / 65536) %% 256, math.floor(n / 256) %% 256, n %% 256)
+		end
+		png = "\137PNG\r\n\26\n" .. u32(13) .. "IHDR" .. u32(180) .. u32(90) .. "rest"
+		require("leetcode.image").load = function() return function() return png end end
+
+		fixture.problem.content = [=[
+<p>Look at this:</p>
+<p><strong class="example">Example 1:</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/tree.jpg" style="width: 180px; height: 90px;" />
+<pre><strong>Input:</strong> root = [1,2]</pre>
+]=]
+		open_problem()
+		reactive.flush()
+		reactive.flush()
+	]]):format(enabled and "true" or "false"))
+end
+
+T["images"]["show in the description"] = function()
+	with_images(true)
+	eq(child.lua_get("vim.tbl_count(shown)"), 1)
+	-- 180 pixels is 20 cells, and half as tall, in cells twice as tall as wide.
+	eq(child.lua_get("({ next(shown) })[2].width"), 20)
+	eq(child.lua_get("({ next(shown) })[2].height"), 5)
+end
+
+T["images"]["go with the section they are in"] = function()
+	with_images(true)
+	press("Example 1")
+	run("reactive.flush()")
+	eq(child.lua_get("vim.tbl_count(shown)"), 0)
+
+	press("Example 1")
+	run("reactive.flush()")
+	eq(child.lua_get("vim.tbl_count(shown)"), 1)
+end
+
+T["images"]["stay links without support"] = function()
+	with_images(false)
+	eq(child.lua_get("vim.tbl_count(shown)"), 0)
+	eq(description_has("tree.jpg"), true)
+end
+
+T["images"]["are downloaded once and kept"] = function()
+	run([[
+		local dir = vim.fn.tempname()
+		vim.fn.mkdir(dir, "p")
+		local file = dir .. "/picture.png"
+		local function u32(n)
+			return string.char(math.floor(n / 16777216) % 256, math.floor(n / 65536) % 256, math.floor(n / 256) % 256, n % 256)
+		end
+		bytes = "\137PNG\r\n\26\n" .. u32(13) .. "IHDR" .. u32(4) .. u32(2) .. "rest"
+		local f = assert(io.open(file, "wb")); f:write(bytes); f:close()
+
+		image = require("leetcode.image")
+		url = "file://" .. file
+		data = image.load(url)
+		vim.wait(3000, function() return data() ~= nil end, 20)
+		first = data()
+
+		-- Gone from where it came from, so only the cache can give it back.
+		os.remove(file)
+		package.loaded["leetcode.image"] = nil
+		again = require("leetcode.image").load(url)()
+	]])
+	eq(child.lua_get("first == bytes"), true)
+	eq(child.lua_get("again == bytes"), true)
+end
+
+T["images"]["convert with what is installed"] = function()
+	run([[image = require("leetcode.image")]])
+	local command = child.lua_get("image.converter('in.jpg', 'out.png')")
+	eq(type(command), "table")
+	eq(vim.tbl_contains({ "magick", "convert", "ffmpeg" }, command[1]), true)
+end
+
 T["extras"] = new_set()
 
 T["extras"]["follow the problem, all closed"] = function()

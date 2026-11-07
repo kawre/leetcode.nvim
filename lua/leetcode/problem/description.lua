@@ -5,8 +5,6 @@ local extras = require("leetcode.ui.problem.description.extras")
 local kit = require("leetcode.ui.kit")
 local t = require("leetcode.translator")
 
-local img_ok, image_api = pcall(require, "image")
-local img_sup = img_ok and config.user.image_support
 
 ---@class leet.problem.description
 ---@field problem leet.problem
@@ -28,7 +26,6 @@ function M:new(problem)
 	local opts = config.user.description
 
 	self.problem = problem
-	self.images = {}
 	self.stats_visible = m.signal(opts.show_stats)
 
 	self.win = Markup.window({
@@ -55,10 +52,8 @@ function M:new(problem)
 	if self.win:valid() then
 		self.win:focus()
 	end
-	self:draw_images()
-
-	if config.user.image_support and not img_ok then
-		Markup.log.error("image.nvim not found but `image_support` is enabled")
+	if config.user.image_support and not Markup.image.available() then
+		Markup.log.warn("`image_support` needs a Neovim with `vim.ui.img`, links are shown instead")
 	end
 end
 
@@ -367,37 +362,6 @@ function M:content()
 			}),
 		}),
 	})
-end
-
-function M:draw_images()
-	if not img_sup then
-		return
-	end
-
-	vim.schedule(function()
-		if not self.win:valid() then
-			return
-		end
-
-		local lines = vim.api.nvim_buf_get_lines(self.win.buf, 0, -1, false)
-		for i, line in ipairs(lines) do
-			for link in line:gmatch("%((http[s]?://%S+)%)") do
-				if not self.images[link] then
-					self.images[link] = {}
-					image_api.from_url(link, {
-						buffer = self.win.buf,
-						window = self.win.win,
-						with_virtual_padding = true,
-					}, function(image)
-						if image then
-							self.images[link] = image
-							image:render({ y = i + 1 })
-						end
-					end)
-				end
-			end
-		end
-	end)
 end
 
 --- Opens a section and brings it into view. Without a name that is the first one.
