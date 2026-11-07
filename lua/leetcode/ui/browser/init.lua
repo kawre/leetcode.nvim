@@ -75,36 +75,66 @@ local function choices(options, selected, set)
 	})
 end
 
+--- Room the count takes at the end of the search field.
+---@param state table
+---@return integer
+local function count_width(state)
+	local total = #state.problems
+	return #("%d of %d"):format(total, total)
+end
+
+--- An input across the top, which the search float covers while typing.
+local SearchField = m.component(function(props)
+	local state = props.state
+	local hovered = m.signal(false)
+
+	return m.flex({
+		on_press = state.search,
+		on_hover = hovered,
+		justify = "between",
+		white_space = "nowrap",
+		margin_bottom = 1,
+		padding = { 0, 1 },
+		style = function()
+			return (state.typing() or hovered()) and "leetcode_input_focus" or "leetcode_input"
+		end,
+		m.inline({
+			shrink = 1,
+			m.inline(kit.icons.search .. " ", "leetcode_accent"),
+			m.inline({
+				style = function()
+					return state.query() == "" and "leetcode_muted" or "leetcode_strong"
+				end,
+				function()
+					local query = state.query()
+					return query == "" and "Search problems" or query
+				end,
+			}),
+		}),
+		m.inline({
+			shrink = 0,
+			margin_left = 2,
+			m.inline(function()
+				-- The count matters once anything narrows the list, the hint before.
+				local everything = #state.filtered() == #state.problems
+				if everything and state.query() == "" and not state.typing() then
+					return m.inline({ m.inline("i ", "leetcode_key"), m.inline("to search", "leetcode_muted") })
+				end
+				return m.inline({
+					m.inline(tostring(#state.filtered()), "leetcode_strong"),
+					m.inline(" of " .. #state.problems, "leetcode_muted"),
+				})
+			end),
+		}),
+	})
+end)
+
 local Filters = m.component(function(props)
 	local state = props.state
 
 	return m.block({
 		padding = { 1, 2 },
-		m.flex({
-			justify = "between",
-			margin_bottom = 1,
-			m.inline({
-				on_press = state.search,
-				white_space = "nowrap",
-				m.inline(kit.icons.search .. " ", "leetcode_accent"),
-				m.inline({
-					style = function()
-						return state.query() == "" and "leetcode_muted" or "leetcode_strong"
-					end,
-					function()
-						local query = state.query()
-						return query == "" and "Search  i" or query
-					end,
-				}),
-			}),
-			m.inline({
-				white_space = "nowrap",
-				m.inline(function()
-					return tostring(#state.filtered())
-				end, "leetcode_strong"),
-				m.inline(" of " .. #state.problems, "leetcode_muted"),
-			}),
-		}),
+		SearchField({ state = state }),
 		m.block({ margin_bottom = 1, choices(difficulties, state.difficulty, state.difficulty) }),
 		m.flex({
 			spacing = 1,
@@ -192,6 +222,7 @@ local function create_state(problems)
 		status = m.signal("all"),
 		free = m.signal(false),
 		query = m.signal(""),
+		typing = m.signal(false),
 		limit = m.signal(BATCH),
 	}
 
@@ -239,14 +270,16 @@ local function search(state)
 	local win = api.nvim_open_win(buf, true, {
 		relative = "win",
 		win = anchor.win,
+		-- Over the text of the field: past the padding, the field's own and the icon.
 		row = 1,
-		col = 4,
-		width = math.max(api.nvim_win_get_width(anchor.win) - 20, 10),
+		col = 5,
+		width = math.max(api.nvim_win_get_width(anchor.win) - 5 - 3 - 2 - count_width(state), 10),
 		height = 1,
 		style = "minimal",
 		zindex = 60,
 	})
-	vim.wo[win].winhighlight = "NormalFloat:leetcode_surface"
+	vim.wo[win].winhighlight = "NormalFloat:leetcode_input_focus"
+	state.typing(true)
 
 	--- Neovim holds back TextChangedI while keys are queued, so whatever acts on
 	--- the query reads it first.
@@ -266,6 +299,7 @@ local function search(state)
 
 	local function leave()
 		vim.cmd.stopinsert()
+		state.typing(false)
 		if api.nvim_win_is_valid(win) then
 			api.nvim_win_close(win, true)
 		end
@@ -374,8 +408,9 @@ function M.open(problems)
 	})
 	M.layout:show()
 
-	M.filters_view = Markup.view(M.filters, { snap = true })
-	M.list_view = Markup.view(M.list, { snap = true })
+	-- The marked row shows where the cursor is, so it only shows while typing.
+	M.filters_view = Markup.view(M.filters, { snap = true, hide_cursor = true })
+	M.list_view = Markup.view(M.list, { snap = true, hide_cursor = true })
 
 	local function set_filter(signal, value)
 		signal(value)

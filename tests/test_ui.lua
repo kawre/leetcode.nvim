@@ -233,7 +233,7 @@ end
 T["browser"]["lists problems beside the menu"] = function()
 	open_browser(5)
 	eq(list_has("Problem 3"), true)
-	eq(filters_have("5 of 5"), true)
+	eq(filters_have("i to search"), true)
 	eq(child.lua_get("vim.api.nvim_get_current_win() == browser.list.win"), true)
 end
 
@@ -249,7 +249,7 @@ T["browser"]["keys filter from either window"] = function()
 	-- The same key again turns the filter off.
 	child.type_keys("e")
 	child.lua("reactive.flush()")
-	eq(filters_have("9 of 9"), true)
+	eq(filters_have("i to search"), true)
 end
 
 T["browser"]["filters are reached with h and l"] = function()
@@ -275,7 +275,7 @@ T["browser"]["filters are reached with h and l"] = function()
 	eq(under_cursor(), "Medium")
 	child.type_keys("h")
 	eq(under_cursor(), "Easy")
-	eq(filters_have("9 of 9"), true)
+	eq(filters_have("i to search"), true)
 end
 
 T["browser"]["hard has a key that leaves h alone"] = function()
@@ -389,6 +389,56 @@ T["browser"]["all and any need no key"] = function()
 	eq(filters_have("All a"), false)
 	eq(filters_have("Any A"), false)
 	eq(filters_have("Easy e"), true)
+end
+
+local function cursor_hidden()
+	return child.lua_get("vim.o.guicursor:find('MarkupHiddenCursor', 1, true) ~= nil")
+end
+
+T["browser"]["the cursor only shows in the search"] = function()
+	open_browser(5)
+	eq(cursor_hidden(), true)
+	child.type_keys("<Tab>")
+	eq(cursor_hidden(), true)
+
+	child.type_keys("i")
+	eq(cursor_hidden(), false)
+
+	child.type_keys("<Esc>")
+	eq(cursor_hidden(), true)
+
+	child.type_keys("q")
+	eq(cursor_hidden(), false)
+end
+
+T["browser"]["the search field stands apart"] = function()
+	open_browser(5)
+	eq(filters_have("Search problems"), true)
+	eq(filters_have("i to search"), true)
+
+	child.lua([[
+		lit = nil
+		local buf, ns = browser.filters.buf, browser.filters_view.ns
+		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, { 1, 0 }, { 1, -1 }, { details = true })) do
+			if mark[4].hl_group == "leetcode_input" then lit = true end
+		end
+	]])
+	eq(child.lua_get("lit"), true)
+end
+
+T["browser"]["typing lights up the field and shows the count"] = function()
+	open_browser(9)
+	child.type_keys("i", "1")
+	child.lua("vim.wait(20, function() reactive.flush(); return false end, 5)")
+	eq(filters_have("1 of 9"), true)
+	child.lua([[
+		focused = nil
+		local buf, ns = browser.filters.buf, browser.filters_view.ns
+		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, { 1, 0 }, { 1, -1 }, { details = true })) do
+			if mark[4].hl_group == "leetcode_input_focus" then focused = true end
+		end
+	]])
+	eq(child.lua_get("focused"), true)
 end
 
 T["browser"]["says when nothing matches"] = function()
