@@ -2,6 +2,7 @@
 --- pinned in their own window, so they remain real buttons while the list scrolls.
 
 local m = require("markup")
+local reactive = require("markup.reactive")
 local kit = require("leetcode.ui.kit")
 local filter = require("leetcode.ui.browser.filter")
 local ui = require("leetcode.ui.util")
@@ -19,14 +20,14 @@ local WIDTH = 0.5
 local M = {}
 
 local difficulties = {
-	{ value = "all", title = "All", lhs = "a" },
+	{ value = "all", title = "All" },
 	{ value = "easy", title = "Easy", lhs = "e", kind = "easy" },
 	{ value = "medium", title = "Medium", lhs = "m", kind = "medium" },
 	{ value = "hard", title = "Hard", lhs = "H", kind = "hard" },
 }
 
 local statuses = {
-	{ value = "all", title = "Any", lhs = "A" },
+	{ value = "all", title = "Any" },
 	{ value = "ac", title = "Solved", lhs = "s" },
 	{ value = "notac", title = "Attempted", lhs = "x" },
 	{ value = "todo", title = "Todo", lhs = "o" },
@@ -47,7 +48,7 @@ local Choice = m.component(function(props)
 			return hovered() and "leetcode_row_active" or "leetcode_tab"
 		end,
 		m.inline((" %s "):format(props.title)),
-		m.inline({
+		props.lhs and m.inline({
 			style = function()
 				return props.active() and "leetcode_tab_active" or "leetcode_key"
 			end,
@@ -92,7 +93,7 @@ local Filters = m.component(function(props)
 					end,
 					function()
 						local query = state.query()
-						return query == "" and "Search  /" or query
+						return query == "" and "Search  i" or query
 					end,
 				}),
 			}),
@@ -247,12 +248,20 @@ local function search(state)
 	})
 	vim.wo[win].winhighlight = "NormalFloat:leetcode_surface"
 
+	--- Neovim holds back TextChangedI while keys are queued, so whatever acts on
+	--- the query reads it first.
+	local function sync()
+		local text = api.nvim_buf_is_valid(buf) and api.nvim_buf_get_lines(buf, 0, 1, false)[1] or ""
+		if text ~= state.query() then
+			state.query(text)
+			M.list_view:after_commit(M.to_top)
+			reactive.flush()
+		end
+	end
+
 	api.nvim_create_autocmd({ "TextChangedI", "TextChanged" }, {
 		buffer = buf,
-		callback = function()
-			state.query(api.nvim_buf_get_lines(buf, 0, 1, false)[1] or "")
-			M.to_top()
-		end,
+		callback = sync,
 	})
 
 	local function leave()
@@ -263,16 +272,55 @@ local function search(state)
 		M.list:focus()
 	end
 
-	vim.keymap.set({ "i", "n" }, "<CR>", leave, { buffer = buf })
-	vim.keymap.set({ "i", "n" }, "<Esc>", leave, { buffer = buf })
+	local function move(by)
+		sync()
+		M.select_row(api.nvim_win_get_cursor(M.list.win)[1] + by)
+	end
+
+	local keys = {
+		["<Esc>"] = leave,
+		["<CR>"] = function()
+			sync()
+			leave()
+			M.list_view:press()
+		end,
+	}
+	for _, lhs in ipairs({ "<C-n>", "<Down>", "<C-j>" }) do
+		keys[lhs] = function()
+			move(1)
+		end
+	end
+	for _, lhs in ipairs({ "<C-p>", "<Up>", "<C-k>" }) do
+		keys[lhs] = function()
+			move(-1)
+		end
+	end
+	for lhs, action in pairs(keys) do
+		vim.keymap.set({ "i", "n" }, lhs, action, { buffer = buf, nowait = true })
+	end
+
 	vim.cmd.startinsert({ bang = true })
+end
+
+--- Puts the cursor of the list on a row, and marks it, from any window.
+---@param row integer
+function M.select_row(row)
+	if not (M.list and M.list:valid()) then
+		return
+	end
+
+	api.nvim_win_call(M.list.win, function()
+		local last = api.nvim_buf_line_count(M.list.buf)
+		api.nvim_win_set_cursor(0, { math.max(math.min(row, last), 1), 0 })
+		M.list_view.cursor = nil
+		M.list_view:snap_cursor()
+		M.list_view:update_hover()
+	end)
 end
 
 --- Puts the cursor back on the first row, which filtering may have replaced.
 function M.to_top()
-	if M.list and M.list:valid() then
-		api.nvim_win_set_cursor(M.list.win, { 1, 0 })
-	end
+	M.select_row(1)
 end
 
 function M.is_open()
@@ -336,7 +384,6 @@ function M.open(problems)
 	end
 
 	local keys = {
-		["/"] = state.search,
 		f = state.toggle_free,
 		q = M.close,
 		["<Tab>"] = function()
@@ -350,16 +397,23 @@ function M.open(problems)
 			end
 		end,
 	}
-	for _, option in ipairs(difficulties) do
-		keys[option.lhs] = function()
-			set_filter(state.difficulty, option.value)
+	-- Like the keys that start insert mode anywhere else, these start typing.
+	for _, lhs in ipairs({ "/", "i", "a", "I", "A" }) do
+		keys[lhs] = state.search
+	end
+
+	-- A filter key turns its filter off again, which is how to get back to all.
+	local function toggles(options, signal)
+		for _, option in ipairs(options) do
+			if option.lhs then
+				keys[option.lhs] = function()
+					set_filter(signal, signal() == option.value and "all" or option.value)
+				end
+			end
 		end
 	end
-	for _, option in ipairs(statuses) do
-		keys[option.lhs] = function()
-			set_filter(state.status, option.value)
-		end
-	end
+	toggles(difficulties, state.difficulty)
+	toggles(statuses, state.status)
 
 	for _, win in ipairs({ M.filters, M.list }) do
 		for lhs, action in pairs(keys) do

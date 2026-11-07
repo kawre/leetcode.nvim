@@ -246,7 +246,8 @@ T["browser"]["keys filter from either window"] = function()
 
 	child.type_keys("<Tab>")
 	eq(child.lua_get("vim.api.nvim_get_current_win() == browser.filters.win"), true)
-	child.type_keys("a")
+	-- The same key again turns the filter off.
+	child.type_keys("e")
 	child.lua("reactive.flush()")
 	eq(filters_have("9 of 9"), true)
 end
@@ -322,6 +323,72 @@ T["browser"]["highlights what the search matched"] = function()
 	]])
 	child.type_keys("<Esc>")
 	eq(child.lua_get("matched"), { "blem", "12" })
+end
+
+local function search_open()
+	return child.lua_get([[(function()
+		local win = vim.api.nvim_get_current_win()
+		return vim.api.nvim_win_get_config(win).relative ~= "" and vim.fn.mode() == "i"
+	end)()]])
+end
+
+T["browser"]["insert keys start the search"] = function()
+	for _, lhs in ipairs({ "i", "a", "I", "A", "/" }) do
+		open_browser(5)
+		child.type_keys(lhs)
+		eq(search_open(), true)
+		child.type_keys("<Esc>")
+		child.lua("browser.close()")
+	end
+end
+
+T["browser"]["the search starts from the filters too"] = function()
+	open_browser(5)
+	child.type_keys("<Tab>", "i")
+	eq(search_open(), true)
+end
+
+T["browser"]["moving while typing selects in the list"] = function()
+	open_browser(9)
+	child.type_keys("i", "<C-n>", "<C-n>")
+	eq(child.lua_get("vim.api.nvim_win_get_cursor(browser.list.win)[1]"), 3)
+	eq(child.lua_get("buffer_text(browser.list.buf)[3]:find('▌', 1, true) ~= nil"), true)
+
+	child.type_keys("<C-p>")
+	eq(child.lua_get("vim.api.nvim_win_get_cursor(browser.list.win)[1]"), 2)
+	eq(search_open(), true)
+end
+
+T["browser"]["enter in the search opens the selected problem"] = function()
+	open_browser(30)
+	child.lua([[
+		opened = nil
+		package.loaded["leetcode.cmd"] = { open = function(problem) opened = problem.title_slug end }
+	]])
+	child.type_keys("i", "2", "<C-n>", "<CR>")
+	-- Rows with a 2 in them: 2, 12, 20, 21, ...
+	eq(child.lua_get("opened"), "p12")
+end
+
+T["browser"]["typing puts the selection back on top"] = function()
+	open_browser(30)
+	child.type_keys("i", "<C-n>", "<C-n>", "1")
+	child.lua("vim.wait(20, function() reactive.flush(); return false end, 5)")
+	eq(child.lua_get("vim.api.nvim_win_get_cursor(browser.list.win)[1]"), 1)
+end
+
+T["browser"]["escape leaves the search for the list"] = function()
+	open_browser(5)
+	child.type_keys("i", "<Esc>")
+	eq(child.lua_get("vim.api.nvim_get_current_win() == browser.list.win"), true)
+	eq(child.fn.mode(), "n")
+end
+
+T["browser"]["all and any need no key"] = function()
+	open_browser(5)
+	eq(filters_have("All a"), false)
+	eq(filters_have("Any A"), false)
+	eq(filters_have("Easy e"), true)
 end
 
 T["browser"]["says when nothing matches"] = function()
