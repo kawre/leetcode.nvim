@@ -72,6 +72,15 @@ function M.truncate(text, width)
 	return table.concat(result) .. "…"
 end
 
+--- Something that is on its way.
+---@param text? string
+function M.Loading(text)
+	return m.inline({
+		m.spinner({ style = "leetcode_accent" }),
+		m.inline(" " .. (text or "Loading"), "leetcode_muted"),
+	})
+end
+
 --- A rounded label.
 ---@param text string
 ---@param kind string one of `easy`, `medium`, `hard`, `accent`

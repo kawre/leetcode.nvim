@@ -14,7 +14,10 @@ local Action = m.component(function(props)
 		style = function()
 			return hovered() and "leetcode_tab_active" or "leetcode_tab"
 		end,
-		m.inline((" %s "):format(props.title)),
+		m.inline(function()
+			local content = props.content and props.content()
+			return content and m.inline({ " ", content, " " }) or (" %s "):format(props.title)
+		end),
 		m.inline({
 			style = function()
 				return hovered() and "leetcode_tab_active" or "leetcode_key"
@@ -25,7 +28,7 @@ local Action = m.component(function(props)
 end)
 
 --- The top of a page that slides in beside the dashboard.
----@param props { title: string, width: integer, actions: { title: string, lhs: string, press: function }[] }
+---@param props { title: string, width: integer, actions: { title: string, lhs: string, press: function, content?: fun(): any }[] }
 return function(props)
 	return kit.Card({
 		width = props.width,

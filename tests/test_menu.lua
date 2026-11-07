@@ -552,6 +552,49 @@ T["statistics"]["move between the buttons sideways"] = function()
 	eq(under_cursor(), "Update")
 end
 
+T["statistics"]["update in the page, not in a notification"] = function()
+	open_stats()
+	child.lua([[
+		require("leetcode.logger.spinner").start = function() error("no notifications") end
+		local stats = package.loaded["leetcode.api.stats"]
+		local skills = stats.skills
+		stats.skills = function(cb) held = function() skills(cb) end end
+	]])
+	child.type_keys("u")
+	child.lua("reactive.flush()")
+	eq(contains("Updating"), true)
+	eq(contains("Update u"), false)
+
+	child.lua("held(); reactive.flush()")
+	eq(contains("Updated"), true)
+
+	child.lua("vim.wait(1700, function() reactive.flush(); return false end, 20)")
+	eq(contains("Update u"), true)
+end
+
+T["statistics"]["a second update waits for the first"] = function()
+	open_stats()
+	child.lua([[
+		count = 0
+		local stats = package.loaded["leetcode.api.stats"]
+		stats.skills = function(cb) count = count + 1; held = cb end
+	]])
+	child.type_keys("u")
+	child.type_keys("u")
+	eq(child.lua_get("count"), 1)
+end
+
+T["statistics"]["update finishes even when something fails"] = function()
+	open_stats()
+	child.lua([[
+		vim.notify = function() end
+		package.loaded["leetcode.api.stats"].languages = function(cb) cb(nil, { msg = "offline" }) end
+	]])
+	child.type_keys("u")
+	child.lua("reactive.flush()")
+	eq(contains("Updated"), true)
+end
+
 T["statistics"]["open no popups"] = function()
 	open(true)
 	child.lua("wins = #vim.api.nvim_list_wins()")

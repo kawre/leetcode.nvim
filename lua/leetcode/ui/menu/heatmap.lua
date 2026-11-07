@@ -146,7 +146,7 @@ return m.component(function(props)
 		function()
 			local calendar = data.calendar()
 			if not calendar then
-				return m.block("Loading...", "leetcode_muted")
+				return m.block(kit.Loading())
 			end
 			return Content({ summary = summarize(calendar, os.time()) })
 		end,

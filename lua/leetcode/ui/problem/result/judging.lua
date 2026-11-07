@@ -11,7 +11,9 @@ local RUNNER = 10
 --- What the console shows while the judge works.
 ---@param props { state: fun(): string?, submit: boolean, lang?: string }
 return m.component(function(props)
-	local spinner = m.frames({ "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" })
+	-- One spinner for the whole run, rather than a new one at every step.
+	local names = require("markup.view.components").spinner_names()
+	local spinner = names[math.random(#names)]
 
 	local position = m.signal(0)
 	animate.run({
@@ -40,7 +42,7 @@ return m.component(function(props)
 					if index < current then
 						return kit.icons.check
 					end
-					return index == current and spinner() or "○"
+					return index == current and m.spinner({ name = spinner }) or "○"
 				end,
 			}),
 			m.inline({

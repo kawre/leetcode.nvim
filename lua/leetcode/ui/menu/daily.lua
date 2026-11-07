@@ -35,7 +35,7 @@ return m.component(function(props)
 		function()
 			local problem = data.daily()
 			if not problem then
-				return m.block("Loading...", "leetcode_muted")
+				return m.block(kit.Loading())
 			end
 
 			local status = require("leetcode.config").icons.hl.status[problem.status]

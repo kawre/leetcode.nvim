@@ -1,7 +1,6 @@
 local m = require("markup")
 local kit = require("leetcode.ui.kit")
 local statistics = require("leetcode.api.stats")
-local Spinner = require("leetcode.logger.spinner")
 local t = require("leetcode.translator")
 
 local BAR_WIDTH = 16
@@ -11,24 +10,16 @@ local data = m.signal(nil)
 ---@class leet.ui.solved
 local M = {}
 
-function M.fetch()
+---@param done? function called once it came back, errors included
+function M.fetch(done)
 	statistics.solved(function(res, err)
+		if done then
+			done()
+		end
 		if err then
 			return Markup.log.error(err)
 		end
 		data(res)
-	end)
-end
-
-function M.update()
-	local spinner = Spinner:start("updating solved problems")
-	statistics.solved(function(res, err)
-		if err then
-			spinner:error(err.msg)
-		else
-			spinner:success("solved problems updated")
-			data(res)
-		end
 	end)
 end
 

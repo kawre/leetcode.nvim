@@ -1,10 +1,6 @@
 local m = require("markup")
+local kit = require("leetcode.ui.kit")
 
 return m.component(function()
-    local spinner = m.frames({ "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" })
-
-    return m.block({
-        m.inline(spinner, "leetcode_accent"),
-        m.inline(" Signing in", "leetcode_muted"),
-    })
+    return m.block({ padding = { 0, 1 }, kit.Loading("Signing in") })
 end)

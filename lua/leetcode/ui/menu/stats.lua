@@ -3,7 +3,6 @@
 local m = require("markup")
 local kit = require("leetcode.ui.kit")
 local data = require("leetcode.ui.menu.data")
-local solved = require("leetcode.ui.menu.solved")
 local PageBar = require("leetcode.ui.menu.page_bar")
 local t = require("leetcode.translator")
 
@@ -25,22 +24,47 @@ local function by_solved(items)
 	return sorted
 end
 
+--- How long `Updated` shows before the button is plain again.
+local UPDATED_FOR = 1500
+
 local function Bar(width)
+	local state = m.signal("idle")
+
 	local function back()
 		Leet.menu.set_page("menu")
 	end
 
 	local function update()
-		solved.update()
-		data.load_details()
-		Leet.menu.refresh()
+		if state() == "busy" then
+			return
+		end
+
+		state("busy")
+		data.update(function()
+			state("done")
+			vim.defer_fn(function()
+				if state() == "done" then
+					state("idle")
+				end
+			end, UPDATED_FOR)
+		end)
+	end
+
+	local function progress()
+		local current = state()
+		if current == "busy" then
+			return m.inline({ m.spinner(), m.inline(" Updating") })
+		elseif current == "done" then
+			-- In the colors of the button, which may be lit by the cursor.
+			return m.inline(kit.icons.check .. " Updated")
+		end
 	end
 
 	return PageBar({
 		title = "Statistics",
 		width = width,
 		actions = {
-			{ title = "Update", lhs = "u", press = update },
+			{ title = "Update", lhs = "u", press = update, content = progress },
 			{ title = "Back", lhs = "q", press = back },
 		},
 	})
@@ -66,7 +90,7 @@ local function Level(level, width)
 		function()
 			local skills = data.skills()
 			if not skills then
-				return m.block("Loading...", "leetcode_muted")
+				return m.block(kit.Loading())
 			end
 
 			local sorted = by_solved(skills[level.key] or {})
@@ -131,7 +155,7 @@ local function Languages(width)
 		function()
 			local languages = data.languages()
 			if not languages then
-				return m.block("Loading...", "leetcode_muted")
+				return m.block(kit.Loading())
 			end
 			if #languages == 0 then
 				return m.block("Nothing yet", "leetcode_muted")
