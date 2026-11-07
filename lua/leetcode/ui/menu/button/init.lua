@@ -5,7 +5,8 @@ local animate = Markup.animate
 
 ---@class MenuButtonProps
 ---@field title string
----@field desc? string
+---@field prefix? string muted, before the title
+---@field desc? string|{ [1]: string, [2]?: string }[] text, or spans of text and highlight
 ---@field icon_hl? string
 ---@field icon string
 ---@field lhs string
@@ -46,6 +47,16 @@ return m.component(function(p)
         focus
     )
 
+    local function description()
+        if type(p.desc) == "string" then
+            return m.inline(p.desc, fade("leetcode_muted"))
+        end
+
+        return vim.tbl_map(function(span)
+            return m.inline(span[1], fade(span[2] or "leetcode_muted"))
+        end, p.desc)
+    end
+
     local function marker()
         return m.block(function()
             return focus() > 0.5 and "▌" or " "
@@ -67,10 +78,11 @@ return m.component(function(p)
                 end,
                 m.block({
                     m.inline(p.icon .. " ", fade(p.icon_hl or "Character")),
+                    p.prefix and m.inline(p.prefix .. " ", fade("leetcode_muted")),
                     m.inline(p.title, fade("leetcode_strong")),
                     p.nested and m.inline(" \u{eab6}", fade("leetcode_muted")),
                 }),
-                p.desc and m.block({ margin_left = 2, m.inline(p.desc, fade("leetcode_muted")) }),
+                p.desc and m.block({ margin_left = 2, description() }),
             }),
         }),
         m.inline({ margin_right = 1, kit.Key(p.lhs) }),

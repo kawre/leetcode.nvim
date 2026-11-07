@@ -5,6 +5,7 @@ local kit = require("leetcode.ui.kit")
 local config = require("leetcode.config")
 local recent = require("leetcode.ui.menu.recent")
 local t = require("leetcode.translator")
+local ui = require("leetcode.ui.util")
 local Button = require("leetcode.ui.menu.button")
 local Buttons = require("leetcode.ui.menu.buttons")
 local PageBar = require("leetcode.ui.menu.page_bar")
@@ -13,23 +14,46 @@ local RECENT = 5
 
 local status_labels = { ac = "Solved", notac = "Attempted", todo = "Not solved" }
 
+--- The language a solution is in, from the extension of its file.
+---@param ext string
+---@return lc.language?
+local function language_of(ext)
+	return vim.iter(config.langs):find(function(lang)
+		return lang.ft == ext
+	end)
+end
+
 ---@param item leet.ui.menu.recent.item
 ---@param index integer
----@param width integer room for the title
+---@param width integer room for the number and the title
 local function Recent(item, index, width)
 	local problem = item.problem
 	local status = config.icons.hl.status[problem.status]
+	local status_hl = status and status[2] or "leetcode_muted"
+	local number = problem.frontend_id .. "."
 	local title = Leet.util.translate(problem.title, problem.title_cn)
+	local language = language_of(item.ext)
+
+	local separator = { " · ", "leetcode_muted" }
+	local desc = {
+		{ t(status_labels[problem.status] or status_labels.todo), status_hl },
+		separator,
+		{ t(problem.difficulty), ui.diff_to_hl(problem.difficulty) },
+		separator,
+		{ recent.ago(item.time), "leetcode_muted" },
+	}
+
+	if language then
+		desc[#desc + 1] = separator
+		desc[#desc + 1] = { language.icon, language.hl or "leetcode_accent" }
+	end
 
 	return Button({
 		icon = status and status[1] or config.icons.status.todo,
-		icon_hl = status and status[2] or "leetcode_muted",
-		title = kit.truncate(("%s. %s"):format(problem.frontend_id, title), width),
-		desc = ("%s · %s · %s"):format(
-			t(status_labels[problem.status] or status_labels.todo),
-			t(problem.difficulty),
-			recent.ago(item.time)
-		),
+		icon_hl = status_hl,
+		prefix = number,
+		title = kit.truncate(title, width - vim.api.nvim_strwidth(number) - 1),
+		desc = desc,
 		lhs = tostring(index),
 		on_submit = function()
 			require("leetcode.cmd").open(problem)

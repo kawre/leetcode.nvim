@@ -312,6 +312,30 @@ T["problems"]["show recent work with its status, newest first"] = function()
 	eq(child.lua_get("first < second"), true)
 end
 
+T["problems"]["color recent work by what it means"] = function()
+	worked_on(two_problems)
+	open_problems()
+
+	local function hl_of(text)
+		return child.lua_get(([[(function()
+			local buf, ns = menu.win.buf, menu.view.ns
+			for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, { details = true })) do
+				local found = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[4].end_row or mark[2], mark[4].end_col, {})[1]
+				if found == %q then
+					return mark[4].hl_group
+				end
+			end
+		end)()]]):format(text))
+	end
+
+	eq(hl_of("Solved"), "leetcode_easy")
+	eq(hl_of("Attempted"), "leetcode_medium")
+	eq(hl_of("Easy"), "leetcode_easy")
+	eq(hl_of("Medium"), "leetcode_medium")
+	eq(hl_of("1h ago"), "leetcode_muted")
+	eq(hl_of("Two Sum"), "leetcode_strong")
+end
+
 T["problems"]["open recent work with its number"] = function()
 	worked_on(two_problems)
 	open_problems()
