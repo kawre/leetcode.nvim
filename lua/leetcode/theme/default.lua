@@ -63,6 +63,7 @@ M.get = function()
     local ok = hl("DiagnosticOk").fg or 0x46c6c2
     local err = hl("DiagnosticError").fg or 0xf8615c
     local warn = hl("DiagnosticWarn").fg or 0xfac31d
+    local header = mix(hl("CursorLine").bg or raised, 0xffffff, 0.06)
     local difficulty = {
         easy = readable(0x46c6c2),
         medium = readable(0xfac31d),
@@ -93,7 +94,8 @@ M.get = function()
 
         normal = { fg = hl("Conceal").fg },
         alt = { fg = hl("Comment").fg },
-        description_header = { bg = mix(hl("CursorLine").bg or raised, 0xffffff, 0.06) },
+        description_header = { bg = header },
+        header_track = { fg = mix(header, fg, 0.15) },
         section = { bg = blend(hl("NormalFloat").bg or hl("Normal").bg, hl("CursorLine").bg) },
 
         italic = { italic = true },

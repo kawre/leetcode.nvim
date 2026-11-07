@@ -73,66 +73,153 @@ function M:open_link()
 	end
 end
 
-function M:header()
-	local q, cached = self.problem.problem, self.problem.cached
-
-	local function stats()
-		local visible = self.stats_visible()
-		local spans = {}
-
-		local function add(text, hl)
-			spans[#spans + 1] = m.inline(text, hl)
-		end
-
-		local separator = (" %s "):format(config.icons.bar)
-
-		if visible then
-			spans[#spans + 1] = kit.Pill(t(q.difficulty), q.difficulty)
-		else
-			add("????", "leetcode_list")
-		end
-
-		local status = config.icons.hl.status[cached.status]
-		if status then
-			add(" ")
-			add(status[1], status[2])
-		end
-
-		add(separator)
-		add((visible and q.likes or "___") .. " ", "leetcode_alt")
-		if not config.is_cn then
-			add((" %s "):format(visible and q.dislikes or "___"), "leetcode_alt")
-		end
-
-		add(separator)
-		local ac_rate = visible and q.stats.acRate or "__%"
-		local total = visible and q.stats.totalSubmission or "__"
-		add(("%s %s %s"):format(ac_rate, t("of"), total), "leetcode_alt")
-
-		if not vim.tbl_isempty(q.hints) then
-			add(separator)
-			add("󰛨 " .. t("Hints"), "leetcode_hint")
-		end
-
-		return m.block(spans)
+--- A count that stays short, such as `71.1K`.
+---@param count any
+---@return string
+function M.compact(count)
+	local number = tonumber(count)
+	if not number then
+		return tostring(count)
 	end
+
+	for _, unit in ipairs({ { 1e6, "M" }, { 1e3, "K" } }) do
+		if number >= unit[1] then
+			return ("%.1f"):format(number / unit[1]):gsub("%.0$", "") .. unit[2]
+		end
+	end
+	return tostring(number)
+end
+
+--- Where the problem stands for the user, if anywhere.
+function M:status()
+	local status = config.icons.hl.status[self.problem.cached.status]
+	if not status then
+		return
+	end
+
+	local label = self.problem.cached.status == "ac" and "Solved" or "Attempted"
+	return m.inline({
+		white_space = "nowrap",
+		m.inline(status[1] .. " " .. t(label), status[2]),
+	})
+end
+
+--- The difficulty and how the problem was received. Details leave as the window
+--- narrows, least important first, so that nothing runs into anything else.
+function M:stats()
+	local q = self.problem.problem
+	local visible = self.stats_visible()
+	local width = vim.api.nvim_strwidth
+	local available = self.view:columns() - 4
+
+	local difficulty = visible and t(q.difficulty) or "????"
+	local used = width(difficulty) + 2
+
+	local function stat(icon, value, hl)
+		local text = (" %s"):format(visible and M.compact(value) or "___")
+		local item = {
+			width = 2 + width(icon) + width(text),
+			element = m.inline({
+				margin_left = 2,
+				m.inline(icon, "leetcode_muted"),
+				m.inline(text, hl or "leetcode_alt"),
+			}),
+		}
+		used = used + item.width
+		return item
+	end
+
+	local likes = stat(kit.icons.thumb_up, q.likes)
+	local dislikes = not config.is_cn and stat(kit.icons.thumb_down, q.dislikes)
+	local hint_count = #(q.hints or {})
+	local hints = hint_count > 0 and stat(kit.icons.bulb, hint_count, "leetcode_hint")
+
+	local rate = visible and q.stats.acRate or "__%"
+	local total = visible and q.stats.totalSubmission or "__"
+	local right = ("%s %s %s"):format(rate, t("of"), total)
+
+	if used + 2 + width(right) > available then
+		right = rate
+	end
+	if used + 2 + width(right) > available then
+		right = nil
+	end
+
+	for _, item in ipairs({ dislikes or {}, hints or {}, likes }) do
+		if used > available and item.element then
+			used = used - item.width
+			item.element = nil
+		end
+	end
+
+	return m.flex({
+		justify = "between",
+		white_space = "nowrap",
+		m.inline({
+			visible and kit.Pill(difficulty, q.difficulty) or m.inline(difficulty, "leetcode_list"),
+			likes.element,
+			dislikes and dislikes.element,
+			hints and hints.element,
+		}),
+		right and m.inline(right, "leetcode_alt"),
+	})
+end
+
+--- How many submissions pass, as the last row of the band. It takes the place of
+--- the padding, so it adds no height.
+function M:meter()
+	local q = self.problem.problem
+	local rate = (tonumber((tostring(q.stats.acRate):gsub("%%", ""))) or 0) / 100
+	local filled = m.animated(0, { duration = 560, delay = 120 })
+
+	m.effect(function()
+		filled(self.stats_visible() and rate or 0)
+	end)
+
+	local function cells()
+		return math.floor(filled() * self.view:columns() + 0.5)
+	end
+
+	return m.block({
+		white_space = "nowrap",
+		m.inline(function()
+			return ("▂"):rep(cells())
+		end, "leetcode_" .. q.difficulty:lower()),
+		m.inline(function()
+			return ("▂"):rep(self.view:columns() - cells())
+		end, "leetcode_header_track"),
+	})
+end
+
+function M:header()
+	local q = self.problem.problem
 
 	return m.vflex({
 		position = "fixed",
 		top = 0,
 		style = "leetcode_description_header",
-		padding = { 1, 2 },
-		m.flex({
-			justify = "between",
-			m.block({
-				shrink = 1,
-				m.inline(q.frontend_id .. ". ", "leetcode_alt"),
-				m.inline(Leet.util.translate(q.title, q.translated_title), "Title"),
-				q.is_paid_only and m.inline(" " .. t("Premium"), "leetcode_medium"),
+		m.vflex({
+			padding = { 1, 2, 0, 2 },
+			m.flex({
+				justify = "between",
+				m.block({
+					shrink = 1,
+					m.inline(q.frontend_id .. ". ", "leetcode_muted"),
+					m.inline(Leet.util.translate(q.title, q.translated_title), "leetcode_strong"),
+					q.is_paid_only and m.inline(" " .. t("Premium"), "leetcode_medium"),
+				}),
+				m.inline({
+					shrink = 0,
+					margin_left = 2,
+					self:status(),
+					m.inline("  " .. html.LINK_ICON, "leetcode_muted"),
+				}),
 			}),
-			m.inline({ " " .. html.LINK_ICON, style = "leetcode_link", shrink = 0 }),
+			function()
+				return self:stats()
+			end,
 		}),
-		stats,
+		self:meter(),
 	})
 end
 
@@ -172,7 +259,7 @@ function M:scroll_hint()
 			return function()
 				local label = (" %s %d+ "):format(kit.icons.arrow_up, hidden())
 				-- The pill has a cap on each side.
-				local rule = vim.api.nvim_win_get_width(self.win.win) - vim.api.nvim_strwidth(label) - 2
+				local rule = self.view:columns() - vim.api.nvim_strwidth(label) - 2
 				local left = math.floor(rule / 2)
 
 				return m.block({

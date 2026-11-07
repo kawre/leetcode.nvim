@@ -1,5 +1,4 @@
 local icons = {
-    bar = "│",
     circle = "",
     square = "󱓻",
     lock = "",

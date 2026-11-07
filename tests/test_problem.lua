@@ -272,6 +272,123 @@ T["description"]["renders lists with markers"] = function()
 	eq(description_has("2. Second"), true)
 end
 
+T["header"] = new_set()
+
+T["header"]["keeps numbers short"] = function()
+	run([[description = require("leetcode.problem.description")]])
+	eq(child.lua_get("description.compact(950)"), "950")
+	eq(child.lua_get("description.compact(71085)"), "71.1K")
+	eq(child.lua_get("description.compact(2000)"), "2K")
+	eq(child.lua_get("description.compact(41400000)"), "41.4M")
+	eq(child.lua_get("description.compact('10M')"), "10M")
+end
+
+T["header"]["shows where the problem stands"] = function()
+	run("open_problem()")
+	eq(header_has("Solved"), true)
+
+	run([[
+		problem:unmount()
+		fixture.cached.status = "notac"
+		open_problem()
+	]])
+	eq(header_has("Attempted"), true)
+end
+
+T["header"]["says nothing for untouched problems"] = function()
+	run([[
+		fixture.cached.status = "todo"
+		open_problem()
+	]])
+	eq(header_has("Solved"), false)
+	eq(header_has("Attempted"), false)
+end
+
+T["header"]["counts the hints"] = function()
+	run([[
+		fixture.problem.hints = { "a", "b", "c" }
+		open_problem()
+	]])
+	eq(child.lua_get([[buffer_text(problem.description.view.fixed[1].win.buf)[3]:find(" 3", 1, true) ~= nil]]), true)
+end
+
+local function header_at(width)
+	run(([[
+		problem.description.view.width_cells(%d)
+		reactive.flush()
+		reactive.flush()
+	]]):format(width))
+end
+
+T["header"]["details leave as the window narrows"] = function()
+	run("open_problem()")
+	eq(header_has("50% of 10M"), true)
+
+	header_at(34)
+	eq(header_has("50% of 10M"), false)
+	eq(header_has("50%"), true)
+
+	header_at(30)
+	eq(header_has("50%"), false)
+	eq(header_has("100"), true)
+
+	header_at(14)
+	eq(header_has("100"), false)
+	eq(header_has("Easy"), true)
+end
+
+T["header"]["details come back when there is room"] = function()
+	run("open_problem()")
+	header_at(14)
+	header_at(80)
+	eq(header_has("50% of 10M"), true)
+	eq(header_has("100"), true)
+end
+
+local function meter()
+	return child.lua_get([[(function()
+		local rows = buffer_text(problem.description.view.fixed[1].win.buf)
+		return select(2, rows[#rows]:gsub("▂", ""))
+	end)()]])
+end
+
+T["header"]["ends in a meter across the band"] = function()
+	run("open_problem()")
+	eq(meter(), child.lua_get("vim.api.nvim_win_get_width(problem.description.win.win)"))
+end
+
+T["header"]["the meter fills to the acceptance rate"] = function()
+	run([[
+		open_problem()
+		band = problem.description.view.fixed[1]
+		marks = {}
+		local rows = vim.api.nvim_buf_line_count(band.win.buf)
+		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(band.win.buf, band.view.ns, { rows - 1, 0 }, -1, { details = true })) do
+			if mark[4].hl_group == "leetcode_easy" then
+				filled = mark[4].end_col - mark[3]
+			end
+		end
+	]])
+	local width = child.lua_get("vim.api.nvim_win_get_width(problem.description.win.win)")
+	-- Each cell of the meter is three bytes, and the fixture is at 50%.
+	eq(child.lua_get("filled"), math.floor(width * 0.5 + 0.5) * 3)
+end
+
+T["header"]["the meter empties while stats are hidden"] = function()
+	run([[
+		open_problem()
+		problem.description:toggle_stats()
+		reactive.flush()
+		band = problem.description.view.fixed[1]
+		filled = nil
+		local rows = vim.api.nvim_buf_line_count(band.win.buf)
+		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(band.win.buf, band.view.ns, { rows - 1, 0 }, -1, { details = true })) do
+			if mark[4].hl_group == "leetcode_easy" then filled = mark[4].end_col - mark[3] end
+		end
+	]])
+	eq(child.lua_get("filled"), vim.NIL)
+end
+
 T["description"]["half cell edges are the only gap between sections"] = function()
 	run([[
 		open_problem()
