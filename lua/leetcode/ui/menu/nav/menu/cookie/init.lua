@@ -7,8 +7,8 @@ return m.component(function()
     local cmd = require("leetcode.cmd")
 
     return Items({
-        Item({ title = "Cookie", desc = "paste a new session cookie", lhs = "u", on_submit = cmd.cookie_prompt }),
-        Item({ title = "Sign out", desc = "forget this session", lhs = "d", on_submit = cmd.sign_out }),
+        Item({ icon = "\u{f16ec}", title = "Cookie", desc = "paste a new session cookie", lhs = "u", on_submit = cmd.cookie_prompt }),
+        Item({ icon = "\u{f16ea}", title = "Sign out", desc = "forget this session", lhs = "d", on_submit = cmd.sign_out }),
         BackButton({ page = "menu" }),
     })
 end)

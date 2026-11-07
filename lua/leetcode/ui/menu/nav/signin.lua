@@ -6,8 +6,9 @@ return m.component(function()
     local cmd = require("leetcode.cmd")
 
     return Items({
-        Item({ title = "Sign in", desc = "paste your session cookie", lhs = "i", on_submit = cmd.cookie_prompt }),
+        Item({ icon = "\u{f0306}", title = "Sign in", desc = "paste your session cookie", lhs = "i", on_submit = cmd.cookie_prompt }),
         Item({
+            icon = "\u{f0a48}",
             title = "Quit",
             desc = "close leetcode.nvim",
             lhs = "q",

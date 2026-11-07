@@ -10,6 +10,7 @@ local TITLE_WIDTH = 12
 
 ---@class leet.ui.menu.item
 ---@field title string
+---@field icon? string
 ---@field lhs string
 ---@field desc? string|fun(): any text, or what to show
 ---@field page? string
@@ -41,6 +42,7 @@ return m.component(function(p)
     local tint = animate.tint({ bg = background }, { bg = kit.color("leetcode_row_active", "bg") }, focus)
     local title = fade("leetcode_strong")
     local muted = fade("leetcode_muted")
+    local icon = fade("Character")
 
     local desc = p.desc
     if type(desc) == "string" then
@@ -63,6 +65,13 @@ return m.component(function(p)
             m.inline(function()
                 return focus() > 0.5 and "▌" or " "
             end, "leetcode_accent"),
+            p.icon and m.inline({
+                margin_left = 1,
+                style = function()
+                    return focus() > 0.5 and "leetcode_accent" or icon
+                end,
+                p.icon,
+            }),
             m.inline({
                 margin_left = 1,
                 width = TITLE_WIDTH,

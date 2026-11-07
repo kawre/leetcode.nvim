@@ -54,10 +54,11 @@ return m.component(function(props)
         m.vflex({ Continue(props.width), Today(props.width) }),
         m.block({ margin = { 1, 0 }, padding = { 0, 1 }, m.inline(("─"):rep(props.width - 2), "leetcode_divider") }),
         Items({
-            Item({ title = "Problems", desc = "browse, random, recent", lhs = "p", page = "menu.problems" }),
-            Item({ title = "Statistics", desc = "progress and skills", lhs = "s", page = "menu.statistics" }),
-            Item({ title = "Account", desc = "cookie, sign out", lhs = "a", page = "menu.cookie" }),
+            Item({ icon = "\u{f452}", title = "Problems", desc = "browse, random, recent", lhs = "p", page = "menu.problems" }),
+            Item({ icon = "\u{f201}", title = "Statistics", desc = "progress and skills", lhs = "s", page = "menu.statistics" }),
+            Item({ icon = "\u{f0198}", title = "Account", desc = "cookie, sign out", lhs = "a", page = "menu.cookie" }),
             Item({
+                icon = "\u{f0a48}",
                 title = "Quit",
                 desc = "close leetcode.nvim",
                 lhs = "q",
