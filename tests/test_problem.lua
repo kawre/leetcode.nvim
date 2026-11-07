@@ -36,7 +36,7 @@ local function description_has(text)
 end
 
 local function header_has(text)
-	return child.lua_get(("contains(problem.description.view.fixed[1].win.buf, %q)"):format(text))
+	return child.lua_get(("contains(problem.description.header.win.buf, %q)"):format(text))
 end
 
 --- Presses the first line holding `text` in the description.
@@ -67,7 +67,7 @@ T["description"]["pins the header in a band"] = function()
 end
 
 local function hint_has(text)
-	return child.lua_get(("contains(problem.description.view.fixed[2].win.buf, %q)"):format(text))
+	return child.lua_get(("contains(problem.description.view.fixed[1].win.buf, %q)"):format(text))
 end
 
 local function scroll_description(top)
@@ -86,16 +86,16 @@ end
 T["description"]["says when text is hidden above"] = function()
 	run("open_problem()")
 	run([[vim.api.nvim_win_set_height(problem.description.win.win, 8)]])
-	eq(child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[2].win.win).hide"), true)
+	eq(child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[1].win.win).hide"), true)
 
 	-- Rows: the header, then a blank one, and then the text.
 	scroll_description(4)
 	eq(hint_has(" 3+ "), true)
 	eq(hint_has("───"), true)
-	eq(child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[2].win.win).hide"), false)
+	eq(child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[1].win.win).hide"), false)
 
 	scroll_description(1)
-	eq(child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[2].win.win).hide"), true)
+	eq(child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[1].win.win).hide"), true)
 end
 
 T["description"]["blank rows alone do not count as hidden"] = function()
@@ -309,12 +309,12 @@ T["header"]["counts the hints"] = function()
 		fixture.problem.hints = { "a", "b", "c" }
 		open_problem()
 	]])
-	eq(child.lua_get([[buffer_text(problem.description.view.fixed[1].win.buf)[3]:find(" 3", 1, true) ~= nil]]), true)
+	eq(child.lua_get([[buffer_text(problem.description.header.win.buf)[3]:find(" 3", 1, true) ~= nil]]), true)
 end
 
 local function header_at(width)
 	run(([[
-		problem.description.view.width_cells(%d)
+		problem.description.header.view.width_cells(%d)
 		reactive.flush()
 		reactive.flush()
 	]]):format(width))
@@ -347,7 +347,7 @@ end
 
 local function meter()
 	return child.lua_get([[(function()
-		local rows = buffer_text(problem.description.view.fixed[1].win.buf)
+		local rows = buffer_text(problem.description.header.win.buf)
 		return select(2, rows[1]:gsub("▔", ""))
 	end)()]])
 end
@@ -360,7 +360,7 @@ end
 T["header"]["the meter fills to the acceptance rate"] = function()
 	run([[
 		open_problem()
-		band = problem.description.view.fixed[1]
+		band = problem.description.header
 		marks = {}
 		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(band.win.buf, band.view.ns, 0, { 0, -1 }, { details = true })) do
 			if mark[4].hl_group == "leetcode_easy" then
@@ -378,7 +378,7 @@ T["header"]["the meter empties while stats are hidden"] = function()
 		open_problem()
 		problem.description:toggle_stats()
 		reactive.flush()
-		band = problem.description.view.fixed[1]
+		band = problem.description.header
 		filled = nil
 		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(band.win.buf, band.view.ns, 0, { 0, -1 }, { details = true })) do
 			if mark[4].hl_group == "leetcode_easy" then filled = mark[4].end_col - mark[3] end
@@ -707,6 +707,35 @@ T["description"]["hides and shows stats"] = function()
 	run("problem.description:toggle_stats(); reactive.flush()")
 	eq(header_has("????"), true)
 	eq(header_has("___"), true)
+end
+
+T["description"]["the header is a window above it"] = function()
+	run("open_problem()")
+	run([[
+		header, body = problem.description.header.win.win, problem.description.win.win
+		header_pos, body_pos = vim.fn.win_screenpos(header), vim.fn.win_screenpos(body)
+	]])
+	eq(child.lua_get("vim.api.nvim_win_get_config(header).relative"), "")
+	eq(child.lua_get("header_pos[2] == body_pos[2]"), true)
+	eq(child.lua_get("header_pos[1] < body_pos[1]"), true)
+	-- As tall as the meter, the title, the stats and the padding.
+	eq(child.lua_get("vim.api.nvim_win_get_height(header)"), 4)
+end
+
+T["description"]["the header comes and goes with it"] = function()
+	run([[
+		open_problem()
+		problem.description:toggle()
+		reactive.flush()
+	]])
+	eq(child.lua_get("problem.description.header.win:win_valid() and true or false"), false)
+
+	run([[
+		problem.description:toggle()
+		reactive.flush()
+	]])
+	eq(child.lua_get("problem.description.header.win:win_valid()"), true)
+	eq(header_has("1. Two Sum"), true)
 end
 
 T["description"]["toggles its window"] = function()

@@ -41,15 +41,67 @@ function M:new(problem)
 		minimal = true,
 		bo = { filetype = config.name },
 		wo = { winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder" },
+		on_close = function()
+			self:hide_header()
+		end,
 	})
 
 	self.view = Markup.view(self.win, { snap = "text" })
 	self:bind_keys()
+	self:mount_header()
 	self.view:render(self:content())
 	self:draw_images()
 
 	if config.user.image_support and not img_ok then
 		Markup.log.error("image.nvim not found but `image_support` is enabled")
+	end
+end
+
+--- The header is a window of its own above the description, as tall as what it
+--- shows. It opens and closes with the description.
+function M:mount_header()
+	local win = Markup.window({
+		relative = "win",
+		win = self.win.win,
+		position = "top",
+		height = 1,
+		enter = false,
+		show = false,
+		minimal = true,
+		bo = { filetype = config.name },
+		wo = { winhighlight = "Normal:leetcode_description_header", winfixheight = true },
+	})
+
+	local view = Markup.view(win)
+	self.header = { win = win, view = view }
+
+	view:on_commit(function()
+		if win:win_valid() then
+			local root = require("markup.view.protocol").ROOT
+			local height = view.engine:describe(root).outer_height or 1
+			vim.api.nvim_win_set_height(win.win, math.max(height, 1))
+		end
+	end)
+
+	self.win:on_show(function()
+		self:show_header()
+	end)
+
+	self:show_header()
+	view:render(self:header_content())
+end
+
+function M:show_header()
+	local header = self.header
+	if header and self.win:win_valid() and not header.win:win_valid() then
+		header.win.opts.win = self.win.win
+		header.win:show()
+	end
+end
+
+function M:hide_header()
+	if self.header and self.header.win:win_valid() then
+		self.header.win:close()
 	end
 end
 
@@ -110,7 +162,7 @@ function M:stats()
 	local q = self.problem.problem
 	local visible = self.stats_visible()
 	local width = vim.api.nvim_strwidth
-	local available = self.view:columns() - 4
+	local available = self.header.view:columns() - 4
 
 	local difficulty = visible and t(q.difficulty) or "????"
 	local used = width(difficulty) + 2
@@ -177,7 +229,7 @@ function M:meter()
 	end)
 
 	local function cells()
-		return math.floor(filled() * self.view:columns() + 0.5)
+		return math.floor(filled() * self.header.view:columns() + 0.5)
 	end
 
 	return m.block({
@@ -186,17 +238,15 @@ function M:meter()
 			return ("▔"):rep(cells())
 		end, "leetcode_" .. q.difficulty:lower()),
 		m.inline(function()
-			return ("▔"):rep(self.view:columns() - cells())
+			return ("▔"):rep(self.header.view:columns() - cells())
 		end, "leetcode_header_track"),
 	})
 end
 
-function M:header()
+function M:header_content()
 	local q = self.problem.problem
 
 	return m.vflex({
-		position = "fixed",
-		top = 0,
 		style = "leetcode_description_header",
 		self:meter(),
 		m.vflex({
@@ -232,7 +282,7 @@ function M:hidden_lines()
 		return 0
 	end
 
-	local header = self.view.fixed[1] and self.view.fixed[1].height or 0
+	local header = 0
 	local lines = vim.api.nvim_buf_get_lines(self.win.buf, header, top + header + 1, false)
 
 	local count = 0
@@ -279,7 +329,6 @@ function M:content()
 	sections, self.sections = extras.build(q)
 
 	return m.block({
-		self:header(),
 		self:scroll_hint(),
 		m.vflex({
 			padding = { 1, 2 },
@@ -372,6 +421,8 @@ function M:toggle_stats()
 end
 
 function M:unmount()
+	self.header.view:destroy()
+	self:hide_header()
 	self.view:destroy()
 	self.win:close()
 end
