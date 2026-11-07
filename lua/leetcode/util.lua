@@ -4,14 +4,6 @@ local log = require("leetcode.logger")
 ---@class leet.util
 local M = {}
 
-function M.deprecate_usr_cmd(name, new)
-	vim.api.nvim_create_user_command(name, function()
-		local cmd = require("leetcode.cmd")
-		cmd.deprecate(name, new)
-		pcall(vim.cmd, new) ---@diagnostic disable-line
-	end, {})
-end
-
 ---@param fn string
 function M.cmd(fn)
 	return ("<cmd>lua require('leetcode.cmd').%s()<cr>"):format(fn)
@@ -41,15 +33,6 @@ function M.question_tabs()
 	return questions
 end
 
----@param q lc.ui.Question
----@return integer|nil
-function M.question_tabp(q)
-	local ok, tabp = pcall(vim.api.nvim_win_get_tabpage, q.win.win)
-	if ok then
-		return tabp
-	end
-end
-
 ---@return leet.problem
 function M.curr_question()
 	local tabp = vim.api.nvim_get_current_tabpage()
@@ -60,14 +43,6 @@ function M.curr_question()
 		end
 	end
 
-	-- local tab = vim.tbl_filter(function(tab)
-	--     return tab.tabpage == tabp
-	-- end, tabs)[1] or {}
-	-- if tab.question then
-	--     return tab.question, tabp
-	-- else
-	--     log.error("No current question found")
-	-- end
 end
 
 ---@return lc.language
@@ -134,17 +109,6 @@ function M.auth_guard()
 	if not config.auth.is_signed_in then
 		error("User not logged-in", 0)
 	end
-end
-
-function M.norm_ins(str)
-	local ins = vim.inspect(str)
-	return ins:sub(2, #ins - 1)
-end
-
-function M.with_version(v, with, without)
-	with = with or function() end
-	without = without or function() end
-	return (vim.fn.has("nvim-" .. v) == 1 and with or without)()
 end
 
 ---@param name lc.editor.section

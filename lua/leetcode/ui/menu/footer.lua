@@ -6,6 +6,8 @@ return m.component(function()
     local progress = m.signal({})
 
     m.effect(function()
+        Leet.menu.stats_version()
+
         if not Leet.auth() then
             return
         end

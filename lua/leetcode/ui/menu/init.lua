@@ -8,6 +8,7 @@ local config = require("leetcode.config")
 ---@class leet.menu
 local M = {
     page = m.signal("loading"),
+    stats_version = m.signal(0),
     win = Markup.window({
         position = "current",
         hijack = true,
@@ -20,6 +21,13 @@ Leet.menu = M
 ---@param page string
 function M.set_page(page)
     M.page(page)
+end
+
+--- Fetches the stats shown around the menu again.
+function M.refresh()
+    M.stats_version(function(version)
+        return version + 1
+    end)
 end
 
 local function sign_in()

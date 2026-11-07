@@ -66,15 +66,6 @@ function cmd.delete_cookie()
 	cookie.delete()
 end
 
-cmd.q_close_all = function()
-	local utils = require("leetcode.util")
-	local qs = utils.question_tabs()
-
-	for _, tabp in ipairs(qs) do
-		tabp.question:unmount()
-	end
-end
-
 function cmd.exit()
 	local leetcode = require("leetcode")
 	leetcode.stop()
@@ -170,7 +161,7 @@ end
 
 function cmd.start_user_session() --
 	cmd.set_menu_page("menu")
-	config.stats.update()
+	Leet.menu.refresh()
 end
 
 function cmd.question_tabs()
@@ -220,7 +211,6 @@ function cmd.info()
 end
 
 function cmd.hints()
-	-- cmd.deprecate("Leet hints", "Leet info")
 	cmd.info()
 end
 
@@ -322,7 +312,7 @@ function cmd.last_submit()
 		return
 	end
 
-	local question_api = require("leetcode.api.question")
+	local question_api = require("leetcode.api.problems")
 	question_api.latest_submission(q.problem.id, q.lang, function(res, err) --
 		if err then
 			if err.status == 404 then
@@ -387,68 +377,6 @@ function cmd.fold()
 	end
 
 	q:editor_fold_imports(true)
-end
-
-function cmd.get_active_session()
-	local sessions = config.sessions.all
-	return vim.tbl_filter(function(s)
-		return s.is_active
-	end, sessions)[1]
-end
-
-function cmd.get_session_by_name(name)
-	local sessions = config.sessions.all
-
-	name = name:lower()
-	if name == config.sessions.default then
-		name = ""
-	end
-	return vim.tbl_filter(function(s)
-		return s.name:lower() == name
-	end, sessions)[1]
-end
-
-function cmd.change_session(opts)
-	require("leetcode.util").auth_guard()
-
-	local name = opts.name[1] or config.sessions.default
-
-	local session = cmd.get_session_by_name(name)
-	if not session then
-		return log.error("Session not found")
-	end
-
-	local stats_api = require("leetcode.api.stats")
-	stats_api.change_session(session.id, function(_, err)
-		if err then
-			return log.err(err)
-		end
-		log.info(("Session changed to `%s`"):format(name))
-		config.stats.update()
-	end)
-end
-
-function cmd.create_session(opts)
-	require("leetcode.util").auth_guard()
-
-	local name = opts.name[1]
-	if not name then
-		return log.error("Session name not provided")
-	end
-
-	local stats_api = require("leetcode.api.stats")
-	stats_api.create_session(name, function(_, err)
-		if err then
-			return log.err(err)
-		end
-		log.info(("session `%s` created"):format(name))
-	end)
-end
-
-function cmd.update_sessions()
-	require("leetcode.util").auth_guard()
-
-	config.stats.update_sessions()
 end
 
 function cmd.fix()
@@ -594,17 +522,6 @@ cmd.commands = {
 	restore = { cmd.restore },
 	inject = { cmd.inject },
 	fold = { cmd.fold },
-	-- session = {
-	--     change = {
-	--         cmd.change_session,
-	--         _args = arguments.session_change,
-	--     },
-	--     create = {
-	--         cmd.create_session,
-	--         _args = arguments.session_create,
-	--     },
-	--     update = { cmd.update_sessions },
-	-- },
 	list = {
 		cmd.problems,
 		_args = arguments.list,

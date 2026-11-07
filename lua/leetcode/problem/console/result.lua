@@ -25,6 +25,16 @@ end
 function M:handle(item)
     item._.params = self.console.problem.problem.meta_data.params
     self.view:render(Result({ item = item, console = self.console }))
+
+    if item._.submission then
+        local accepted = item.status_code == 10
+        local slug = self.console.problem.problem.title_slug
+        require("leetcode.cache.problems").change_status(slug, accepted and "ac" or "notac")
+
+        if accepted then
+            require("leetcode.ui.menu").refresh()
+        end
+    end
 end
 
 return M

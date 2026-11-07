@@ -22,8 +22,6 @@ local config = {
 
 	langs = require("leetcode.config.langs"),
 	icons = require("leetcode.config.icons"),
-	sessions = require("leetcode.config.sessions"),
-	stats = require("leetcode.config.stats"),
 	imports = require("leetcode.config.imports"),
 	hooks = require("leetcode.config.hooks"),
 

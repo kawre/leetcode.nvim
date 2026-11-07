@@ -11,7 +11,6 @@ function cn.load()
     config.translator = config.user.cn.translator
     config.domain = "cn"
     config.is_cn = true
-    config.sessions.default = "匿名"
 
     require("leetcode-plugins.cn.urls")
     require("leetcode-plugins.cn.queries")

@@ -47,12 +47,6 @@ local function check(id, cb)
 	Leet.api.get(url, { callback = cb })
 end
 
--- local function fetch(url, opts)
---     Leet.api.post(url, {
---         body = opts.body,
---         callback = opts.callback,
---     })
--- end
 
 ---@param id string
 ---@param callback function

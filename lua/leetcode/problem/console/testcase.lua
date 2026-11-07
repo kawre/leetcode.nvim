@@ -19,9 +19,6 @@ function M:new(console)
             modifiable = true,
             buftype = "nofile",
         },
-        -- on_buf = function()
-        --     -- self:handle_buf()
-        -- end,
     })
     self.win:on({
         "TextChanged",
@@ -40,9 +37,7 @@ function M:path()
     self.file = Leet.config.storage.home:joinpath("testcase/" .. fn)
     local existed = self.file:exists()
 
-    -- if not existed then
     self.file:write(self:build_lines(), "w")
-    -- end
 
     return self.file:absolute(), existed
 end
@@ -62,9 +57,7 @@ function M:build_lines()
         end
     end
 
-    -- vim.api.nvim_buf_set_lines(self.win.buf, 0, -1, false, lines)
     return table.concat(lines, "\n")
-    -- return self:draw_extmarks()
 end
 
 local ns = vim.api.nvim_create_namespace("leet.problem.console.testcase.extmarks")

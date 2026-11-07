@@ -27,7 +27,7 @@ return m.component(function()
             lhs = "u",
             on_submit = function()
                 solved.update()
-                config.stats.update()
+                Leet.menu.refresh()
             end,
         }),
         BackButton({ page = "menu" }),

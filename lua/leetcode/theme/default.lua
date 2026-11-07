@@ -82,7 +82,6 @@ M.get = function()
         header = { fg = hl("SpecialChar").fg, bold = true },
         followup = { fg = hl("Number").fg, bold = true },
 
-        indent = { fg = hl("Comment").fg },
         link = { fg = hl("Function").fg, underline = true },
         list = { fg = hl("SpecialChar").fg },
         ref = { fg = hl("Tag").fg },

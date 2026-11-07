@@ -311,10 +311,6 @@ function M:editor_section_range(name, inclusive)
         Markup.log.warn(table.concat(missing, " and ") .. " not found.")
     end
 
-    res.is_partial = function()
-        return res.complete or (res.start_i or res.end_i)
-    end
-
     res.is_valid_or_log = function()
         if res.complete then
             return true

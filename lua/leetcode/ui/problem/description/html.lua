@@ -4,7 +4,6 @@
 --- so a resize never has to parse anything again.
 
 local m = require("markup")
-local config = require("leetcode.config")
 local theme = require("leetcode.theme")
 local Normalizer = require("leetcode.parser.normalizer")
 local entities = require("leetcode.parser.utils")
@@ -306,18 +305,10 @@ local function render_list(b, node, tag, ctx)
 	b:element(m.block({ padding_left = 2, items }))
 end
 
---- A real left border, so the bar runs beside wrapped lines too.
 local function render_pre(b, node, ctx)
 	local content = builder()
 	walk(node, ctx, content)
-	b:element(m.block({
-		margin_left = 2,
-		padding_left = 1,
-		border = { chars = config.icons.bar:rep(8) },
-		border_sides = { "left" },
-		border_style = "leetcode_indent",
-		content:finish(),
-	}))
+	b:element(m.block(content:finish()))
 end
 
 local function table_rows(node, ctx)

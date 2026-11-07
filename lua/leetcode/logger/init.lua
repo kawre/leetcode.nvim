@@ -9,12 +9,6 @@ local function normalize(msg)
     return type(msg) == "string" and t(msg) or vim.inspect(msg)
 end
 
--- ---@private
--- ---@param msg any
--- ---@param lvl? integer
--- ---@return any
--- logger.log = vim.schedule_wrap(function(msg, lvl)
--- end)
 
 function logger.log(msg, lvl)
     if not config.user.logging then

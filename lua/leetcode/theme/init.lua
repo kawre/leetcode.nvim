@@ -31,15 +31,6 @@ local highlights = {
     sup = "su",
     sub = "su",
 
-    -- pre = "",
-    -- span = "",
-    -- p = "",
-    -- ul = "",
-    -- ol = "",
-    -- li = "",
-    -- font = "",
-    -- small = "",
-    -- div = "",
 }
 
 function Theme.load_devicons()

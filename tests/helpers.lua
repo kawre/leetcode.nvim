@@ -8,7 +8,7 @@ function H.boot(child)
 		m = require("markup")
 		reactive = require("markup.reactive")
 
-		_G.Leet = setmetatable({ ctx = {}, active_problems = {} }, {
+		_G.Leet = setmetatable({ active_problems = {} }, {
 			__index = function(t, k)
 				t[k] = require("leetcode." .. k)
 				return rawget(t, k)
@@ -39,7 +39,10 @@ function H.boot(child)
 			session_progress = function(cb)
 				cb({ { difficulty = "Easy", count = 12 }, { difficulty = "Medium", count = 7 } })
 			end,
-			streak = function(cb) cb({ streakCount = 42, todayCompleted = true }) end,
+			streak = function(cb)
+				_G.streak_fetches = (_G.streak_fetches or 0) + 1
+				cb({ streakCount = 42, todayCompleted = true })
+			end,
 			solved = function(cb)
 				cb({
 					submit_stats = { acSubmissionNum = {
@@ -69,6 +72,9 @@ function H.boot(child)
 		}
 
 		package.loaded["leetcode.cache.problems"] = {
+			change_status = function(slug, status)
+				_G.status_change = { slug, status }
+			end,
 			by_slug = function(slug)
 				return {
 					title_slug = slug, frontend_id = 15, title = "3Sum", title_cn = "3Sum",

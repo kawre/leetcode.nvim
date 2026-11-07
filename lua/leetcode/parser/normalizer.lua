@@ -13,15 +13,8 @@ function Normalizer:cleanup() --
         :gsub("<br%s*/>", "\n")
         :gsub("<meta[^>]*/>", "")
         :gsub("&nbsp;", " ")
-        -- :gsub("<(/?)b([^>]*)>", "<%1strong%2>")
         :gsub("<(/?)b>", "<%1strong>")
-    -- :gsub("&#?%w+;", function(e) --
-    --     return vim.tbl_keys({})
-    -- end)
 
-    -- for e, char in pairs(u.entities) do
-    --     self.text = self.text:gsub(e, char)
-    -- end
 end
 
 function Normalizer:fix_indent()

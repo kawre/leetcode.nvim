@@ -14,7 +14,7 @@ local M = {}
 ---@field guard leet.guard
 ---@field util leet.util
 ---@field config leet.config
-_G.Leet = { ctx = {}, active_problems = {} }
+_G.Leet = { active_problems = {} }
 
 local function log_failed_to_init()
 	local log = require("leetcode.logger")
@@ -94,7 +94,6 @@ end
 
 function M.setup_globals()
 	_G.Leet = setmetatable({
-		ctx = {},
 		active_problems = {},
 	}, {
 		__index = function(t, k)

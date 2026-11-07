@@ -237,7 +237,7 @@ T["description"]["list items wrap with a hanging indent"] = function()
 	eq(next_line:sub(1, col + 1):match("^%s*$") ~= nil, true)
 end
 
-T["description"]["code keeps its bar and indent when it wraps"] = function()
+T["description"]["code wraps at the margin of the text"] = function()
 	run([[
 		fixture.problem.content = "<pre><strong>Input:</strong> " .. ("words "):rep(30) .. "</pre>"
 		open_problem()
@@ -248,7 +248,8 @@ T["description"]["code keeps its bar and indent when it wraps"] = function()
 	local rows = child.lua_get("code")
 	eq(#rows > 2, true)
 	for _, row in ipairs(rows) do
-		eq(row:match("^%s*│ ") ~= nil, true)
+		eq(row:match("^  %S") ~= nil, true)
+		eq(row:find("│", 1, true), nil)
 	end
 end
 
@@ -354,6 +355,38 @@ T["console"]["shows a submission"] = function()
 	eq(result_has("Memory"), true)
 	eq(result_has("18.9MB"), true)
 	eq(result_has("Beats 80.50%"), true)
+end
+
+T["console"]["an accepted submission updates the problem and the stats"] = function()
+	run([[
+		refreshed = 0
+		require("leetcode.ui.menu").refresh = function() refreshed = refreshed + 1 end
+	]])
+	show_result([[{
+		_ = { title = "Accepted", hl = "leetcode_ok", success = true, submission = true },
+		status_code = 10, status_runtime = "12 ms", display_runtime = "12", pretty_lang = "Python3",
+		status_memory = "18.9MB", runtime_percentile = 80.5, memory_percentile = 33.2,
+	}]])
+	eq(child.lua_get("status_change"), { "two-sum", "ac" })
+	eq(child.lua_get("refreshed"), 1)
+end
+
+T["console"]["a failed submission only updates the problem"] = function()
+	run([[
+		refreshed = 0
+		require("leetcode.ui.menu").refresh = function() refreshed = refreshed + 1 end
+	]])
+	show_result([[{
+		_ = { title = "Wrong Answer", hl = "leetcode_error", submission = true, params = {} },
+		status_code = 11, input = "[1]", code_output = "[]", expected_output = "[1]", std_output = "",
+	}]])
+	eq(child.lua_get("status_change"), { "two-sum", "notac" })
+	eq(child.lua_get("refreshed"), 0)
+end
+
+T["console"]["a plain run changes nothing"] = function()
+	show_result(accepted)
+	eq(child.lua_get("status_change"), vim.NIL)
 end
 
 T["console"]["shows a compile error"] = function()

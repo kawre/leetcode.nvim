@@ -12,10 +12,6 @@ local ascii = vim.tbl_map(m.block, {
     [[|________/\_______/\_______/  \___/  \______/ \______/ \_______/\_______/]],
 })
 
-local function is_same_day(date1, date2)
-    return date1.year == date2.year and date1.month == date2.month and date1.day == date2.day
-end
-
 local month_names = {
     "Jan",
     "Feb",
@@ -43,6 +39,8 @@ return m.component(function()
     local calendar_data = m.signal({})
 
     m.effect(function()
+        Leet.menu.stats_version()
+
         if not Leet.auth() then
             return
         end

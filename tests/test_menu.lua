@@ -137,6 +137,16 @@ T["every module loads"] = function()
 	eq(failed, {})
 end
 
+T["refresh fetches the stats again"] = function()
+	open(true)
+	child.lua([[
+		before = streak_fetches
+		menu.refresh()
+		reactive.flush()
+	]])
+	eq(child.lua_get("streak_fetches == before + 1"), true)
+end
+
 T["titles follow the page"] = function()
 	open(true)
 	child.lua([[menu.set_page("menu.cache"); reactive.flush()]])

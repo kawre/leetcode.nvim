@@ -3,7 +3,6 @@ local config = require("leetcode.config")
 local statistics = require("leetcode.api.stats")
 local queries = require("leetcode.api.queries")
 local urls = require("leetcode.api.urls")
-local utils = require("leetcode.api.utils")
 local cn_utils = require("leetcode-plugins.cn.utils")
 
 ---@param cb fun(res: lc.Stats.Res|nil, err: lc.err)
@@ -14,7 +13,7 @@ statistics.solved = function(cb) ---@diagnostic disable-line
 
     local query = queries.solved
 
-    utils.query(query, variables, {
+    Leet.api.query(query, variables, {
         endpoint = urls.solved,
         callback = function(res, err)
             if err then
@@ -38,7 +37,7 @@ statistics.session_progress = function(cb)
 
     local query = queries.session_progress
 
-    utils.query(query, variables, {
+    Leet.api.query(query, variables, {
         callback = function(res, err)
             if err then
                 return cb(nil, err)
@@ -58,7 +57,7 @@ statistics.calendar = function(cb) ---@diagnostic disable-line
 
     local query = queries.calendar
 
-    utils.query(query, variables, {
+    Leet.api.query(query, variables, {
         endpoint = urls.calendar,
         callback = function(res, err)
             if err then
@@ -69,7 +68,7 @@ statistics.calendar = function(cb) ---@diagnostic disable-line
             local calendar = data["calendar"]
 
             calendar.submission_calendar =
-                select(2, pcall(utils.decode, calendar.submission_calendar))
+                select(2, pcall(vim.json.decode, calendar.submission_calendar))
 
             cb({
                 calendar = calendar,
@@ -86,7 +85,7 @@ statistics.languages = function(cb) ---@diagnostic disable-line
 
     local query = queries.languages
 
-    utils.query(query, variables, {
+    Leet.api.query(query, variables, {
         endpoint = urls.languages,
         callback = function(res, err)
             if err then
