@@ -255,6 +255,136 @@ local function open_stats()
 	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
 end
 
+T["problems"] = new_set()
+
+--- Creates solutions in the storage, each an hour older than the one before.
+local function worked_on(problems)
+	child.lua(([[
+		_G.cached_problems = %s
+		local home = require("leetcode.config").storage.home:absolute()
+		for i, problem in ipairs(_G.cached_problems) do
+			local path = ("%%s/%%s.%%s.py"):format(home, problem.frontend_id, problem.title_slug)
+			vim.fn.writefile({ "x" }, path)
+			local time = os.time() - i * 3600
+			vim.uv.fs_utime(path, time, time)
+		end
+	]]):format(problems))
+end
+
+local two_problems = [[{
+	{ title = "Two Sum", title_cn = "", title_slug = "two-sum", frontend_id = "1", difficulty = "Easy", status = "ac" },
+	{ title = "3Sum", title_cn = "", title_slug = "3sum", frontend_id = "15", difficulty = "Medium", status = "notac" },
+}]]
+
+local function open_problems()
+	open(true)
+	child.type_keys("p")
+	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+end
+
+T["problems"]["slide in with their buttons"] = function()
+	open_problems()
+	eq(child.lua_get("menu.page()"), "menu.problems")
+	eq(contains("Random"), true)
+	eq(contains("Daily"), true)
+	eq(contains("day streak"), false)
+end
+
+T["problems"]["say when nothing was worked on"] = function()
+	open_problems()
+	eq(contains("Problems you work on will show up here"), true)
+end
+
+T["problems"]["show recent work with its status, newest first"] = function()
+	worked_on(two_problems)
+	open_problems()
+	eq(contains("1. Two Sum"), true)
+	eq(contains("Solved · Easy · 1h ago"), true)
+	eq(contains("15. 3Sum"), true)
+	eq(contains("Attempted · Medium · 2h ago"), true)
+
+	child.lua([[
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("1. Two Sum", 1, true) then first = i end
+			if line:find("15. 3Sum", 1, true) then second = i end
+		end
+	]])
+	eq(child.lua_get("first < second"), true)
+end
+
+T["problems"]["open recent work with its number"] = function()
+	worked_on(two_problems)
+	open_problems()
+	child.lua([[
+		opened = nil
+		package.loaded["leetcode.cmd"].open = function(problem) opened = problem.title_slug end
+	]])
+	child.type_keys("2")
+	eq(child.lua_get("opened"), "3sum")
+end
+
+T["problems"]["list only as much as fits"] = function()
+	child.lua([[
+		local items = {}
+		for i = 1, 8 do
+			items[i] = {
+				title = "Problem " .. i, title_cn = "", title_slug = "problem-" .. i,
+				frontend_id = tostring(i), difficulty = "Easy", status = "todo",
+			}
+		end
+		problems_json = vim.inspect(items)
+	]])
+	worked_on(child.lua_get("problems_json"))
+	open_problems()
+	eq(contains("5. Problem 5"), true)
+	eq(contains("6. Problem 6"), false)
+end
+
+T["problems"]["cut long titles"] = function()
+	worked_on([[{
+		{ title = "Longest Substring Without Repeating Characters In A String", title_cn = "",
+		  title_slug = "long", frontend_id = "3", difficulty = "Medium", status = "ac" },
+	}]])
+	open_problems()
+	eq(contains("…"), true)
+end
+
+T["problems"]["keep their keys after the slide"] = function()
+	open(true)
+	child.lua([[
+		Markup.animate.enabled = true
+		Markup.animate.manual = true
+		browsed = false
+		require("leetcode.ui.browser").open = function() browsed = true end
+	]])
+	child.type_keys("p")
+	child.lua([[
+		reactive.flush()
+		Markup.animate.tick(3000)
+		reactive.flush()
+		reactive.flush()
+	]])
+	child.type_keys("p")
+	eq(child.lua_get("browsed"), true)
+end
+
+T["problems"]["q goes back"] = function()
+	open_problems()
+	child.type_keys("q")
+	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+	eq(child.lua_get("menu.page()"), "menu")
+	eq(contains("day streak"), true)
+end
+
+T["problems"]["the menu keeps its keys after coming back"] = function()
+	open_problems()
+	child.type_keys("q")
+	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+	child.type_keys("s")
+	child.lua("reactive.flush()")
+	eq(child.lua_get("menu.page()"), "menu.statistics")
+end
+
 T["statistics"] = new_set()
 
 T["statistics"]["replace the dashboard"] = function()

@@ -8,9 +8,10 @@ local Heatmap = require("leetcode.ui.menu.heatmap")
 local solved = require("leetcode.ui.menu.solved")
 local data = require("leetcode.ui.menu.data")
 local Stats = require("leetcode.ui.menu.stats")
+local Problems = require("leetcode.ui.menu.problems")
 
---- The page that is not part of the navigation, but slides in beside it.
-local STATISTICS = "menu.statistics"
+--- Pages that are not part of the navigation, but slide in beside it.
+local SLIDES = { ["menu.statistics"] = "stats", ["menu.problems"] = "problems" }
 
 ---@class leet.menu
 local M = {
@@ -33,7 +34,7 @@ Leet.menu = M
 
 ---@param page string
 function M.set_page(page)
-    if page ~= STATISTICS then
+    if not SLIDES[page] then
         M.home_page(page)
     end
     M.page(page)
@@ -174,17 +175,18 @@ local App = m.component(function()
                     end,
                 }),
                 m.slide(function()
-                    return M.page() == STATISTICS and "stats" or "home"
+                    return SLIDES[M.page()] or "home"
                 end, function(key)
                     if key == "home" then
                         return m.show(wide, Wide, Narrow)
                     end
+                    local Page = key == "stats" and Stats or Problems
                     return function()
-                        return Stats({ width = wide() and WIDTH or NARROW, columns = wide() })
+                        return Page({ width = wide() and WIDTH or NARROW, columns = wide() })
                     end
                 end, {
                     forward = function(_, to)
-                        return to == "stats"
+                        return to ~= "home"
                     end,
                 }),
             })

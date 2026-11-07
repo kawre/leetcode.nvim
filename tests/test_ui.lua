@@ -24,6 +24,69 @@ T["kit"]["draws numbers three rows tall"] = function()
 	eq(child.lua_get("#kit.big_number(42)[1]"), #"█ █ ▀▀█")
 end
 
+T["kit"]["cuts text to a width"] = function()
+	child.lua([[kit = require("leetcode.ui.kit")]])
+	eq(child.lua_get("kit.truncate('short', 10)"), "short")
+	eq(child.lua_get("kit.truncate('a longer title', 8)"), "a longe…")
+	eq(child.lua_get("vim.api.nvim_strwidth(kit.truncate('日本語のタイトルです', 7))<= 7"), true)
+end
+
+T["recent"] = new_set()
+
+T["recent"]["says how long ago"] = function()
+	child.lua([[recent = require("leetcode.ui.menu.recent")]])
+	eq(child.lua_get("recent.ago(1000, 1030)"), "just now")
+	eq(child.lua_get("recent.ago(1000, 1000 + 300)"), "5m ago")
+	eq(child.lua_get("recent.ago(0, 7200)"), "2h ago")
+	eq(child.lua_get("recent.ago(0, 3 * 86400)"), "3d ago")
+	eq(child.lua_get("recent.ago(0, 15 * 86400)"), "2w ago")
+end
+
+T["recent"]["keeps the newest file of a problem"] = function()
+	child.lua([[
+		_G.cached_problems = { { title = "Two Sum", title_slug = "two-sum", frontend_id = "1" } }
+		local home = require("leetcode.config").storage.home:absolute()
+		for ext, age in pairs({ py = 100, cpp = 5 }) do
+			local path = home .. "/1.two-sum." .. ext
+			vim.fn.writefile({ "x" }, path)
+			vim.uv.fs_utime(path, os.time() - age, os.time() - age)
+		end
+		items = require("leetcode.ui.menu.recent").list(5)
+	]])
+	eq(child.lua_get("#items"), 1)
+	eq(child.lua_get("items[1].ext"), "cpp")
+end
+
+T["recent"]["finds solutions with a language in their name"] = function()
+	child.lua([[
+		_G.cached_problems = { { title = "Two Sum", title_slug = "two-sum", frontend_id = "1" } }
+		local home = require("leetcode.config").storage.home:absolute()
+		vim.fn.writefile({ "x" }, home .. "/1.two-sum.python2.py")
+		items = require("leetcode.ui.menu.recent").list(5)
+	]])
+	eq(child.lua_get("#items"), 1)
+	eq(child.lua_get("items[1].ext"), "py")
+end
+
+T["recent"]["skips files that are not solutions"] = function()
+	child.lua([[
+		_G.cached_problems = { { title = "Two Sum", title_slug = "two-sum", frontend_id = "1" } }
+		local home = require("leetcode.config").storage.home:absolute()
+		vim.fn.writefile({ "x" }, home .. "/notes.md")
+		vim.fn.writefile({ "x" }, home .. "/9.unknown-problem.py")
+		items = require("leetcode.ui.menu.recent").list(5)
+	]])
+	eq(child.lua_get("#items"), 0)
+end
+
+T["recent"]["is empty when the problems cannot be read"] = function()
+	child.lua([[
+		package.loaded["leetcode.cache.problems"].get = function() error("offline") end
+		items = require("leetcode.ui.menu.recent").list(5)
+	]])
+	eq(child.lua_get("#items"), 0)
+end
+
 T["diff"] = new_set()
 
 T["diff"]["marks only what differs"] = function()

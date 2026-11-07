@@ -76,6 +76,9 @@ function H.boot(child)
 		end
 
 		package.loaded["leetcode.cache.problems"] = {
+			get = function()
+				return _G.cached_problems or {}
+			end,
 			change_status = function(slug, status)
 				_G.status_change = { slug, status }
 			end,

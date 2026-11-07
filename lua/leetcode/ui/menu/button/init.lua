@@ -6,6 +6,7 @@ local animate = Markup.animate
 ---@class MenuButtonProps
 ---@field title string
 ---@field desc? string
+---@field icon_hl? string
 ---@field icon string
 ---@field lhs string
 ---@field page string
@@ -65,7 +66,7 @@ return m.component(function(p)
                     return 1 + math.floor(slide() + 0.5)
                 end,
                 m.block({
-                    m.inline(p.icon .. " ", fade("Character")),
+                    m.inline(p.icon .. " ", fade(p.icon_hl or "Character")),
                     m.inline(p.title, fade("leetcode_strong")),
                     p.nested and m.inline(" \u{eab6}", fade("leetcode_muted")),
                 }),

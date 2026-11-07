@@ -4,6 +4,7 @@ local m = require("markup")
 local kit = require("leetcode.ui.kit")
 local data = require("leetcode.ui.menu.data")
 local solved = require("leetcode.ui.menu.solved")
+local PageBar = require("leetcode.ui.menu.page_bar")
 local t = require("leetcode.translator")
 
 --- Tags shown per level, the rest is only counted.
@@ -24,29 +25,6 @@ local function by_solved(items)
 	return sorted
 end
 
---- A button of the top bar, which marks itself as the cursor is hidden here.
-local Action = m.component(function(props)
-	local hovered = m.signal(false)
-
-	m.use_key(props.lhs, props.press, { nowait = true })
-
-	return m.inline({
-		on_press = props.press,
-		on_hover = hovered,
-		white_space = "nowrap",
-		style = function()
-			return hovered() and "leetcode_tab_active" or "leetcode_tab"
-		end,
-		m.inline((" %s "):format(props.title)),
-		m.inline({
-			style = function()
-				return hovered() and "leetcode_tab_active" or "leetcode_key"
-			end,
-			props.lhs .. " ",
-		}),
-	})
-end)
-
 local function Bar(width)
 	local function back()
 		Leet.menu.set_page("menu")
@@ -58,17 +36,13 @@ local function Bar(width)
 		Leet.menu.refresh()
 	end
 
-	return kit.Card({
+	return PageBar({
+		title = "Statistics",
 		width = width,
-		m.flex({
-			justify = "between",
-			m.inline("Statistics", "leetcode_strong"),
-			m.flex({
-				spacing = 1,
-				Action({ title = "Update", lhs = "u", press = update }),
-				Action({ title = "Back", lhs = "q", press = back }),
-			}),
-		}),
+		actions = {
+			{ title = "Update", lhs = "u", press = update },
+			{ title = "Back", lhs = "q", press = back },
+		},
 	})
 end
 

@@ -51,6 +51,27 @@ function M.Card(props)
 	return m.block(card)
 end
 
+--- Cuts text to a width, which shows with an ellipsis.
+---@param text string
+---@param width integer
+---@return string
+function M.truncate(text, width)
+	if vim.api.nvim_strwidth(text) <= width then
+		return text
+	end
+
+	local chars = vim.fn.split(text, "\\zs")
+	local result, used = {}, 0
+	for _, char in ipairs(chars) do
+		used = used + vim.api.nvim_strwidth(char)
+		if used > width - 1 then
+			break
+		end
+		result[#result + 1] = char
+	end
+	return table.concat(result) .. "…"
+end
+
 --- A rounded label.
 ---@param text string
 ---@param kind string one of `easy`, `medium`, `hard`, `accent`
