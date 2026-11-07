@@ -71,6 +71,23 @@ local function summarize(calendar, now)
 	return summary
 end
 
+--- What draws a cell holding two days, the top one and the one below it. A day
+--- that is not there, -1, leaves its half without color.
+---@param top integer
+---@param bottom integer
+---@return string char
+---@return string? group
+local function cell(top, bottom)
+	if top >= 0 and bottom >= 0 then
+		return "▀", ("leetcode_heat_%d_%d"):format(top, bottom)
+	elseif top >= 0 then
+		return "▀", ("leetcode_heat_%d_x"):format(top)
+	elseif bottom >= 0 then
+		return "▄", ("leetcode_heat_x_%d"):format(bottom)
+	end
+	return " ", nil
+end
+
 --- Rows of half blocks: two days fit in each cell, and the cells are square.
 local function Grid(summary)
 	local settled = Leet.menu.settled()
@@ -92,14 +109,15 @@ local function Grid(summary)
 		for week = 1, WEEKS do
 			local top = summary.weeks[week][row * 2 - 1]
 			local bottom = summary.weeks[week][row * 2] or -1
-			local group = ("leetcode_heat_%d_%d"):format(top + 1, bottom + 1)
-			local hidden = ("leetcode_heat_%d_%d"):format(top < 0 and 0 or 1, bottom < 0 and 0 or 1)
+			-- Before the sweep reaches it, a day shows as one without activity.
+			local char, group = cell(top, bottom)
+			local _, hidden = cell(top < 0 and -1 or 0, bottom < 0 and -1 or 0)
 
 			cells[week] = m.inline({
 				style = function()
 					return visible[week]() and group or hidden
 				end,
-				"▀",
+				char,
 			})
 		end
 		rows[row] = m.block({ white_space = "nowrap", cells })
@@ -141,7 +159,7 @@ local Content = m.component(function(props)
 end)
 
 return m.component(function(props)
-	return kit.Card({
+	return kit.HoverCard({
 		width = props.width,
 		function()
 			local calendar = data.calendar()

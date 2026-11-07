@@ -118,7 +118,7 @@ local function Skills(width, columns)
 		return Level(level, level_width)
 	end, levels)
 
-	return kit.Card({
+	return kit.HoverCard({
 		width = width,
 		columns and m.flex({ justify = "between", items }) or m.vflex({ spacing = 1, items }),
 	})
@@ -151,7 +151,7 @@ local function Language(language, index, most, bar_width)
 end
 
 local function Languages(width)
-	return kit.Card({
+	return kit.HoverCard({
 		width = width,
 		m.block({ margin_bottom = 1, m.inline(t("Languages"), "leetcode_muted") }),
 		function()

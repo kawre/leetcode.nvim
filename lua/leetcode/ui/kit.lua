@@ -52,6 +52,26 @@ function M.Card(props)
 	return m.block(card)
 end
 
+--- A card the cursor can stop on, which lifts while it is there. Pressing it
+--- does nothing unless it says so.
+---@param props table
+function M.HoverCard(props)
+	local focus = m.animated(0, { duration = 110 })
+	local tint = Markup.animate.tint(
+		{ bg = M.color("leetcode_surface", "bg") },
+		{ bg = M.color("leetcode_row_active", "bg") },
+		focus
+	)
+
+	return M.Card(vim.tbl_extend("force", props, {
+		style = tint,
+		on_press = props.on_press or function() end,
+		on_hover = function(hovered)
+			focus(hovered and 1 or 0)
+		end,
+	}))
+end
+
 --- Cuts text to a width, which shows with an ellipsis.
 ---@param text string
 ---@param width integer

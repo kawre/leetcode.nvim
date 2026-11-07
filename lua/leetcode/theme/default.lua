@@ -178,15 +178,18 @@ M.get = function()
     groups.pill_accent_cap = { fg = accent }
     groups.rule = { fg = mix(bg, accent, 0.45) }
 
-    -- Heatmap cells are half blocks, so each pair of levels is a group. Level 0
-    -- is a day without activity, and -1 is no day at all.
-    local heat = { [-1] = surface, [0] = raised }
+    -- Heatmap cells are half blocks, so each pair of days is a group. Level 0 is a
+    -- day without activity. A day that is not there has no color at all, so the
+    -- card shows through whatever its color, such as while it is lifted.
+    local heat = { [0] = raised }
     for level = 1, 4 do
         heat[level] = mix(raised, ok, level / 4)
     end
-    for top = -1, 4 do
-        for bottom = -1, 4 do
-            groups[("heat_%d_%d"):format(top + 1, bottom + 1)] = { fg = heat[top], bg = heat[bottom] }
+    for top = 0, 4 do
+        groups[("heat_%d_x"):format(top)] = { fg = heat[top] }
+        groups[("heat_x_%d"):format(top)] = { fg = heat[top] }
+        for bottom = 0, 4 do
+            groups[("heat_%d_%d"):format(top, bottom)] = { fg = heat[top], bg = heat[bottom] }
         end
     end
 

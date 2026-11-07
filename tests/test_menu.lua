@@ -650,6 +650,46 @@ T["statistics"]["update finishes even when something fails"] = function()
 	eq(contains("Updated"), true)
 end
 
+T["statistics"]["every block is a stop for the cursor"] = function()
+	open_stats()
+	child.lua("stops = {}")
+	for _ = 1, 12 do
+		child.lua([[
+			local id = menu.view.hovered
+			if id and not vim.tbl_contains(stops, id) then stops[#stops + 1] = id end
+		]])
+		child.type_keys("j")
+	end
+	-- Solved, the year, skills and languages.
+	eq(child.lua_get("#stops"), 4)
+
+	-- Up above them, the buttons of the page.
+	for _ = 1, 12 do
+		child.type_keys("k")
+	end
+	eq(child.lua_get("vim.api.nvim_get_current_line():find('Update', 1, true) ~= nil"), true)
+end
+
+T["statistics"]["a block lifts while the cursor is on it"] = function()
+	open_stats()
+	child.lua([[
+		local function lifted()
+			local buf, ns = menu.win.buf, menu.view.ns
+			local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+			for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, { row, 0 }, { row, -1 }, { details = true })) do
+				local group = mark[4].hl_group or ""
+				if group:find("MarkupAnimated", 1, true) then
+					return vim.api.nvim_get_hl(0, { name = group, link = false }).bg
+				end
+			end
+		end
+		lifted_now = lifted
+		active = vim.api.nvim_get_hl(0, { name = "leetcode_row_active", link = false }).bg
+	]])
+	child.type_keys("j", "j")
+	eq(child.lua_get("lifted_now()"), child.lua_get("active"))
+end
+
 T["statistics"]["open no popups"] = function()
 	open(true)
 	child.lua("wins = #vim.api.nvim_list_wins()")

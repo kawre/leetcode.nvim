@@ -93,7 +93,7 @@ M.Solved = m.component(function(props)
 		return M.stat_of("All").solved
 	end, { instant = Leet.menu.settled() })
 
-	return kit.Card({
+	return kit.HoverCard({
 		width = props.width,
 		grow = props.grow,
 		m.flex({
