@@ -2,9 +2,43 @@ local m = require("markup")
 local Stdout = require("leetcode.ui.problem.result.stdout")
 local Input = require("leetcode.ui.problem.result.input")
 
----@param props { item: lc.runtime_error }
+--- A case LeetCode would not run, with a way to it.
+---@param props { console: leet.problem.console, index: integer }
+local InvalidCase = m.component(function(props)
+	local console = props.console
+	local hovered = m.signal(false)
+
+	local function go()
+		console.testcase:select(props.index)
+		console.tab("testcase")
+		if console:is_open() then
+			console.win:focus()
+		end
+	end
+	m.use_key("e", go)
+
+	return m.block({
+		m.block({ ("Case %d is not a valid input for this problem."):format(props.index), style = "leetcode_muted" }),
+		m.block({
+			margin_top = 1,
+			m.inline({
+				click = "double",
+				on_press = go,
+				on_hover = hovered,
+				style = function()
+					return hovered() and "leetcode_console_case_active_hover" or "leetcode_console_case_active"
+				end,
+				(" \u{f03eb} Edit Case %d "):format(props.index),
+			}),
+			m.inline("  e", "leetcode_key"),
+		}),
+	})
+end)
+
+---@param props { item: lc.runtime_error, console?: leet.problem.console }
 local RuntimeError = m.component(function(props)
 	local item = props.item
+	local invalid = item.invalid_testcase == true and type(item.case_idx) == "number" and props.console
 
 	return m.block({
 		padding = { 0, 3 },
@@ -15,6 +49,7 @@ local RuntimeError = m.component(function(props)
 				return m.block(line)
 			end),
 		}),
+		invalid and InvalidCase({ console = props.console, index = item.case_idx + 1 }),
 		item._.submission and Input({
 			title = "Last input",
 			input = vim.split(item.last_testcase, "\n"),

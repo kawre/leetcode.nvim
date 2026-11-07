@@ -34,7 +34,9 @@ local function Detail(item)
 		return lang and m.inline(lang.icon .. " " .. lang.lang)
 	end
 
-	return item.status_runtime and m.inline(item.status_runtime)
+	-- LeetCode says "N/A" when there is no time to tell, which reads as noise.
+	local runtime = item.status_runtime
+	return type(runtime) == "string" and runtime ~= "N/A" and m.inline(runtime) or nil
 end
 
 ---@param sc integer
@@ -60,7 +62,7 @@ local App = m.component(function(props)
 	elseif sc == 12 or sc == 13 or sc == 14 then
 		body = LimitExceed({ item = item })
 	elseif sc == 15 then
-		body = RuntimeError({ item = item })
+		body = RuntimeError({ item = item, console = console })
 	elseif sc == 16 then
 		body = InternalError({ item = item })
 	elseif sc == 20 then

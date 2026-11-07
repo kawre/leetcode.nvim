@@ -1032,6 +1032,27 @@ T["console"]["shows a runtime error"] = function()
 	eq(result_has("Line 45"), true)
 end
 
+T["console"]["an invalid testcase leads back to it"] = function()
+	show_result([[{
+		_ = { title = "Runtime Error", hl = "leetcode_error", submission = false, params = {} },
+		status_code = 15, run_success = false, code_answer = {}, code_output = {},
+		runtime_error = "expected 'nums' to have 2 <= size <= 10000 but got 1",
+		full_runtime_error = "expected 'nums' to have 2 <= size <= 10000 but got 1",
+		invalid_testcase = true, case_idx = 1, status_runtime = "N/A", status_memory = "N/A",
+		status_msg = "Runtime Error", state = "SUCCESS",
+	}]])
+	eq(result_has("Case 2 is not a valid input"), true)
+	eq(result_has("Edit Case 2"), true)
+	eq(result_has("N/A"), false)
+
+	run("vim.api.nvim_set_current_win(problem.console.win.win)")
+	child.type_keys("e")
+	run("reactive.flush()")
+	eq(child.lua_get("problem.console.tab()"), "testcase")
+	eq(child.lua_get("problem.console.testcase.selected()"), 2)
+	eq(result_has("[3,3]"), true)
+end
+
 T["console"]["shows limits and internal errors"] = function()
 	show_result([[{ _ = { submission = false }, status_code = 14, std_output_list = { "out" } }]])
 	eq(result_has("out"), true)
