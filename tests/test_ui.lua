@@ -554,7 +554,7 @@ local function picker_rows()
 	return child.lua_get([[(function()
 		for _, win in ipairs(vim.api.nvim_list_wins()) do
 			local config = vim.api.nvim_win_get_config(win)
-			if config.relative ~= "" and not config.focusable then
+			if config.relative ~= "" and win ~= vim.api.nvim_get_current_win() then
 				return buffer_text(vim.api.nvim_win_get_buf(win))
 			end
 		end
