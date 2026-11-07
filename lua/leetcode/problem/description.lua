@@ -53,7 +53,7 @@ function M:new(problem)
 		self.win:focus()
 	end
 	if config.user.image_support and not Markup.image.available() then
-		Markup.log.warn("`image_support` needs a Neovim with `vim.ui.img`, links are shown instead")
+		Markup.log.warn("`image_support` needs a Neovim with `vim.ui.img`, or image.nvim, links are shown instead")
 	end
 end
 
