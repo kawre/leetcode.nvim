@@ -43,7 +43,7 @@ T["signed in shows the main page"] = function()
 	eq(child.lua_get("menu.page()"), "menu")
 	eq(contains("Problems"), true)
 	eq(contains("Statistics"), true)
-	eq(contains("Exit"), true)
+	eq(contains("Quit"), true)
 end
 
 T["the dashboard follows the signed in user"] = function()
@@ -186,7 +186,7 @@ T["one press moves between rows in both directions"] = function()
 	child.type_keys("j")
 	eq(on("Statistics"), true)
 	child.type_keys("j")
-	eq(on("Cookie"), true)
+	eq(on("Account"), true)
 	child.type_keys("k")
 	eq(on("Statistics"), true)
 	child.type_keys("k")
@@ -231,7 +231,7 @@ end
 T["the breadcrumb shows only away from the menu"] = function()
 	open(true)
 	eq(contains("Menu"), false)
-	child.lua([[menu.set_page("menu.cache"); reactive.flush()]])
+	child.lua([[menu.set_page("menu.cookie"); reactive.flush()]])
 	eq(contains("Menu"), true)
 end
 
@@ -262,9 +262,20 @@ T["a short window can still show the whole dashboard"] = function()
 	eq(child.lua_get("visible('Problems')"), true)
 end
 
+T["refresh fetches the problem list right away"] = function()
+	open(true)
+	child.lua([[
+		refreshed = false
+		require("leetcode.cmd").cache_update = function() refreshed = true end
+	]])
+	child.type_keys("c")
+	eq(child.lua_get("refreshed"), true)
+	eq(child.lua_get("menu.page()"), "menu")
+end
+
 T["navigation explains itself"] = function()
 	open(true)
-	eq(contains("Browse, filter and search"), true)
+	eq(contains("Browse, random, daily and recent"), true)
 	eq(contains("Skills and languages"), true)
 end
 
@@ -341,7 +352,7 @@ T["problems"]["slide in with their buttons"] = function()
 	open_problems()
 	eq(child.lua_get("menu.page()"), "menu.problems")
 	eq(contains("Random"), true)
-	eq(contains("Daily"), true)
+	eq(contains("Daily challenge"), true)
 	eq(contains("day streak"), false)
 end
 
@@ -711,8 +722,9 @@ end
 
 T["titles follow the page"] = function()
 	open(true)
-	child.lua([[menu.set_page("menu.cache"); reactive.flush()]])
-	eq(contains("Cache"), true)
+	child.lua([[menu.set_page("menu.cookie"); reactive.flush()]])
+	eq(contains("Account"), true)
+	eq(contains("Sign out"), true)
 end
 
 return T

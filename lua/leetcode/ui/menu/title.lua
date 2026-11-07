@@ -1,7 +1,7 @@
 local m = require("markup")
 
 --- Pages named for the code rather than for reading.
-local names = { signin = "Welcome", loading = "Welcome" }
+local names = { signin = "Welcome", loading = "Welcome", cookie = "Account" }
 
 return m.component(function()
     local function titles()

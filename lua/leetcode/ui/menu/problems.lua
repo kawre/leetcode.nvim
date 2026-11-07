@@ -67,8 +67,8 @@ local function Actions()
 	return Buttons({
 		Button({
 			icon = "\u{f03a}",
-			title = "List",
-			desc = "Browse and filter",
+			title = "Browse",
+			desc = "Search and filter every problem",
 			lhs = "p",
 			on_submit = function()
 				require("leetcode.ui.browser").open(require("leetcode.cache.problems").get())
@@ -83,8 +83,8 @@ local function Actions()
 		}),
 		Button({
 			icon = kit.icons.calendar,
-			title = "Daily",
-			desc = "Today's challenge",
+			title = "Daily challenge",
+			desc = "Today's problem",
 			lhs = "i",
 			on_submit = cmd.qot,
 		}),

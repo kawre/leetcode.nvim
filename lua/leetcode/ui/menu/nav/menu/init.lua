@@ -9,7 +9,7 @@ return m.component(function()
         Button({
             icon = "",
             title = "Problems",
-            desc = "Browse, filter and search",
+            desc = "Browse, random, daily and recent",
             lhs = "p",
             nested = true,
             page = "menu.problems",
@@ -24,23 +24,28 @@ return m.component(function()
         }),
         Button({
             icon = "󰆘",
-            title = "Cookie",
-            desc = "Sign in again or sign out",
+            title = "Account",
+            desc = "Change your cookie or sign out",
             lhs = "i",
             nested = true,
             page = "menu.cookie",
         }),
         Button({
             icon = "",
-            title = "Cache",
-            desc = "Refresh the problem list",
+            title = "Refresh",
+
+            desc = "Fetch the problem list again",
             lhs = "c",
-            nested = true,
-            page = "menu.cache",
+
+            on_submit = function()
+
+                require("leetcode.cmd").cache_update()
+
+            end,
         }),
         Button({
             icon = "󰩈",
-            title = "Exit",
+            title = "Quit",
             desc = "Close leetcode.nvim",
             lhs = "qa",
             on_submit = function()

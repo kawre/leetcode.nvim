@@ -10,14 +10,14 @@ return markup.component(function()
         Button({
             icon = "󱛬",
             lhs = "u",
-            title = "Update",
-            desc = "Paste a new cookie",
+            title = "Change cookie",
+            desc = "Paste a new session cookie",
             on_submit = cmd.cookie_prompt,
         }),
         Button({
             icon = "󱛪",
             lhs = "d",
-            title = "Delete / Sign out",
+            title = "Sign out",
             desc = "Forget this session",
             on_submit = cmd.sign_out,
         }),
