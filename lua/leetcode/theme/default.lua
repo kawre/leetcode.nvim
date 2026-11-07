@@ -157,6 +157,8 @@ M.get = function()
         tab = { fg = muted, bg = surface },
         tab_active = { fg = bg, bg = accent, bold = true },
         tab_hover = { fg = fg, bg = raised },
+        -- Active and under the cursor: the accent, lit up toward the text.
+        tab_active_hover = { fg = bg, bg = mix(accent, fg, 0.35), bold = true, underline = true },
         tab_ok = { fg = ok, bg = surface },
         tab_error = { fg = err, bg = surface },
         tab_ok_active = { fg = bg, bg = ok, bold = true },

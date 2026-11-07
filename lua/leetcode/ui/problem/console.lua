@@ -17,7 +17,9 @@ local function Chip(props)
 		white_space = "nowrap",
 		style = function()
 			local kind = props.kind and props.kind()
-			if props.active() then
+			if props.active() and hovered() then
+				return "leetcode_tab_active_hover"
+			elseif props.active() then
 				return kind and ("leetcode_tab_%s_active"):format(kind) or "leetcode_tab_active"
 			elseif hovered() then
 				return "leetcode_tab_hover"
