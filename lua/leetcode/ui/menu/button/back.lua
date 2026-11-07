@@ -1,4 +1,4 @@
-local Button = require("leetcode.ui.menu.button")
+local Button = require("leetcode.ui.menu.tile")
 local m = require("markup")
 
 return m.component(function(props)

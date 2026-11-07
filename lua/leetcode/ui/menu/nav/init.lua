@@ -6,7 +6,12 @@ local Nav = m.component(function()
     local mounted = false
 
     return m.block({
-        Title(),
+        -- Where the menu is matters once it is not at the top.
+        m.show(function()
+            return Leet.menu.home_page() ~= "menu"
+        end, function()
+            return Title()
+        end),
         function()
             Leet.menu.rows = 0
             Leet.menu.rows_enter = mounted or not Leet.menu.settled()

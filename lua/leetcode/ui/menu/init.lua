@@ -95,7 +95,7 @@ local function Brand(width)
 end
 
 local function Menu(width)
-    return kit.Card({ width = width, padding = { 0, 1 }, Nav() })
+    return m.block({ width = width, Nav() })
 end
 
 local COLUMN = 38
@@ -111,11 +111,12 @@ local Wide = m.component(function()
             width = WIDTH,
             justify = "between",
             Menu(COLUMN),
-            m.block({
+            -- Solved takes what is left, so both columns end on the same row.
+            m.vflex({
                 width = COLUMN,
                 Streak({ width = COLUMN }),
                 Daily({ width = COLUMN }),
-                solved.Solved({ width = COLUMN }),
+                solved.Solved({ width = COLUMN, grow = 1 }),
             }),
         }),
         Heatmap({ width = WIDTH }),

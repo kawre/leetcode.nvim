@@ -208,12 +208,31 @@ T["one press reaches the daily card and back"] = function()
 		end
 	]])
 	child.type_keys("l")
-	-- The card starts at its edge, right above the title.
-	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1]"), child.lua_get("daily - 1"))
+	-- Entered on its first row of content, below its edge.
+	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1]"), child.lua_get("daily"))
 
 	child.type_keys("h")
-	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1] ~= daily - 1"), true)
+	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1] ~= daily"), true)
 	eq(child.lua_get("vim.fn.virtcol('.') < 40"), true)
+end
+
+T["navigation tiles have room between them"] = function()
+	open(true)
+	child.lua([[
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("Problems", 1, true) and not first then first = i end
+			if line:find("Statistics", 1, true) and not second then second = i end
+		end
+	]])
+	-- A title and a description, then the edges of two tiles.
+	eq(child.lua_get("second - first"), 4)
+end
+
+T["the breadcrumb shows only away from the menu"] = function()
+	open(true)
+	eq(contains("Menu"), false)
+	child.lua([[menu.set_page("menu.cache"); reactive.flush()]])
+	eq(contains("Menu"), true)
 end
 
 T["navigation explains itself"] = function()
@@ -246,7 +265,16 @@ T["the row under the cursor is marked"] = function()
 		vim.api.nvim_exec_autocmds("CursorMoved", { buffer = menu.win.buf })
 		reactive.flush()
 	]])
-	eq(child.lua_get("buffer_text(menu.win.buf)[row]:find('▌', 1, true) ~= nil"), true)
+	-- The tile lifts its title into the accent color.
+	child.lua([[
+		lit = nil
+		local buf, ns = menu.win.buf, menu.view.ns
+		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, { row - 1, 0 }, { row - 1, -1 }, { details = true })) do
+			local text = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[2], mark[4].end_col, {})[1]
+			if text == "Statistics" then lit = mark[4].hl_group end
+		end
+	]])
+	eq(child.lua_get("lit"), "leetcode_accent")
 end
 
 local function open_stats()

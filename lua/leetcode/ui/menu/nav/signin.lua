@@ -1,6 +1,6 @@
 local m = require("markup")
-local Buttons = require("leetcode.ui.menu.buttons")
-local Button = require("leetcode.ui.menu.button")
+local Buttons = require("leetcode.ui.menu.tiles")
+local Button = require("leetcode.ui.menu.tile")
 
 return m.component(function()
     local cmd = require("leetcode.cmd")

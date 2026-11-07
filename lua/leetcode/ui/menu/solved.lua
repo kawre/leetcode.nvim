@@ -90,6 +90,7 @@ M.Solved = m.component(function(props)
 
 	return kit.Card({
 		width = props.width,
+		grow = props.grow,
 		m.flex({
 			justify = "between",
 			margin_bottom = 1,
