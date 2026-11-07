@@ -11,6 +11,7 @@ return m.component(function()
         Button({
             icon = "",
             title = "List",
+            desc = "Every problem, with filters",
             lhs = "p",
             nested = true,
             on_submit = function()
@@ -20,6 +21,7 @@ return m.component(function()
         Button({
             icon = "",
             title = "Random",
+            desc = "Pick one for me",
             lhs = "s",
             nested = true,
             on_submit = cmd.random_question,
@@ -27,6 +29,7 @@ return m.component(function()
         Button({
             icon = "󰃭",
             title = "Daily",
+            desc = "Today's challenge",
             lhs = "i",
             nested = true,
             on_submit = cmd.qot,

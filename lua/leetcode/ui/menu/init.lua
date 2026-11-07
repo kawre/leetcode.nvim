@@ -87,20 +87,28 @@ local function Menu(width)
     return kit.Card({ width = width, padding = { 0, 1 }, Nav() })
 end
 
+local COLUMN = 38
+
+--- Navigation leads, with the numbers beside it and the year below.
 local Wide = m.component(function()
     M.dashboards = M.dashboards + 1
 
     return m.vflex({
         align = "center",
         Brand(WIDTH),
-        m.flex({ margin_top = 1, width = WIDTH, justify = "between", Streak({ width = 30 }), Daily({ width = 46 }) }),
-        Heatmap({ width = WIDTH }),
         m.flex({
+            margin_top = 1,
             width = WIDTH,
             justify = "between",
-            solved.Solved({ width = 44 }),
-            Menu(32),
+            Menu(COLUMN),
+            m.block({
+                width = COLUMN,
+                Streak({ width = COLUMN }),
+                Daily({ width = COLUMN }),
+                solved.Solved({ width = COLUMN }),
+            }),
         }),
+        Heatmap({ width = WIDTH }),
     })
 end)
 
@@ -159,7 +167,7 @@ end)
 
 function M.render()
     if not M.view then
-        M.view = Markup.view(M.win, { snap = true })
+        M.view = Markup.view(M.win, { snap = true, hide_cursor = true })
         M.view:on_commit(function()
             if M.win:valid() then
                 M.width(vim.api.nvim_win_get_width(M.win.win))

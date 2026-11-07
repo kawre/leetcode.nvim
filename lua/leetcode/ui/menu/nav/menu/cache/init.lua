@@ -10,6 +10,7 @@ return m.component(function()
         Button({
             icon = "󱘴",
             title = "Update",
+            desc = "Fetch the problem list again",
             lhs = "u",
             on_submit = cmd.cache_update,
         }),

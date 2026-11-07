@@ -11,6 +11,7 @@ return m.component(function()
     return Buttons({
         not config.is_cn and Button({
             title = "Skills",
+            desc = "Solved by topic",
             icon = "",
             lhs = "s",
             on_submit = cmd.ui_skills,
@@ -18,12 +19,14 @@ return m.component(function()
         Button({
             icon = "",
             title = "Languages",
+            desc = "Solved by language",
             lhs = "l",
             on_submit = cmd.ui_languages,
         }),
         Button({
             icon = "",
             title = "Update",
+            desc = "Fetch the latest numbers",
             lhs = "u",
             on_submit = function()
                 solved.update()

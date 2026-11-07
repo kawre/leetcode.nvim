@@ -5,6 +5,7 @@ local animate = Markup.animate
 
 ---@class MenuButtonProps
 ---@field title string
+---@field desc? string
 ---@field icon string
 ---@field lhs string
 ---@field page string
@@ -44,6 +45,12 @@ return m.component(function(p)
         focus
     )
 
+    local function marker()
+        return m.block(function()
+            return focus() > 0.5 and "▌" or " "
+        end, "leetcode_accent")
+    end
+
     return m.flex({
         on_press = press,
         on_hover = function(hovered)
@@ -52,17 +59,18 @@ return m.component(function(p)
         style = row,
         justify = "between",
         m.flex({
-            m.inline(function()
-                return focus() > 0.5 and "▌" or " "
-            end, "leetcode_accent"),
-            m.inline({
+            m.block({ marker(), p.desc and marker() }),
+            m.block({
                 margin_left = function()
-                    return math.floor(slide() + 0.5)
+                    return 1 + math.floor(slide() + 0.5)
                 end,
+                m.block({
+                    m.inline(p.icon .. " ", fade("Character")),
+                    m.inline(p.title, fade("leetcode_strong")),
+                    p.nested and m.inline(" \u{eab6}", fade("leetcode_muted")),
+                }),
+                p.desc and m.block({ margin_left = 2, m.inline(p.desc, fade("leetcode_muted")) }),
             }),
-            m.inline(p.icon .. " ", fade("Character")),
-            m.inline(p.title, fade("leetcode_strong")),
-            p.nested and m.inline(" \u{eab6}", fade("leetcode_muted")),
         }),
         m.inline({ margin_right = 1, kit.Key(p.lhs) }),
     })

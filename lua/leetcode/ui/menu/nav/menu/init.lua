@@ -9,6 +9,7 @@ return m.component(function()
         Button({
             icon = "",
             title = "Problems",
+            desc = "Browse, filter and search",
             lhs = "p",
             nested = true,
             page = "menu.problems",
@@ -16,6 +17,7 @@ return m.component(function()
         Button({
             icon = "",
             title = "Statistics",
+            desc = "Skills and languages",
             lhs = "s",
             nested = true,
             page = "menu.statistics",
@@ -23,6 +25,7 @@ return m.component(function()
         Button({
             icon = "󰆘",
             title = "Cookie",
+            desc = "Sign in again or sign out",
             lhs = "i",
             nested = true,
             page = "menu.cookie",
@@ -30,6 +33,7 @@ return m.component(function()
         Button({
             icon = "",
             title = "Cache",
+            desc = "Refresh the problem list",
             lhs = "c",
             nested = true,
             page = "menu.cache",
@@ -37,6 +41,7 @@ return m.component(function()
         Button({
             icon = "󰩈",
             title = "Exit",
+            desc = "Close leetcode.nvim",
             lhs = "qa",
             on_submit = function()
                 require("leetcode").stop()

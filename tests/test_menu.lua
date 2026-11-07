@@ -125,6 +125,9 @@ T["reflowing keeps the data and skips the intro"] = function()
 	]])
 	eq(contains("Solved"), true)
 	eq(child.lua_get("streak_fetches"), child.lua_get("fetches"))
+
+	-- The row under the cursor may still fade in, but the intro takes far longer.
+	child.lua("Markup.animate.tick(200)")
 	eq(child.lua_get("Markup.animate.running()"), false)
 end
 
@@ -146,18 +149,65 @@ T["the cursor only stops on buttons"] = function()
 		for i, line in ipairs(rows) do
 			if line:find("Problems", 1, true) then
 				button_row = i
-				vim.api.nvim_win_set_cursor(0, { i, #line:match("^%s*") })
+				vim.api.nvim_win_set_cursor(0, { i, (line:find("Problems", 1, true)) })
 			end
 		end
 		menu.view.cursor = nil
 		menu.view:snap_cursor()
 	]])
 	child.type_keys("j")
-	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1]"), child.lua_get("button_row + 1"))
+	eq(child.lua_get("vim.api.nvim_get_current_line():find('Statistics', 1, true) ~= nil"), true)
+end
 
-	-- Past the last button there is nowhere to go.
-	child.type_keys("jjjjjj")
-	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1]"), child.lua_get("button_row + 4"))
+T["the selected row stands in for the cursor"] = function()
+	open(true)
+	eq(child.lua_get("vim.o.guicursor:find('MarkupHiddenCursor', 1, true) ~= nil"), true)
+
+	child.cmd("tabnew")
+	eq(child.lua_get("vim.o.guicursor:find('MarkupHiddenCursor', 1, true)"), vim.NIL)
+end
+
+T["one press moves between rows in both directions"] = function()
+	open(true)
+	child.lua([[
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("Problems", 1, true) then
+				vim.api.nvim_win_set_cursor(0, { i, (line:find("Problems", 1, true)) })
+			end
+		end
+		menu.view.cursor = nil
+		menu.view:snap_cursor()
+	]])
+
+	local function on(text)
+		return child.lua_get(("vim.api.nvim_get_current_line():find(%q, 1, true) ~= nil"):format(text))
+	end
+
+	child.type_keys("j")
+	eq(on("Statistics"), true)
+	child.type_keys("j")
+	eq(on("Cookie"), true)
+	child.type_keys("k")
+	eq(on("Statistics"), true)
+	child.type_keys("k")
+	eq(on("Problems"), true)
+end
+
+T["navigation explains itself"] = function()
+	open(true)
+	eq(contains("Browse, filter and search"), true)
+	eq(contains("Skills and languages"), true)
+end
+
+T["navigation comes first on the screen"] = function()
+	open(true)
+	child.lua([[
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("Problems", 1, true) and not nav then nav = i end
+			if line:find("submissions", 1, true) and not calendar then calendar = i end
+		end
+	]])
+	eq(child.lua_get("nav < calendar"), true)
 end
 
 T["the row under the cursor is marked"] = function()
@@ -165,7 +215,7 @@ T["the row under the cursor is marked"] = function()
 	child.lua([[
 		for i, line in ipairs(buffer_text(menu.win.buf)) do
 			if line:find("Statistics", 1, true) then
-				vim.api.nvim_win_set_cursor(0, { i, #line - 20 })
+				vim.api.nvim_win_set_cursor(0, { i, (line:find("Statistics", 1, true)) })
 				row = i
 			end
 		end

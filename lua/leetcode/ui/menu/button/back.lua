@@ -7,6 +7,7 @@ return m.component(function(props)
     return Button({
         icon = "",
         title = "Back",
+        desc = "Return to the menu",
         lhs = "q",
         page = page,
     })
