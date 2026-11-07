@@ -29,7 +29,7 @@ local function resolve_item(item)
 	end
 
 	item._ = {
-		title = " " .. t(item.status_msg),
+		title = t(item.status_msg),
 		hl = hl,
 		success = success,
 		submission = submission,

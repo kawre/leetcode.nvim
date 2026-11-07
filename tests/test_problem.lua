@@ -974,6 +974,41 @@ T["console"]["stdout opens in a dimmed popup"] = function()
 	eq(child.lua_get("vim.api.nvim_get_current_win() == problem.console.win.win"), true)
 end
 
+local function tab_row()
+	return child.lua_get([[(function()
+		for _, line in ipairs(vim.api.nvim_buf_get_lines(problem.console.win.buf, 0, -1, false)) do
+			if line:find("Testcase", 1, true) then return line end
+		end
+	end)()]])
+end
+
+T["console"]["shows what a run came to beside the tabs"] = function()
+	show_result(accepted)
+	local row = tab_row()
+	eq(row:find("Result", 1, true) ~= nil, true)
+	eq(row:find("Accepted", 1, true) ~= nil, true)
+	eq(row:find("0 ms", 1, true) ~= nil, true)
+	-- The title is just the status, which the header gives an icon of its own.
+	run([[
+		local resolved
+		require("leetcode.api.interpreter")
+		Leet.api.get = function(_, opts) opts.callback({ status_code = 15, status_msg = "Runtime Error", full_runtime_error = "x" }) end
+		require("leetcode.api.interpreter").listener("x", function(item) resolved = item end)
+		title = resolved and resolved._.title
+	]])
+	eq(child.lua_get("title"), "Runtime Error")
+end
+
+T["console"]["shows the judge at work beside the tabs"] = function()
+	run([[
+		open_problem()
+		problem.console:show("result")
+		problem.console.result:judging(false)
+		reactive.flush()
+	]])
+	eq(tab_row():find("Running", 1, true) ~= nil, true)
+end
+
 T["console"]["shows a submission"] = function()
 	show_result([[{
 		_ = { title = "Accepted", hl = "leetcode_ok", success = true, submission = true },

@@ -1,6 +1,7 @@
 local m = require("markup")
 local Result = require("leetcode.ui.problem.result")
 local Judging = require("leetcode.ui.problem.result.judging")
+local Status = require("leetcode.ui.problem.result.status")
 
 --- What the result tab of the console shows: nothing yet, the judge at work, or
 --- what it decided. The console draws it.
@@ -16,8 +17,9 @@ function M:new(console)
     self.console = console
     self.win = console.win
     self.view = console.view
-    --- `{ render = fun(): element }`, or nil before the first run. A table, as a
-    --- signal given a function would call it to update its value.
+    --- `{ render = fun(): element, status = fun(): element }`, the body and the
+    --- line for the header, or nil before the first run. A table, as a signal
+    --- given a function would call it to update its value.
     self.content = m.signal(nil)
 end
 
@@ -34,6 +36,9 @@ function M:judging(submit)
     self.content({
         render = function()
             return Judging({ state = state, submit = submit })
+        end,
+        status = function()
+            return Status.Pending(submit)
         end,
     })
 end
@@ -52,6 +57,9 @@ function M:handle(item)
     self.content({
         render = function()
             return Result({ item = item, console = self.console })
+        end,
+        status = function()
+            return Status.Status(item)
         end,
     })
 

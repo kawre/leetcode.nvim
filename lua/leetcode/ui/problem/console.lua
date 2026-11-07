@@ -244,10 +244,17 @@ return m.component(function(props)
 			padding = { 1, 3 },
 			style = "leetcode_description_header",
 			m.inline({ spacing = 1, tabs }),
-			m.inline({
-				m.inline("<Tab>", "leetcode_key"),
-				m.inline(" switch", "leetcode_muted"),
-			}),
+			-- What the last run came to, or how to switch tabs before there is one.
+			function()
+				local content = console.result.content()
+				if content and content.status then
+					return content.status()
+				end
+				return m.inline({
+					m.inline("<Tab>", "leetcode_key"),
+					m.inline(" switch", "leetcode_muted"),
+				})
+			end,
 		}),
 		function()
 			if console.tab() == "testcase" then

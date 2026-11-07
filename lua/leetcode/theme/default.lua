@@ -148,6 +148,10 @@ M.get = function()
         flame_off = { fg = muted },
 
         -- verdicts
+        -- The status of a run in the console's header, text on its band.
+        status_ok = { fg = ok, bold = true },
+        status_error = { fg = err, bold = true },
+        status_warn = { fg = warn, bold = true },
         verdict_ok = { fg = ok, bg = mix(bg, ok, 0.16), bold = true },
         verdict_error = { fg = err, bg = mix(bg, err, 0.16), bold = true },
         verdict_warn = { fg = warn, bg = mix(bg, warn, 0.16), bold = true },
