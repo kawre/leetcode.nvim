@@ -7,7 +7,7 @@ return m.component(function(props)
 
 	local count = kit.counter(function()
 		return streak().streakCount
-	end, { duration = 760, instant = Leet.menu.settled() })
+	end, { duration = 1100, instant = Leet.menu.settled() })
 
 	return kit.Card({
 		width = props.width,

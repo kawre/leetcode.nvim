@@ -170,7 +170,7 @@ end
 function M:meter()
 	local q = self.problem.problem
 	local rate = (tonumber((tostring(q.stats.acRate):gsub("%%", ""))) or 0) / 100
-	local filled = m.animated(0, { duration = 560, delay = 120 })
+	local filled = m.animated(0, { duration = 800, delay = 170 })
 
 	m.effect(function()
 		filled(self.stats_visible() and rate or 0)

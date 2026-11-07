@@ -74,7 +74,7 @@ end
 --- Rows of half blocks: two days fit in each cell, and the cells are square.
 local function Grid(summary)
 	local settled = Leet.menu.settled()
-	local reveal = m.animated(settled and WEEKS or 0, { duration = 620, delay = 70, easing = "out_cubic" })
+	local reveal = m.animated(settled and WEEKS or 0, { duration = 900, delay = 100, easing = "out_cubic" })
 	if not settled then
 		reveal(WEEKS)
 	end
@@ -111,7 +111,7 @@ end
 local function Stat(value, label)
 	local shown = kit.counter(function()
 		return value
-	end, { delay = 140, instant = Leet.menu.settled() })
+	end, { delay = 200, instant = Leet.menu.settled() })
 
 	return m.block({
 		m.inline(function()

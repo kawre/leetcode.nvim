@@ -45,14 +45,14 @@ local Accepted = m.component(function(props)
 			label = "Runtime",
 			value = runtime_ms .. " ms",
 			percentile = item.runtime_percentile,
-			delay = 140,
+			delay = 200,
 		}),
 		Metric({
 			icon = kit.icons.memory,
 			label = "Memory",
 			value = memory,
 			percentile = item.memory_percentile,
-			delay = 240,
+			delay = 350,
 		}),
 	})
 end)

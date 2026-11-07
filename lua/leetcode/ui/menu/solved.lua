@@ -53,7 +53,7 @@ local function stat_of(difficulty)
 end
 
 local function Row(difficulty, index)
-	local delay = 100 + index * 80
+	local delay = 150 + index * 120
 	local stat = m.memo(function()
 		return stat_of(difficulty)
 	end)

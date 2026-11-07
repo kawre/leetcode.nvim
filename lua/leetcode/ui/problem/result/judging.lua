@@ -15,7 +15,7 @@ return m.component(function(props)
 
 	local position = m.signal(0)
 	animate.run({
-		duration = 1000,
+		duration = 1400,
 		easing = "linear",
 		loop = true,
 		update = function(t)

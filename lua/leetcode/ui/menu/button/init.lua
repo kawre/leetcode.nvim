@@ -25,19 +25,19 @@ return m.component(function(p)
 
     -- Rows of a page arrive one after another.
     Leet.menu.rows = Leet.menu.rows + 1
-    local delay = Leet.menu.rows * 25
+    local delay = Leet.menu.rows * 35
     local surface = kit.color("leetcode_surface", "bg")
 
     local enter = Leet.menu.rows_enter
 
     local function fade(group)
-        return enter and animate.fade_in(group, surface, { delay = delay, duration = 140 }) or group
+        return enter and animate.fade_in(group, surface, { delay = delay, duration = 200 }) or group
     end
 
-    local slide = m.animated(enter and 2 or 0, { delay = delay, duration = 140 })
+    local slide = m.animated(enter and 2 or 0, { delay = delay, duration = 200 })
     slide(0)
 
-    local focus = m.animated(0, { duration = 80 })
+    local focus = m.animated(0, { duration = 110 })
     local row = animate.tint(
         { bg = surface },
         { bg = kit.color("leetcode_row_active", "bg") },

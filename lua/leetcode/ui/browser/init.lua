@@ -277,7 +277,7 @@ end
 --- Slides the column in from the side of the screen.
 ---@param target integer
 local function slide_in(target)
-	local width = m.animated(1, { duration = 150, easing = "out_cubic" })
+	local width = m.animated(1, { duration = 220, easing = "out_cubic" })
 
 	m.effect(function()
 		local current = math.max(math.floor(width() + 0.5), 1)
