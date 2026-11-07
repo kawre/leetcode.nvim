@@ -189,6 +189,21 @@ T["filter"]["by words of the title, in any order, or the number"] = function()
 	eq(filtered([[{ query = "nothing" }]]), {})
 end
 
+T["filter"]["finds where the words are"] = function()
+	child.lua("filter = require('leetcode.ui.browser.filter')")
+	eq(child.lua_get("filter.ranges('Two Sum', 'sum')"), { { 5, 7 } })
+	eq(child.lua_get("filter.ranges('Two Sum', 'sum two')"), { { 1, 3 }, { 5, 7 } })
+	eq(child.lua_get("filter.ranges('Two Sum Two', 't')"), { { 1, 1 } })
+	eq(child.lua_get("filter.ranges('Two Sum', '')"), {})
+	eq(child.lua_get("filter.ranges('三数之和', '数之')"), { { 4, 9 } })
+end
+
+T["filter"]["splits a title around its matches"] = function()
+	child.lua("filter = require('leetcode.ui.browser.filter')")
+	eq(child.lua_get("filter.highlight('Two Sum', 'sum')"), { { "Two " }, { "Sum", "MarkupPickerMatch" } })
+	eq(child.lua_get("filter.highlight('Two Sum', 'zz')"), { { "Two Sum" } })
+end
+
 T["browser"] = new_set()
 
 local function open_browser(count)
@@ -290,6 +305,23 @@ T["browser"]["search filters as you type"] = function()
 	eq(filters_have("1 of 30"), true)
 	child.type_keys("<Esc>")
 	eq(child.lua_get("vim.api.nvim_get_current_win() == browser.list.win"), true)
+end
+
+T["browser"]["highlights what the search matched"] = function()
+	open_browser(30)
+	child.type_keys("/", "b", "l", "e", "m", " ", "1", "2")
+	child.lua([[
+		vim.wait(20, function() reactive.flush(); return false end, 5)
+		matched = {}
+		local buf, ns = browser.list.buf, browser.list_view.ns
+		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, { details = true })) do
+			if mark[4].hl_group == "MarkupPickerMatch" then
+				matched[#matched + 1] = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[2], mark[4].end_col, {})[1]
+			end
+		end
+	]])
+	child.type_keys("<Esc>")
+	eq(child.lua_get("matched"), { "blem", "12" })
 end
 
 T["browser"]["says when nothing matches"] = function()

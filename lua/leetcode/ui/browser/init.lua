@@ -148,7 +148,12 @@ local Row = m.component(function(props)
 			end, "leetcode_accent"),
 			m.inline(locked and config.icons.lock or (status and status[1] or " "), locked and "leetcode_medium" or status and status[2]),
 			m.inline((" %5s  "):format(problem.frontend_id), "leetcode_muted"),
-			m.inline(Leet.util.translate(problem.title, problem.title_cn)),
+			m.inline(function()
+				local title = Leet.util.translate(problem.title, problem.title_cn)
+				return vim.tbl_map(function(span)
+					return m.inline(span[1], span[2])
+				end, filter.highlight(title, state.query()))
+			end),
 		}),
 		m.inline({
 			shrink = 0,
