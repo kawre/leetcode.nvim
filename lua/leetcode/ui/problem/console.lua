@@ -226,10 +226,12 @@ return m.component(function(props)
 
 	return m.block({
 		white_space = "nowrap",
+		-- A solid band, the color of the description's header.
 		m.flex({
 			justify = "between",
-			padding = { 1, 3, 0, 3 },
+			padding = { 1, 3 },
 			margin_bottom = 1,
+			style = "leetcode_description_header",
 			m.inline({ spacing = 1, tabs }),
 			m.inline({
 				m.inline("<Tab>", "leetcode_key"),
