@@ -21,7 +21,7 @@ function M.run(problem, submit)
 			question_id = problem.problem.id,
 			data_input = not submit and problem.console.testcase:content(),
 		}
-		Markup.log("body:", body)
+		Leet.logger.debug("body: " .. vim.inspect(body))
 
 		local judge = Judge:init()
 		problem.console.result:judging(submit)

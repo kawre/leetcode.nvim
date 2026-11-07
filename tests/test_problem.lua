@@ -1206,6 +1206,42 @@ T["console"]["shows the judge's progress through a whole run"] = function()
 	eq(vim.tbl_contains(seen, "STARTED: true"), true)
 end
 
+local function logged_run(debug)
+	open_console()
+	run(([[
+		Leet.config.debug = %s
+		notes = {}
+		vim.notify = function(msg) notes[#notes + 1] = tostring(msg) end
+		local checks = { { state = "PENDING" }, { state = "STARTED" }, { status_code = 16 } }
+		Leet.api.post = function(_, opts) opts.callback({ interpret_id = "run1", test_case = "[2,7]\n9" }) end
+		Leet.api.get = function(_, opts) opts.callback(table.remove(checks, 1)) end
+		vim.defer_fn = function(fn) fn() end
+		require("leetcode.problem.runner").running = false
+		problem.console:run()
+		vim.wait(200, function() return #checks == 0 end, 10)
+		function noted(text)
+			for _, note in ipairs(notes) do
+				if note:find(text, 1, true) then return true end
+			end
+			return false
+		end
+	]]):format(tostring(debug)))
+end
+
+T["console"]["a run shows no debugging unless asked to"] = function()
+	logged_run(false)
+	eq(child.lua_get("noted('body:')"), false)
+	eq(child.lua_get("noted('check run1')"), false)
+end
+
+T["console"]["with debug, each check of a run says what came back"] = function()
+	logged_run(true)
+	eq(child.lua_get("noted('body:')"), true)
+	eq(child.lua_get("noted('check run1: PENDING')"), true)
+	eq(child.lua_get("noted('check run1: STARTED')"), true)
+	eq(child.lua_get("noted('check run1: result 16')"), true)
+end
+
 T["console"]["is one split below the editor"] = function()
 	open_console()
 	run([[

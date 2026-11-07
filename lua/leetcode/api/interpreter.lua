@@ -53,6 +53,10 @@ end
 function interpreter.listener(id, callback)
 	local function listen()
 		check(id, function(item, err)
+			-- With `debug = true`, says what each check of a run got back.
+			require("leetcode.logger").debug(
+				("check %s: %s"):format(id, err and "error" or item.state or ("result " .. tostring(item.status_code)))
+			)
 			if err then         -- error
 				callback(nil, nil, err)
 			elseif item.status_code then -- got results
