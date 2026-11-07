@@ -64,6 +64,13 @@ M.get = function()
     local err = hl("DiagnosticError").fg or 0xf8615c
     local warn = hl("DiagnosticWarn").fg or 0xfac31d
     local header = mix(hl("CursorLine").bg or raised, 0xffffff, 0.06)
+    -- Cards of the description: the color the colorscheme gives indent guides,
+    -- which it picks to sit quietly on the background, such as `surface0`.
+    local subtle
+    for _, group in ipairs({ "SnacksIndent", "IblIndent", "IndentBlanklineChar" }) do
+        subtle = subtle or hl(group).fg
+    end
+    subtle = subtle or blend(hl("NormalFloat").bg or hl("Normal").bg, hl("CursorLine").bg)
     local difficulty = {
         easy = readable(0x46c6c2),
         medium = readable(0xfac31d),
@@ -98,13 +105,14 @@ M.get = function()
         header_track = { fg = mix(header, fg, 0.15) },
         -- Separators beside the header keep their own color on its background.
         header_separator = { fg = hl("WinSeparator").fg or muted, bg = header },
-        section = { bg = blend(hl("NormalFloat").bg or hl("Normal").bg, hl("CursorLine").bg) },
+        section = { bg = subtle },
 
         italic = { italic = true },
         bold = { bold = true },
         underline = { underline = true },
 
-        code = { fg = hl("Type").fg, bg = hl("Normal").bg },
+        -- A step up from the cards, so it stands out on them and beside them.
+        code = { fg = hl("Type").fg, bg = mix(subtle, fg, 0.08) },
         example = { fg = hl("DiagnosticHint").fg },
         constraints = { fg = hl("DiagnosticInfo").fg },
         header = { fg = hl("SpecialChar").fg, bold = true },
