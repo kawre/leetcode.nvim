@@ -1,23 +1,19 @@
 local m = require("markup")
-local Buttons = require("leetcode.ui.menu.tiles")
-local Button = require("leetcode.ui.menu.tile")
+local Items = require("leetcode.ui.menu.items")
+local Item = require("leetcode.ui.menu.item")
 
 return m.component(function()
     local cmd = require("leetcode.cmd")
 
-    return m.block({
-        m.block({ margin_bottom = 1, padding = { 0, 1 }, m.inline("please sign in", "leetcode_muted") }),
-        Buttons({
-            Button({ icon = "\u{f0306}", title = "Sign in", desc = "Paste your session cookie", lhs = "i", on_submit = cmd.cookie_prompt }),
-            Button({
-                icon = "\u{f0a48}",
-                title = "Quit",
-                desc = "Close leetcode.nvim",
-                lhs = "qa",
-                on_submit = function()
-                    require("leetcode").stop()
-                end,
-            }),
+    return Items({
+        Item({ title = "Sign in", desc = "paste your session cookie", lhs = "i", on_submit = cmd.cookie_prompt }),
+        Item({
+            title = "Quit",
+            desc = "close leetcode.nvim",
+            lhs = "q",
+            on_submit = function()
+                require("leetcode").stop()
+            end,
         }),
     })
 end)

@@ -2,10 +2,7 @@ local m = require("markup")
 local cookie = require("leetcode.cache.cookie")
 local kit = require("leetcode.ui.kit")
 local Nav = require("leetcode.ui.menu.nav")
-local Streak = require("leetcode.ui.menu.streak")
-local Daily = require("leetcode.ui.menu.daily")
-local Heatmap = require("leetcode.ui.menu.heatmap")
-local solved = require("leetcode.ui.menu.solved")
+local Summary = require("leetcode.ui.menu.summary")
 local data = require("leetcode.ui.menu.data")
 local Stats = require("leetcode.ui.menu.stats")
 local Problems = require("leetcode.ui.menu.problems")
@@ -76,59 +73,59 @@ local WIDE = 80
 local WIDTH = 78
 local NARROW = 46
 
-local function Brand(width)
-    return m.flex({
-        width = width,
-        justify = "between",
-        padding = { 0, 1 },
-        m.inline({
+--- Wide enough for the launcher, which keeps one width whatever the window.
+local LAUNCHER = 50
+
+local function greeting()
+    local hour = tonumber(os.date("%H"))
+    return hour < 5 and "night" or hour < 12 and "morning" or hour < 18 and "afternoon" or "evening"
+end
+
+--- The name, and who is here with how long their streak is.
+local Brand = m.component(function()
+    local streak = kit.counter(function()
+        return data.streak().streakCount
+    end, { duration = 1100, instant = M.settled() })
+
+    return m.vflex({
+        align = "center",
+        m.block({
             m.inline(kit.icons.code .. " ", "leetcode_accent"),
             m.inline("leetcode.nvim", "leetcode_strong"),
         }),
-        m.inline(function()
+        m.block(function()
             local auth = Leet.auth()
-            local hour = tonumber(os.date("%H"))
-            local part = hour < 5 and "night" or hour < 12 and "morning" or hour < 18 and "afternoon" or "evening"
-            return auth and ("Good %s, %s"):format(part, auth.name) or ""
-        end, "leetcode_muted"),
-    })
-end
+            if not auth then
+                return nil
+            end
 
-local function Menu(width)
-    return m.block({ width = width, Nav() })
-end
-
-local COLUMN = 38
-
---- Navigation leads, with the numbers beside it and the year below.
-local Wide = m.component(function()
-    M.dashboards = M.dashboards + 1
-
-    return m.vflex({
-        align = "center",
-        m.flex({
-            margin_top = 1,
-            width = WIDTH,
-            justify = "between",
-            Menu(COLUMN),
-            -- Solved takes what is left, so both columns end on the same row.
-            m.vflex({
-                width = COLUMN,
-                Streak({ width = COLUMN }),
-                Daily({ width = COLUMN }),
-                solved.Solved({ width = COLUMN, grow = 1 }),
-            }),
-        }),
-        Heatmap({ width = WIDTH }),
+            return m.inline({
+                m.inline(("Good %s, %s"):format(greeting(), auth.name), "leetcode_muted"),
+                data.streak().streakCount and m.inline({
+                    m.inline(" · ", "leetcode_muted"),
+                    m.inline({
+                        style = function()
+                            return data.streak().todayCompleted and "leetcode_flame" or "leetcode_flame_off"
+                        end,
+                        kit.icons.fire .. " ",
+                    }),
+                    m.inline(function()
+                        return tostring(math.floor(streak() + 0.5))
+                    end, "leetcode_strong"),
+                }),
+            })
+        end),
     })
 end)
 
-local Narrow = m.component(function()
+local Home = m.component(function()
     M.dashboards = M.dashboards + 1
 
     return m.vflex({
         align = "center",
-        m.block({ margin_top = 1, width = NARROW, Menu(NARROW), solved.Solved({ width = NARROW }) }),
+        margin_top = 2,
+        m.block({ width = LAUNCHER, Nav({ width = LAUNCHER }) }),
+        m.block({ margin_top = 2, Summary() }),
     })
 end)
 
@@ -136,8 +133,12 @@ end)
 local Gate = m.component(function()
     M.dashboards = 0
 
-    local width = 36
-    return m.vflex({ align = "center", margin_top = 6, Brand(width), m.block({ margin_top = 1, Menu(width) }) })
+    return m.vflex({
+        align = "center",
+        margin_top = 4,
+        Brand(),
+        m.block({ margin_top = 2, width = LAUNCHER, Nav({ width = LAUNCHER }) }),
+    })
 end)
 
 local App = m.component(function()
@@ -166,20 +167,15 @@ local App = m.component(function()
     end)
 
     return m.block({
-        margin_top = math.max(math.floor((vim.o.lines - 30) / 2), 1),
+        margin_top = math.max(math.floor((vim.o.lines - 26) / 2), 1),
         m.show(gated, Gate, function()
             return m.block({
-                m.vflex({
-                    align = "center",
-                    function()
-                        return Brand(wide() and WIDTH or NARROW)
-                    end,
-                }),
+                Brand(),
                 m.slide(function()
                     return SLIDES[M.page()] or "home"
                 end, function(key)
                     if key == "home" then
-                        return m.show(wide, Wide, Narrow)
+                        return Home()
                     end
                     local Page = key == "stats" and Stats or Problems
                     return function()

@@ -1,26 +1,14 @@
-local markup = require("markup")
-local Buttons = require("leetcode.ui.menu.tiles")
-local Button = require("leetcode.ui.menu.tile")
+local m = require("markup")
+local Items = require("leetcode.ui.menu.items")
+local Item = require("leetcode.ui.menu.item")
 local BackButton = require("leetcode.ui.menu.button.back")
 
-return markup.component(function()
+return m.component(function()
     local cmd = require("leetcode.cmd")
 
-    return Buttons({
-        Button({
-            icon = "󱛬",
-            lhs = "u",
-            title = "Change cookie",
-            desc = "Paste a new session cookie",
-            on_submit = cmd.cookie_prompt,
-        }),
-        Button({
-            icon = "󱛪",
-            lhs = "d",
-            title = "Sign out",
-            desc = "Forget this session",
-            on_submit = cmd.sign_out,
-        }),
+    return Items({
+        Item({ title = "Cookie", desc = "paste a new session cookie", lhs = "u", on_submit = cmd.cookie_prompt }),
+        Item({ title = "Sign out", desc = "forget this session", lhs = "d", on_submit = cmd.sign_out }),
         BackButton({ page = "menu" }),
     })
 end)

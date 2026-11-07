@@ -35,7 +35,8 @@ end
 T["signed out shows the sign in page"] = function()
 	open(false)
 	eq(child.lua_get("menu.page()"), "signin")
-	eq(contains("please sign in"), true)
+	eq(contains("Sign in"), true)
+	eq(contains("paste your session cookie"), true)
 end
 
 T["signed in shows the main page"] = function()
@@ -46,24 +47,20 @@ T["signed in shows the main page"] = function()
 	eq(contains("Quit"), true)
 end
 
-T["the dashboard follows the signed in user"] = function()
+T["the greeting follows the signed in user"] = function()
 	open(true)
 	eq(contains("tester"), true)
-	eq(contains("day streak"), true)
-	eq(contains("done for today"), true)
+	eq(contains("42"), true)
 end
 
-T["the daily challenge has a card"] = function()
+T["today shows the daily challenge"] = function()
 	open(true)
-	eq(contains("Daily challenge"), true)
-	eq(contains("3Sum"), true)
-	eq(contains("Medium"), true)
+	eq(contains("Today"), true)
+	eq(contains("15. 3Sum"), true)
 end
 
-T["the dashboard stacks when it gets narrow"] = function()
+T["the launcher keeps its shape when narrow"] = function()
 	open(true)
-	eq(contains("Daily challenge"), true)
-
 	child.lua([[
 		vim.cmd("vnew")
 		vim.api.nvim_win_set_width(menu.win.win, 60)
@@ -71,9 +68,9 @@ T["the dashboard stacks when it gets narrow"] = function()
 		reactive.flush()
 		reactive.flush()
 	]])
-	eq(contains("Daily challenge"), false)
+	eq(contains("Today"), true)
 	eq(contains("Problems"), true)
-	eq(contains("Solved"), true)
+	eq(contains("solved"), true)
 end
 
 T["the header swaps to the calendar"] = function()
@@ -111,19 +108,18 @@ T["enter presses the button under the cursor"] = function()
 	eq(child.lua_get("menu.page()"), "menu.statistics")
 end
 
-T["reflowing keeps the data and skips the intro"] = function()
+T["coming back skips the intro and keeps the data"] = function()
 	open(true)
 	child.lua([[
 		Markup.animate.enabled = true
 		Markup.animate.manual = true
 		fetches = streak_fetches
-		vim.cmd("vnew")
-		vim.api.nvim_win_set_width(menu.win.win, 60)
-		menu.view:request_commit()
-		reactive.flush()
-		reactive.flush()
 	]])
-	eq(contains("Solved"), true)
+	child.type_keys("p")
+	child.lua("reactive.flush(); Markup.animate.tick(3000); reactive.flush(); reactive.flush()")
+	child.type_keys("q")
+	child.lua("reactive.flush(); Markup.animate.tick(3000); reactive.flush(); reactive.flush()")
+	eq(contains("solved"), true)
 	eq(child.lua_get("streak_fetches"), child.lua_get("fetches"))
 
 	-- The row under the cursor may still fade in, but the intro takes far longer.
@@ -193,30 +189,7 @@ T["one press moves between rows in both directions"] = function()
 	eq(on("Problems"), true)
 end
 
-T["one press reaches the daily card and back"] = function()
-	open(true)
-	child.lua([[
-		for i, line in ipairs(buffer_text(menu.win.buf)) do
-			if line:find("Problems", 1, true) then
-				vim.api.nvim_win_set_cursor(0, { i, (line:find("Problems", 1, true)) })
-			end
-		end
-		menu.view.cursor = nil
-		menu.view:snap_cursor()
-		for i, line in ipairs(buffer_text(menu.win.buf)) do
-			if line:find("Daily challenge", 1, true) then daily = i end
-		end
-	]])
-	child.type_keys("l")
-	-- Entered on its first row of content, below its edge.
-	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1]"), child.lua_get("daily"))
-
-	child.type_keys("h")
-	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1] ~= daily"), true)
-	eq(child.lua_get("vim.fn.virtcol('.') < 40"), true)
-end
-
-T["navigation tiles have room between them"] = function()
+T["rows have a line between them"] = function()
 	open(true)
 	child.lua([[
 		for i, line in ipairs(buffer_text(menu.win.buf)) do
@@ -224,8 +197,7 @@ T["navigation tiles have room between them"] = function()
 			if line:find("Statistics", 1, true) and not second then second = i end
 		end
 	]])
-	-- A title and a description, then the edges of two tiles.
-	eq(child.lua_get("second - first"), 4)
+	eq(child.lua_get("second - first"), 2)
 end
 
 T["the breadcrumb shows only away from the menu"] = function()
@@ -236,7 +208,7 @@ T["the breadcrumb shows only away from the menu"] = function()
 end
 
 T["a short window can still show the whole dashboard"] = function()
-	child.o.lines = 22
+	child.o.lines = 14
 	-- What many configs set, which used to undo every scroll.
 	child.o.scrolloff = 8
 	open(true)
@@ -249,12 +221,12 @@ T["a short window can still show the whole dashboard"] = function()
 			return false
 		end
 	]])
-	eq(child.lua_get("visible('submissions')"), false)
+	eq(child.lua_get("visible('hard')"), false)
 
 	for _ = 1, 25 do
 		child.type_keys("j")
 	end
-	eq(child.lua_get("visible('submissions')"), true)
+	eq(child.lua_get("visible('hard')"), true)
 
 	for _ = 1, 40 do
 		child.type_keys("k")
@@ -262,32 +234,21 @@ T["a short window can still show the whole dashboard"] = function()
 	eq(child.lua_get("visible('Problems')"), true)
 end
 
-T["refresh fetches the problem list right away"] = function()
-	open(true)
-	child.lua([[
-		refreshed = false
-		require("leetcode.cmd").cache_update = function() refreshed = true end
-	]])
-	child.type_keys("c")
-	eq(child.lua_get("refreshed"), true)
-	eq(child.lua_get("menu.page()"), "menu")
-end
-
 T["navigation explains itself"] = function()
 	open(true)
-	eq(contains("Browse, random, daily and recent"), true)
-	eq(contains("Skills and languages"), true)
+	eq(contains("browse, random, recent"), true)
+	eq(contains("progress and skills"), true)
 end
 
-T["navigation comes first on the screen"] = function()
+T["navigation comes before the numbers"] = function()
 	open(true)
 	child.lua([[
 		for i, line in ipairs(buffer_text(menu.win.buf)) do
 			if line:find("Problems", 1, true) and not nav then nav = i end
-			if line:find("submissions", 1, true) and not calendar then calendar = i end
+			if line:find("hard", 1, true) and not summary then summary = i end
 		end
 	]])
-	eq(child.lua_get("nav < calendar"), true)
+	eq(child.lua_get("nav < summary"), true)
 end
 
 T["the row under the cursor is marked"] = function()
@@ -309,7 +270,7 @@ T["the row under the cursor is marked"] = function()
 		local buf, ns = menu.win.buf, menu.view.ns
 		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, { row - 1, 0 }, { row - 1, -1 }, { details = true })) do
 			local text = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[2], mark[4].end_col, {})[1]
-			if text == "Statistics" then lit = mark[4].hl_group end
+			if vim.trim(text) == "Statistics" then lit = mark[4].hl_group end
 		end
 	]])
 	eq(child.lua_get("lit"), "leetcode_accent")
@@ -353,7 +314,7 @@ T["problems"]["slide in with their buttons"] = function()
 	eq(child.lua_get("menu.page()"), "menu.problems")
 	eq(contains("Random"), true)
 	eq(contains("Daily challenge"), true)
-	eq(contains("day streak"), false)
+	eq(contains("browse, random, recent"), false)
 end
 
 T["problems"]["say when nothing was worked on"] = function()
@@ -463,7 +424,7 @@ T["problems"]["q goes back"] = function()
 	child.type_keys("q")
 	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
 	eq(child.lua_get("menu.page()"), "menu")
-	eq(contains("day streak"), true)
+	eq(contains("Today"), true)
 end
 
 T["problems"]["the menu keeps its keys after coming back"] = function()
@@ -482,7 +443,7 @@ T["statistics"]["replace the dashboard"] = function()
 	eq(child.lua_get("menu.page()"), "menu.statistics")
 	eq(contains("Statistics"), true)
 	eq(contains("Fundamental"), true)
-	eq(contains("day streak"), false)
+	eq(contains("Today"), false)
 end
 
 T["statistics"]["show skills by level, most solved first"] = function()
@@ -551,7 +512,7 @@ T["statistics"]["q goes back to where the menu was"] = function()
 	child.type_keys("q")
 	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
 	eq(child.lua_get("menu.page()"), "menu")
-	eq(contains("day streak"), true)
+	eq(contains("Today"), true)
 	eq(contains("Fundamental"), false)
 	eq(contains("Problems"), true)
 end
@@ -689,7 +650,49 @@ T["statistics"]["slide in and out"] = function()
 		reactive.flush()
 	]])
 	eq(contains("Fundamental"), true)
-	eq(contains("day streak"), false)
+	eq(contains("Today"), false)
+end
+
+T["continue"] = new_set()
+
+T["continue"]["shows the last problem worked on"] = function()
+	worked_on(two_problems)
+	open(true)
+	eq(contains("Continue"), true)
+	eq(contains("1. Two Sum"), true)
+	eq(contains("Solved · Easy · 1h ago"), true)
+end
+
+T["continue"]["opens it with c"] = function()
+	worked_on(two_problems)
+	open(true)
+	child.lua([[
+		opened = nil
+		require("leetcode.cmd").open = function(problem) opened = problem.title_slug end
+	]])
+	child.type_keys("c")
+	eq(child.lua_get("opened"), "two-sum")
+end
+
+T["continue"]["stays away before any work"] = function()
+	open(true)
+	eq(contains("Continue"), false)
+end
+
+T["problems"]["refresh the problem list"] = function()
+	open_problems()
+	child.lua([[
+		refreshed = false
+		require("leetcode.cmd").cache_update = function() refreshed = true end
+	]])
+	child.type_keys("r")
+	eq(child.lua_get("refreshed"), true)
+end
+
+T["statistics"]["show what was solved and when"] = function()
+	open_stats()
+	eq(contains("20/100"), true)
+	eq(contains("submissions"), true)
 end
 
 T["every module loads"] = function()

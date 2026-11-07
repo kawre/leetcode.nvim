@@ -10,6 +10,9 @@ local data = m.signal(nil)
 ---@class leet.ui.solved
 local M = {}
 
+--- What the solved stats came back as, once they did.
+M.data = data
+
 ---@param done? function called once it came back, errors included
 function M.fetch(done)
 	statistics.solved(function(res, err)
@@ -26,7 +29,7 @@ end
 --- Solved and total counts of a difficulty.
 ---@param difficulty string
 ---@return { solved: integer, total: integer }
-local function stat_of(difficulty)
+function M.stat_of(difficulty)
 	local res = data()
 	local stat = { solved = 0, total = 0 }
 
@@ -43,10 +46,10 @@ local function stat_of(difficulty)
 	return stat
 end
 
-local function Row(difficulty, index)
+local function Row(difficulty, index, bar_width)
 	local delay = 150 + index * 120
 	local stat = m.memo(function()
-		return stat_of(difficulty)
+		return M.stat_of(difficulty)
 	end)
 	local solved = kit.counter(function()
 		return stat().solved
@@ -57,7 +60,7 @@ local function Row(difficulty, index)
 		white_space = "nowrap",
 		m.inline({ width = 8, m.inline(t(difficulty), "leetcode_" .. difficulty:lower()) }),
 		kit.Bar({
-			width = BAR_WIDTH,
+			width = bar_width,
 			delay = delay,
 			instant = Leet.menu.settled(),
 			style = "leetcode_bar_" .. difficulty:lower(),
@@ -80,12 +83,14 @@ local function Row(difficulty, index)
 end
 
 M.Solved = m.component(function(props)
+	-- The card, the label and the count take the rest.
+	local bar_width = math.max((props.width or 0) - 4 - 8 - 10, BAR_WIDTH)
 	if not data() then
 		M.fetch()
 	end
 
 	local total = kit.counter(function()
-		return stat_of("All").solved
+		return M.stat_of("All").solved
 	end, { instant = Leet.menu.settled() })
 
 	return kit.Card({
@@ -100,11 +105,11 @@ M.Solved = m.component(function(props)
 					return tostring(math.floor(total() + 0.5))
 				end, "leetcode_strong"),
 				m.inline(function()
-					return " / " .. stat_of("All").total
+					return " / " .. M.stat_of("All").total
 				end, "leetcode_muted"),
 			}),
 		}),
-		m.vflex({ spacing = 1, Row("Easy", 1), Row("Medium", 2), Row("Hard", 3) }),
+		m.vflex({ spacing = 1, Row("Easy", 1, bar_width), Row("Medium", 2, bar_width), Row("Hard", 3, bar_width) }),
 	})
 end)
 

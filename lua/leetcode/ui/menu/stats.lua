@@ -4,6 +4,8 @@ local m = require("markup")
 local kit = require("leetcode.ui.kit")
 local data = require("leetcode.ui.menu.data")
 local PageBar = require("leetcode.ui.menu.page_bar")
+local solved = require("leetcode.ui.menu.solved")
+local Heatmap = require("leetcode.ui.menu.heatmap")
 local t = require("leetcode.translator")
 
 --- Tags shown per level, the rest is only counted.
@@ -185,6 +187,8 @@ return m.component(function(props)
 		align = "center",
 		margin_top = 1,
 		Bar(width),
+		solved.Solved({ width = width }),
+		props.columns and Heatmap({ width = width }),
 		Skills(width, props.columns),
 		Languages(width),
 	})

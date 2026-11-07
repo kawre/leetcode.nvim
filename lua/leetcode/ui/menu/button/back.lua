@@ -1,14 +1,6 @@
-local Button = require("leetcode.ui.menu.tile")
 local m = require("markup")
+local Item = require("leetcode.ui.menu.item")
 
 return m.component(function(props)
-    local page = props.page
-
-    return Button({
-        icon = "",
-        title = "Back",
-        desc = "Return to the menu",
-        lhs = "q",
-        page = page,
-    })
+    return Item({ title = "Back", desc = "return to the menu", lhs = "q", page = props.page })
 end)

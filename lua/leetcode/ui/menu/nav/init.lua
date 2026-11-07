@@ -1,7 +1,7 @@
 local m = require("markup")
 local Title = require("leetcode.ui.menu.title")
 
-local Nav = m.component(function()
+local Nav = m.component(function(props)
     -- Rows only make an entrance on a new page, not when the dashboard reflows.
     local mounted = false
 
@@ -16,7 +16,7 @@ local Nav = m.component(function()
             Leet.menu.rows = 0
             Leet.menu.rows_enter = mounted or not Leet.menu.settled()
             mounted = true
-            return require("leetcode.ui.menu.nav." .. Leet.menu.home_page())()
+            return require("leetcode.ui.menu.nav." .. Leet.menu.home_page())({ width = props.width })
         end,
     })
 end)

@@ -137,6 +137,7 @@ M.get = function()
         strong = { fg = fg, bold = true },
         key = { fg = mix(bg, accent, light and 1 or 0.75) },
         track = { bg = raised },
+        divider = { fg = raised },
         flame = { fg = accent },
         flame_off = { fg = muted },
 

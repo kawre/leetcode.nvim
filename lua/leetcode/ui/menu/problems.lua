@@ -82,6 +82,15 @@ local function Actions()
 			on_submit = cmd.random_question,
 		}),
 		Button({
+			icon = "\u{f0450}",
+			title = "Refresh",
+			desc = "Fetch the list again",
+			lhs = "r",
+			on_submit = function()
+				require("leetcode.cmd").cache_update()
+			end,
+		}),
+		Button({
 			icon = kit.icons.calendar,
 			title = "Daily challenge",
 			desc = "Today's problem",

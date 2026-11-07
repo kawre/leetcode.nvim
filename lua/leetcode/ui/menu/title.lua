@@ -22,5 +22,5 @@ return m.component(function()
         return titles
     end
 
-    return m.flex({ margin_bottom = 1, padding = { 0, 1 }, titles })
+    return m.flex({ margin_bottom = 1, padding = { 0, 2 }, titles })
 end)
