@@ -194,6 +194,14 @@ return m.component(function(props)
 			end
 		end
 	end
+	-- Presses what the cursor is on: a tab, a case, or a field to type into.
+	local view = m.use_view()
+	local confirm = Leet.config.user.keys.confirm
+	for _, lhs in ipairs(type(confirm) == "table" and confirm or { confirm }) do
+		m.use_key(lhs, function()
+			view:press()
+		end)
+	end
 	m.use_key("<Tab>", function()
 		switch(1)
 	end)

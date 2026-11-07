@@ -1236,6 +1236,39 @@ T["console"]["adds, removes and resets cases"] = function()
 	eq(child.lua_get("#problem.console.testcase.cases()"), 2)
 end
 
+T["console"]["enter on a field types over it, and on a case picks it"] = function()
+	open_console()
+	run([[
+		local function row_of(text)
+			for i, line in ipairs(vim.api.nvim_buf_get_lines(problem.console.win.buf, 0, -1, false)) do
+				if line:find(text, 1, true) then return i end
+			end
+		end
+		vim.api.nvim_win_set_cursor(0, { row_of("[2,7]"), 6 })
+		vim.cmd("doautocmd CursorMoved")
+		reactive.flush()
+	]])
+	child.type_keys("<CR>")
+	run("reactive.flush()")
+	eq(child.lua_get("problem.console.typing()"), 1)
+	eq(child.lua_get("vim.api.nvim_win_get_config(0).relative"), "win")
+
+	child.type_keys("<Esc>")
+	run([[
+		reactive.flush()
+		local line = vim.api.nvim_buf_get_lines(problem.console.win.buf, 0, -1, false)
+		for i, text in ipairs(line) do
+			local col = text:find("Case 2", 1, true)
+			if col then vim.api.nvim_win_set_cursor(0, { i, col }) end
+		end
+		vim.cmd("doautocmd CursorMoved")
+		reactive.flush()
+	]])
+	child.type_keys("<CR>")
+	run("reactive.flush()")
+	eq(child.lua_get("problem.console.testcase.selected()"), 2)
+end
+
 T["console"]["types a value over its field"] = function()
 	open_console()
 	run([[
