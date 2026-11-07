@@ -100,9 +100,9 @@ local SearchField = m.component(function(props)
 
 	local field = kit.color("leetcode_input", "bg")
 	local focused = kit.color("leetcode_input_focus", "bg")
-	local fill = Markup.animate.tint({ bg = field }, { bg = focused }, light)
+	local fill = animate.tint({ bg = field }, { bg = focused }, light)
 	-- A half block inside the fill, which at rest has the color of the fill.
-	local edge = Markup.animate.tint({ fg = field }, { fg = kit.color("leetcode_accent", "fg") }, bar)
+	local edge = animate.tint({ fg = field }, { fg = kit.color("leetcode_accent", "fg") }, bar)
 	state.field_style = fill
 
 	return m.flex({
@@ -381,38 +381,6 @@ function M.is_open()
 	return M.layout ~= nil and M.layout:valid()
 end
 
---- Slides the column in from the side of the screen.
----@param target integer
-local function slide_in(target)
-	-- Laid out at the final width from the start, the rows wait in place while
-	-- the column uncovers them, rather than moving with its edge.
-	local views = { M.filters_view, M.list_view }
-	for _, view in ipairs(views) do
-		view:hold_width(target)
-	end
-
-	local width = m.animated(1, { duration = 220, easing = "out_cubic" })
-	local held = true
-
-	m.effect(function()
-		local current = math.max(math.floor(width() + 0.5), 1)
-		if M.list and M.list:valid() then
-			pcall(api.nvim_win_set_width, M.list.win, current)
-		end
-
-		-- Only once the window has its final width, or the rows would be laid out
-		-- for the frame before and move after all.
-		if held and current >= target then
-			held = false
-			for _, view in ipairs(views) do
-				view:release_width()
-			end
-		end
-	end)
-
-	width(target)
-end
-
 ---@param problems leet.cache.problem[]
 function M.open(problems)
 	if M.is_open() then
@@ -503,10 +471,6 @@ function M.open(problems)
 	M.filters_view:render(Filters({ state = state }))
 	M.list_view:render(List({ state = state }))
 	M.list:focus()
-
-	if animate.enabled then
-		slide_in(api.nvim_win_get_width(M.list.win))
-	end
 end
 
 function M.close()
