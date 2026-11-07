@@ -943,6 +943,37 @@ T["console"]["stdout collapses"] = function()
 	eq(result_has("hello"), false)
 end
 
+T["console"]["stdout opens in a dimmed popup"] = function()
+	show_result(accepted)
+	run([[
+		-- The backdrop only dims with true colors, as any real session has.
+		vim.o.termguicolors = true
+		vim.api.nvim_set_current_win(problem.console.win.win)
+		for i, line in ipairs(vim.api.nvim_buf_get_lines(problem.console.win.buf, 0, -1, false)) do
+			local col = line:find("\u{f0293}", 1, true)
+			if col then vim.api.nvim_win_set_cursor(0, { i, col - 1 }) end
+		end
+		vim.cmd("doautocmd CursorMoved")
+		reactive.flush()
+		floats_before = #vim.tbl_filter(function(w) return vim.api.nvim_win_get_config(w).relative ~= "" end, vim.api.nvim_list_wins())
+		problem.console.view:press()
+		reactive.flush()
+		popup = vim.api.nvim_get_current_win()
+		popup_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+		modifiable = vim.bo.modifiable
+		-- The popup and the backdrop that dims the rest.
+		floats_after = #vim.tbl_filter(function(w) return vim.api.nvim_win_get_config(w).relative ~= "" end, vim.api.nvim_list_wins())
+	]])
+	eq(child.lua_get("popup_lines"), { "hello" })
+	eq(child.lua_get("modifiable"), false)
+	eq(child.lua_get("floats_after - floats_before"), 2)
+
+	child.type_keys("q")
+	eq(child.lua_get("vim.api.nvim_win_is_valid(popup)"), false)
+	eq(child.lua_get("#vim.tbl_filter(function(w) return vim.api.nvim_win_get_config(w).relative ~= '' end, vim.api.nvim_list_wins())"), child.lua_get("floats_before"))
+	eq(child.lua_get("vim.api.nvim_get_current_win() == problem.console.win.win"), true)
+end
+
 T["console"]["shows a submission"] = function()
 	show_result([[{
 		_ = { title = "Accepted", hl = "leetcode_ok", success = true, submission = true },
