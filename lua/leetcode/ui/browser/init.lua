@@ -22,7 +22,7 @@ local difficulties = {
 	{ value = "all", title = "All", lhs = "a" },
 	{ value = "easy", title = "Easy", lhs = "e", kind = "easy" },
 	{ value = "medium", title = "Medium", lhs = "m", kind = "medium" },
-	{ value = "hard", title = "Hard", lhs = "h", kind = "hard" },
+	{ value = "hard", title = "Hard", lhs = "H", kind = "hard" },
 }
 
 local statuses = {

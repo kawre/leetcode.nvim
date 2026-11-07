@@ -173,6 +173,39 @@ T["browser"]["keys filter from either window"] = function()
 	eq(filters_have("9 of 9"), true)
 end
 
+T["browser"]["filters are reached with h and l"] = function()
+	open_browser(9)
+	child.lua([[
+		browser.filters:focus()
+		for i, line in ipairs(buffer_text(browser.filters.buf)) do
+			local col = line:find("All", 1, true)
+			if col then vim.api.nvim_win_set_cursor(0, { i, col - 2 }) end
+		end
+		browser.filters_view.cursor = nil
+		browser.filters_view:snap_cursor()
+	]])
+
+	local function under_cursor()
+		return child.lua_get("vim.api.nvim_get_current_line():sub(vim.fn.col('.')):match('^%s*(%a+)')")
+	end
+
+	eq(under_cursor(), "All")
+	child.type_keys("l")
+	eq(under_cursor(), "Easy")
+	child.type_keys("l")
+	eq(under_cursor(), "Medium")
+	child.type_keys("h")
+	eq(under_cursor(), "Easy")
+	eq(filters_have("9 of 9"), true)
+end
+
+T["browser"]["hard has a key that leaves h alone"] = function()
+	open_browser(9)
+	child.type_keys("H")
+	child.lua("reactive.flush()")
+	eq(filters_have("3 of 9"), true)
+end
+
 T["browser"]["filters can be pressed"] = function()
 	open_browser(9)
 	child.lua([[

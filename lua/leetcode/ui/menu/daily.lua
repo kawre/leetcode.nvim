@@ -2,6 +2,8 @@ local m = require("markup")
 local kit = require("leetcode.ui.kit")
 local data = require("leetcode.ui.menu.data")
 
+local animate = Markup.animate
+
 return m.component(function(props)
 	local function open()
 		require("leetcode.cmd").qot()
@@ -9,9 +11,19 @@ return m.component(function(props)
 
 	m.use_key("t", open, { nowait = true })
 
+	local focus = m.animated(0, { duration = 110 })
+
 	return kit.Card({
 		width = props.width,
 		on_press = open,
+		on_hover = function(hovered)
+			focus(hovered and 1 or 0)
+		end,
+		style = animate.tint(
+			{ bg = kit.color("leetcode_surface", "bg") },
+			{ bg = kit.color("leetcode_row_active", "bg") },
+			focus
+		),
 		m.flex({
 			justify = "between",
 			m.inline({

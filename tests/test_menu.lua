@@ -193,6 +193,29 @@ T["one press moves between rows in both directions"] = function()
 	eq(on("Problems"), true)
 end
 
+T["one press reaches the daily card and back"] = function()
+	open(true)
+	child.lua([[
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("Problems", 1, true) then
+				vim.api.nvim_win_set_cursor(0, { i, (line:find("Problems", 1, true)) })
+			end
+		end
+		menu.view.cursor = nil
+		menu.view:snap_cursor()
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("Daily challenge", 1, true) then daily = i end
+		end
+	]])
+	child.type_keys("l")
+	-- The card starts at its edge, right above the title.
+	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1]"), child.lua_get("daily - 1"))
+
+	child.type_keys("h")
+	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1] ~= daily - 1"), true)
+	eq(child.lua_get("vim.fn.virtcol('.') < 40"), true)
+end
+
 T["navigation explains itself"] = function()
 	open(true)
 	eq(contains("Browse, filter and search"), true)
@@ -349,6 +372,30 @@ T["statistics"]["are fetched once, until updated"] = function()
 	child.type_keys("u")
 	wait()
 	eq(child.lua_get("fetched"), 2)
+end
+
+T["statistics"]["move between the buttons sideways"] = function()
+	open_stats()
+	child.lua([[
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			local col = line:find("Update", 1, true)
+			if col then vim.api.nvim_win_set_cursor(0, { i, col - 2 }) end
+		end
+		menu.view.cursor = nil
+		menu.view:snap_cursor()
+	]])
+
+	local function under_cursor()
+		return child.lua_get("vim.api.nvim_get_current_line():sub(vim.fn.col('.')):match('^%s*(%a+)')")
+	end
+
+	eq(under_cursor(), "Update")
+	child.type_keys("l")
+	eq(under_cursor(), "Back")
+	child.type_keys("l")
+	eq(under_cursor(), "Back")
+	child.type_keys("h")
+	eq(under_cursor(), "Update")
 end
 
 T["statistics"]["open no popups"] = function()
