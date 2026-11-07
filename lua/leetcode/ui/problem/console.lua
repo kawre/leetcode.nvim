@@ -108,7 +108,7 @@ local Testcases = m.component(function(props)
 	end
 
 	return m.block({
-		padding = { 0, 3 },
+		padding = { 1, 3, 0, 3 },
 		m.block({
 			margin_bottom = 1,
 			m.inline({
@@ -166,7 +166,7 @@ local function Results(props)
 			return content.render()
 		end
 		return m.block({
-			padding = { 0, 3 },
+			padding = { 1, 3, 0, 3 },
 			m.block({ "Run your code to see how it does.", style = "leetcode_muted" }),
 			m.block({
 				margin_top = 1,
@@ -242,7 +242,6 @@ return m.component(function(props)
 		m.flex({
 			justify = "between",
 			padding = { 1, 3 },
-			margin_bottom = 1,
 			style = "leetcode_description_header",
 			m.inline({ spacing = 1, tabs }),
 			m.inline({
