@@ -71,6 +71,18 @@ function Theme.load()
     end, config.langs)
 
     Theme.load_dynamic()
+
+    -- The picker comes from markup, which leaves its colors to whoever uses it.
+    for name, definition in pairs({
+        MarkupPickerMatch = { link = "leetcode_accent" },
+        MarkupPickerMarker = { link = "leetcode_accent" },
+        MarkupPickerPrompt = { link = "leetcode_accent" },
+        MarkupPickerSelected = { link = "leetcode_row_active" },
+        MarkupPickerCount = { link = "leetcode_muted" },
+        MarkupPickerEmpty = { link = "leetcode_muted" },
+    }) do
+        vim.api.nvim_set_hl(0, name, definition)
+    end
 end
 
 function Theme.load_dynamic()

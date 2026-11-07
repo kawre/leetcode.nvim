@@ -334,6 +334,111 @@ T["browser"]["closes and opens again"] = function()
 	eq(list_has("Problem 2"), true)
 end
 
+T["picker"] = new_set()
+
+local function picker_rows()
+	return child.lua_get([[(function()
+		for _, win in ipairs(vim.api.nvim_list_wins()) do
+			local config = vim.api.nvim_win_get_config(win)
+			if config.relative ~= "" and not config.focusable then
+				return buffer_text(vim.api.nvim_win_get_buf(win))
+			end
+		end
+	end)()]])
+end
+
+local function list_problems(options)
+	child.lua(([[
+		_G.cached_problems = {
+			{ title = "Two Sum", title_cn = "", title_slug = "two-sum", frontend_id = "1", difficulty = "Easy", status = "ac", ac_rate = 55.1, paid_only = false },
+			{ title = "3Sum", title_cn = "", title_slug = "3sum", frontend_id = "15", difficulty = "Medium", status = "todo", ac_rate = 35, paid_only = false },
+			{ title = "Paint House", title_cn = "", title_slug = "paint-house", frontend_id = "256", difficulty = "Medium", status = "todo", ac_rate = 60, paid_only = true },
+		}
+		opened = nil
+		Leet.cmd = { open = function(problem) opened = problem.title_slug end }
+		require("leetcode.picker").question(_G.cached_problems, %s)
+		reactive.flush()
+	]]):format(options or "nil"))
+end
+
+T["picker"]["lists problems without a picker plugin"] = function()
+	list_problems()
+	local rows = picker_rows()
+	eq(#rows, 3)
+	eq(rows[1]:find("1. Two Sum", 1, true) ~= nil, true)
+	eq(rows[1]:find("55.1%", 1, true) ~= nil, true)
+	eq(child.fn.mode(), "i")
+end
+
+T["picker"]["finds problems by number"] = function()
+	list_problems()
+	child.type_keys("256")
+	child.lua("reactive.flush()")
+	local rows = picker_rows()
+	eq(#rows, 1)
+	eq(rows[1]:find("Paint House", 1, true) ~= nil, true)
+end
+
+T["picker"]["opens the chosen problem"] = function()
+	list_problems()
+	child.type_keys("3sum", "<CR>")
+	eq(child.lua_get("opened"), "3sum")
+end
+
+T["picker"]["keeps leet list options"] = function()
+	list_problems([[{ difficulty = { "medium" } }]])
+	eq(#picker_rows(), 2)
+end
+
+T["picker"]["changes the language"] = function()
+	child.lua([[
+		changed = nil
+		problem = {
+			lang = "python3",
+			problem = { code_snippets = { { lang_slug = "python3" }, { lang_slug = "cpp" } } },
+			change_lang = function(_, slug) changed = slug end,
+		}
+		require("leetcode.picker").language(problem)
+		reactive.flush()
+	]])
+	local rows = picker_rows()
+	eq(#rows, 2)
+	child.type_keys("c++", "<CR>")
+	eq(child.lua_get("changed"), "cpp")
+end
+
+T["picker"]["switches between open problems"] = function()
+	child.lua([[
+		first = vim.api.nvim_get_current_tabpage()
+		vim.cmd("tabnew")
+		local function tab(tabpage, id, title)
+			return { tabpage = tabpage, question = {
+				lang = "python3",
+				problem = { frontend_id = id, title = title, translated_title = vim.NIL, difficulty = "Easy" },
+			} }
+		end
+		Leet.util.question_tabs = function()
+			return { tab(first, "1", "Two Sum"), tab(vim.api.nvim_get_current_tabpage(), "15", "3Sum") }
+		end
+		require("leetcode.picker").tabs()
+		reactive.flush()
+	]])
+	child.type_keys("two", "<CR>")
+	eq(child.lua_get("vim.api.nvim_get_current_tabpage() == first"), true)
+end
+
+T["picker"]["needs no picker plugin"] = function()
+	child.lua([[
+		for _, name in ipairs({ "telescope", "fzf-lua", "snacks.picker", "mini.pick" }) do
+			package.loaded[name] = nil
+			package.preload[name] = function() error("not installed") end
+		end
+		_G.Snacks = nil
+	]])
+	list_problems()
+	eq(#picker_rows(), 3)
+end
+
 T["browser"]["leet list still uses the picker"] = function()
 	child.lua([[
 		picked = false
