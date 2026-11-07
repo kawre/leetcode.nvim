@@ -6,8 +6,8 @@ local ICONS = {
 	add = "\u{f0415}",
 }
 
---- A pressable chip, lighter under the cursor.
----@param props { label: string|fun(): string, active: fun(): boolean, press: function, kind?: fun(): string? }
+--- A pressable chip, a tab or a case, lighter under the cursor.
+---@param props { variant: "tab"|"case", label: string|fun(): string, active: fun(): boolean, press: function }
 local function Chip(props)
 	local hovered = m.signal(false)
 	return m.inline({
@@ -16,15 +16,14 @@ local function Chip(props)
 		on_hover = hovered,
 		white_space = "nowrap",
 		style = function()
-			local kind = props.kind and props.kind()
-			if props.active() and hovered() then
-				return "leetcode_tab_active_hover"
-			elseif props.active() then
-				return kind and ("leetcode_tab_%s_active"):format(kind) or "leetcode_tab_active"
-			elseif hovered() then
-				return "leetcode_tab_hover"
+			local group = "leetcode_console_" .. props.variant
+			if props.active() then
+				group = group .. "_active"
 			end
-			return kind and ("leetcode_tab_%s"):format(kind) or "leetcode_tab"
+			if hovered() then
+				group = group .. "_hover"
+			end
+			return group
 		end,
 		props.label,
 	})
@@ -122,6 +121,7 @@ local Testcases = m.component(function(props)
 					return list
 				end, function(i)
 					return Chip({
+						variant = "case",
 						label = (" Case %d "):format(i),
 						active = function()
 							return testcase.selected() == i
@@ -132,6 +132,7 @@ local Testcases = m.component(function(props)
 					})
 				end),
 				Chip({
+					variant = "case",
 					label = (" %s "):format(ICONS.add),
 					active = function()
 						return false
@@ -213,8 +214,19 @@ return m.component(function(props)
 
 	local tabs = {}
 	for _, tab in ipairs(TABS) do
+		local function active()
+			return console.tab() == tab.key
+		end
 		tabs[#tabs + 1] = Chip({
-			label = (" %s %s "):format(tab.icon, tab.label),
+			variant = "tab",
+			-- The icon of the tab shown takes the accent.
+			label = m.inline({
+				" ",
+				m.inline(tab.icon, function()
+					return active() and "leetcode_accent" or nil
+				end),
+				(" %s "):format(tab.label),
+			}),
 			active = function()
 				return console.tab() == tab.key
 			end,
