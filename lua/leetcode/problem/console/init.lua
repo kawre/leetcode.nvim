@@ -37,7 +37,9 @@ function M:new(problem)
 		bo = { filetype = Leet.config.name },
 		wo = { winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder" },
 	})
-	self.view = Markup.view(self.win, { snap = true, hide_cursor = true })
+	-- Like the description: the cursor shows, and stops on text as well as on
+	-- what can be pressed.
+	self.view = Markup.view(self.win, { snap = "text" })
 
 	self.testcase = Testcase(self)
 	self.result = Result(self)

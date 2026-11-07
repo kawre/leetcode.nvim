@@ -1297,6 +1297,37 @@ T["console"]["running leaves the cursor in the code"] = function()
 	eq(child.lua_get("vim.api.nvim_get_current_win() == problem.win"), true)
 end
 
+T["console"]["moves through every line with a visible cursor"] = function()
+	run([[guicursor = vim.o.guicursor]])
+	open_console()
+	run([[
+		vim.api.nvim_win_set_cursor(0, { 1, 0 })
+		vim.cmd("doautocmd CursorMoved")
+		reactive.flush()
+		visited = {}
+		for _ = 1, 8 do
+			local line = vim.api.nvim_get_current_line():gsub("^%s+", ""):gsub("%s+$", "")
+			if visited[#visited] ~= line then visited[#visited + 1] = line end
+			vim.cmd("normal j")
+			vim.cmd("doautocmd CursorMoved")
+			reactive.flush()
+		end
+	]])
+	local visited = child.lua_get("visited")
+	local function at(text)
+		for i, line in ipairs(visited) do
+			if line:find(text, 1, true) then return i end
+		end
+	end
+	-- Text as well as what can be pressed, top to bottom.
+	for _, text in ipairs({ "Testcase", "Case 1", "nums =", "[2,7]", "target =", "9", "add" }) do
+		eq(at(text) ~= nil, true)
+	end
+	eq(at("nums =") < at("[2,7]"), true)
+	eq(at("[2,7]") < at("target ="), true)
+	eq(child.lua_get("vim.o.guicursor == guicursor"), true)
+end
+
 T["console"]["shows each parameter of a case"] = function()
 	open_console()
 	eq(console_has("Case 1"), true)
