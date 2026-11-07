@@ -203,15 +203,17 @@ function cmd.console()
 end
 
 function cmd.info()
-	local utils = require("leetcode.util")
-	local q = utils.curr_question()
+	local q = require("leetcode.util").curr_question()
 	if q then
-		q.info:toggle()
+		q.description:reveal()
 	end
 end
 
 function cmd.hints()
-	cmd.info()
+	local q = require("leetcode.util").curr_question()
+	if q then
+		q.description:reveal("hints")
+	end
 end
 
 function cmd.q_run()

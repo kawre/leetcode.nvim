@@ -26,9 +26,10 @@ local border = {
 	lv = "├", rv = "┤", cross = "┼",
 }
 
---- A heading that shows or hides what follows it. Open until pressed.
+--- A heading that shows or hides what follows it. Open until pressed, unless it
+--- gets a signal of its own in `open`.
 M.Section = m.component(function(props)
-	local open = m.signal(true)
+	local open = props.open or m.signal(true)
 
 	return m.block({
 		margin_top = 1,

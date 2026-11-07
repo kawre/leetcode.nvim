@@ -93,7 +93,7 @@ M.get = function()
 
         normal = { fg = hl("Conceal").fg },
         alt = { fg = hl("Comment").fg },
-        description_header = { bg = hl("CursorLine").bg },
+        description_header = { bg = mix(hl("CursorLine").bg or raised, 0xffffff, 0.06) },
         section = { bg = blend(hl("NormalFloat").bg or hl("Normal").bg, hl("CursorLine").bg) },
 
         italic = { italic = true },

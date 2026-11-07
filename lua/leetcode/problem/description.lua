@@ -1,6 +1,7 @@
 local m = require("markup")
 local config = require("leetcode.config")
 local html = require("leetcode.ui.problem.description.html")
+local extras = require("leetcode.ui.problem.description.extras")
 local kit = require("leetcode.ui.kit")
 local t = require("leetcode.translator")
 
@@ -187,13 +188,20 @@ end
 
 function M:content()
 	local q = self.problem.problem
+	local sections
+	sections, self.sections = extras.build(q)
+
 	return m.block({
 		self:header(),
 		self:scroll_hint(),
 		m.vflex({
 			padding = { 1, 2 },
 			spacing = 1,
-			html.parse(Leet.util.translate(q.content, q.translated_content)),
+			m.block({
+				html.parse(Leet.util.translate(q.content, q.translated_content)),
+				-- Sections bring their own margin.
+				sections,
+			}),
 		}),
 	})
 end
@@ -224,6 +232,38 @@ function M:draw_images()
 						end
 					end)
 				end
+			end
+		end
+	end)
+end
+
+--- Opens a section and brings it into view. Without a name that is the first one.
+---@param name? "hints"|"topics"|"similar"
+function M:reveal(name)
+	local section = self.sections[name]
+	if not name then
+		for _, candidate in ipairs(extras.sections) do
+			section = section or self.sections[candidate.name]
+		end
+	end
+
+	if not section then
+		return Markup.log.warn(t("No hints available"))
+	end
+
+	self:show()
+	self.win:focus()
+	section.open(true)
+
+	self.view:after_commit(function()
+		local lines = vim.api.nvim_buf_get_lines(self.win.buf, 0, -1, false)
+		-- The text of the problem may use the same word, so look from the end.
+		for row = #lines, 1, -1 do
+			local col = lines[row]:find(section.title, 1, true)
+			if col then
+				vim.api.nvim_win_set_cursor(self.win.win, { row, col - 1 })
+				vim.cmd("normal! zz")
+				return
 			end
 		end
 	end)

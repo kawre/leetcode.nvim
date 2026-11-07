@@ -3,7 +3,6 @@
 local config = require("leetcode.config")
 local Description = require("leetcode.problem.description")
 local Console = require("leetcode.problem.console")
-local Info = require("leetcode.problem.info")
 
 ---@class leet.problem
 ---@field cached leet.cache.problem
@@ -24,7 +23,6 @@ function M:new(cached, problem)
 
     self.description = Description(self)
     self.console = Console(self)
-    self.info = Info(self)
 end
 
 --- Closes the problem and everything that belongs to it.
@@ -33,7 +31,6 @@ function M:unmount()
         return
     end
 
-    self.info:close()
     self.console:close()
     self.description:unmount()
 

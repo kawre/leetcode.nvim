@@ -118,7 +118,10 @@ T["description"]["the band has its own color"] = function()
 		vim.api.nvim_set_hl(0, "CursorLine", { bg = "#222233" })
 		require("leetcode.theme").load()
 	]])
-	eq(child.lua_get("vim.api.nvim_get_hl(0, { name = 'leetcode_description_header' }).bg"), 0x222233)
+	eq(
+		child.lua_get("vim.api.nvim_get_hl(0, { name = 'leetcode_description_header' }).bg"),
+		child.lua_get("Markup.animate.mix(0x222233, 0xffffff, 0.06)")
+	)
 end
 
 T["description"]["does not print the problem url"] = function()
@@ -269,6 +272,110 @@ T["description"]["renders lists with markers"] = function()
 	eq(description_has("2. Second"), true)
 end
 
+T["extras"] = new_set()
+
+T["extras"]["follow the problem, all closed"] = function()
+	run("open_problem()")
+	eq(description_has("Hints"), true)
+	eq(description_has("Topics"), true)
+	eq(description_has("Similar Questions"), true)
+
+	eq(description_has("Hint 1/1"), false)
+	eq(description_has("* Array"), false)
+	eq(description_has("3Sum"), false)
+
+	run([[
+		for i, line in ipairs(buffer_text(problem.description.win.buf)) do
+			if line:find("Constraints", 1, true) then constraints = i end
+			if line:find("Hints", 1, true) then hints = i end
+		end
+	]])
+	eq(child.lua_get("hints > constraints"), true)
+end
+
+T["extras"]["open with enter"] = function()
+	run("open_problem()")
+	press("Topics")
+	eq(description_has("* Array"), true)
+
+	press("Similar Questions")
+	eq(description_has("3Sum"), true)
+end
+
+T["extras"]["each hint opens on its own"] = function()
+	run([[
+		fixture.problem.hints = { "First <code>hint</code>.", "Second hint." }
+		open_problem()
+	]])
+	press("Hints")
+	eq(description_has("Hint 1/2"), true)
+	eq(description_has("First hint."), false)
+
+	press("Hint 1/2")
+	eq(description_has("First hint."), true)
+	eq(description_has("Second hint."), false)
+end
+
+T["extras"]["empty sections do not show"] = function()
+	run([[
+		fixture.problem.hints, fixture.problem.similar = {}, {}
+		open_problem()
+	]])
+	eq(description_has("Hints"), false)
+	eq(description_has("Similar Questions"), false)
+	eq(description_has("Topics"), true)
+end
+
+T["extras"]["similar problems open"] = function()
+	run([[
+		opened = nil
+		Leet.cmd = { open = function(problem) opened = problem.title_slug end }
+		open_problem()
+	]])
+	press("Similar Questions")
+	press("3Sum")
+	eq(child.lua_get("opened"), "3sum")
+end
+
+T["extras"]["leet hints jumps to them"] = function()
+	run([[
+		open_problem()
+		package.loaded["leetcode.util"].curr_question = function() return problem end
+		vim.api.nvim_set_current_win(problem.win)
+		require("leetcode.cmd").hints()
+		reactive.flush()
+		reactive.flush()
+	]])
+	eq(child.lua_get("vim.api.nvim_get_current_win() == problem.description.win.win"), true)
+	eq(description_has("Hint 1/1"), true)
+	eq(child.lua_get("vim.api.nvim_get_current_line():find('Hints', 1, true) ~= nil"), true)
+end
+
+T["extras"]["leet info opens the first section there is"] = function()
+	run([[
+		fixture.problem.hints = {}
+		open_problem()
+		package.loaded["leetcode.util"].curr_question = function() return problem end
+		require("leetcode.cmd").info()
+		reactive.flush()
+		reactive.flush()
+	]])
+	eq(description_has("* Array"), true)
+end
+
+T["extras"]["leet hints shows a hidden description"] = function()
+	run([[
+		open_problem()
+		package.loaded["leetcode.util"].curr_question = function() return problem end
+		problem.description:toggle()
+		require("leetcode.cmd").hints()
+		reactive.flush()
+		reactive.flush()
+	]])
+	eq(child.lua_get("problem.description.win:valid()"), true)
+	eq(description_has("Hint 1/1"), true)
+end
+
 T["description"]["lists start at the margin of their section"] = function()
 	run([[
 		open_problem()
@@ -323,6 +430,7 @@ end
 T["description"]["code wraps at the margin of the text"] = function()
 	run([[
 		fixture.problem.content = "<pre><strong>Input:</strong> " .. ("words "):rep(30) .. "</pre>"
+		fixture.problem.hints, fixture.problem.topic_tags, fixture.problem.similar = {}, {}, {}
 		open_problem()
 		code = vim.tbl_filter(function(line)
 			return line:find("%S") ~= nil
@@ -634,70 +742,6 @@ T["console"]["keeps its keys when reopened"] = function()
 end
 
 T["popups"] = new_set()
-
-local function open_info()
-	run([[
-		open_problem()
-		problem.info:show()
-		reactive.flush()
-	]])
-end
-
-local function info_has(text)
-	return child.lua_get(("contains(problem.info.win.buf, %q)"):format(text))
-end
-
-T["popups"]["info starts collapsed"] = function()
-	open_info()
-	eq(child.lua_get("buffer_text(problem.info.win.buf)[2]"):match("Hints$") ~= nil, true)
-	eq(info_has("Topics"), true)
-	eq(info_has("Array"), false)
-end
-
-T["popups"]["info sections expand with enter"] = function()
-	open_info()
-	run([[
-		for i, line in ipairs(buffer_text(problem.info.win.buf)) do
-			if line:find("Topics", 1, true) then
-				vim.api.nvim_win_set_cursor(0, { i, #line:match("^%s*") })
-			end
-		end
-	]])
-	child.type_keys("<CR>")
-	run("reactive.flush()")
-	eq(info_has("* Array"), true)
-end
-
-T["popups"]["info parses hints"] = function()
-	open_info()
-	run([[
-		local function press(text)
-			for i, line in ipairs(buffer_text(problem.info.win.buf)) do
-				if line:find(text, 1, true) then
-					vim.api.nvim_win_set_cursor(0, { i, #line:match("^%s*") })
-					problem.info.view:press()
-					reactive.flush()
-					return
-				end
-			end
-		end
-		press("Hints")
-		press("1/1")
-	]])
-	eq(info_has("Try a hash map."), true)
-end
-
-T["popups"]["close with the toggle key"] = function()
-	open_info()
-	child.type_keys("q")
-	eq(child.lua_get("not problem.info:is_open()"), true)
-end
-
-T["popups"]["info reopens"] = function()
-	open_info()
-	run("problem.info:toggle(); problem.info:toggle(); reactive.flush()")
-	eq(info_has("Hints"), true)
-end
 
 T["popups"]["skills"] = function()
 	run([[
