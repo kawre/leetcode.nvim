@@ -208,6 +208,19 @@ T["browser"] = new_set()
 
 local function open_browser(count)
 	child.lua(([[
+		-- The highlight of the search field, which follows its state.
+		function browser_state_style()
+			local style
+			local buf, ns = browser.filters.buf, browser.filters_view.ns
+			for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, { details = true })) do
+				local text = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[2], mark[4].end_col, {})[1]
+				if text:find("Search problems", 1, true) or (mark[4].hl_group or ""):find("MarkupAnimated") then
+					style = style or (mark[4].hl_group:find("MarkupAnimated") and mark[4].hl_group)
+				end
+			end
+			return style
+		end
+
 		browser = require("leetcode.ui.browser")
 		items = {}
 		for i = 1, %d do
@@ -391,6 +404,22 @@ T["browser"]["all and any need no key"] = function()
 	eq(filters_have("Easy e"), true)
 end
 
+T["browser"]["the field looks different while typing"] = function()
+	open_browser(5)
+	child.lua([[
+		color = function()
+			return vim.api.nvim_get_hl(0, { name = browser_state_style(), link = false }).bg
+		end
+		idle = color()
+	]])
+	child.type_keys("i")
+	child.lua("typing = color()")
+	child.type_keys("<Esc>")
+	child.lua("back = color()")
+	eq(child.lua_get("idle ~= typing"), true)
+	eq(child.lua_get("back == idle"), true)
+end
+
 local function cursor_hidden()
 	return child.lua_get("vim.o.guicursor:find('MarkupHiddenCursor', 1, true) ~= nil")
 end
@@ -419,11 +448,19 @@ T["browser"]["the search field stands apart"] = function()
 	child.lua([[
 		lit = nil
 		local buf, ns = browser.filters.buf, browser.filters_view.ns
-		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, { 1, 0 }, { 1, -1 }, { details = true })) do
-			if mark[4].hl_group == "leetcode_input" then lit = true end
+		local rows = buffer_text(buf)
+		for i, line in ipairs(rows) do
+			if line:find("Search problems", 1, true) then field_row = i end
+		end
+		-- Padding above and below the text.
+		above, below = rows[field_row - 1], rows[field_row + 1]
+		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, { field_row - 2, 0 }, { field_row, -1 }, { details = true })) do
+			if mark[4].hl_group == browser_state_style() then lit = (lit or 0) + 1 end
 		end
 	]])
-	eq(child.lua_get("lit"), true)
+	eq(child.lua_get("vim.trim(above):gsub('▌', '') == ''"), true)
+	eq(child.lua_get("vim.trim(below):gsub('▌', '') == ''"), true)
+	eq(child.lua_get("lit >= 3"), true)
 end
 
 T["browser"]["typing lights up the field and shows the count"] = function()
@@ -432,13 +469,12 @@ T["browser"]["typing lights up the field and shows the count"] = function()
 	child.lua("vim.wait(20, function() reactive.flush(); return false end, 5)")
 	eq(filters_have("1 of 9"), true)
 	child.lua([[
-		focused = nil
-		local buf, ns = browser.filters.buf, browser.filters_view.ns
-		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, { 1, 0 }, { 1, -1 }, { details = true })) do
-			if mark[4].hl_group == "leetcode_input_focus" then focused = true end
-		end
+		Markup.animate.tick(500)
+		local name = browser_state_style()
+		focused = vim.api.nvim_get_hl(0, { name = name, link = false }).bg
+		wanted = vim.api.nvim_get_hl(0, { name = "leetcode_input_focus", link = false }).bg
 	]])
-	eq(child.lua_get("focused"), true)
+	eq(child.lua_get("focused == wanted"), true)
 end
 
 T["browser"]["says when nothing matches"] = function()

@@ -12,7 +12,7 @@ local api = vim.api
 
 --- Rows mounted at a time. Scrolling near the end brings in the next batch.
 local BATCH = 200
-local FILTERS_HEIGHT = 7
+local FILTERS_HEIGHT = 9
 local WIDTH = 0.5
 
 ---@class leet.ui.browser
@@ -83,21 +83,39 @@ local function count_width(state)
 	return #("%d of %d"):format(total, total)
 end
 
---- An input across the top, which the search float covers while typing.
+--- An input across the top, which the search float covers while typing. It is
+--- lighter while selected, and lighter still with a bar of the accent beside it
+--- while typing.
 local SearchField = m.component(function(props)
 	local state = props.state
 	local hovered = m.signal(false)
 
+	local light = m.animated(0, { duration = 120 })
+	local bar = m.animated(0, { duration = 120 })
+	m.effect(function()
+		local typing = state.typing()
+		light(typing and 1 or hovered() and 0.5 or 0)
+		bar(typing and 1 or 0)
+	end)
+
+	local field = kit.color("leetcode_input", "bg")
+	local focused = kit.color("leetcode_input_focus", "bg")
+	local fill = Markup.animate.tint({ bg = field }, { bg = focused }, light)
+	-- A half block inside the fill, which at rest has the color of the fill.
+	local edge = Markup.animate.tint({ fg = field }, { fg = kit.color("leetcode_accent", "fg") }, bar)
+	state.field_style = fill
+
 	return m.flex({
 		on_press = state.search,
 		on_hover = hovered,
-		justify = "between",
 		white_space = "nowrap",
 		margin_bottom = 1,
-		padding = { 0, 1 },
-		style = function()
-			return (state.typing() or hovered()) and "leetcode_input_focus" or "leetcode_input"
-		end,
+		style = fill,
+		m.block({ width = 1, shrink = 0, m.block("▌", edge), m.block("▌", edge), m.block("▌", edge) }),
+		m.flex({
+		grow = 1,
+		justify = "between",
+		padding = { 1, 1 },
 		m.inline({
 			shrink = 1,
 			m.inline(kit.icons.search .. " ", "leetcode_accent"),
@@ -125,6 +143,7 @@ local SearchField = m.component(function(props)
 					m.inline(" of " .. #state.problems, "leetcode_muted"),
 				})
 			end),
+		}),
 		}),
 	})
 end)
@@ -270,15 +289,16 @@ local function search(state)
 	local win = api.nvim_open_win(buf, true, {
 		relative = "win",
 		win = anchor.win,
-		-- Over the text of the field: past the padding, the field's own and the icon.
-		row = 1,
-		col = 5,
-		width = math.max(api.nvim_win_get_width(anchor.win) - 5 - 3 - 2 - count_width(state), 10),
+		-- Over the text of the field: past the padding of the window, the bar and
+		-- the padding of the field, and the icon.
+		row = 2,
+		col = 6,
+		width = math.max(api.nvim_win_get_width(anchor.win) - 6 - 3 - 2 - count_width(state), 10),
 		height = 1,
 		style = "minimal",
 		zindex = 60,
 	})
-	vim.wo[win].winhighlight = "NormalFloat:leetcode_input_focus"
+	vim.wo[win].winhighlight = "NormalFloat:" .. (state.field_style or "leetcode_input_focus")
 	state.typing(true)
 
 	--- Neovim holds back TextChangedI while keys are queued, so whatever acts on

@@ -165,9 +165,9 @@ M.get = function()
         groups["bar_" .. name] = { fg = color, bg = raised }
     end
 
-    -- An input sits apart from the cards, and lights up while it has the cursor.
-    groups.input = { fg = fg, bg = mix(raised, accent, 0.1) }
-    groups.input_focus = { fg = fg, bg = mix(raised, accent, 0.22) }
+    -- An input is a solid block, and lighter while it has the cursor.
+    groups.input = { fg = fg, bg = mix(bg, fg, 0.09) }
+    groups.input_focus = { fg = fg, bg = mix(bg, fg, 0.17) }
 
     groups.pill_accent = { fg = bg, bg = accent, bold = true }
     groups.pill_accent_cap = { fg = accent }
