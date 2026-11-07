@@ -55,7 +55,7 @@ end
 
 T["today shows the daily challenge"] = function()
 	open(true)
-	eq(contains("Today"), true)
+	eq(contains("Daily challenge"), true)
 	eq(contains("15. 3Sum"), true)
 	eq(contains("Not solved · Medium"), true)
 end
@@ -94,7 +94,7 @@ T["the launcher keeps its shape when narrow"] = function()
 		reactive.flush()
 		reactive.flush()
 	]])
-	eq(contains("Today"), true)
+	eq(contains("progress and skills"), true)
 	eq(contains("Problems"), true)
 	eq(contains("solved"), true)
 end
@@ -452,7 +452,7 @@ T["problems"]["q goes back"] = function()
 	child.type_keys("q")
 	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
 	eq(child.lua_get("menu.page()"), "menu")
-	eq(contains("Today"), true)
+	eq(contains("progress and skills"), true)
 end
 
 T["problems"]["the menu keeps its keys after coming back"] = function()
@@ -471,7 +471,7 @@ T["statistics"]["replace the dashboard"] = function()
 	eq(child.lua_get("menu.page()"), "menu.statistics")
 	eq(contains("Statistics"), true)
 	eq(contains("Fundamental"), true)
-	eq(contains("Today"), false)
+	eq(contains("progress and skills"), false)
 end
 
 T["statistics"]["show skills by level, most solved first"] = function()
@@ -540,7 +540,7 @@ T["statistics"]["q goes back to where the menu was"] = function()
 	child.type_keys("q")
 	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
 	eq(child.lua_get("menu.page()"), "menu")
-	eq(contains("Today"), true)
+	eq(contains("progress and skills"), true)
 	eq(contains("Fundamental"), false)
 	eq(contains("Problems"), true)
 end
@@ -678,7 +678,7 @@ T["statistics"]["slide in and out"] = function()
 		reactive.flush()
 	]])
 	eq(contains("Fundamental"), true)
-	eq(contains("Today"), false)
+	eq(contains("progress and skills"), false)
 end
 
 T["continue"] = new_set()

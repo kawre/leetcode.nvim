@@ -170,6 +170,10 @@ M.get = function()
     groups.input = { fg = fg, bg = mix(bg, fg, 0.09) }
     groups.input_focus = { fg = fg, bg = mix(bg, fg, 0.17) }
 
+    -- What changes every day gets a warmth of its own.
+    groups.daily = { bg = mix(surface, accent, 0.1) }
+    groups.daily_active = { bg = mix(raised, accent, 0.2) }
+
     groups.pill_accent = { fg = bg, bg = accent, bold = true }
     groups.pill_accent_cap = { fg = accent }
     groups.rule = { fg = mix(bg, accent, 0.45) }

@@ -5,6 +5,7 @@ local ProblemCard = require("leetcode.ui.menu.problem_card")
 local data = require("leetcode.ui.menu.data")
 local recent = require("leetcode.ui.menu.recent")
 local t = require("leetcode.translator")
+local kit = require("leetcode.ui.kit")
 
 --- The problem worked on last, if any.
 local function Continue(width)
@@ -15,6 +16,7 @@ local function Continue(width)
 
     return ProblemCard({
         label = t("Continue"),
+        icon = kit.icons.resume,
         lhs = "c",
         width = width,
         problem = item.problem,
@@ -31,7 +33,10 @@ local function Today(width)
         local problem = data.daily()
 
         return ProblemCard({
-            label = ("%s · %s"):format(t("Today"), os.date("%b %-d")),
+            label = t("Daily challenge"),
+            icon = kit.icons.calendar,
+            aside = os.date("%b %-d"),
+            accent = true,
             lhs = "t",
             width = width,
             problem = problem,

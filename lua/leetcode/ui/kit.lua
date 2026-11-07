@@ -16,6 +16,7 @@ M.icons = {
 	memory = "\u{f035b}",
 	calendar = "\u{f00f6}",
 	arrow_up = "\u{f005d}",
+	resume = "\u{f040a}",
 	thumb_up = "\u{f164}",
 	thumb_down = "\u{f165}",
 	bulb = "\u{f06e8}",

@@ -12,6 +12,9 @@ local status_labels = { ac = "Solved", notac = "Attempted", todo = "Not solved" 
 
 ---@class leet.ui.menu.problem_card
 ---@field label string what the problem is to the user
+---@field icon string
+---@field aside? string beside the key, such as a date
+---@field accent? boolean warm, and the label always lit, for what stands out
 ---@field lhs string
 ---@field width integer
 ---@field problem? leet.cache.problem nil while it is on its way
@@ -22,9 +25,10 @@ local status_labels = { ac = "Solved", notac = "Attempted", todo = "Not solved" 
 return m.component(function(props)
     m.use_key(props.lhs, props.on_press, { nowait = true })
 
-    local surface = kit.color("leetcode_surface", "bg")
+    local rest = props.accent and "leetcode_daily" or "leetcode_surface"
+    local active = props.accent and "leetcode_daily_active" or "leetcode_row_active"
     local focus = m.animated(0, { duration = 110 })
-    local tint = animate.tint({ bg = surface }, { bg = kit.color("leetcode_row_active", "bg") }, focus)
+    local tint = animate.tint({ bg = kit.color(rest, "bg") }, { bg = kit.color(active, "bg") }, focus)
 
     local function body()
         local problem = props.problem
@@ -69,11 +73,15 @@ return m.component(function(props)
             margin_bottom = 1,
             m.inline({
                 style = function()
-                    return focus() > 0.5 and "leetcode_accent" or "leetcode_muted"
+                    return (props.accent or focus() > 0.5) and "leetcode_accent" or "leetcode_muted"
                 end,
-                props.label,
+                m.inline(props.icon .. " "),
+                m.inline(props.label, props.accent and "leetcode_accent" or nil),
             }),
-            kit.Key(props.lhs),
+            m.inline({
+                props.aside and m.inline(props.aside .. "  ", "leetcode_muted"),
+                kit.Key(props.lhs),
+            }),
         }),
         body(),
     })
