@@ -235,6 +235,31 @@ T["the breadcrumb shows only away from the menu"] = function()
 	eq(contains("Menu"), true)
 end
 
+T["a short window can still show the whole dashboard"] = function()
+	child.o.lines = 22
+	open(true)
+	child.lua([[
+		visible = function(text)
+			local first, last = vim.fn.line("w0"), vim.fn.line("w$")
+			for i = first, last do
+				if (vim.fn.getline(i)):find(text, 1, true) then return true end
+			end
+			return false
+		end
+	]])
+	eq(child.lua_get("visible('submissions')"), false)
+
+	for _ = 1, 25 do
+		child.type_keys("j")
+	end
+	eq(child.lua_get("visible('submissions')"), true)
+
+	for _ = 1, 40 do
+		child.type_keys("k")
+	end
+	eq(child.lua_get("visible('Problems')"), true)
+end
+
 T["navigation explains itself"] = function()
 	open(true)
 	eq(contains("Browse, filter and search"), true)
