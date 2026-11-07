@@ -237,6 +237,8 @@ end
 
 T["a short window can still show the whole dashboard"] = function()
 	child.o.lines = 22
+	-- What many configs set, which used to undo every scroll.
+	child.o.scrolloff = 8
 	open(true)
 	child.lua([[
 		visible = function(text)
