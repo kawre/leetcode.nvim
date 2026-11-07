@@ -1,5 +1,8 @@
 local m = require("markup")
 
+--- Pages named for the code rather than for reading.
+local names = { signin = "Welcome", loading = "Welcome" }
+
 return m.component(function()
     local function titles()
         local page = Leet.menu.page()
@@ -7,7 +10,7 @@ return m.component(function()
         local parts = vim.split(page, ".", { plain = true })
 
         for i, title in ipairs(parts) do
-            title = title:gsub("^%l", string.upper)
+            title = names[title] or title:gsub("^%l", string.upper)
             local last = i == #parts
             table.insert(titles, m.inline(title, last and "leetcode_strong" or "leetcode_muted"))
 

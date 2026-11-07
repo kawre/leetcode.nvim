@@ -52,18 +52,29 @@ M.get = function()
     local surface = mix(bg, fg, 0.06)
     local raised = mix(bg, fg, 0.13)
     local muted = mix(bg, fg, 0.5)
-    local accent = 0xffa116
+    local light = vim.o.background == "light"
+
+    --- Colors tuned for dark backgrounds lose their contrast on light ones.
+    local function readable(color)
+        return light and mix(color, 0x000000, 0.35) or color
+    end
+
+    local accent = readable(0xffa116)
     local ok = hl("DiagnosticOk").fg or 0x46c6c2
     local err = hl("DiagnosticError").fg or 0xf8615c
     local warn = hl("DiagnosticWarn").fg or 0xfac31d
-    local difficulty = { easy = 0x46c6c2, medium = 0xfac31d, hard = 0xf8615c }
+    local difficulty = {
+        easy = readable(0x46c6c2),
+        medium = readable(0xfac31d),
+        hard = readable(0xf8615c),
+    }
 
     local groups = {
         [""] = { fg = hl("Normal").fg },
 
-        easy = { fg = "#46c6c2" },
-        medium = { fg = "#fac31d" },
-        hard = { fg = "#f8615c" },
+        easy = { fg = difficulty.easy },
+        medium = { fg = difficulty.medium },
+        hard = { fg = difficulty.hard },
 
         easy_alt = { fg = "#294d35" },
         medium_alt = { fg = "#5e4e25" },
@@ -122,7 +133,7 @@ M.get = function()
         muted = { fg = muted },
         accent = { fg = accent },
         strong = { fg = fg, bold = true },
-        key = { fg = mix(bg, accent, 0.75) },
+        key = { fg = mix(bg, accent, light and 1 or 0.75) },
         track = { bg = raised },
         flame = { fg = accent },
         flame_off = { fg = muted },

@@ -1,6 +1,7 @@
 local m = require("markup")
 local config = require("leetcode.config")
 local html = require("leetcode.ui.problem.description.html")
+local kit = require("leetcode.ui.kit")
 local t = require("leetcode.translator")
 
 local img_ok, image_api = pcall(require, "image")
@@ -85,7 +86,7 @@ function M:header()
 		local separator = (" %s "):format(config.icons.bar)
 
 		if visible then
-			add(t(q.difficulty), "leetcode_" .. q.difficulty:lower())
+			spans[#spans + 1] = kit.Pill(t(q.difficulty), q.difficulty)
 		else
 			add("????", "leetcode_list")
 		end
