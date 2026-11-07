@@ -280,7 +280,7 @@ T["extras"]["follow the problem, all closed"] = function()
 	eq(description_has("Topics"), true)
 	eq(description_has("Similar Questions"), true)
 
-	eq(description_has("Hint 1/1"), false)
+	eq(description_has("1/1"), false)
 	eq(description_has("* Array"), false)
 	eq(description_has("3Sum"), false)
 
@@ -308,12 +308,40 @@ T["extras"]["each hint opens on its own"] = function()
 		open_problem()
 	]])
 	press("Hints")
-	eq(description_has("Hint 1/2"), true)
+	eq(description_has("1/2"), true)
 	eq(description_has("First hint."), false)
 
-	press("Hint 1/2")
+	press("1/2")
 	eq(description_has("First hint."), true)
 	eq(description_has("Second hint."), false)
+end
+
+T["extras"]["hints line up and end with the card"] = function()
+	run([[
+		fixture.problem.hints = { "First hint.", "Second hint." }
+		open_problem()
+	]])
+	press("Hints")
+	press("1/2")
+	press("2/2")
+	run([[
+		local function column(line, text)
+			local start = line:find(text, 1, true)
+			return start and vim.fn.strdisplaywidth(line:sub(1, start - 1))
+		end
+
+		rows = buffer_text(problem.description.win.buf)
+		for i, line in ipairs(rows) do
+			title_col = title_col or column(line, "Hints")
+			first_col = first_col or column(line, "First hint.")
+			if line:find("First hint.", 1, true) then after_first = rows[i + 1] end
+			if line:find("Second hint.", 1, true) then after_last = rows[i + 1] end
+		end
+	]])
+	eq(child.lua_get("first_col"), child.lua_get("title_col"))
+	-- A gap between hints, and the edge of the card right after the last one.
+	eq(child.lua_get("after_first"), "")
+	eq(child.lua_get("after_last:find('▀', 1, true) ~= nil"), true)
 end
 
 T["extras"]["empty sections do not show"] = function()
@@ -347,7 +375,7 @@ T["extras"]["leet hints jumps to them"] = function()
 		reactive.flush()
 	]])
 	eq(child.lua_get("vim.api.nvim_get_current_win() == problem.description.win.win"), true)
-	eq(description_has("Hint 1/1"), true)
+	eq(description_has("1/1"), true)
 	eq(child.lua_get("vim.api.nvim_get_current_line():find('Hints', 1, true) ~= nil"), true)
 end
 
@@ -373,7 +401,7 @@ T["extras"]["leet hints shows a hidden description"] = function()
 		reactive.flush()
 	]])
 	eq(child.lua_get("problem.description.win:valid()"), true)
-	eq(description_has("Hint 1/1"), true)
+	eq(description_has("1/1"), true)
 end
 
 T["description"]["lists start at the margin of their section"] = function()

@@ -23,10 +23,10 @@ local function Hint(index, total, hint)
 			m.inline(function()
 				return ui.chevron(open())
 			end, "leetcode_alt"),
-			m.inline(("%s %d/%d"):format(t("Hint"), index, total), "leetcode_list"),
+			m.inline(("%d/%d"):format(index, total), "leetcode_list"),
 		}),
 		m.collapse(open, function()
-			return m.block({ padding = { 0, 0, 1, 2 }, html.parse(hint) })
+			return m.block({ margin_bottom = index < total and 1 or 0, html.parse(hint) })
 		end),
 	})
 end
