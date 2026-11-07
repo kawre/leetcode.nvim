@@ -1285,6 +1285,18 @@ T["console"]["running shows the results"] = function()
 	eq(child.lua_get("problem.console.tab()"), "result")
 end
 
+T["console"]["running leaves the cursor in the code"] = function()
+	run([[
+		open_problem()
+		require("leetcode.problem.runner").run = function() end
+		vim.api.nvim_set_current_win(problem.win)
+		problem.console:run()
+		reactive.flush()
+	]])
+	eq(child.lua_get("problem.console:is_open()"), true)
+	eq(child.lua_get("vim.api.nvim_get_current_win() == problem.win"), true)
+end
+
 T["console"]["shows each parameter of a case"] = function()
 	open_console()
 	eq(console_has("Case 1"), true)

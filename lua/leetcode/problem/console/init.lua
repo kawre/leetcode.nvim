@@ -70,12 +70,10 @@ function M:run(submit)
 		return
 	end
 
+	-- The result shows below, while the cursor stays in the code.
 	self.tab("result")
 	if Leet.config.user.console.open_on_runcode then
 		self:open()
-	end
-	if self:is_open() then
-		self.win:focus()
 	end
 
 	Runner.run(self.problem, submit)
