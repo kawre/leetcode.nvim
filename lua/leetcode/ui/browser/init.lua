@@ -384,14 +384,32 @@ end
 --- Slides the column in from the side of the screen.
 ---@param target integer
 local function slide_in(target)
+	-- Laid out at the final width from the start, the rows wait in place while
+	-- the column uncovers them, rather than moving with its edge.
+	local views = { M.filters_view, M.list_view }
+	for _, view in ipairs(views) do
+		view:hold_width(target)
+	end
+
 	local width = m.animated(1, { duration = 220, easing = "out_cubic" })
+	local held = true
 
 	m.effect(function()
 		local current = math.max(math.floor(width() + 0.5), 1)
 		if M.list and M.list:valid() then
 			pcall(api.nvim_win_set_width, M.list.win, current)
 		end
+
+		-- Only once the window has its final width, or the rows would be laid out
+		-- for the frame before and move after all.
+		if held and current >= target then
+			held = false
+			for _, view in ipairs(views) do
+				view:release_width()
+			end
+		end
 	end)
+
 	width(target)
 end
 

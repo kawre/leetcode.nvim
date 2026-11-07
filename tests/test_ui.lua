@@ -507,6 +507,41 @@ T["browser"]["mounts rows in batches"] = function()
 	eq(child.lua_get("#buffer_text(browser.list.buf)"), 400)
 end
 
+T["browser"]["rows stay in place while the column slides in"] = function()
+	child.lua([[
+		Markup.animate.enabled = true
+		Markup.animate.manual = true
+	]])
+	open_browser(5)
+	child.lua([[
+		Markup.animate.tick(60)
+		reactive.flush()
+		mid = buffer_text(browser.list.buf)
+		mid_width = vim.api.nvim_win_get_width(browser.list.win)
+		Markup.animate.tick(1000)
+		reactive.flush()
+		reactive.flush()
+		final = buffer_text(browser.list.buf)
+		final_width = vim.api.nvim_win_get_width(browser.list.win)
+	]])
+	eq(child.lua_get("mid_width < final_width"), true)
+	eq(child.lua_get("mid"), child.lua_get("final"))
+end
+
+T["browser"]["follows resizes once it has slid in"] = function()
+	child.lua([[
+		Markup.animate.enabled = true
+		Markup.animate.manual = true
+	]])
+	open_browser(5)
+	child.lua([[
+		Markup.animate.tick(1000)
+		reactive.flush()
+	]])
+	eq(child.lua_get("browser.list_view.held_width"), vim.NIL)
+	eq(child.lua_get("browser.filters_view.held_width"), vim.NIL)
+end
+
 T["browser"]["closes and opens again"] = function()
 	open_browser(3)
 	local wins = child.lua_get("#vim.api.nvim_list_wins()")
