@@ -98,7 +98,7 @@ end
 ---@param text? string
 function M.Loading(text)
 	return m.inline({
-		m.spinner({ style = "leetcode_accent" }),
+		m.loader({ style = "leetcode_accent" }),
 		m.inline(" " .. (text or "Loading"), "leetcode_muted"),
 	})
 end

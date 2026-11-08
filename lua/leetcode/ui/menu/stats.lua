@@ -55,7 +55,7 @@ local function Bar(width)
 	local function progress()
 		local current = state()
 		if current == "busy" then
-			return m.inline({ m.spinner(), m.inline(" Updating") })
+			return m.inline({ m.loader(), m.inline(" Updating") })
 		elseif current == "done" then
 			-- In the colors of the button, which may be lit by the cursor.
 			return m.inline(kit.icons.check .. " Updated")

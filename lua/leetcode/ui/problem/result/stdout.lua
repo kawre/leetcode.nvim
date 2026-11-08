@@ -35,6 +35,28 @@ local function fullscreen(lines)
     return win
 end
 
+--- A press that opens the whole output.
+---@param lines string[]
+---@param label string
+local function FullscreenButton(lines, label)
+    local hovered = m.signal(false)
+    return m.inline({
+        click = "double",
+        on_press = function()
+            fullscreen(lines)
+        end,
+        on_hover = hovered,
+        style = function()
+            return hovered() and "leetcode_accent" or "leetcode_muted"
+        end,
+        ICONS.fullscreen .. " " .. label,
+    })
+end
+
+local function plural(count, word)
+    return ("%d %s%s"):format(count, word, count == 1 and "" or "s")
+end
+
 ---@param props { stdout: string }
 local Stdout = m.component(function(props)
     local expanded = m.signal(true)
@@ -44,7 +66,14 @@ local Stdout = m.component(function(props)
         return
     end
 
-    local hovered = m.signal(false)
+    m.use_key("f", function()
+        fullscreen(lines)
+    end)
+
+    -- A long output would push everything else out of the console.
+    local limit = math.max(Leet.config.user.console.result.stdout_lines or 50, 1)
+    local shown = vim.list_slice(lines, 1, limit)
+    local hidden = #lines - #shown
 
     return m.block({
         padding = { 0, 1 },
@@ -54,30 +83,24 @@ local Stdout = m.component(function(props)
             justify = "between",
             m.block({
                 width = "fit",
-                click = "double",
-                on_press = function()
-                    expanded(not expanded())
-                end,
-                m.inline(function()
-                    return ui.chevron(expanded())
-                end, "leetcode_muted"),
-                m.inline(ICONS.stdout .. " ", "leetcode_accent"),
-                m.inline("Stdout", "leetcode_strong"),
-                m.inline(
-                    ("  %d %s"):format(#lines, #lines == 1 and "line" or "lines"),
-                    "leetcode_muted"
-                ),
+                m.inline({
+                    click = "double",
+                    on_press = function()
+                        expanded(not expanded())
+                    end,
+                    m.inline(function()
+                        return ui.chevron(expanded())
+                    end, "leetcode_muted"),
+                    m.inline(ICONS.stdout .. " ", "leetcode_accent"),
+                    m.inline("Stdout", "leetcode_strong"),
+                }),
+                -- Beside the button rather than in it, as the cursor goes
+                -- anywhere inside a button, and the count is only to read.
+                m.inline({ "  " .. plural(#lines, "line"), style = "leetcode_muted", snap = false }),
             }),
             m.inline({
-                click = "double",
-                on_press = function()
-                    fullscreen(lines)
-                end,
-                on_hover = hovered,
-                style = function()
-                    return hovered() and "leetcode_accent" or "leetcode_muted"
-                end,
-                ICONS.fullscreen .. " Fullscreen",
+                FullscreenButton(lines, "Fullscreen"),
+                m.inline({ "  f", style = "leetcode_key", snap = false }),
             }),
         }),
         m.collapse(expanded, function()
@@ -85,7 +108,12 @@ local Stdout = m.component(function(props)
                 padding = { 1, 0, 0, 2 },
                 vim.tbl_map(function(line)
                     return m.block(line)
-                end, lines),
+                end, shown),
+                hidden > 0 and m.block({
+                    margin_top = 1,
+                    m.inline({ "… " .. plural(hidden, "more line") .. "  ", style = "leetcode_muted", snap = false }),
+                    FullscreenButton(lines, "Show all"),
+                }),
             })
         end),
     })

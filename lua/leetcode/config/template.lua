@@ -93,6 +93,9 @@ local M = {
 
         result = {
             size = "60%", ---@type lc.size
+
+            --- Lines of stdout the result shows, the rest is a press (or `f`) away.
+            stdout_lines = 50, ---@type integer
         },
 
         testcase = {

@@ -11,9 +11,9 @@ local RUNNER = 10
 --- What the console shows while the judge works.
 ---@param props { state: fun(): string?, submit: boolean, lang?: string }
 return m.component(function(props)
-	-- One spinner for the whole run, rather than a new one at every step.
-	local names = require("markup.view.components").spinner_names()
-	local spinner = names[math.random(#names)]
+	-- One loader for the whole run, rather than a new one at every step.
+	local names = require("markup.view.components").loader_names()
+	local loader = names[math.random(#names)]
 
 	local position = m.signal(0)
 	animate.run({
@@ -42,7 +42,7 @@ return m.component(function(props)
 					if index < current then
 						return kit.icons.check
 					end
-					return index == current and m.spinner({ name = spinner }) or "○"
+					return index == current and m.loader({ name = loader }) or "○"
 				end,
 			}),
 			m.inline({
@@ -60,8 +60,10 @@ return m.component(function(props)
 		})
 	end
 
+	-- Progress to watch, not text to move through.
 	return m.block({
 		padding = { 1, 3 },
+		snap = false,
 		m.block({
 			margin_bottom = 1,
 			m.inline(props.submit and "Submitting your solution" or "Running your testcases", "leetcode_strong"),

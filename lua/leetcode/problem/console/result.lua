@@ -2,6 +2,7 @@ local m = require("markup")
 local Result = require("leetcode.ui.problem.result")
 local Judging = require("leetcode.ui.problem.result.judging")
 local Status = require("leetcode.ui.problem.result.status")
+local RequestError = require("leetcode.ui.problem.result.request-error")
 
 --- What the result tab of the console shows: nothing yet, the judge at work, or
 --- what it decided. The console draws it.
@@ -48,6 +49,23 @@ function M:set_state(state)
     if self.state then
         self.state(state)
     end
+end
+
+--- LeetCode would not take the run, such as when it came too soon after the
+--- last one.
+---@param err lc.err
+function M:failed(err)
+    self.state = nil
+    local too_soon = err.status == 429
+    local title = too_soon and "Too soon" or "Run failed"
+    self.content({
+        render = function()
+            return RequestError({ err = err, too_soon = too_soon })
+        end,
+        status = function()
+            return Status.Notice(title, too_soon and "warn" or "error")
+        end,
+    })
 end
 
 ---@param item lc.interpreter_response

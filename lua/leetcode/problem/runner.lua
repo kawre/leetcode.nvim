@@ -1,5 +1,4 @@
 local interpreter = require("leetcode.api.interpreter")
-local Judge = require("leetcode.logger.spinner.judge")
 
 ---@class leet.problem.runner
 ---@field question lc.ui.Question
@@ -23,29 +22,33 @@ function M.run(problem, submit)
         }
         Leet.logger.debug("body: " .. vim.inspect(body))
 
-        local judge = Judge:init()
-        problem.console.result:judging(submit)
+        local console = problem.console
+        console.result:judging(submit)
+
+        -- The console shows the judge at work and what it decided. With it
+        -- closed, one notification says how the run ended.
+        local function notify(msg, lvl)
+            if not console:is_open() then
+                Leet.logger.log(msg, lvl)
+            end
+        end
+
         local function callback(item, state, err)
             if err or item then
                 M.running = false
             end
 
             if item then
-                if item._.success then
-                    judge:success(item.status_msg)
-                else
-                    judge:error(item.status_msg)
-                end
+                console.result:handle(item)
+                notify(
+                    item._.title or item.status_msg,
+                    item._.success and vim.log.levels.INFO or vim.log.levels.ERROR
+                )
             elseif state then
-                judge:from_state(state)
-                problem.console.result:set_state(state)
+                console.result:set_state(state)
             elseif err then
-                judge:error(err.msg or "Something went wrong")
-                problem.console.result:clear()
-            end
-
-            if item then
-                problem.console.result:handle(item)
+                console.result:failed(err)
+                notify(err.msg or "Something went wrong", err.lvl or vim.log.levels.ERROR)
             end
         end
 

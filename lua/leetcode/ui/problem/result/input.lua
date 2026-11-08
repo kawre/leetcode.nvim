@@ -10,7 +10,7 @@ local Input = m.component(function(props)
 		children = Markup.list(props.input):map(function(value, i)
 			local param = params[i]
 			return m.block({
-				param and m.inline(param.name .. " = ", "leetcode_muted"),
+				param and m.inline({ param.name .. " = ", style = "leetcode_muted", snap = false }),
 				m.inline(value),
 			})
 		end),

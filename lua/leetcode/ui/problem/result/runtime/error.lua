@@ -30,7 +30,7 @@ local InvalidCase = m.component(function(props)
 				end,
 				(" \u{f03eb} Edit Case %d "):format(props.index),
 			}),
-			m.inline("  e", "leetcode_key"),
+			m.inline({ "  e", style = "leetcode_key", snap = false }),
 		}),
 	})
 end)

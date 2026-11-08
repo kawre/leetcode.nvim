@@ -165,12 +165,12 @@ M.get = function()
         tab = { fg = muted, bg = surface },
         tab_active = { fg = bg, bg = accent, bold = true },
         -- The console. Its tabs are text on the band of the header, the one shown
-        -- bright with its icon in the accent, and its cases quiet chips below
-        -- them, so the accent marks only where you are.
+        -- a chip warmed by the accent with its icon in it, and its cases quiet
+        -- chips below them, so the accent marks only where you are.
         console_tab = { fg = muted, bg = header },
         console_tab_hover = { fg = fg, bg = mix(header, fg, 0.08) },
-        console_tab_active = { fg = fg, bg = header, bold = true },
-        console_tab_active_hover = { fg = fg, bg = mix(header, fg, 0.08), bold = true },
+        console_tab_active = { fg = mix(fg, accent, 0.3), bg = mix(header, accent, 0.18), bold = true },
+        console_tab_active_hover = { fg = mix(fg, accent, 0.3), bg = mix(header, accent, 0.26), bold = true },
         console_case = { fg = muted },
         console_case_hover = { fg = fg, bg = surface },
         console_case_active = { fg = fg, bg = raised, bold = true },

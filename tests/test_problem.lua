@@ -974,6 +974,75 @@ T["console"]["stdout opens in a dimmed popup"] = function()
 	eq(child.lua_get("vim.api.nvim_get_current_win() == problem.console.win.win"), true)
 end
 
+--- A run whose first case printed `count` lines, `line 1` to `line <count>`.
+local function printing(count)
+	local lines = {}
+	for i = 1, count do
+		lines[i] = "line " .. i
+	end
+	return ([[{
+		_ = { title = "Accepted", hl = "leetcode_ok", success = true, submission = false },
+		status_code = 10, status_runtime = "0 ms", submission_id = "run1", total_testcases = 2,
+		code_answer = { "[0,1]", "[0,1]" }, expected_code_answer = { "[0,1]", "[0,1]" },
+		std_output_list = { %q, "" },
+	}]]):format(table.concat(lines, "\n") .. "\n")
+end
+
+--- Lines of the popup that opened, once something opens it.
+local function popup_lines()
+	return child.lua_get("vim.api.nvim_buf_get_lines(0, 0, -1, false)")
+end
+
+T["console"]["stdout shows only its first lines, and how many more there are"] = function()
+	show_result(printing(80))
+	eq(result_has("line 50"), true)
+	eq(result_has("line 51"), false)
+	eq(result_has("30 more lines"), true)
+	-- The header still counts all of them.
+	eq(result_has("80 lines"), true)
+end
+
+T["console"]["how many stdout lines show is a setting"] = function()
+	run([[Leet.config.user.console.result.stdout_lines = 3]])
+	show_result(printing(30))
+	eq(result_has("line 3"), true)
+	eq(result_has("line 4"), false)
+	eq(result_has("27 more lines"), true)
+end
+
+T["console"]["stdout that fits says nothing about more"] = function()
+	show_result(printing(50))
+	eq(result_has("line 50"), true)
+	eq(result_has("more line"), false)
+end
+
+T["console"]["the more lines button opens all of stdout"] = function()
+	show_result(printing(80))
+	run([[
+		vim.api.nvim_set_current_win(problem.console.win.win)
+		for i, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
+			if line:find("more lines", 1, true) then
+				local col = line:find("\u{f0293}", 1, true)
+				vim.api.nvim_win_set_cursor(0, { i, col - 1 })
+			end
+		end
+		problem.console.view:press()
+		reactive.flush()
+	]])
+	local lines = popup_lines()
+	eq(#lines, 80)
+	eq(lines[80], "line 80")
+end
+
+T["console"]["f opens stdout fullscreen"] = function()
+	show_result(printing(80))
+	run([[vim.api.nvim_set_current_win(problem.console.win.win)]])
+	child.type_keys("f")
+	run([[reactive.flush()]])
+	eq(child.lua_get("vim.bo.filetype"), "leetcode.stdout")
+	eq(#popup_lines(), 80)
+end
+
 local function tab_row()
 	return child.lua_get([[(function()
 		for _, line in ipairs(vim.api.nvim_buf_get_lines(problem.console.win.buf, 0, -1, false)) do
@@ -1051,6 +1120,126 @@ end
 T["console"]["a plain run changes nothing"] = function()
 	show_result(accepted)
 	eq(child.lua_get("status_change"), vim.NIL)
+end
+
+--- Every place `j` stops on in the console, from the top, as the word there
+--- and as the line. A button is entered at its start, often a blank.
+local function stops()
+	run([[
+		vim.api.nvim_set_current_win(problem.console.win.win)
+		vim.api.nvim_win_set_cursor(0, { 1, 0 })
+		problem.console.view.cursor = nil
+		problem.console.view:snap_cursor()
+	]])
+	local words, lines, seen = {}, {}, {}
+	for _ = 1, 40 do
+		local at = child.lua_get("vim.api.nvim_win_get_cursor(0)")
+		local key = at[1] .. ":" .. at[2]
+		if seen[key] then
+			break
+		end
+		seen[key] = true
+		words[#words + 1] = child.lua_get("vim.fn.expand('<cWORD>')")
+		lines[#lines + 1] = child.lua_get("vim.trim(vim.api.nvim_get_current_line())")
+		child.type_keys("j")
+	end
+	return words, lines
+end
+
+--- Fails with the stop that landed on something it should have passed.
+local function never_stops_on(words, skipped)
+	for _, word in ipairs(words) do
+		for _, pattern in ipairs(skipped) do
+			if word:find(pattern) then
+				error(("stopped on %q, in %s"):format(word, vim.inspect(words)), 2)
+			end
+		end
+	end
+end
+
+local function stops_on(words, wanted)
+	for _, word in ipairs(words) do
+		if word:find(wanted, 1, true) then
+			return true
+		end
+	end
+	error(("never stopped on %q, only on %s"):format(wanted, vim.inspect(words)), 2)
+end
+
+T["console"]["j passes over labels and the status of a run"] = function()
+	show_result(accepted)
+	local words = stops()
+	stops_on(words, "[2,7]")
+	stops_on(words, "9")
+	stops_on(words, "[0,1]")
+	stops_on(words, "hello")
+	never_stops_on(words, { "^Input$", "^Output$", "^Expected$", "^nums$", "^target$", "^=$", "^Accepted$", "^0$", "^ms$" })
+end
+
+T["console"]["j passes over the labels and bars of a submission"] = function()
+	show_result([[{
+		_ = { title = "Accepted", hl = "leetcode_ok", success = true, submission = true },
+		status_code = 10, status_runtime = "12 ms", display_runtime = "12", pretty_lang = "Python3",
+		status_memory = "18.9MB", runtime_percentile = 80.5, memory_percentile = 33.2,
+	}]])
+	local words = stops()
+	stops_on(words, "12")
+	stops_on(words, "18.9")
+	never_stops_on(words, { "Runtime", "Memory", "^beats$", "[█▏▎▍▌▋▊▉]", "Python3" })
+end
+
+T["console"]["j only stops on the tabs while the judge works"] = function()
+	run([[
+		open_problem()
+		problem.console:show("result")
+		problem.console.result:judging(false)
+		reactive.flush()
+	]])
+	never_stops_on(stops(), { "Running", "Queued", "Judging", "█" })
+end
+
+T["console"]["j still reaches the buttons of a result"] = function()
+	show_result(accepted)
+	local _, lines = stops()
+	stops_on(lines, "Case 1")
+	stops_on(lines, "Stdout")
+end
+
+T["console"]["j passes over the count of more lines, to its button"] = function()
+	-- Few lines, so the walk gets there quickly.
+	run([[Leet.config.user.console.result.stdout_lines = 3]])
+	show_result(printing(30))
+	local words, lines = stops()
+	never_stops_on(words, { "^27$", "^more$" })
+	stops_on(lines, "more lines")
+end
+
+T["console"]["moving along the stdout header passes over its line count"] = function()
+	show_result(accepted)
+	run([[
+		vim.api.nvim_set_current_win(problem.console.win.win)
+		for i, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
+			if line:find("Stdout", 1, true) then
+				stdout_row = i
+				vim.api.nvim_win_set_cursor(0, { i, #line:match("^%s*") })
+			end
+		end
+		problem.console.view.cursor = nil
+		problem.console.view:snap_cursor()
+	]])
+	local words, seen = {}, {}
+	for _ = 1, 20 do
+		local at = child.lua_get("vim.api.nvim_win_get_cursor(0)")
+		if seen[at[2]] or at[1] ~= child.lua_get("stdout_row") then
+			break
+		end
+		seen[at[2]] = true
+		words[#words + 1] = child.lua_get("vim.fn.expand('<cWORD>')")
+		child.type_keys("w")
+	end
+	stops_on(words, "Stdout")
+	stops_on(words, "Fullscreen")
+	never_stops_on(words, { "^1$", "^lines?$" })
 end
 
 T["console"]["shows a compile error"] = function()
@@ -1328,6 +1517,73 @@ T["console"]["with debug, each check of a run says what came back"] = function()
 	eq(child.lua_get("noted('check run1: PENDING')"), true)
 	eq(child.lua_get("noted('check run1: STARTED')"), true)
 	eq(child.lua_get("noted('check run1: result 16')"), true)
+end
+
+--- Runs code against a fake LeetCode, collecting every notification. `post`
+--- is what taking the run answers, `checks` what each check of it does.
+---@param opts { open: boolean, post?: string, checks?: string }
+local function notified_run(opts)
+	run(([[
+		open_problem()
+		Leet.config.debug = false
+		Leet.config.user.console.open_on_runcode = %s
+		if Leet.config.user.console.open_on_runcode then
+			problem.console:open()
+		else
+			problem.console:close()
+		end
+		reactive.flush()
+		notes = {}
+		vim.notify = function(msg) notes[#notes + 1] = tostring(msg) end
+		checks = %s
+		Leet.api.post = function(_, opts) opts.callback(%s) end
+		Leet.api.get = function(_, opts) opts.callback(table.remove(checks, 1)) end
+		vim.defer_fn = function(fn) fn() end
+		require("leetcode.problem.runner").running = false
+		problem.console:run()
+		vim.wait(200, function() return not require("leetcode.problem.runner").running end, 10)
+		vim.wait(20, function() return false end, 5)
+		reactive.flush()
+	]]):format(
+		tostring(opts.open),
+		opts.checks or "{ { state = 'PENDING' }, { state = 'STARTED' }, { status_code = 16, status_msg = 'Internal Error' } }",
+		opts.post or "{ interpret_id = 'run1', test_case = '[2,7]\\n9' }"
+	))
+end
+
+T["console"]["says nothing while the console shows the run"] = function()
+	notified_run({ open = true })
+	eq(child.lua_get("notes"), {})
+	eq(result_has("The judge failed"), true)
+end
+
+T["console"]["closed, says once how the run ended"] = function()
+	notified_run({ open = false })
+	eq(child.lua_get("notes"), { "Internal Error" })
+	-- And the result waits in the console.
+	run("problem.console:open(); reactive.flush()")
+	eq(result_has("The judge failed"), true)
+end
+
+T["console"]["shows a run that came too soon in the console"] = function()
+	notified_run({ open = true, post = "nil, { status = 429 }" })
+	eq(child.lua_get("notes"), {})
+	eq(tab_row():find("Too soon", 1, true) ~= nil, true)
+	eq(result_has("You have attempted to run code too soon"), true)
+	eq(result_has("Wait a moment"), true)
+	eq(child.lua_get("require('leetcode.problem.runner').running"), false)
+end
+
+T["console"]["closed, says once that a run came too soon"] = function()
+	notified_run({ open = false, post = "nil, { status = 429 }" })
+	eq(child.lua_get("notes"), { "You have attempted to run code too soon" })
+end
+
+T["console"]["shows a run LeetCode would not take"] = function()
+	notified_run({ open = true, post = "nil, { status = 500, msg = 'Bad Gateway' }" })
+	eq(tab_row():find("Run failed", 1, true) ~= nil, true)
+	eq(result_has("Bad Gateway"), true)
+	eq(result_has("Wait a moment"), false)
 end
 
 T["console"]["is one split below the editor"] = function()

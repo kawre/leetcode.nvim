@@ -54,9 +54,24 @@ function M.Status(item)
 	local detail = M.detail(item)
 	return m.inline({
 		white_space = "nowrap",
+		-- Read at a glance from anywhere, so the cursor never needs to go there.
+		snap = false,
 		m.inline((kind == "ok" and kit.icons.check or kit.icons.cross) .. " ", group),
 		m.inline(item._.title or item.status_msg or "", group),
 		detail and m.inline({ "   ", detail }),
+	})
+end
+
+--- A run that ended before the judge saw it, in the colors of `kind`.
+---@param title string
+---@param kind "warn"|"error"
+function M.Notice(title, kind)
+	local group = "leetcode_status_" .. kind
+	return m.inline({
+		white_space = "nowrap",
+		snap = false,
+		m.inline(kit.icons.cross .. " ", group),
+		m.inline(title, group),
 	})
 end
 
@@ -65,7 +80,8 @@ end
 function M.Pending(submit)
 	return m.inline({
 		white_space = "nowrap",
-		m.spinner({ style = "leetcode_accent" }),
+		snap = false,
+		m.loader({ style = "leetcode_accent" }),
 		m.inline(submit and " Submitting…" or " Running…", "leetcode_muted"),
 	})
 end
