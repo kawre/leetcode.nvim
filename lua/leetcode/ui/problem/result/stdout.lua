@@ -77,7 +77,7 @@ local Stdout = m.component(function(props)
                 style = function()
                     return hovered() and "leetcode_accent" or "leetcode_muted"
                 end,
-                ICONS.fullscreen,
+                ICONS.fullscreen .. " Fullscreen",
             }),
         }),
         m.collapse(expanded, function()
