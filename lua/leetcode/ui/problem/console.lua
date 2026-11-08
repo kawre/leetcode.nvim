@@ -241,8 +241,8 @@ return m.component(function(props)
 		-- A solid band, the color of the description's header.
 		m.flex({
 			justify = "between",
-			-- No room above the tabs, half a row below them.
-			padding = { 0, 3 },
+			-- A row above the tabs, and half a row below them.
+			padding = { 1, 3, 0, 3 },
 			border = "half",
 			border_sides = { "bottom" },
 			style = "leetcode_description_header",
