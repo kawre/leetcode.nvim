@@ -40,6 +40,8 @@
 
 ---@alias lc.picker { provider?: "fzf-lua" | "telescope" | "snacks-picker" }
 
+---@alias lc.login { browser?: string }
+
 ---@class lc.UserConfig
 local M = {
     ---@type string
@@ -110,6 +112,13 @@ local M = {
 
     ---@type lc.picker
     picker = { provider = nil },
+
+    ---@type lc.login
+    login = {
+        -- executable name or path of a Chromium-based browser
+        -- used by browser sign-in, `nil` to auto-detect
+        browser = nil, ---@type string|nil
+    },
 
     hooks = {
         ---@type fun()[]

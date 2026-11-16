@@ -134,6 +134,11 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     ---@type lc.picker
     picker = { provider = nil },
 
+    ---@type lc.login
+    login = {
+        browser = nil, ---@type string|nil
+    },
+
     hooks = {
         ---@type fun()[]
         ["enter"] = {},
@@ -298,6 +303,20 @@ available one in the order above.
 picker = { provider = nil },
 ```
 
+### login
+
+Browser used by [browser sign-in](#sign-in). Must be a Chromium-based browser
+(Chrome, Chromium, Brave, Edge, Vivaldi), given as an executable name or path.
+
+If `browser` is `nil`, [leetcode.nvim] will use the first one it finds.
+
+```lua
+---@type lc.login
+login = {
+    browser = nil, ---@type string|nil
+},
+```
+
 ### hooks
 
 List of functions that get executed on specified event
@@ -398,6 +417,8 @@ image_support = true,
   - `stats` toggle description stats visibility
 
 - `cookie`
+  - `browser` opens a browser window to sign in, the cookie is picked up automatically
+
   - `update` opens a prompt to enter a new cookie
 
   - `delete` deletes stored cookie and logs out of [leetcode.nvim]
@@ -436,6 +457,21 @@ This plugin can be initiated in two ways:
   To bypass this requirement use [`non_standalone`](#non-standalone-mode) plugin.
 
 ### Sign In
+
+#### Browser (recommended)
+
+Choose `Sign in (Browser)` or run `Leet cookie browser`. A browser window opens on
+the LeetCode login page. Once you sign in there, [leetcode.nvim] picks up the
+session cookie and closes the window, so there's nothing to copy.
+
+- Requires a Chromium-based browser, see [`login`](#login).
+- The window uses its own profile stored in [`storage.cache`](#storage). Your
+  regular browser profile, cookies and keyring are never read.
+- Signing out (`Leet cookie delete`) also clears that profile.
+
+#### Cookie
+
+If no supported browser is available, sign in by pasting the cookie manually.
 
 > [!WARNING]
 > Be sure to copy the `Cookie` from request headers, not the `set-cookie` from

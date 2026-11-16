@@ -81,11 +81,44 @@ function cmd.cookie_prompt(cb)
     end)
 end
 
+---Sign in through a browser window opened by leetcode.nvim,
+---falls back to the cookie prompt when no supported browser is available.
+---
+---@param cb? function
+function cmd.browser_login(cb)
+    local browser = require("leetcode.browser")
+
+    if browser.active() then
+        return log.warn("Browser sign-in is already in progress")
+    end
+
+    local launched, err = browser.login(function(success, lerr)
+        if success then
+            log.info("Sign-in successful")
+            cmd.start_user_session()
+        else
+            log.error("Sign-in failed: " .. lerr)
+        end
+
+        pcall(cb, success)
+    end)
+
+    if not launched then
+        log.warn(err .. ", sign in by cookie instead")
+        return cmd.cookie_prompt(cb)
+    end
+
+    log.info(
+        "Sign in to LeetCode in the opened browser window, it will close automatically once you're signed in"
+    )
+end
+
 function cmd.sign_out()
     cmd.menu()
 
     log.warn("You're now signed out")
     cmd.delete_cookie()
+    require("leetcode.browser").clear()
     cmd.set_menu_page("signin")
 end
 
@@ -646,6 +679,7 @@ cmd.commands = {
     },
     cookie = {
         update = { cmd.cookie_prompt },
+        browser = { cmd.browser_login },
         delete = { cmd.sign_out },
     },
     cache = {

@@ -21,6 +21,12 @@ local update = Button("Update", {
     on_press = cmd.cookie_prompt,
 })
 
+local browser = Button("Update (Browser)", {
+    icon = "󰖟",
+    sc = "b",
+    on_press = cmd.browser_login,
+})
+
 local delete = Button("Delete / Sign out", {
     icon = "󱛪",
     sc = "d",
@@ -30,6 +36,7 @@ local delete = Button("Delete / Sign out", {
 local back = BackButton("menu")
 
 page:insert(Buttons({
+    browser,
     update,
     delete,
     back,

@@ -16,7 +16,13 @@ page:insert(header)
 
 page:insert(Title({}, "Sign in"))
 
-local problems = Button("Sign in (By Cookie)", {
+local browser = Button("Sign in (Browser)", {
+    icon = "󰖟",
+    sc = "b",
+    on_press = cmd.browser_login,
+})
+
+local cookie = Button("Sign in (By Cookie)", {
     icon = "󱛖",
     sc = "s",
     on_press = cmd.cookie_prompt,
@@ -25,7 +31,8 @@ local problems = Button("Sign in (By Cookie)", {
 local exit = ExitButton()
 
 page:insert(Buttons({
-    problems,
+    browser,
+    cookie,
     exit,
 }))
 
