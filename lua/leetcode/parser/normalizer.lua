@@ -6,78 +6,77 @@ local log = require("leetcode.logger")
 local Normalizer = Markup.object()
 
 function Normalizer:cleanup() --
-    self.text = self
-        .text --
-        :gsub("​", "")
-        :gsub("\r\n", "\n")
-        :gsub("<br%s*/>", "\n")
-        :gsub("<meta[^>]*/>", "")
-        :gsub("&nbsp;", " ")
-        :gsub("<(/?)b>", "<%1strong>")
-
+	self.text = self
+		.text --
+		:gsub("​", "")
+		:gsub("\r\n", "\n")
+		:gsub("<br%s*/>", "\n")
+		:gsub("<meta[^>]*/>", "")
+		:gsub("&nbsp;", " ")
+		:gsub("<(/?)b>", "<%1strong>")
 end
 
 function Normalizer:fix_indent()
-    self.text = self
-        .text --
-        :gsub("(\n+)(\t+)", "%1")
-        :gsub("<(/?li)>\n*", "<%1>\n\n")
-        :gsub("\n*(<ul[^>]*>)\n*", "\n\n%1\n")
-        :gsub("\n*(<ol[^>]*>)\n*", "\n\n%1\n")
-        :gsub("\n*(<pre[^>]*>)", "\n\n%1\n")
-        :gsub("\n*(<img[^>]*/?>)\n*", "\n\n%1\n\n")
+	self.text = self
+		.text --
+		:gsub("(\n+)(\t+)", "%1")
+		:gsub("<(/?li)>\n*", "<%1>\n\n")
+		:gsub("\n*(<ul[^>]*>)\n*", "\n\n%1\n")
+		:gsub("\n*(<ol[^>]*>)\n*", "\n\n%1\n")
+		:gsub("\n*(<pre[^>]*>)", "\n\n%1\n")
+		:gsub("\n*(<img[^>]*/?>)\n*", "\n\n%1\n\n")
 end
 
 function Normalizer:tags() --
-    self.text = self
-        .text --
-        :gsub("<div.-class=[\"']example%-block[\"'].->(.-)</div>", "<pre>%1</pre>")
-        :gsub("<strong>(Input:?%s*)</strong>", "<input>%1</input>")
-        :gsub("<strong>(Output:?%s*)</strong>", "<output>%1</output>")
-        :gsub("<strong>(Explanation:?%s*)</strong>", "<explanation>%1</explanation>")
-        :gsub("<strong>(Note:?%s*)</strong>", "<explanation>%1</explanation>")
-        :gsub("<strong>(Follow%-up:?%s*)</strong>", "<followup>%1</followup>")
-        :gsub("<strong>(Follow up:?%s*)</strong>", "<followup>%1</followup>")
-        :gsub(
-            "\n*<p>%s*<strong[^>]*>(Example%s*%d*:?)%s*</strong>%s*</p>\n*",
-            "\n\n<example>%1</example>\n\n"
-        )
-        :gsub(
-            "\n*<p>%s*<strong[^>]*>(Constraints:?)%s*</strong>%s*</p>\n*",
-            "\n\n<constraints>%1</constraints>\n\n"
-        )
+	self.text = self
+		.text --
+		:gsub("<div.-class=[\"']example%-block[\"'].->(.-)</div>", "<pre>%1</pre>")
+		:gsub("<strong>(Input:?%s*)</strong>", "<input>%1</input>")
+		:gsub("<strong>(Output:?%s*)</strong>", "<output>%1</output>")
+		:gsub("<strong>(Explanation:?%s*)</strong>", "<explanation>%1</explanation>")
+		:gsub("<strong>(Note:?%s*)</strong>", "<explanation>%1</explanation>")
+		:gsub("<strong>(Follow%-up:?%s*)</strong>", "<followup>%1</followup>")
+		:gsub("<strong>(Follow up:?%s*)</strong>", "<followup>%1</followup>")
+		:gsub(
+			"\n*<p>%s*<strong[^>]*>(Example%s*%d*:?)%s*</strong>%s*</p>\n*",
+			"\n\n<example>%1</example>\n\n"
+		)
+		:gsub(
+			"\n*<p>%s*<strong[^>]*>(Constraints:?)%s*</strong>%s*</p>\n*",
+			"\n\n<constraints>%1</constraints>\n\n"
+		)
 end
 
 function Normalizer:entities()
-    self.text = self
-        .text --
-        :gsub("\n*<p>%s*</p>\n*", "&lcpad;")
-        :gsub("\n*<p> *</p>\n*", "&lcpad;")
-        :gsub("<([^>]+)>(%s*)</%1>", "%2")
-        :gsub("\n", "&lcnl;")
-        :gsub("\t", "&lctab;")
-        :gsub("%s", "&nbsp;")
-        :gsub("<[^>]+>", function(match)
-            return match:gsub("&nbsp;", " ")
-        end)
+	self.text = self
+		.text --
+		:gsub("\n*<p>%s*</p>\n*", "&lcpad;")
+		:gsub("\n*<p> *</p>\n*", "&lcpad;")
+		:gsub("<([^>]+)>(%s*)</%1>", "%2")
+		:gsub("\n", "&lcnl;")
+		:gsub("\t", "&lctab;")
+		:gsub("%s", "&nbsp;")
+		:gsub("<[^>]+>", function(match)
+			return match:gsub("&nbsp;", " ")
+		end)
 end
 
 ---@param text string
 function Normalizer:new(text) --
-    log.debug(text)
+	log.debug(text)
 
-    self.text = text
-    self:cleanup()
-    self:fix_indent()
-    self:tags()
-    self:entities()
+	self.text = text
+	self:cleanup()
+	self:fix_indent()
+	self:tags()
+	self:entities()
 
-    log.debug(self.text:gsub("&lcnl;", "\n"), false)
+	log.debug(self.text:gsub("&lcnl;", "\n"), false)
 end
 
 ---@param text string
 function Normalizer:norm(text)
-    return Normalizer(text).text
+	return Normalizer(text).text
 end
 
 return Normalizer

@@ -6,7 +6,8 @@ local interval = config.user.cache.update_interval
 
 local util = require("leetcode.util")
 
-local file = vim.fs.joinpath(config.storage.cache, ("problemlist%s"):format(config.is_cn and "_cn" or ""))
+local file =
+	vim.fs.joinpath(config.storage.cache, ("problemlist%s"):format(config.is_cn and "_cn" or ""))
 
 ---@type { at: integer, payload: lc.cache.payload }
 local hist = nil
@@ -29,86 +30,86 @@ local M = {}
 
 ---@return leet.cache.problem[]
 function M.get()
-    return M.read().data
+	return M.read().data
 end
 
 ---@return lc.cache.payload
 function M.read()
-    if not vim.uv.fs_stat(file) then
-        return M.populate()
-    end
+	if not vim.uv.fs_stat(file) then
+		return M.populate()
+	end
 
-    local time = os.time()
-    if hist and (time - hist.at) <= math.min(60, interval) then
-        return hist.payload
-    end
+	local time = os.time()
+	if hist and (time - hist.at) <= math.min(60, interval) then
+		return hist.payload
+	end
 
-    local contents = util.read_file(file)
-    if not contents or type(contents) ~= "string" then
-        return M.populate()
-    end
+	local contents = util.read_file(file)
+	if not contents or type(contents) ~= "string" then
+		return M.populate()
+	end
 
-    local cached = M.parse(contents)
+	local cached = M.parse(contents)
 
-    if not cached or (cached.version ~= config.version or cached.username ~= config.auth.name) then
-        return M.populate()
-    end
+	if not cached or (cached.version ~= config.version or cached.username ~= config.auth.name) then
+		return M.populate()
+	end
 
-    hist = { at = time, payload = cached }
-    if (time - cached.updated_at) > interval then
-        M.update()
-    end
+	hist = { at = time, payload = cached }
+	if (time - cached.updated_at) > interval then
+		M.update()
+	end
 
-    return cached
+	return cached
 end
 
 ---@return lc.cache.payload
 function M.populate()
-    local res, err = problems_api.all(nil, true)
+	local res, err = problems_api.all(nil, true)
 
-    if not res or err then
-        local msg = (err or {}).msg or "failed to fetch problem list"
-        error(msg)
-    end
+	if not res or err then
+		local msg = (err or {}).msg or "failed to fetch problem list"
+		error(msg)
+	end
 
-    M.write({ data = res })
-    return hist.payload
+	M.write({ data = res })
+	return hist.payload
 end
 
 function M.update()
-    problems_api.all(function(res, err)
-        if not err then
-            M.write({ data = res })
-        end
-    end, true)
+	problems_api.all(function(res, err)
+		if not err then
+			M.write({ data = res })
+		end
+	end, true)
 end
 
 ---@return leet.cache.problem
 function M.by_slug(slug)
-    local problems = M.get()
+	local problems = M.get()
 
-    local problem = vim.tbl_filter(function(e)
-        return e.title_slug == slug
-    end, problems)[1]
+	local problem = vim.tbl_filter(function(e)
+		return e.title_slug == slug
+	end, problems)[1]
 
-    assert(problem, ("Problem `%s` not found. Try updating cache?"):format(slug))
-    return problem
+	assert(problem, ("Problem `%s` not found. Try updating cache?"):format(slug))
+	return problem
 end
 
 ---@param payload? lc.cache.payload
 function M.write(payload)
-    payload = vim.tbl_deep_extend("force", {
-        version = config.version,
-        updated_at = os.time(),
-        username = config.auth.name,
-    }, payload)
+	payload = vim.tbl_deep_extend("force", {
+		version = config.version,
+		updated_at = os.time(),
+		username = config.auth.name,
+	}, payload)
 
-    if not payload.data then
-        payload.data = M.get()
-    end
+	if not payload.data then
+		payload.data = M.get()
+	end
 
-    util.write_file(file, vim.json.encode(payload))
-    hist = { at = os.time(), payload = payload }
+	util.write_file(file, vim.json.encode(payload))
+	hist = { at = os.time(), payload = payload }
 end
 
 ---@alias lc.cache.payload { version: string, data: leet.cache.problem[], updated_at: integer, username: string }
@@ -117,29 +118,29 @@ end
 ---
 ---@return lc.cache.payload
 function M.parse(str)
-    return vim.json.decode(str)
+	return vim.json.decode(str)
 end
 
 ---@param title_slug string
 ---@param status "ac" | "notac"
 M.change_status = vim.schedule_wrap(function(title_slug, status)
-    local cached = M.read()
+	local cached = M.read()
 
-    cached.data = vim.tbl_map(function(p)
-        if p.title_slug == title_slug then
-            p.status = status
-        end
-        return p
-    end, cached.data)
+	cached.data = vim.tbl_map(function(p)
+		if p.title_slug == title_slug then
+			p.status = status
+		end
+		return p
+	end, cached.data)
 
-    M.write(cached)
+	M.write(cached)
 end)
 
 function M.delete()
-    if not vim.uv.fs_stat(file) then
-        return false
-    end
-    return pcall(vim.fs.rm, file)
+	if not vim.uv.fs_stat(file) then
+		return false
+	end
+	return pcall(vim.fs.rm, file)
 end
 
 return M

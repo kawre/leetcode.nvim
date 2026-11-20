@@ -20,10 +20,17 @@ M.LINK_ICON = "\u{f0c1}"
 local section_tags = { example = true, constraints = true, followup = true }
 
 local border = {
-	tl = "┌", tr = "┐", bl = "└", br = "┘",
-	h = "─", v = "│",
-	th = "┬", bh = "┴",
-	lv = "├", rv = "┤", cross = "┼",
+	tl = "┌",
+	tr = "┐",
+	bl = "└",
+	br = "┘",
+	h = "─",
+	v = "│",
+	th = "┬",
+	bh = "┴",
+	lv = "├",
+	rv = "┤",
+	cross = "┼",
 }
 
 --- A heading that shows or hides what follows it. Open until pressed, unless it
@@ -413,7 +420,8 @@ local function render_table(b, node, ctx)
 			local cell = row.cells[i]
 			local text = cell and cell.text or ""
 			local padding = (" "):rep(widths[i] - vim.api.nvim_strwidth(text) + 1)
-			spans[#spans + 1] = m.inline(" " .. text .. padding, cell and cell.is_header and hl_header or hl_cell)
+			spans[#spans + 1] =
+				m.inline(" " .. text .. padding, cell and cell.is_header and hl_header or hl_cell)
 			spans[#spans + 1] = m.inline(border.v, hl_border)
 		end
 		return m.block(spans)

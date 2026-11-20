@@ -109,7 +109,12 @@ M.Solved = m.component(function(props)
 				end, "leetcode_muted"),
 			}),
 		}),
-		m.vflex({ spacing = 1, Row("Easy", 1, bar_width), Row("Medium", 2, bar_width), Row("Hard", 3, bar_width) }),
+		m.vflex({
+			spacing = 1,
+			Row("Easy", 1, bar_width),
+			Row("Medium", 2, bar_width),
+			Row("Hard", 3, bar_width),
+		}),
 	})
 end)
 

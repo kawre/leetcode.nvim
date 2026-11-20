@@ -102,7 +102,8 @@ local function Level(level, width)
 
 			local rows = vim.tbl_map(Skill, vim.list_slice(sorted, 1, TOP_SKILLS))
 			if #sorted > TOP_SKILLS then
-				rows[#rows + 1] = m.block(("+%d more"):format(#sorted - TOP_SKILLS), "leetcode_muted")
+				rows[#rows + 1] =
+					m.block(("+%d more"):format(#sorted - TOP_SKILLS), "leetcode_muted")
 			end
 			return m.block(rows)
 		end,

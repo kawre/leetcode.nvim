@@ -131,7 +131,8 @@ function M.build(problem)
 			local title = t(section.title)
 
 			sections[section.name] = { open = open, title = title }
-			elements[#elements + 1] = html.Section({ title = title, hl = section.hl, body = rows, open = open })
+			elements[#elements + 1] =
+				html.Section({ title = title, hl = section.hl, body = rows, open = open })
 		end
 	end
 

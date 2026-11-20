@@ -9,5 +9,4 @@ function M.auth()
 	end
 end
 
-
 return M
