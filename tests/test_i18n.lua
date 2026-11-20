@@ -258,7 +258,6 @@ T["chinese"]["the judge at work"] = function()
 	local text = console_text()
 	eq(text:find("正在运行测试用例", 1, true) ~= nil, true)
 	eq(text:find("排队中", 1, true) ~= nil, true)
-	eq(text:find("运行中…", 1, true) ~= nil, true)
 end
 
 T["chinese"]["a run that came too soon"] = function()

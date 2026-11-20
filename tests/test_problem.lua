@@ -1197,14 +1197,16 @@ T["console"]["shows what a run came to beside the tabs"] = function()
 	eq(child.lua_get("title"), "Runtime Error")
 end
 
-T["console"]["shows the judge at work beside the tabs"] = function()
+T["console"]["the judge at work shows below the tabs, not beside them"] = function()
 	run([[
 		open_problem()
 		problem.console:show("result")
 		problem.console.result:judging(false)
 		reactive.flush()
 	]])
-	eq(tab_row():find("Running", 1, true) ~= nil, true)
+	-- One loader, in the steps of the result: beside the tabs is the hint.
+	eq(tab_row():find("Running", 1, true), nil)
+	eq(tab_row():find("<Tab>", 1, true) ~= nil, true)
 end
 
 T["console"]["shows a submission"] = function()
