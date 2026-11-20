@@ -86,6 +86,7 @@ end
 T["description"]["says when text is hidden above"] = function()
 	run("open_problem()")
 	run([[vim.api.nvim_win_set_height(problem.description.win.win, 8)]])
+	scroll_description(1)
 	eq(
 		child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[1].win.win).hide"),
 		true

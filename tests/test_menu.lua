@@ -66,7 +66,7 @@ T["today has the date and how many pass"] = function()
 		local by_slug = problems.by_slug
 		problems.by_slug = function(slug)
 			local problem = by_slug(slug)
-			problem.status, problem.ac_rate = "ac", 41.25
+			problem.status, problem.ac_rate = "ac", 41.24
 			return problem
 		end
 	]])
