@@ -2,14 +2,14 @@
 --- its UI with, at a version it works with, with its engine built.
 local M = {}
 
---- The release range declared in the standalone lazy.lua package spec.
+--- The markup.nvim API range used by leetcode.nvim.
 M.markup = "^0.2"
 
 --- How to get markup.nvim, for every way of installing it.
 local INSTALL = table.concat({
 	"lazy.nvim installs it by itself on the next start of Neovim.",
 	"With another plugin manager, add https://github.com/kawre/markup.nvim and run",
-	"`nvim -l build.lua` in its directory, which downloads its engine.",
+	"`nvim -l build.lua` in its directory, to build its engine (requires Rust for this revision).",
 	"To stay on the version before it, pin leetcode.nvim to the tag v0.3.1.",
 }, "\n")
 
@@ -30,16 +30,10 @@ function M.check()
 		return "leetcode.nvim now needs markup.nvim, which it draws its UI with.\n" .. INSTALL
 	end
 
-	local version = type(config) == "table" and config.version or nil
-	-- The published 0.2.0 release predates config.supports().
-	local supported = version == "0.2.0"
-	if type(config) == "table" and type(config.supports) == "function" then
-		supported = config.supports(M.markup)
-	end
-	if not supported then
+	if not config.supports(M.markup) then
 		return ("leetcode.nvim requires markup.nvim %s (installed: %s)."):format(
 			M.markup,
-			version or "unknown"
+			config.version
 		)
 	end
 
