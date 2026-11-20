@@ -3,7 +3,8 @@ local i18n = require("leetcode.i18n")
 local cookie = require("leetcode.cache.cookie")
 local kit = require("leetcode.ui.kit")
 local Nav = require("leetcode.ui.menu.nav")
-local Summary = require("leetcode.ui.menu.summary")
+local Band = require("leetcode.ui.menu.dashboard.band")
+local focus = require("leetcode.ui.menu.dashboard.focus")
 local data = require("leetcode.ui.menu.data")
 local Stats = require("leetcode.ui.menu.stats")
 local Problems = require("leetcode.ui.menu.problems")
@@ -32,6 +33,8 @@ Leet.menu = M
 
 ---@param page string
 function M.set_page(page)
+	-- What was lit belongs to the page being left.
+	focus.current(nil)
 	if not SLIDES[page] then
 		M.home_page(page)
 	end
@@ -69,7 +72,7 @@ local function sign_in()
 	end)
 end
 
---- Below this the dashboard stacks into one column, such as beside the browser.
+--- Below this the pages stack into one column, such as beside the browser.
 local WIDE = 80
 local WIDTH = 78
 local NARROW = 46
@@ -77,57 +80,36 @@ local NARROW = 46
 --- Wide enough for the launcher, which keeps one width whatever the window.
 local LAUNCHER = 50
 
-local function greeting()
-	local hour = tonumber(os.date("%H"))
-	return hour < 5 and "night" or hour < 12 and "morning" or hour < 18 and "afternoon" or "evening"
+--- The dashboard stands its cards and tiles side by side from here, at
+--- `DASHBOARD` wide, and stacks them below it.
+local DASHBOARD_WIDE = 96
+local DASHBOARD = 90
+local DASHBOARD_NARROW = 74
+
+--- How wide the dashboard is, and whether its cards and tiles stand side by side.
+---@return integer width
+---@return boolean columns
+function M.dashboard_width()
+	local width = M.width()
+	if width >= DASHBOARD_WIDE then
+		return DASHBOARD, true
+	end
+	return math.max(math.min(width - 4, DASHBOARD_NARROW), 40), false
 end
-
---- The name, and who is here with how long their streak is.
-local Brand = m.component(function()
-	local streak = kit.counter(function()
-		return data.streak().streakCount
-	end, { duration = 1100, instant = M.settled() })
-
-	return m.vflex({
-		align = "center",
-		m.block({
-			m.inline(kit.icons.code .. " ", "leetcode_accent"),
-			m.inline("leetcode.nvim", "leetcode_strong"),
-		}),
-		m.block(function()
-			local auth = Leet.auth()
-			if not auth then
-				return nil
-			end
-
-			return m.inline({
-				m.inline(i18n.greeting(greeting(), auth.name), "leetcode_muted"),
-				data.streak().streakCount and m.inline({
-					m.inline(" · ", "leetcode_muted"),
-					m.inline({
-						style = function()
-							return data.streak().todayCompleted and "leetcode_flame"
-								or "leetcode_flame_off"
-						end,
-						kit.icons.fire .. " ",
-					}),
-					m.inline(function()
-						return tostring(math.floor(streak() + 0.5))
-					end, "leetcode_strong"),
-				}),
-			})
-		end),
-	})
-end)
 
 local Home = m.component(function()
 	M.dashboards = M.dashboards + 1
 
 	return m.vflex({
 		align = "center",
-		margin_top = 2,
-		m.block({ width = LAUNCHER, Nav({ width = LAUNCHER }) }),
-		m.block({ margin_top = 2, Summary() }),
+		margin_top = 1,
+		function()
+			if M.home_page() ~= "menu" then
+				return m.block({ margin_top = 1, width = LAUNCHER, Nav({ width = LAUNCHER }) })
+			end
+			local width, columns = M.dashboard_width()
+			return m.block({ width = width, Nav({ width = width, columns = columns }) })
+		end,
 	})
 end)
 
@@ -137,8 +119,8 @@ local Gate = m.component(function()
 
 	return m.vflex({
 		align = "center",
-		margin_top = 4,
-		Brand(),
+		margin_top = 2,
+		Band({ width = LAUNCHER }),
 		m.block({ margin_top = 2, width = LAUNCHER, Nav({ width = LAUNCHER }) }),
 	})
 end)
@@ -169,10 +151,14 @@ local App = m.component(function()
 	end)
 
 	return m.block({
-		margin_top = math.max(math.floor((vim.o.lines - 26) / 2), 1),
+		margin_top = math.max(math.floor((vim.o.lines - 28) / 2), 1),
 		m.show(gated, Gate, function()
-			return m.block({
-				Brand(),
+			return m.vflex({
+				align = "center",
+				function()
+					local width, columns = M.dashboard_width()
+					return Band({ width = width, compact = not columns })
+				end,
 				m.slide(function()
 					return SLIDES[M.page()] or "home"
 				end, function(key)
