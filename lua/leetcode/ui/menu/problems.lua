@@ -1,18 +1,16 @@
 --- The page with ways into problems, and the ones the user was just working on.
 
+local i18n = require("leetcode.i18n")
 local m = require("markup")
 local kit = require("leetcode.ui.kit")
 local config = require("leetcode.config")
 local recent = require("leetcode.ui.menu.recent")
-local t = require("leetcode.translator")
 local ui = require("leetcode.ui.util")
 local Button = require("leetcode.ui.menu.button")
 local Buttons = require("leetcode.ui.menu.buttons")
 local PageBar = require("leetcode.ui.menu.page_bar")
 
 local RECENT = 5
-
-local status_labels = { ac = "Solved", notac = "Attempted", todo = "Not solved" }
 
 --- The language a solution is in, from the extension of its file.
 ---@param ext string
@@ -36,9 +34,9 @@ local function Recent(item, index, width)
 
 	local separator = { " · ", "leetcode_muted" }
 	local desc = {
-		{ t(status_labels[problem.status] or status_labels.todo), status_hl },
+		{ i18n.status(problem.status), status_hl },
 		separator,
-		{ t(problem.difficulty), ui.diff_to_hl(problem.difficulty) },
+		{ i18n.difficulty(problem.difficulty), ui.diff_to_hl(problem.difficulty) },
 		separator,
 		{ recent.ago(item.time), "leetcode_muted" },
 	}
@@ -55,8 +53,9 @@ local function Recent(item, index, width)
 		title = kit.truncate(title, width - vim.api.nvim_strwidth(number) - 1),
 		desc = desc,
 		lhs = tostring(index),
-		on_submit = function()
-			require("leetcode.cmd").open(problem)
+		async = true,
+		on_submit = function(task)
+			require("leetcode.cmd").open(problem, task)
 		end,
 	})
 end
@@ -67,8 +66,8 @@ local function Actions()
 	return Buttons({
 		Button({
 			icon = "\u{f03a}",
-			title = "Browse",
-			desc = "Search and filter every problem",
+			title = i18n.browse,
+			desc = i18n.browse_desc,
 			lhs = "p",
 			on_submit = function()
 				require("leetcode.ui.browser").open(require("leetcode.cache.problems").get())
@@ -76,15 +75,18 @@ local function Actions()
 		}),
 		Button({
 			icon = "\u{f074}",
-			title = "Random",
-			desc = "Pick one for me",
+			title = i18n.random,
+			desc = i18n.random_desc,
 			lhs = "s",
-			on_submit = cmd.random_question,
+			async = true,
+			on_submit = function(task)
+				cmd.random_question(nil, task)
+			end,
 		}),
 		Button({
 			icon = "\u{f0450}",
-			title = "Refresh",
-			desc = "Fetch the list again",
+			title = i18n.refresh,
+			desc = i18n.refresh_desc,
 			lhs = "r",
 			on_submit = function()
 				require("leetcode.cmd").cache_update()
@@ -92,9 +94,10 @@ local function Actions()
 		}),
 		Button({
 			icon = kit.icons.calendar,
-			title = "Daily challenge",
-			desc = "Today's problem",
+			title = i18n.daily_challenge,
+			desc = i18n.todays_problem,
 			lhs = "i",
+			async = true,
 			on_submit = cmd.qot,
 		}),
 	})
@@ -113,10 +116,10 @@ local function RecentCard(width)
 	return kit.Card({
 		width = width,
 		padding = { 0, 1 },
-		m.block({ margin_bottom = 1, padding = { 0, 1 }, m.inline(t("Recent"), "leetcode_muted") }),
+		m.block({ margin_bottom = 1, padding = { 0, 1 }, m.inline(i18n.recent, "leetcode_muted") }),
 		#rows > 0 and Buttons({ children = rows }) or m.block({
 			padding = { 0, 1 },
-			m.inline("Problems you work on will show up here", "leetcode_muted"),
+			m.inline(i18n.recent_empty, "leetcode_muted"),
 		}),
 	})
 end
@@ -133,7 +136,7 @@ return m.component(function(props)
 	local actions = kit.Card({
 		width = props.columns and 30 or width,
 		padding = { 0, 1 },
-		m.block({ margin_bottom = 1, padding = { 0, 1 }, m.inline(t("Open"), "leetcode_muted") }),
+		m.block({ margin_bottom = 1, padding = { 0, 1 }, m.inline(i18n.open, "leetcode_muted") }),
 		Actions(),
 	})
 	local recents = RecentCard(props.columns and 46 or width)
@@ -142,11 +145,11 @@ return m.component(function(props)
 		align = "center",
 		margin_top = 1,
 		PageBar({
-			title = "Problems",
+			title = i18n.problems,
 			width = width,
 			actions = {
 				{
-					title = "Back",
+					title = i18n.back,
 					lhs = "q",
 					press = function()
 						Leet.menu.set_page("menu")

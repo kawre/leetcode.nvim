@@ -1,4 +1,5 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
 local kit = require("leetcode.ui.kit")
 
 local BAR_WIDTH = 30
@@ -32,7 +33,7 @@ local Metric = m.component(function(props)
 		}),
 		percentile and m.inline({
 			margin_left = 2,
-			m.inline({ "beats ", style = "leetcode_muted", snap = false }),
+			m.inline({ i18n.beats .. " ", style = "leetcode_muted", snap = false }),
 			m.inline(function()
 				return ("%.1f%%"):format(beats())
 			end, "leetcode_ok"),
@@ -51,14 +52,14 @@ local Accepted = m.component(function(props)
 		padding = { 0, 3 },
 		Metric({
 			icon = kit.icons.clock,
-			label = "Runtime",
+			label = i18n.runtime,
 			value = runtime_ms .. " ms",
 			percentile = item.runtime_percentile,
 			delay = 200,
 		}),
 		Metric({
 			icon = kit.icons.memory,
-			label = "Memory",
+			label = i18n.memory,
 			value = memory,
 			percentile = item.memory_percentile,
 			delay = 350,

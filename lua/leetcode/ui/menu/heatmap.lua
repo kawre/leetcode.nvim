@@ -1,11 +1,10 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
 local kit = require("leetcode.ui.kit")
 local data = require("leetcode.ui.menu.data")
 
 local WEEKS = 53
 local DAY = 24 * 60 * 60
-local MONTHS =
-	{ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" }
 
 ---@class leet.ui.heatmap.summary
 ---@field total integer submissions in the shown days
@@ -48,7 +47,7 @@ local function summarize(calendar, now)
 				local month = tonumber(os.date("!%m", time))
 				if day == 1 and month ~= last_month then
 					last_month = month
-					labels[week] = MONTHS[month]
+					labels[week] = i18n.month(month)
 				end
 			else
 				summary.weeks[week][day] = -1
@@ -59,9 +58,11 @@ local function summarize(calendar, now)
 	local text, week = {}, 1
 	while week <= WEEKS do
 		local label = labels[week]
-		if label and week + #label <= WEEKS then
+		-- In cells, which a month in Chinese takes more of than its bytes say.
+		local cells = label and vim.api.nvim_strwidth(label)
+		if label and week + cells <= WEEKS then
 			text[#text + 1] = label
-			week = week + #label
+			week = week + cells
 		else
 			text[#text + 1] = " "
 			week = week + 1
@@ -153,9 +154,9 @@ local Content = m.component(function(props)
 		m.block({
 			width = 18,
 			margin_top = 1,
-			Stat(summary.total, "submissions"),
-			Stat(summary.active, "active days"),
-			Stat(summary.best, "best streak"),
+			Stat(summary.total, i18n.submissions),
+			Stat(summary.active, i18n.active_days),
+			Stat(summary.best, i18n.best_streak),
 		}),
 	})
 end)

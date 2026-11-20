@@ -73,6 +73,32 @@ function M:add()
 	self.selected(#cases)
 end
 
+--- Makes `input` a case, as LeetCode gives the one a submission failed on:
+--- the value of each parameter on a line of its own. A case that is the same
+--- already is selected rather than added twice.
+---@param input string
+---@return integer index of the case
+function M:use(input)
+	local values = vim.split(input, "\n", { trimempty = true })
+	local case = {}
+	for i = 1, self.testcase_len do
+		case[i] = values[i] or ""
+	end
+
+	local cases = vim.deepcopy(reactive.untrack(self.cases))
+	for index, existing in ipairs(cases) do
+		if vim.deep_equal(existing, case) then
+			self.selected(index)
+			return index
+		end
+	end
+
+	cases[#cases + 1] = case
+	self.cases(cases)
+	self.selected(#cases)
+	return #cases
+end
+
 --- Removes a case, keeping at least one.
 ---@param index? integer the one shown by default
 function M:remove(index)

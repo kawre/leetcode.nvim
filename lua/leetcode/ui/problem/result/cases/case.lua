@@ -1,4 +1,5 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
 local diff = require("leetcode.ui.problem.result.diff")
 local Field = require("leetcode.ui.problem.result.field")
 local Stdout = require("leetcode.ui.problem.result.stdout")
@@ -10,7 +11,8 @@ local function spans(runs, group)
 	end, runs)
 end
 
----@param props { input: string[], output: string, expected: string, stdout?: string, params?: table[] }
+---@param props { input: string[], output: string, expected: string, stdout?: string, params?: table[], after?: any }
+--- `after` follows what came out and what was expected, before stdout.
 local Case = m.component(function(props)
 	local output = props.output or ""
 	local expected = props.expected or ""
@@ -19,8 +21,9 @@ local Case = m.component(function(props)
 	return m.block({
 		spacing = 1,
 		Input({ input = props.input, params = props.params }),
-		Field({ label = "Output", children = m.block(spans(got, "leetcode_diff_delete")) }),
-		Field({ label = "Expected", children = m.block(spans(wanted, "leetcode_diff_add")) }),
+		Field({ label = i18n.output, children = m.block(spans(got, "leetcode_diff_delete")) }),
+		Field({ label = i18n.expected, children = m.block(spans(wanted, "leetcode_diff_add")) }),
+		props.after,
 		Stdout({ stdout = props.stdout }),
 	})
 end)

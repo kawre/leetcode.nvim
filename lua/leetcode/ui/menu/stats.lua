@@ -1,21 +1,21 @@
 --- The page beside the dashboard, which slides in from the right.
 
+local i18n = require("leetcode.i18n")
 local m = require("markup")
 local kit = require("leetcode.ui.kit")
 local data = require("leetcode.ui.menu.data")
 local PageBar = require("leetcode.ui.menu.page_bar")
 local solved = require("leetcode.ui.menu.solved")
 local Heatmap = require("leetcode.ui.menu.heatmap")
-local t = require("leetcode.translator")
 
 --- Tags shown per level, the rest is only counted.
 local TOP_SKILLS = 6
 local TOP_LANGUAGES = 5
 
 local levels = {
-	{ key = "fundamental", title = "Fundamental", hl = "leetcode_easy" },
-	{ key = "intermediate", title = "Intermediate", hl = "leetcode_medium" },
-	{ key = "advanced", title = "Advanced", hl = "leetcode_hard" },
+	{ key = "fundamental", hl = "leetcode_easy" },
+	{ key = "intermediate", hl = "leetcode_medium" },
+	{ key = "advanced", hl = "leetcode_hard" },
 }
 
 local function by_solved(items)
@@ -55,19 +55,19 @@ local function Bar(width)
 	local function progress()
 		local current = state()
 		if current == "busy" then
-			return m.inline({ m.loader(), m.inline(" Updating") })
+			return m.inline({ m.loader(), m.inline(" " .. i18n.updating) })
 		elseif current == "done" then
 			-- In the colors of the button, which may be lit by the cursor.
-			return m.inline(kit.icons.check .. " Updated")
+			return m.inline(kit.icons.check .. " " .. i18n.updated)
 		end
 	end
 
 	return PageBar({
-		title = "Statistics",
+		title = i18n.statistics,
 		width = width,
 		actions = {
-			{ title = "Update", lhs = "u", press = update, content = progress },
-			{ title = "Back", lhs = "q", press = back },
+			{ title = i18n.update, lhs = "u", press = update, content = progress },
+			{ title = i18n.back, lhs = "q", press = back },
 		},
 	})
 end
@@ -88,7 +88,7 @@ end
 local function Level(level, width)
 	return m.block({
 		width = width,
-		m.block({ margin_bottom = 1, m.inline(t(level.title), level.hl) }),
+		m.block({ margin_bottom = 1, m.inline(i18n.skill(level.key), level.hl) }),
 		function()
 			local skills = data.skills()
 			if not skills then
@@ -97,7 +97,7 @@ local function Level(level, width)
 
 			local sorted = by_solved(skills[level.key] or {})
 			if #sorted == 0 then
-				return m.block("Nothing yet", "leetcode_muted")
+				return m.block(i18n.nothing_yet, "leetcode_muted")
 			end
 
 			local rows = vim.tbl_map(Skill, vim.list_slice(sorted, 1, TOP_SKILLS))
@@ -154,14 +154,14 @@ end
 local function Languages(width)
 	return kit.HoverCard({
 		width = width,
-		m.block({ margin_bottom = 1, m.inline(t("Languages"), "leetcode_muted") }),
+		m.block({ margin_bottom = 1, m.inline(i18n.languages, "leetcode_muted") }),
 		function()
 			local languages = data.languages()
 			if not languages then
 				return m.block(kit.Loading())
 			end
 			if #languages == 0 then
-				return m.block("Nothing yet", "leetcode_muted")
+				return m.block(i18n.nothing_yet, "leetcode_muted")
 			end
 
 			local sorted = by_solved(languages)

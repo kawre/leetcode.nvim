@@ -1,6 +1,7 @@
 --- Browses every problem from the menu, in a column beside it. Filters stay
 --- pinned in their own window, so they remain real buttons while the list scrolls.
 
+local i18n = require("leetcode.i18n")
 local m = require("markup")
 local reactive = require("markup.reactive")
 local kit = require("leetcode.ui.kit")
@@ -20,17 +21,66 @@ local WIDTH = 0.5
 local M = {}
 
 local difficulties = {
-	{ value = "all", title = "All" },
-	{ value = "easy", title = "Easy", lhs = "e", kind = "easy" },
-	{ value = "medium", title = "Medium", lhs = "m", kind = "medium" },
-	{ value = "hard", title = "Hard", lhs = "H", kind = "hard" },
+	{
+		value = "all",
+		title = function()
+			return i18n.difficulty("All")
+		end,
+	},
+	{
+		value = "easy",
+		title = function()
+			return i18n.difficulty("Easy")
+		end,
+		lhs = "e",
+		kind = "easy",
+	},
+	{
+		value = "medium",
+		title = function()
+			return i18n.difficulty("Medium")
+		end,
+		lhs = "m",
+		kind = "medium",
+	},
+	{
+		value = "hard",
+		title = function()
+			return i18n.difficulty("Hard")
+		end,
+		lhs = "H",
+		kind = "hard",
+	},
 }
 
 local statuses = {
-	{ value = "all", title = "Any" },
-	{ value = "ac", title = "Solved", lhs = "s" },
-	{ value = "notac", title = "Attempted", lhs = "x" },
-	{ value = "todo", title = "Todo", lhs = "o" },
+	{
+		value = "all",
+		title = function()
+			return i18n.any
+		end,
+	},
+	{
+		value = "ac",
+		title = function()
+			return i18n.status("ac")
+		end,
+		lhs = "s",
+	},
+	{
+		value = "notac",
+		title = function()
+			return i18n.status("notac")
+		end,
+		lhs = "x",
+	},
+	{
+		value = "todo",
+		title = function()
+			return i18n.todo
+		end,
+		lhs = "o",
+	},
 }
 
 --- A filter that can be pressed, showing its key.
@@ -48,7 +98,7 @@ local Choice = m.component(function(props)
 			end
 			return hovered() and "leetcode_row_active" or "leetcode_tab"
 		end,
-		m.inline((" %s "):format(props.title)),
+		m.inline((" %s "):format(type(props.title) == "function" and props.title() or props.title)),
 		props.lhs and m.inline({
 			style = function()
 				return props.active() and "leetcode_tab_active" or "leetcode_key"
@@ -81,7 +131,7 @@ end
 ---@return integer
 local function count_width(state)
 	local total = #state.problems
-	return #("%d of %d"):format(total, total)
+	return vim.api.nvim_strwidth(tostring(total) .. i18n.of_total(total))
 end
 
 --- An input across the top, which the search float covers while typing. It is
@@ -133,7 +183,7 @@ local SearchField = m.component(function(props)
 					end,
 					function()
 						local query = state.query()
-						return query == "" and "Search problems" or query
+						return query == "" and i18n.search_problems or query
 					end,
 				}),
 			}),
@@ -146,12 +196,12 @@ local SearchField = m.component(function(props)
 					if everything and state.query() == "" and not state.typing() then
 						return m.inline({
 							m.inline("i ", "leetcode_key"),
-							m.inline("to search", "leetcode_muted"),
+							m.inline(i18n.to_search, "leetcode_muted"),
 						})
 					end
 					return m.inline({
 						m.inline(tostring(#state.filtered()), "leetcode_strong"),
-						m.inline(" of " .. #state.problems, "leetcode_muted"),
+						m.inline(i18n.of_total(#state.problems), "leetcode_muted"),
 					})
 				end),
 			}),
@@ -170,7 +220,7 @@ local Filters = m.component(function(props)
 			spacing = 1,
 			choices(statuses, state.status, state.status),
 			Choice({
-				title = "Free",
+				title = i18n.free,
 				lhs = "f",
 				active = state.free,
 				press = state.toggle_free,
@@ -186,11 +236,15 @@ local Row = m.component(function(props)
 
 	local status = config.icons.hl.status[problem.status]
 	local locked = problem.paid_only and not config.auth.is_premium
+	-- While the question is fetched. A row filtered away meanwhile opens nothing.
+	local busy, start = kit.use_task()
 
 	return m.flex({
 		click = "double",
 		on_press = function()
-			state.open(problem)
+			start(function(task)
+				state.open(problem, task)
+			end)
 		end,
 		on_hover = function(value)
 			hovered(value)
@@ -208,10 +262,15 @@ local Row = m.component(function(props)
 			m.inline(function()
 				return hovered() and "▌" or " "
 			end, "leetcode_accent"),
-			m.inline(
-				locked and config.icons.lock or (status and status[1] or " "),
-				locked and "leetcode_medium" or status and status[2]
-			),
+			m.inline(function()
+				if busy() then
+					return m.loader({ style = "leetcode_accent" })
+				end
+				return m.inline(
+					locked and config.icons.lock or (status and status[1] or " "),
+					locked and "leetcode_medium" or status and status[2]
+				)
+			end),
 			m.inline((" %5s  "):format(problem.frontend_id), "leetcode_muted"),
 			m.inline(function()
 				local title = Leet.util.translate(problem.title, problem.title_cn)
@@ -224,7 +283,11 @@ local Row = m.component(function(props)
 			shrink = 0,
 			margin_right = 1,
 			m.inline(("  %5.1f%%  "):format(problem.ac_rate or 0), "leetcode_muted"),
-			m.inline(("%-6s"):format(problem.difficulty), ui.diff_to_hl(problem.difficulty)),
+			-- Six cells, which a difficulty in Chinese takes fewer bytes than.
+			m.inline({
+				width = 6,
+				m.inline(i18n.difficulty(problem.difficulty), ui.diff_to_hl(problem.difficulty)),
+			}),
 		}),
 	})
 end)
@@ -243,10 +306,7 @@ local List = m.component(function(props)
 		m.show(function()
 			return #state.filtered() == 0
 		end, function()
-			return m.block({
-				padding = { 2, 3 },
-				m.inline("No problems match these filters", "leetcode_muted"),
-			})
+			return m.block({ padding = { 2, 3 }, m.inline(i18n.no_matches, "leetcode_muted") })
 		end),
 	})
 end)
@@ -419,8 +479,29 @@ function M.open(problems)
 		search(state)
 	end
 
-	state.open = function(problem)
-		require("leetcode.cmd").open(problem)
+	---@param task? leet.ui.task from the row pressed
+	state.open = function(problem, task)
+		if not task then
+			-- Nothing on screen started it, so the corner shows it, and closing
+			-- the browser meanwhile means it is not wanted.
+			local close = require("leetcode.ui.toast")(
+				require("leetcode.i18n").opening(
+					Leet.util.translate(problem.title, problem.title_cn)
+				)
+			)
+			local browser = M.list
+			task = {
+				cancelled = function()
+					local gone = M.list ~= browser or not M.is_open()
+					if gone then
+						close()
+					end
+					return gone
+				end,
+				done = close,
+			}
+		end
+		require("leetcode.cmd").open(problem, task)
 	end
 
 	local options = { show = false, minimal = true, wo = { winhighlight = "Normal:Normal" } }

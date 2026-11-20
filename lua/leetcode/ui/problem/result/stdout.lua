@@ -1,4 +1,5 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
 local ui = require("leetcode.ui.util")
 
 local ICONS = {
@@ -15,9 +16,9 @@ local function fullscreen(lines)
 		width = 0.8,
 		height = 0.8,
 		border = "rounded",
-		title = (" %s Stdout "):format(ICONS.stdout),
+		title = (" %s %s "):format(ICONS.stdout, i18n.stdout),
 		title_pos = "center",
-		footer = " q close ",
+		footer = (" q %s "):format(i18n.close),
 		footer_pos = "center",
 		backdrop = 60,
 		enter = true,
@@ -51,10 +52,6 @@ local function FullscreenButton(lines, label)
 		end,
 		ICONS.fullscreen .. " " .. label,
 	})
-end
-
-local function plural(count, word)
-	return ("%d %s%s"):format(count, word, count == 1 and "" or "s")
 end
 
 ---@param props { stdout: string }
@@ -92,14 +89,14 @@ local Stdout = m.component(function(props)
 						return ui.chevron(expanded())
 					end, "leetcode_muted"),
 					m.inline(ICONS.stdout .. " ", "leetcode_accent"),
-					m.inline("Stdout", "leetcode_strong"),
+					m.inline(i18n.stdout, "leetcode_strong"),
 				}),
 				-- Beside the button rather than in it, as the cursor goes
 				-- anywhere inside a button, and the count is only to read.
-				m.inline({ "  " .. plural(#lines, "line"), style = "leetcode_muted", snap = false }),
+				m.inline({ "  " .. i18n.lines(#lines), style = "leetcode_muted", snap = false }),
 			}),
 			m.inline({
-				FullscreenButton(lines, "Fullscreen"),
+				FullscreenButton(lines, i18n.fullscreen),
 				m.inline({ "  f", style = "leetcode_key", snap = false }),
 			}),
 		}),
@@ -112,11 +109,11 @@ local Stdout = m.component(function(props)
 				hidden > 0 and m.block({
 					margin_top = 1,
 					m.inline({
-						"… " .. plural(hidden, "more line") .. "  ",
+						i18n.more_lines(hidden) .. "  ",
 						style = "leetcode_muted",
 						snap = false,
 					}),
-					FullscreenButton(lines, "Show all"),
+					FullscreenButton(lines, i18n.show_all),
 				}),
 			})
 		end),

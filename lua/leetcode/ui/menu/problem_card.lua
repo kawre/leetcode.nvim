@@ -1,14 +1,12 @@
 --- A problem worth going to straight from the menu, on a card of its own.
 
+local i18n = require("leetcode.i18n")
 local m = require("markup")
 local kit = require("leetcode.ui.kit")
 local config = require("leetcode.config")
-local t = require("leetcode.translator")
 local ui = require("leetcode.ui.util")
 
 local animate = Markup.animate
-
-local status_labels = { ac = "Solved", notac = "Attempted", todo = "Not solved" }
 
 ---@class leet.ui.menu.problem_card
 ---@field label string what the problem is to the user
@@ -19,11 +17,15 @@ local status_labels = { ac = "Solved", notac = "Attempted", todo = "Not solved" 
 ---@field width integer
 ---@field problem? leet.cache.problem nil while it is on its way
 ---@field extra? string after the status and difficulty
----@field on_press function
+---@field on_press fun(task: leet.ui.task) given a task, see `kit.use_task`, with a loader for the icon until it is done
 
 ---@param props leet.ui.menu.problem_card
 return m.component(function(props)
-	m.use_key(props.lhs, props.on_press, { nowait = true })
+	local busy, start = kit.use_task()
+	local function press()
+		start(props.on_press)
+	end
+	m.use_key(props.lhs, press, { nowait = true })
 
 	local rest = props.accent and "leetcode_daily" or "leetcode_surface"
 	local active = props.accent and "leetcode_daily_active" or "leetcode_row_active"
@@ -56,12 +58,9 @@ return m.component(function(props)
 			}),
 			m.block({
 				white_space = "nowrap",
-				m.inline(
-					t(status_labels[problem.status] or status_labels.todo),
-					status and status[2] or "leetcode_muted"
-				),
+				m.inline(i18n.status(problem.status), status and status[2] or "leetcode_muted"),
 				separator,
-				m.inline(t(problem.difficulty), ui.diff_to_hl(problem.difficulty)),
+				m.inline(i18n.difficulty(problem.difficulty), ui.diff_to_hl(problem.difficulty)),
 				props.extra and separator,
 				props.extra and m.inline(props.extra, "leetcode_muted"),
 			}),
@@ -71,7 +70,7 @@ return m.component(function(props)
 	return kit.Card({
 		width = props.width,
 		click = "double",
-		on_press = props.on_press,
+		on_press = press,
 		on_hover = function(hovered)
 			focus(hovered and 1 or 0)
 		end,
@@ -83,7 +82,9 @@ return m.component(function(props)
 				style = function()
 					return (props.accent or focus() > 0.5) and "leetcode_accent" or "leetcode_muted"
 				end,
-				m.inline(props.icon .. " "),
+				m.inline(function()
+					return busy() and m.inline({ m.loader(), " " }) or props.icon .. " "
+				end),
 				m.inline(props.label, props.accent and "leetcode_accent" or nil),
 			}),
 			m.inline({

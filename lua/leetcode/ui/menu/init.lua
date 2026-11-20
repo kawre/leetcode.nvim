@@ -1,4 +1,5 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
 local cookie = require("leetcode.cache.cookie")
 local kit = require("leetcode.ui.kit")
 local Nav = require("leetcode.ui.menu.nav")
@@ -100,7 +101,7 @@ local Brand = m.component(function()
 			end
 
 			return m.inline({
-				m.inline(("Good %s, %s"):format(greeting(), auth.name), "leetcode_muted"),
+				m.inline(i18n.greeting(greeting(), auth.name), "leetcode_muted"),
 				data.streak().streakCount and m.inline({
 					m.inline(" · ", "leetcode_muted"),
 					m.inline({

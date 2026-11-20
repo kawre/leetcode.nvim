@@ -1,6 +1,15 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
 
-local LABEL_WIDTH = 10
+--- Room for the longest label and two cells after it, so values line up
+--- across the fields of a result, in any language.
+local function label_width()
+	local widest = 0
+	for _, label in ipairs({ i18n.input, i18n.output, i18n.expected, i18n.last_input }) do
+		widest = math.max(widest, vim.api.nvim_strwidth(label))
+	end
+	return widest + 2
+end
 
 --- A labelled value, which wraps beside its label. The cursor goes past the
 --- label, to the value.
@@ -8,7 +17,7 @@ local LABEL_WIDTH = 10
 return m.component(function(props)
 	return m.flex({
 		m.block({
-			width = LABEL_WIDTH,
+			width = label_width(),
 			shrink = 0,
 			snap = false,
 			m.inline(props.label, "leetcode_muted"),

@@ -16,6 +16,11 @@ local M = {}
 
 M.LINK_ICON = "\u{f0c1}"
 
+--- The url each link opens, by the function its press calls, so `gx` can
+--- find the link under the cursor.
+---@type table<function, string>
+M.urls = setmetatable({}, { __mode = "k" })
+
 --- Tags that start a collapsible section.
 local section_tags = { example = true, constraints = true, followup = true }
 
@@ -268,13 +273,20 @@ local function render_link(b, node, attrs, ctx)
 		text = href:gsub("^https?://", ""):gsub("/$", "")
 	end
 
+	local function open()
+		vim.ui.open(href)
+	end
+	M.urls[open] = href
+
+	-- One click, as a link takes anywhere else.
 	b:inline(m.inline({
-		click = "double",
-		on_press = function()
-			vim.ui.open(href)
-		end,
-		m.inline(text, "leetcode_ref"),
-		m.inline(" " .. M.LINK_ICON, "leetcode_link"),
+		click = "single",
+		on_press = open,
+		-- Underlined as a link is, and the icon beside it is not, nor the gap
+		-- between them.
+		m.inline(text, "leetcode_link"),
+		" ",
+		m.inline(M.LINK_ICON, "leetcode_link_icon"),
 	}))
 end
 
@@ -337,10 +349,27 @@ local function render_list(b, node, tag, ctx)
 	b:element(m.block(items))
 end
 
+--- Preformatted text. In an example it is the example itself, which its card
+--- already sets apart, so it is plain. Anywhere else it is code, such as how
+--- the judge calls a solution, and goes on a card of its own.
 local function render_pre(b, node, ctx)
 	local content = builder()
 	walk(node, ctx, content)
-	b:element(m.block(content:finish()))
+
+	local text = vim.trim(text_of(node, ctx))
+	local example = ctx.section == "example" or text:find("^Input:") or text:find("^输入：")
+	if example then
+		return b:element(m.block(content:finish()))
+	end
+
+	b:gap()
+	b:element(m.block({
+		padding = { 0, 2 },
+		style = "leetcode_section",
+		border = "half",
+		content:finish(),
+	}))
+	b:gap()
 end
 
 local function table_rows(node, ctx)
@@ -452,6 +481,8 @@ local function render_element(b, node, ctx)
 	ctx.tags[#ctx.tags + 1] = tag
 
 	if section_tags[tag] then
+		-- What follows belongs to it, until the next one.
+		ctx.section = tag
 		b:section(vim.trim(text_of(node, ctx)), highlight(ctx))
 	elseif tag == "ul" or tag == "ol" then
 		render_list(b, node, tag, ctx)

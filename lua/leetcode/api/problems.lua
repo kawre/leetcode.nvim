@@ -128,16 +128,11 @@ function M.translated_titles(cb)
 	end
 end
 
+--- What a random draw came to, or why it did not.
+---@param res table?
+---@param err lc.err?
 ---@param filters? table
-function M.random(filters)
-	local variables = {
-		categorySlug = "algorithms",
-		filters = filters or vim.empty_dict(),
-	}
-
-	local query = queries.random_question
-
-	local res, err = Leet.api.query(query, variables)
+local function drawn(res, err, filters)
 	if err then
 		return nil, err
 	end
@@ -162,13 +157,36 @@ function M.random(filters)
 	end
 
 	if not config.auth.is_premium and q.paid_only then
-		err = err or {}
-		err.msg = "Drawn question is for premium users only. Please try again"
-		err.lvl = vim.log.levels.WARN
-		return nil, err
+		return nil,
+			{
+				msg = "Drawn question is for premium users only. Please try again",
+				lvl = vim.log.levels.WARN,
+			}
 	end
 
 	return q
+end
+
+--- Draws a random question, waiting for it without `cb`.
+---@param filters? table
+---@param cb? fun(question?: table, err?: lc.err)
+function M.random(filters, cb)
+	local variables = {
+		categorySlug = "algorithms",
+		filters = filters or vim.empty_dict(),
+	}
+
+	if cb then
+		Leet.api.query(queries.random_question, variables, {
+			callback = function(res, err)
+				cb(drawn(res, err, filters))
+			end,
+		})
+		return
+	end
+
+	local res, err = Leet.api.query(queries.random_question, variables)
+	return drawn(res, err, filters)
 end
 
 ---@param qid integer
@@ -179,19 +197,13 @@ function M.latest_submission(qid, lang, cb)
 	Leet.api.get(url, { callback = cb })
 end
 
----@param title_slug string
----
----@return lc.question_res|nil
-function M.by_slug(title_slug)
-	local variables = {
-		titleSlug = title_slug,
-	}
-
-	local query = queries.question
-
-	local res, err = Leet.api.query(query, variables)
+--- A question as it came, made ready to use.
+---@param res table?
+---@param err lc.err?
+---@return lc.question_res?, lc.err?
+local function question(res, err)
 	if not res or err then
-		return log.err(err)
+		return nil, err or { msg = "Could not fetch the question" }
 	end
 
 	local q = res.data.question
@@ -203,6 +215,29 @@ function M.by_slug(title_slug)
 		q.similar = Leet.api.normalize_similar_cn(q.similar)
 	end
 
+	return q
+end
+
+--- Fetches a question, waiting for it without `cb`.
+---@param title_slug string
+---@param cb? fun(question?: lc.question_res, err?: lc.err)
+---@return lc.question_res|nil
+function M.by_slug(title_slug, cb)
+	local variables = { titleSlug = title_slug }
+
+	if cb then
+		Leet.api.query(queries.question, variables, {
+			callback = function(res, err)
+				cb(question(res, err))
+			end,
+		})
+		return
+	end
+
+	local q, err = question(Leet.api.query(queries.question, variables))
+	if not q then
+		return log.err(err)
+	end
 	return q
 end
 

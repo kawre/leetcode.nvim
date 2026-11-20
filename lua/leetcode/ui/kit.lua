@@ -1,5 +1,6 @@
 --- The pieces every screen is built from, so they all speak the same language.
 
+local i18n = require("leetcode.i18n")
 local m = require("markup")
 
 local animate = Markup.animate
@@ -8,6 +9,7 @@ local animate = Markup.animate
 local M = {}
 
 M.icons = {
+	add = "\u{f0415}",
 	fire = "\u{f0238}",
 	check = "\u{f00c}",
 	cross = "\u{f00d}",
@@ -99,7 +101,7 @@ end
 function M.Loading(text)
 	return m.inline({
 		m.loader({ style = "leetcode_accent" }),
-		m.inline(" " .. (text or "Loading"), "leetcode_muted"),
+		m.inline(" " .. (text or i18n.loading), "leetcode_muted"),
 	})
 end
 
@@ -120,6 +122,63 @@ end
 ---@param lhs string
 function M.Key(lhs)
 	return m.inline(lhs, "leetcode_key")
+end
+
+---@class leet.ui.task
+---@field cancelled fun(): boolean whether what started it is gone, and the answer is not wanted
+---@field done fun() ends it
+
+--- Work that answers later, such as a fetch, tied to the component starting
+--- it. Returns whether it is under way, and `start(run)`, which calls
+--- `run(task)` unless it already is. Once the component is gone the task is
+--- cancelled, and nothing should be done with what comes back.
+---@return fun(): boolean busy
+---@return fun(run: fun(task: leet.ui.task)) start
+function M.use_task()
+	local busy = m.signal(false)
+	local alive = true
+	m.on_cleanup(function()
+		alive = false
+	end)
+
+	local task = {
+		cancelled = function()
+			return not alive
+		end,
+		done = function()
+			if alive then
+				busy(false)
+			end
+		end,
+	}
+
+	return busy,
+		function(run)
+			if m.untrack(busy) then
+				return
+			end
+			busy(true)
+			run(task)
+		end
+end
+
+--- Muted text with elements in it, such as keys, which fill its `%s` in order.
+--- A translation is free to put them where it reads well.
+---@param text string
+---@param ... any
+function M.Sentence(text, ...)
+	local parts = { ... }
+	local pieces = vim.split(text, "%s", { plain = true })
+	local children = {}
+	for i, piece in ipairs(pieces) do
+		if piece ~= "" then
+			children[#children + 1] = m.inline(piece, "leetcode_muted")
+		end
+		if i < #pieces then
+			children[#children + 1] = parts[i]
+		end
+	end
+	return m.inline(children)
 end
 
 --- A number that counts up to `value`.
@@ -182,7 +241,7 @@ function M.BigNumber(props)
 end
 
 --- A bar that fills up when it appears.
----@param props { value: fun(): number, width: integer, style: string, delay?: number, instant?: boolean }
+---@param props { value: fun(): number, width: integer, style: string, track?: string, delay?: number, instant?: boolean }
 function M.Bar(props)
 	local start = props.instant and (m.untrack(props.value) or 0) or 0
 	local filled = m.animated(start, { duration = 800, delay = props.delay, easing = "out_cubic" })
@@ -195,7 +254,7 @@ function M.Bar(props)
 		value = filled,
 		width = props.width,
 		style = props.style,
-		track = "leetcode_track",
+		track = props.track or "leetcode_track",
 	})
 end
 

@@ -1,4 +1,5 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
 local kit = require("leetcode.ui.kit")
 local Case = require("leetcode.ui.problem.result.cases.case")
 
@@ -42,7 +43,7 @@ local Cases = m.component(function(props)
 			style = function()
 				return ("leetcode_tab_%s%s"):format(kind, active() == i and "_active" or "")
 			end,
-			(" %s Case %d "):format(failed and kit.icons.cross or kit.icons.check, i),
+			(" %s %s "):format(failed and kit.icons.cross or kit.icons.check, i18n.case(i)),
 		})
 	end)
 
