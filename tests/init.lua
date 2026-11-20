@@ -13,6 +13,9 @@ vim.opt.rtp:prepend(root)
 vim.opt.rtp:prepend(markup)
 vim.opt.rtp:append(vim.fn.stdpath("data") .. "/site")
 vim.opt.rtp:append(root .. "/deps/mini.test")
+-- The HTML parser `make deps` builds, so descriptions read the same as for
+-- users with nvim-treesitter.
+vim.opt.rtp:prepend(root .. "/deps/parsers")
 
 -- Lua coverage with LuaCov when COVERAGE is set (`make coverage`). Every
 -- Neovim, the test runner and each child, writes stats of its own, which

@@ -22,8 +22,14 @@ LUAJIT_INCDIR ?= /usr/include/luajit-2.1
 MARKUP_PATH ?= $(if $(wildcard ../markup.nvim/lua/markup),$(abspath ../markup.nvim),)
 export MARKUP_PATH
 
-# What the tests need: mini.test and markup.nvim with its engine.
-deps: deps/mini.test $(if $(MARKUP_PATH),,$(MARKUP))
+# The HTML parser of tree-sitter, which problem descriptions are read with.
+# Neovim does not come with it; users get it from nvim-treesitter.
+HTML_PARSER_VERSION ?= v0.23.2
+HTML_PARSER = deps/parsers/parser/html.so
+
+# What the tests need: mini.test, markup.nvim with its engine, and the HTML
+# parser.
+deps: deps/mini.test $(if $(MARKUP_PATH),,$(MARKUP)) $(HTML_PARSER)
 
 # Run the tests, every file at once on every core, with a progress bar
 test: deps
@@ -57,6 +63,11 @@ $(MARKUP):
 	@mkdir -p deps
 	git -c advice.detachedHead=false clone --quiet --filter=blob:none --branch $(MARKUP_VERSION) https://github.com/kawre/markup.nvim $@
 	cd $@ && nvim -l build.lua
+
+$(HTML_PARSER):
+	@mkdir -p deps/parsers/parser
+	git -c advice.detachedHead=false clone --quiet --depth 1 --branch $(HTML_PARSER_VERSION) https://github.com/tree-sitter/tree-sitter-html deps/tree-sitter-html
+	cc -O2 -shared -fPIC -I deps/tree-sitter-html/src deps/tree-sitter-html/src/parser.c deps/tree-sitter-html/src/scanner.c -o $@
 
 # LuaCov and its hook in C, in a tree of the project's own
 $(ROCKS):
