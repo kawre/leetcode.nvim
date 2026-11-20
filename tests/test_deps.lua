@@ -72,4 +72,15 @@ T["tells once, and stops the command"] = function()
 	eq(child.lua_get("{ first, second, told }"), { false, false, 1 })
 end
 
+T["the tests run on a markup.nvim the plugin asks for"] = function()
+	-- The release the Makefile clones for the tests (CI) must be in the range
+	-- lazy.lua and deps.lua ask for, or the tests check another markup.nvim
+	-- than the one users get.
+	local makefile = table.concat(vim.fn.readfile("Makefile"), "\n")
+	local tested = makefile:match("\nMARKUP_VERSION %?= v?([%d%.]+)")
+	eq(type(tested), "string")
+	local range = child.lua_get("deps.markup")
+	eq(vim.version.range(range):has(tested), true)
+end
+
 return T
