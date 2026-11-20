@@ -114,6 +114,11 @@ function M.start(on_vimenter)
 		return false
 	end
 
+	-- Without markup.nvim nothing can be drawn: say what to do instead.
+	if not require("leetcode.deps").ensure() then
+		return false
+	end
+
 	config.setup()
 	M.setup_globals()
 
@@ -147,7 +152,12 @@ end
 function M.setup(cfg)
 	config.apply(cfg or {})
 
-	vim.api.nvim_create_user_command("Leet", require("leetcode.cmd").start_with_cmd, {
+	vim.api.nvim_create_user_command("Leet", function(opts)
+		-- Without markup.nvim nothing can be drawn: say what to do instead.
+		if require("leetcode.deps").ensure() then
+			require("leetcode.cmd").start_with_cmd(opts)
+		end
+	end, {
 		bar = true,
 		bang = true,
 		desc = "Open leetcode.nvim",
