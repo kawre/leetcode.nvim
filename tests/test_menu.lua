@@ -66,12 +66,21 @@ T["today has the date and how many pass"] = function()
 		local by_slug = problems.by_slug
 		problems.by_slug = function(slug)
 			local problem = by_slug(slug)
-			problem.status, problem.ac_rate = "ac", 41.25
+			problem.status, problem.ac_rate = "ac", 41.24
 			return problem
 		end
 	]])
 	open(true)
-	eq(contains(child.lua_get("os.date('%b %-d')")), true)
+	-- The daily challenge arrives a moment after the menu: wait for it from
+	-- here, so the child's loop turns between the questions.
+	local today = child.lua_get("os.date('%b %-d')")
+	eq(
+		vim.wait(2000, function()
+			child.lua("reactive.flush()")
+			return contains(today)
+		end, 10),
+		true
+	)
 	eq(contains("Solved · Medium · 41.2% accepted"), true)
 end
 
