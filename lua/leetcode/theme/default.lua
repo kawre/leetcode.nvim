@@ -115,6 +115,7 @@ M.get = function()
 		followup = { fg = hl("Number").fg, bold = true },
 
 		link = { fg = hl("Function").fg, underline = true },
+		link_icon = { fg = hl("Function").fg },
 		list = { fg = hl("SpecialChar").fg },
 		ref = { fg = hl("Tag").fg },
 		su = { fg = hl("Number").fg },
@@ -157,6 +158,10 @@ M.get = function()
 		verdict_warn = { fg = warn, bg = mix(bg, warn, 0.16), bold = true },
 		bar_ok = { fg = ok, bg = raised },
 		bar_error = { fg = err, bg = raised },
+		-- A bar on the band of the console's header, whose track has to stand
+		-- out from the band, empty as it is when nothing passed.
+		header_bar_track = { bg = mix(header, fg, 0.14) },
+		header_bar_error = { fg = err, bg = mix(header, fg, 0.14) },
 		bar_accent = { fg = accent, bg = raised },
 		diff_add = { fg = ok, bg = mix(bg, ok, 0.25), bold = true },
 		diff_delete = { fg = err, bg = mix(bg, err, 0.25), bold = true },

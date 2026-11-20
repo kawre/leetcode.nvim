@@ -1,9 +1,10 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
 local kit = require("leetcode.ui.kit")
 
 local animate = Markup.animate
 
-local STEPS = { "Queued", "Judging", "Result" }
+local STEPS = { "step_queued", "step_judging", "step_result" }
 local STEP_OF = { PENDING = 1, STARTED = 2 }
 local TRACK = 44
 local RUNNER = 10
@@ -51,7 +52,7 @@ return m.component(function(props)
 				style = function()
 					return index == step() and "leetcode_strong" or "leetcode_muted"
 				end,
-				" " .. STEPS[index],
+				" " .. i18n[STEPS[index]],
 			}),
 			index < #STEPS and m.inline({
 				style = function()
@@ -68,10 +69,7 @@ return m.component(function(props)
 		snap = false,
 		m.block({
 			margin_bottom = 1,
-			m.inline(
-				props.submit and "Submitting your solution" or "Running your testcases",
-				"leetcode_strong"
-			),
+			m.inline(props.submit and i18n.judging_submit or i18n.judging_run, "leetcode_strong"),
 		}),
 		m.block({ margin_bottom = 1, white_space = "nowrap", Step(1), Step(2), Step(3) }),
 		m.block({

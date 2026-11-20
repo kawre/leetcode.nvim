@@ -16,9 +16,9 @@ local App = m.component(function(props)
 	if sc == 10 then
 		body = Runtime({ item = item, console = console })
 	elseif sc == 11 then
-		body = SubmissionError({ item = item })
+		body = SubmissionError({ item = item, console = console })
 	elseif sc == 12 or sc == 13 or sc == 14 then
-		body = LimitExceed({ item = item })
+		body = LimitExceed({ item = item, console = console })
 	elseif sc == 15 then
 		body = RuntimeError({ item = item, console = console })
 	elseif sc == 16 then

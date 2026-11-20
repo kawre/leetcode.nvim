@@ -14,18 +14,30 @@ local hist = {}
 ---@class leet.cache.cookie
 local M = {}
 
+--- Saves a cookie and signs in with it, waiting for LeetCode without `cb`.
 ---@param str string
+---@param cb? fun(err?: string)
 ---@return string|nil
-function M.set(str)
+function M.set(str, cb)
 	local _, cerr = M.parse(str)
 	if cerr then
+		if cb then
+			return cb(cerr)
+		end
 		return cerr
 	end
 
 	util.write_file(file, str)
 	local auth_api = require("leetcode.api.auth")
-	local _, aerr = auth_api.user()
 
+	if cb then
+		auth_api.user(function(_, aerr)
+			cb(aerr and aerr.msg or nil)
+		end)
+		return
+	end
+
+	local _, aerr = auth_api.user()
 	if aerr then
 		return aerr.msg
 	end

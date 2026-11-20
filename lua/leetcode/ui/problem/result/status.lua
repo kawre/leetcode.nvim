@@ -1,4 +1,5 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
 local kit = require("leetcode.ui.kit")
 
 local M = {}
@@ -16,12 +17,14 @@ function M.detail(item)
 		return m.inline({
 			kit.Bar({
 				width = 10,
-				style = "leetcode_bar_error",
+				-- On the band of the header, which the usual track is lost on.
+				style = "leetcode_header_bar_error",
+				track = "leetcode_header_bar_track",
 				value = function()
 					return correct / total
 				end,
 			}),
-			m.inline((" %d/%d passed"):format(correct, total), "leetcode_muted"),
+			m.inline(" " .. i18n.passed(correct, total), "leetcode_muted"),
 		})
 	end
 
@@ -83,7 +86,10 @@ function M.Pending(submit)
 		white_space = "nowrap",
 		snap = false,
 		m.loader({ style = "leetcode_accent" }),
-		m.inline(submit and " Submitting…" or " Running…", "leetcode_muted"),
+		m.inline(
+			" " .. (submit and i18n.header_submitting or i18n.header_running),
+			"leetcode_muted"
+		),
 	})
 end
 

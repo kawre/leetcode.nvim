@@ -13,11 +13,16 @@ local animate = Markup.animate
 ---@field page string
 ---@field nested boolean
 ---@field on_submit function
+---@field async? boolean `on_submit` gets a task, see `kit.use_task`, and the icon is a loader until it is done
 
 ---@param p MenuButtonProps
 return m.component(function(p)
+	local busy, start = kit.use_task()
+
 	local function press()
-		if p.on_submit then
+		if p.on_submit and p.async then
+			start(p.on_submit)
+		elseif p.on_submit then
 			p.on_submit()
 		elseif p.page then
 			Leet.menu.set_page(p.page)
@@ -78,7 +83,12 @@ return m.component(function(p)
 					return 1 + math.floor(slide() + 0.5)
 				end,
 				m.block({
-					m.inline(p.icon .. " ", fade(p.icon_hl or "Character")),
+					m.inline(function()
+						if busy() then
+							return m.inline({ m.loader({ style = "leetcode_accent" }), " " })
+						end
+						return m.inline(p.icon .. " ", fade(p.icon_hl or "Character"))
+					end),
 					p.prefix and m.inline(p.prefix .. " ", fade("leetcode_muted")),
 					m.inline(p.title, fade("leetcode_strong")),
 					p.nested and m.inline(" \u{eab6}", fade("leetcode_muted")),

@@ -8,6 +8,23 @@ local t = require("leetcode.translator")
 ---@class leet.cmd
 local cmd = {}
 
+--- A task for work that nothing on screen started, shown by a loader in the
+--- corner of the editor until it is done.
+---@param text string
+---@return leet.ui.task
+local function corner_task(text)
+	local close = require("leetcode.ui.toast")(text)
+	return {
+		cancelled = function()
+			return false
+		end,
+		done = close,
+	}
+end
+
+--- Questions being fetched, by slug, so a second press does not open two.
+local opening = {}
+
 ---@param old_name string
 ---@param new_name string
 function cmd.deprecate(old_name, new_name)
@@ -38,16 +55,23 @@ function cmd.cookie_prompt(cb)
 			return
 		end
 
-		local err = cookie.set(value)
+		-- The menu shows it signing in, rather than everything waiting for LeetCode.
+		local before = Leet.menu.page()
+		cmd.set_menu_page("loading")
 
-		if not err then
-			log.info("Sign-in successful")
-			cmd.start_user_session()
-		else
-			log.error("Sign-in failed: " .. err)
-		end
+		cookie.set(value, function(err)
+			if not err then
+				log.info("Sign-in successful")
+				cmd.start_user_session()
+			else
+				cmd.set_menu_page(before ~= "loading" and before or "signin")
+				log.error("Sign-in failed: " .. err)
+			end
 
-		pcall(cb, not err and true or false)
+			if type(cb) == "function" then
+				cb(not err)
+			end
+		end)
 	end)
 end
 
@@ -87,21 +111,31 @@ cmd.expire = vim.schedule_wrap(function()
 	end)
 end)
 
-function cmd.qot()
+--- Opens the daily challenge, see `cmd.open` for `task`.
+---@param task? leet.ui.task
+function cmd.qot(task)
 	require("leetcode.util").auth_guard()
+	task = task or corner_task(require("leetcode.i18n").opening_daily)
 
 	local problems = require("leetcode.api.problems")
 
 	problems.question_of_today(function(qot, err)
+		if task.cancelled() then
+			return
+		end
 		if err then
+			task.done()
 			return log.err(err)
 		end
 		local problemlist = require("leetcode.cache.problems")
-		cmd.open(problemlist.by_slug(qot.title_slug))
+		cmd.open(problemlist.by_slug(qot.title_slug), task)
 	end)
 end
 
-function cmd.random_question(opts)
+--- Opens a random question, see `cmd.open` for `task`.
+---@param opts? table filters
+---@param task? leet.ui.task
+function cmd.random_question(opts, task)
 	require("leetcode.util").auth_guard()
 
 	local problems_cache = require("leetcode.cache.problems")
@@ -118,13 +152,20 @@ function cmd.random_question(opts)
 		})[opts.status[1]]
 	end
 
-	local q, err = problems.random(opts)
-	if err then
-		return log.err(err)
-	end
+	task = task or corner_task(require("leetcode.i18n").drawing_random)
 
-	local item = problems_cache.by_slug(q.title_slug) or {}
-	cmd.open(item)
+	problems.random(opts, function(q, err)
+		if task.cancelled() then
+			return
+		end
+		if err then
+			task.done()
+			return log.err(err)
+		end
+
+		local item = problems_cache.by_slug(q.title_slug) or {}
+		cmd.open(item, task)
+	end)
 end
 
 function cmd.start_with_cmd()
@@ -240,22 +281,59 @@ end
 
 ---@param cached leet.cache.problem
 ---@return boolean
-function cmd.open(cached)
-	local tabp = Leet.util.detect_duplicate_question(cached.title_slug, config.lang)
+--- Opens a question, fetching it without blocking anything.
+---
+--- `task` comes from what started it, as `kit.use_task` gives: it is done
+--- when the question opens or cannot, and once it is cancelled, because what
+--- started it is gone, the question does not open at all. Without one a loader
+--- in the corner of the editor shows it is on its way.
+---@param cached leet.cache.problem
+---@param task? leet.ui.task
+function cmd.open(cached, task)
+	local slug = cached.title_slug
+	local tabp = Leet.util.detect_duplicate_question(slug, config.lang)
 
 	if tabp then
 		vim.api.nvim_set_current_tabpage(tabp)
-		return true
+		if task then
+			task.done()
+		end
+		return
 	end
 
-	local res = Leet.api.problems.by_slug(cached.title_slug)
-	if not res or (res.is_paid_only and not config.auth.is_premium) then
-		Markup.log.warn("Problem is for premium users only")
-		return false
+	-- Already on its way, from another press.
+	if opening[slug] then
+		if task then
+			task.done()
+		end
+		return
 	end
 
-	Leet.problem(cached, res)
-	return true
+	local title = Leet.util.translate(cached.title or slug, cached.title_cn)
+	task = task or corner_task(require("leetcode.i18n").opening(title))
+	opening[slug] = true
+
+	Leet.api.problems.by_slug(slug, function(res, err)
+		opening[slug] = nil
+		if task.cancelled() then
+			return
+		end
+		task.done()
+
+		if not res then
+			return log.err(err)
+		end
+		if res.is_paid_only and not config.auth.is_premium then
+			return Markup.log.warn("Problem is for premium users only")
+		end
+		-- Opened meanwhile, such as from the picker.
+		local open = Leet.util.detect_duplicate_question(slug, config.lang)
+		if open then
+			return vim.api.nvim_set_current_tabpage(open)
+		end
+
+		Leet.problem(cached, res)
+	end)
 end
 
 function cmd.browser_open()
@@ -505,7 +583,11 @@ cmd.commands = {
 	run = { cmd.q_run },
 	test = { cmd.q_run },
 	submit = { cmd.q_submit },
-	daily = { cmd.qot },
+	daily = {
+		function()
+			cmd.qot()
+		end,
+	},
 	yank = { cmd.yank },
 	open = { cmd.browser_open },
 	reset = { cmd.reset },

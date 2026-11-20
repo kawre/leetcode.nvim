@@ -31,6 +31,17 @@ local config = {
 ---Merge configurations into default configurations and set it as user configurations.
 ---
 ---@param cfg lc.UserConfig Configurations to be merged.
+--- The language of the interface: `ui.locale` when set, or Chinese on
+--- leetcode.cn with its translator on.
+---@return "en"|"zh"
+function config.locale()
+	local ui = config.user and config.user.ui
+	if ui and ui.locale then
+		return ui.locale
+	end
+	return config.translator and "zh" or "en"
+end
+
 function config.apply(cfg)
 	config.user = vim.tbl_deep_extend("force", config.default, cfg or {})
 	config.load_plugins()
@@ -68,6 +79,11 @@ function config.validate()
 	local utils = require("leetcode.util")
 
 	assert(vim.fn.has("nvim-0.11.0") == 1, "Neovim >= 0.11.0 required")
+
+	local locale = config.user.ui and config.user.ui.locale
+	if locale ~= nil and locale ~= "en" and locale ~= "zh" then
+		error(("Unsupported ui.locale: %s, expected \"en\" or \"zh\""):format(vim.inspect(locale)))
+	end
 
 	if not utils.get_lang(config.lang) then
 		---@type lc.lang[]

@@ -1,7 +1,7 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
 local kit = require("leetcode.ui.kit")
 local statistics = require("leetcode.api.stats")
-local t = require("leetcode.translator")
 
 local BAR_WIDTH = 16
 
@@ -58,7 +58,10 @@ local function Row(difficulty, index, bar_width)
 	return m.flex({
 		justify = "between",
 		white_space = "nowrap",
-		m.inline({ width = 8, m.inline(t(difficulty), "leetcode_" .. difficulty:lower()) }),
+		m.inline({
+			width = 8,
+			m.inline(i18n.difficulty(difficulty), "leetcode_" .. difficulty:lower()),
+		}),
 		kit.Bar({
 			width = bar_width,
 			delay = delay,
@@ -99,7 +102,7 @@ M.Solved = m.component(function(props)
 		m.flex({
 			justify = "between",
 			margin_bottom = 1,
-			m.inline(t("Solved"), "leetcode_muted"),
+			m.inline(i18n.status("ac"), "leetcode_muted"),
 			m.inline({
 				m.inline(function()
 					return tostring(math.floor(total() + 0.5))

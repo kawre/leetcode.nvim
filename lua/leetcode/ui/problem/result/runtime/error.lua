@@ -1,4 +1,6 @@
 local m = require("markup")
+local UseTestcase = require("leetcode.ui.problem.result.use-testcase")
+local i18n = require("leetcode.i18n")
 local Stdout = require("leetcode.ui.problem.result.stdout")
 local Input = require("leetcode.ui.problem.result.input")
 
@@ -18,10 +20,7 @@ local InvalidCase = m.component(function(props)
 	m.use_key("e", go)
 
 	return m.block({
-		m.block({
-			("Case %d is not a valid input for this problem."):format(props.index),
-			style = "leetcode_muted",
-		}),
+		m.block({ i18n.invalid_case(props.index), style = "leetcode_muted" }),
 		m.block({
 			margin_top = 1,
 			m.inline({
@@ -32,7 +31,7 @@ local InvalidCase = m.component(function(props)
 					return hovered() and "leetcode_console_case_active_hover"
 						or "leetcode_console_case_active"
 				end,
-				(" \u{f03eb} Edit Case %d "):format(props.index),
+				(" \u{f03eb} %s "):format(i18n.edit_case(props.index)),
 			}),
 			m.inline({ "  e", style = "leetcode_key", snap = false }),
 		}),
@@ -57,10 +56,13 @@ local RuntimeError = m.component(function(props)
 		}),
 		invalid and InvalidCase({ console = props.console, index = item.case_idx + 1 }),
 		item._.submission and Input({
-			title = "Last input",
+			title = i18n.last_input,
 			input = vim.split(item.last_testcase, "\n"),
 			params = item._.params,
 		}),
+		item._.submission
+			and props.console
+			and UseTestcase({ console = props.console, input = item.last_testcase }),
 		Stdout({
 			stdout = item._.submission and item.std_output
 				or (item.std_output_list and item.std_output_list[#item.std_output_list]),

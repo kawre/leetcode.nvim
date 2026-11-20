@@ -1,4 +1,5 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
 local Result = require("leetcode.ui.problem.result")
 local Judging = require("leetcode.ui.problem.result.judging")
 local Status = require("leetcode.ui.problem.result.status")
@@ -57,7 +58,7 @@ end
 function M:failed(err)
 	self.state = nil
 	local too_soon = err.status == 429
-	local title = too_soon and "Too soon" or "Run failed"
+	local title = too_soon and i18n.too_soon or i18n.run_failed
 	self.content({
 		render = function()
 			return RequestError({ err = err, too_soon = too_soon })

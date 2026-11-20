@@ -1,9 +1,9 @@
 --- Solved problems on one line, below the launcher.
 
+local i18n = require("leetcode.i18n")
 local m = require("markup")
 local kit = require("leetcode.ui.kit")
 local solved = require("leetcode.ui.menu.solved")
-local t = require("leetcode.translator")
 
 local function Count(difficulty, style, label, delay)
 	local count = kit.counter(function()
@@ -27,12 +27,12 @@ return m.component(function()
 
 	return m.block({
 		white_space = "nowrap",
-		Count("All", "leetcode_strong", t("solved"), 100),
+		Count("All", "leetcode_strong", i18n.solved_count, 100),
 		separator,
-		Count("Easy", "leetcode_easy", t("easy"), 200),
+		Count("Easy", "leetcode_easy", i18n.difficulty("easy"), 200),
 		separator,
-		Count("Medium", "leetcode_medium", t("medium"), 300),
+		Count("Medium", "leetcode_medium", i18n.difficulty("medium"), 300),
 		separator,
-		Count("Hard", "leetcode_hard", t("hard"), 400),
+		Count("Hard", "leetcode_hard", i18n.difficulty("hard"), 400),
 	})
 end)

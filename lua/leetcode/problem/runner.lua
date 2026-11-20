@@ -1,4 +1,5 @@
 local interpreter = require("leetcode.api.interpreter")
+local i18n = require("leetcode.i18n")
 
 ---@class leet.problem.runner
 ---@field question lc.ui.Question
@@ -8,7 +9,7 @@ M.running = false
 ---@param problem leet.problem
 function M.run(problem, submit)
 	if M.running then
-		return Markup.log.warn("Runner is busy")
+		return Markup.log.warn(i18n.runner_busy)
 	end
 
 	local function _run()
@@ -48,7 +49,7 @@ function M.run(problem, submit)
 				console.result:set_state(state)
 			elseif err then
 				console.result:failed(err)
-				notify(err.msg or "Something went wrong", err.lvl or vim.log.levels.ERROR)
+				notify(err.msg or i18n.something_went_wrong, err.lvl or vim.log.levels.ERROR)
 			end
 		end
 

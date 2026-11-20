@@ -1,6 +1,7 @@
 --- What the user worked on lately. Solutions are files named after their problem,
 --- so their times already tell, with nothing else to keep up to date.
 
+local i18n = require("leetcode.i18n")
 local config = require("leetcode.config")
 
 ---@class leet.ui.menu.recent
@@ -66,10 +67,10 @@ function M.ago(time, now)
 
 	for _, unit in ipairs({ { 604800, "w" }, { 86400, "d" }, { 3600, "h" }, { 60, "m" } }) do
 		if seconds >= unit[1] then
-			return ("%d%s ago"):format(math.floor(seconds / unit[1]), unit[2])
+			return i18n.ago(math.floor(seconds / unit[1]), unit[2])
 		end
 	end
-	return "just now"
+	return i18n.just_now
 end
 
 return M

@@ -1,10 +1,10 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
 local Items = require("leetcode.ui.menu.items")
 local Item = require("leetcode.ui.menu.item")
 local ProblemCard = require("leetcode.ui.menu.problem_card")
 local data = require("leetcode.ui.menu.data")
 local recent = require("leetcode.ui.menu.recent")
-local t = require("leetcode.translator")
 local kit = require("leetcode.ui.kit")
 
 --- The problem worked on last, if any.
@@ -15,15 +15,15 @@ local function Continue(width)
 	end
 
 	return ProblemCard({
-		label = t("Continue"),
+		label = i18n.continue,
 		icon = kit.icons.resume,
 		lhs = "c",
 		width = width,
 		problem = item.problem,
 		extra = recent.ago(item.time),
 		click = "double",
-		on_press = function()
-			require("leetcode.cmd").open(item.problem)
+		on_press = function(task)
+			require("leetcode.cmd").open(item.problem, task)
 		end,
 	})
 end
@@ -34,17 +34,17 @@ local function Today(width)
 		local problem = data.daily()
 
 		return ProblemCard({
-			label = t("Daily challenge"),
+			label = i18n.daily_challenge,
 			icon = kit.icons.calendar,
-			aside = os.date("%b %-d"),
+			aside = os.date(i18n.date_format),
 			accent = true,
 			lhs = "t",
 			width = width,
 			problem = problem,
-			extra = problem and problem.ac_rate and ("%.1f%% accepted"):format(problem.ac_rate),
+			extra = problem and problem.ac_rate and i18n.accepted_rate(problem.ac_rate),
 			click = "double",
-			on_press = function()
-				require("leetcode.cmd").qot()
+			on_press = function(task)
+				require("leetcode.cmd").qot(task)
 			end,
 		})
 	end
@@ -62,29 +62,29 @@ return m.component(function(props)
 		Items({
 			Item({
 				icon = "\u{f452}",
-				title = "Problems",
-				desc = "browse, random, recent",
+				title = i18n.problems,
+				desc = i18n.problems_desc,
 				lhs = "p",
 				page = "menu.problems",
 			}),
 			Item({
 				icon = "\u{f201}",
-				title = "Statistics",
-				desc = "progress and skills",
+				title = i18n.statistics,
+				desc = i18n.statistics_desc,
 				lhs = "s",
 				page = "menu.statistics",
 			}),
 			Item({
 				icon = "\u{f0198}",
-				title = "Account",
-				desc = "cookie, sign out",
+				title = i18n.account,
+				desc = i18n.account_desc,
 				lhs = "a",
 				page = "menu.cookie",
 			}),
 			Item({
 				icon = "\u{f0a48}",
-				title = "Quit",
-				desc = "close leetcode.nvim",
+				title = i18n.quit,
+				desc = i18n.quit_desc,
 				lhs = "q",
 				on_submit = function()
 					require("leetcode").stop()

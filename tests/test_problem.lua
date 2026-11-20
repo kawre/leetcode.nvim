@@ -57,6 +57,112 @@ end
 
 T["description"] = new_set()
 
+--- Puts the cursor on `text` in the description, and gives its row and column.
+local function cursor_on(text)
+	return child.lua_get(([[(function()
+		local win, buf = problem.description.win.win, problem.description.win.buf
+		vim.api.nvim_set_current_win(win)
+		for row, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
+			local at = line:find(%q, 1, true)
+			if at then
+				vim.api.nvim_win_set_cursor(win, { row, at })
+				return { row, at }
+			end
+		end
+	end)()]]):format(text))
+end
+
+local function opening_links()
+	run([[
+		opened = {}
+		vim.ui.open = function(url) opened[#opened + 1] = url end
+		open_problem()
+		reactive.flush()
+	]])
+end
+
+T["description"]["code outside the examples goes on a card, and examples stay plain"] = function()
+	run([==[
+		fixture.problem.content = [[
+<p>The judge runs:</p>
+<pre>
+int k = solve(nums);
+for (int i = 0; i &lt; k; i++) {
+    check(nums[i]);
+}
+</pre>
+<p><strong class="example">Example 1:</strong></p>
+<pre>
+<strong>Input:</strong> nums = [1]
+<strong>Output:</strong> 1
+</pre>
+]]
+		open_problem()
+		reactive.flush()
+		lines = buffer_text(problem.description.win.buf)
+		function index_of(text)
+			for i, line in ipairs(lines) do
+				if line:find(text, 1, true) then return i end
+			end
+		end
+	]==])
+	local lines = child.lua_get("lines")
+	local code = child.lua_get("index_of('int k = solve(nums);')")
+	-- The card's edge right above the code, and below it.
+	eq(lines[code - 1]:find("▄", 1, true) ~= nil, true)
+	eq(
+		lines[child.lua_get("index_of('    check(nums[i]);')") + 2]:find("▀", 1, true) ~= nil,
+		true
+	)
+	-- Indented as written, inside the card's padding.
+	eq(lines[code + 2], "        check(nums[i]);")
+	-- The example has its own card and no second one inside it.
+	local input = child.lua_get("index_of('Input: nums = [1]')")
+	eq(lines[input - 1]:find("▄", 1, true), nil)
+end
+
+T["description"]["gx opens the link under the cursor"] = function()
+	opening_links()
+	cursor_on("the docs")
+	child.type_keys("gx")
+	eq(child.lua_get("opened"), { "https://example.com/docs" })
+end
+
+T["description"]["gx anywhere else opens the problem"] = function()
+	opening_links()
+	cursor_on("Constraints")
+	child.type_keys("gx")
+	eq(child.lua_get("opened"), { "https://leetcode.com/problems/two-sum/" })
+end
+
+T["description"]["a link underlines its text, not the icon after it"] = function()
+	opening_links()
+	run([[
+		local buf, ns = problem.description.win.buf, problem.description.view.ns
+		underlined = {}
+		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, { details = true })) do
+			local group = mark[4].hl_group
+			if group and vim.api.nvim_get_hl(0, { name = group, link = false }).underline then
+				local text = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[2], mark[4].end_col, {})[1]
+				if text:find("docs", 1, true) or text:find(require("leetcode.ui.problem.description.html").LINK_ICON, 1, true) or text == " " then
+					underlined[#underlined + 1] = text
+				end
+			end
+		end
+	]])
+	eq(child.lua_get("underlined"), { "the docs" })
+end
+
+T["description"]["one click opens a link"] = function()
+	opening_links()
+	local at = cursor_on("the docs")
+	run(([[
+		local info = vim.fn.getwininfo(problem.description.win.win)[1]
+		problem.description.view:click({ line = %d, wincol = %d + info.textoff }, "single")
+	]]):format(at[1], at[2] + 1))
+	eq(child.lua_get("opened"), { "https://example.com/docs" })
+end
+
 T["description"]["pins the header in a band"] = function()
 	run("open_problem()")
 	eq(header_has("1. Two Sum"), true)
@@ -1209,6 +1315,19 @@ T["console"]["j passes over labels and the status of a run"] = function()
 	})
 end
 
+T["console"]["j passes over the names above the testcase fields"] = function()
+	run([[
+		open_problem()
+		problem.console:show("testcase")
+		reactive.flush()
+	]])
+	-- A field is pressed as a whole, so the cursor lands on its bar.
+	local words, lines = stops()
+	stops_on(lines, "▌ [2,7]")
+	stops_on(lines, "▌ 9")
+	never_stops_on(words, { "^nums$", "^target$", "^=$" })
+end
+
 T["console"]["j passes over the labels and bars of a submission"] = function()
 	show_result([[{
 		_ = { title = "Accepted", hl = "leetcode_ok", success = true, submission = true },
@@ -1328,6 +1447,78 @@ T["console"]["shows a failed submission"] = function()
 	}]])
 	eq(result_has("Expected"), true)
 	eq(result_has("[1]"), true)
+end
+
+T["console"]["the bar of what passed shows on the header, even empty"] = function()
+	show_result([[{
+		_ = { title = "Output Limit Exceeded", hl = "leetcode_error", submission = true, params = {} },
+		status_code = 13, last_testcase = "[1]", std_output = "", total_correct = 0, total_testcases = 206,
+	}]])
+	run([[
+		local buf, ns = problem.console.win.buf, problem.console.view.ns
+		track = nil
+		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, { details = true })) do
+			if mark[4].hl_group == "leetcode_header_bar_track" then
+				track = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[2], mark[4].end_col, {})[1]
+			end
+		end
+		local function bg(group) return vim.api.nvim_get_hl(0, { name = group, link = false }).bg end
+		apart = bg("leetcode_header_bar_track") ~= bg("leetcode_description_header")
+	]])
+	-- Ten cells of track, in a color of its own on the band.
+	eq(child.lua_get("vim.fn.strdisplaywidth(track or '')"), 10)
+	eq(child.lua_get("apart"), true)
+	eq(result_has("0/206 passed"), true)
+end
+
+local wrong_answer = [[{
+	_ = { title = "Wrong Answer", hl = "leetcode_error", submission = true, params = {} },
+	status_code = 11, input = "[1,5]\n6", code_output = "[]", expected_output = "[0,1]", std_output = "",
+	total_correct = 3, total_testcases = 4,
+}]]
+
+T["console"]["a failed submission's input can be used as a testcase"] = function()
+	show_result(wrong_answer)
+	eq(result_has("Use testcase"), true)
+	run([[vim.api.nvim_set_current_win(problem.console.win.win)]])
+	child.type_keys("U")
+	run("reactive.flush()")
+	eq(child.lua_get("problem.console.tab()"), "testcase")
+	eq(child.lua_get("#problem.console.testcase.cases()"), 3)
+	eq(child.lua_get("problem.console.testcase.cases()[3]"), { "[1,5]", "6" })
+	eq(child.lua_get("problem.console.testcase.selected()"), 3)
+	-- And the testcases now hold it, for the next run.
+	eq(child.lua_get("problem.console.testcase:content()"):find("[1,5]\n6", 1, true) ~= nil, true)
+end
+
+T["console"]["using the same input twice adds it once"] = function()
+	show_result(wrong_answer)
+	run([[
+		problem.console.testcase:use("[1,5]\n6")
+		problem.console.testcase:select(1)
+		problem.console.testcase:use("[1,5]\n6")
+	]])
+	eq(child.lua_get("#problem.console.testcase.cases()"), 3)
+	eq(child.lua_get("problem.console.testcase.selected()"), 3)
+end
+
+T["console"]["the input of a limit or an error is used too"] = function()
+	show_result([[{
+		_ = { title = "Time Limit Exceeded", hl = "leetcode_error", submission = true, params = {} },
+		status_code = 14, last_testcase = "[9]\n9", std_output = "",
+	}]])
+	eq(result_has("Use testcase"), true)
+	run([[
+		vim.api.nvim_set_current_win(problem.console.win.win)
+		vim.api.nvim_feedkeys("U", "x", false)
+		reactive.flush()
+	]])
+	eq(child.lua_get("problem.console.testcase.cases()[3]"), { "[9]", "9" })
+end
+
+T["console"]["a plain run has nothing to use, being your own testcases"] = function()
+	show_result(accepted)
+	eq(result_has("Use testcase"), false)
 end
 
 T["console"]["marks what differs from the expected output"] = function()
@@ -1703,12 +1894,14 @@ T["console"]["moves through every line with a visible cursor"] = function()
 			end
 		end
 	end
-	-- Text as well as what can be pressed, top to bottom.
-	for _, text in ipairs({ "Testcase", "Case 1", "nums =", "[2,7]", "target =", "9", "add" }) do
+	-- Text as well as what can be pressed, top to bottom, past the names of
+	-- the fields, which are only there to read.
+	for _, text in ipairs({ "Testcase", "Case 1", "[2,7]", "9", "add" }) do
 		eq(at(text) ~= nil, true)
 	end
-	eq(at("nums =") < at("[2,7]"), true)
-	eq(at("[2,7]") < at("target ="), true)
+	eq(at("nums ="), nil)
+	eq(at("target ="), nil)
+	eq(at("[2,7]") < at("9"), true)
 	eq(child.lua_get("vim.o.guicursor == guicursor"), true)
 end
 

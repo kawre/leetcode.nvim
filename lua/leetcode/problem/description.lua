@@ -1,9 +1,9 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
 local config = require("leetcode.config")
 local html = require("leetcode.ui.problem.description.html")
 local extras = require("leetcode.ui.problem.description.extras")
 local kit = require("leetcode.ui.kit")
-local t = require("leetcode.translator")
 
 ---@class leet.problem.description
 ---@field problem leet.problem
@@ -140,11 +140,20 @@ function M:bind_keys()
 	end)
 end
 
---- Opens the problem, since the fixed header cannot be pressed.
+--- Opens the link under the cursor, or a url written out there, such as that
+--- of an image shown as text. Anywhere else it is the problem itself.
 function M:open_link()
-	local link = self.problem.cached.link
-	if link then
-		vim.ui.open(link)
+	local id = self.win:win_valid() and self.view:node_at_cursor()
+	local url = id and html.urls[self.view.handlers[id]]
+
+	if not url then
+		local word = vim.fn.expand("<cWORD>")
+		url = word:match("https?://[^%s\"'<>)]+")
+	end
+
+	url = url or self.problem.cached.link
+	if url then
+		vim.ui.open(url)
 	end
 end
 
@@ -172,10 +181,10 @@ function M:status()
 		return
 	end
 
-	local label = self.problem.cached.status == "ac" and "Solved" or "Attempted"
+	local label = i18n.status(self.problem.cached.status == "ac" and "ac" or "notac")
 	return m.inline({
 		white_space = "nowrap",
-		m.inline(status[1] .. " " .. t(label), status[2]),
+		m.inline(status[1] .. " " .. label, status[2]),
 	})
 end
 
@@ -187,7 +196,7 @@ function M:stats()
 	local width = vim.api.nvim_strwidth
 	local available = self.header.view:columns() - 4
 
-	local difficulty = visible and t(q.difficulty) or "????"
+	local difficulty = visible and i18n.difficulty(q.difficulty) or "????"
 	local used = width(difficulty) + 2
 
 	local function stat(icon, value, hl)
@@ -211,7 +220,7 @@ function M:stats()
 
 	local rate = visible and q.stats.acRate or "__%"
 	local total = visible and q.stats.totalSubmission or "__"
-	local right = ("%s %s %s"):format(rate, t("of"), total)
+	local right = i18n.acceptance(rate, total)
 
 	if used + 2 + width(right) > available then
 		right = rate
@@ -281,7 +290,7 @@ function M:header_content()
 					shrink = 1,
 					m.inline(q.frontend_id .. ". ", "leetcode_muted"),
 					m.inline(Leet.util.translate(q.title, q.translated_title), "leetcode_strong"),
-					q.is_paid_only and m.inline(" " .. t("Premium"), "leetcode_medium"),
+					q.is_paid_only and m.inline(" " .. i18n.premium, "leetcode_medium"),
 				}),
 				m.inline({
 					shrink = 0,
@@ -376,7 +385,7 @@ function M:reveal(name)
 	end
 
 	if not section then
-		return Markup.log.warn(t("No hints available"))
+		return Markup.log.warn(i18n.no_hints)
 	end
 
 	self:show()

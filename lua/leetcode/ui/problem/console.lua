@@ -1,4 +1,6 @@
 local m = require("markup")
+local i18n = require("leetcode.i18n")
+local kit = require("leetcode.ui.kit")
 
 local ICONS = {
 	testcase = "\u{f0668}",
@@ -104,7 +106,8 @@ local Testcases = m.component(function(props)
 
 	local fields = {}
 	for i, name in ipairs(testcase:names()) do
-		fields[#fields + 1] = m.block({ m.inline(name .. " =", "leetcode_muted") })
+		-- What each field is, to read: the cursor goes on to the field.
+		fields[#fields + 1] = m.block({ snap = false, m.inline(name .. " =", "leetcode_muted") })
 		fields[#fields + 1] = Field({ console = console, param = i, hovered = hovered })
 	end
 
@@ -123,7 +126,7 @@ local Testcases = m.component(function(props)
 				end, function(i)
 					return Chip({
 						variant = "case",
-						label = (" Case %d "):format(i),
+						label = (" %s "):format(i18n.case(i)),
 						active = function()
 							return testcase.selected() == i
 						end,
@@ -147,13 +150,13 @@ local Testcases = m.component(function(props)
 		fields,
 		m.block({
 			m.inline("a", "leetcode_key"),
-			m.inline(" add  ", "leetcode_muted"),
+			m.inline((" %s  "):format(i18n.add), "leetcode_muted"),
 			m.inline("d", "leetcode_key"),
-			m.inline(" remove  ", "leetcode_muted"),
+			m.inline((" %s  "):format(i18n.remove), "leetcode_muted"),
 			m.inline("r", "leetcode_key"),
-			m.inline(" reset  ", "leetcode_muted"),
+			m.inline((" %s  "):format(i18n.reset), "leetcode_muted"),
 			m.inline("i", "leetcode_key"),
-			m.inline(" edit", "leetcode_muted"),
+			m.inline(" " .. i18n.edit, "leetcode_muted"),
 		}),
 	})
 end)
@@ -170,21 +173,18 @@ local function Results(props)
 		return m.block({
 			padding = { 1, 3, 0, 3 },
 			snap = false,
-			m.block({ "Run your code to see how it does.", style = "leetcode_muted" }),
+			m.block({ i18n.results_empty, style = "leetcode_muted" }),
 			m.block({
 				margin_top = 1,
-				m.inline(":Leet run", "leetcode_key"),
-				m.inline(" tries the testcases, ", "leetcode_muted"),
-				m.inline(":Leet submit", "leetcode_key"),
-				m.inline(" sends it to be judged", "leetcode_muted"),
+				kit.Sentence(i18n.results_how, kit.Key(":Leet run"), kit.Key(":Leet submit")),
 			}),
 		})
 	end
 end
 
 local TABS = {
-	{ key = "testcase", label = "Testcase", icon = ICONS.testcase },
-	{ key = "result", label = "Result", icon = ICONS.result },
+	{ key = "testcase", label = "tab_testcase", icon = ICONS.testcase },
+	{ key = "result", label = "tab_result", icon = ICONS.result },
 }
 
 --- One panel below the editor: the testcases to run, and what running them did.
@@ -228,7 +228,7 @@ return m.component(function(props)
 				m.inline(tab.icon, function()
 					return active() and "leetcode_accent" or nil
 				end),
-				(" %s "):format(tab.label),
+				(" %s "):format(i18n[tab.label]),
 			}),
 			active = function()
 				return console.tab() == tab.key
@@ -257,7 +257,7 @@ return m.component(function(props)
 				return m.inline({
 					snap = false,
 					m.inline("<Tab>", "leetcode_key"),
-					m.inline(" switch", "leetcode_muted"),
+					m.inline(" " .. i18n.switch, "leetcode_muted"),
 				})
 			end,
 		}),
