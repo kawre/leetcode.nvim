@@ -202,7 +202,9 @@ T["one press moves between rows in both directions"] = function()
 	]])
 
 	local function on(text)
-		return child.lua_get(("vim.api.nvim_get_current_line():find(%q, 1, true) ~= nil"):format(text))
+		return child.lua_get(
+			("vim.api.nvim_get_current_line():find(%q, 1, true) ~= nil"):format(text)
+		)
 	end
 
 	child.type_keys("j")
@@ -595,7 +597,9 @@ T["statistics"]["move between the buttons sideways"] = function()
 	]])
 
 	local function under_cursor()
-		return child.lua_get("vim.api.nvim_get_current_line():sub(vim.fn.col('.')):match('^%s*(%a+)')")
+		return child.lua_get(
+			"vim.api.nvim_get_current_line():sub(vim.fn.col('.')):match('^%s*(%a+)')"
+		)
 	end
 
 	eq(under_cursor(), "Update")

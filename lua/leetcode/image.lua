@@ -34,7 +34,19 @@ function M.converter(from, to)
 	elseif vim.fn.executable("convert") == 1 then
 		return { "convert", from .. "[0]", "png:" .. to }
 	elseif vim.fn.executable("ffmpeg") == 1 then
-		return { "ffmpeg", "-loglevel", "error", "-y", "-i", from, "-frames:v", "1", "-f", "image2", to }
+		return {
+			"ffmpeg",
+			"-loglevel",
+			"error",
+			"-y",
+			"-i",
+			from,
+			"-frames:v",
+			"1",
+			"-f",
+			"image2",
+			to,
+		}
 	end
 end
 
@@ -101,7 +113,10 @@ local function split_gif(source, dir, done)
 					return done(nil)
 				end
 				-- Written last, so a split cut short is never read as a whole one.
-				vim.fn.writefile(vim.split(vim.trim(timing.stdout or ""), "\n"), vim.fs.joinpath(dir, "delays"))
+				vim.fn.writefile(
+					vim.split(vim.trim(timing.stdout or ""), "\n"),
+					vim.fs.joinpath(dir, "delays")
+				)
 				done(read_frames(dir))
 			end)
 		end)
@@ -182,16 +197,20 @@ function M.load(url)
 	end
 
 	local source = target .. ".download"
-	vim.system({ "curl", "--silent", "--fail", "--location", "--output", source, url }, {}, function(result)
-		vim.schedule(function()
-			if result.code ~= 0 then
-				return
-			end
-			settle(source, target, function(bytes)
-				data(bytes)
+	vim.system(
+		{ "curl", "--silent", "--fail", "--location", "--output", source, url },
+		{},
+		function(result)
+			vim.schedule(function()
+				if result.code ~= 0 then
+					return
+				end
+				settle(source, target, function(bytes)
+					data(bytes)
+				end)
 			end)
-		end)
-	end)
+		end
+	)
 
 	return data
 end

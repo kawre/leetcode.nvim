@@ -35,7 +35,9 @@ return m.component(function(props)
 			m.inline({
 				style = function()
 					local current = step()
-					return index < current and "leetcode_ok" or index == current and "leetcode_accent" or "leetcode_muted"
+					return index < current and "leetcode_ok"
+						or index == current and "leetcode_accent"
+						or "leetcode_muted"
 				end,
 				function()
 					local current = step()
@@ -66,7 +68,10 @@ return m.component(function(props)
 		snap = false,
 		m.block({
 			margin_bottom = 1,
-			m.inline(props.submit and "Submitting your solution" or "Running your testcases", "leetcode_strong"),
+			m.inline(
+				props.submit and "Submitting your solution" or "Running your testcases",
+				"leetcode_strong"
+			),
 		}),
 		m.block({ margin_bottom = 1, white_space = "nowrap", Step(1), Step(2), Step(3) }),
 		m.block({

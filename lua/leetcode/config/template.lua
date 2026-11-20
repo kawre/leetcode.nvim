@@ -38,113 +38,111 @@
 
 ---@alias lc.storage table<"cache"|"home", string>
 
-
 ---@class lc.UserConfig
 local M = {
-    ---@type string
-    arg = "leetcode.nvim",
+	---@type string
+	arg = "leetcode.nvim",
 
-    ---@type lc.lang
-    lang = "cpp",
+	---@type lc.lang
+	lang = "cpp",
 
-    cn = { -- leetcode.cn
-        enabled = false, ---@type boolean
-        translator = true, ---@type boolean
-        translate_problems = true, ---@type boolean
-    },
+	cn = { -- leetcode.cn
+		enabled = false, ---@type boolean
+		translator = true, ---@type boolean
+		translate_problems = true, ---@type boolean
+	},
 
-    ---Save the html of fetched problems to `.dev/problems`, for working on the plugin.
-    dev = false, ---@type boolean
+	---Save the html of fetched problems to `.dev/problems`, for working on the plugin.
+	dev = false, ---@type boolean
 
-    ---@type lc.storage
-    storage = {
-        home = vim.fn.stdpath("data") .. "/leetcode",
-        cache = vim.fn.stdpath("cache") .. "/leetcode",
-    },
+	---@type lc.storage
+	storage = {
+		home = vim.fn.stdpath("data") .. "/leetcode",
+		cache = vim.fn.stdpath("cache") .. "/leetcode",
+	},
 
-    ---@type table<string, boolean>
-    plugins = {
-        non_standalone = false,
-    },
+	---@type table<string, boolean>
+	plugins = {
+		non_standalone = false,
+	},
 
-    ---@type boolean
-    logging = true,
+	---@type boolean
+	logging = true,
 
-    injector = {}, ---@type table<lc.lang, lc.inject>
+	injector = {}, ---@type table<lc.lang, lc.inject>
 
-    cache = {
-        update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
-    },
+	cache = {
+		update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
+	},
 
-    editor = {
-        reset_previous_code = true, ---@type boolean
-        fold_imports = true, ---@type boolean
-    },
+	editor = {
+		reset_previous_code = true, ---@type boolean
+		fold_imports = true, ---@type boolean
+	},
 
-    console = {
-        open_on_runcode = true, ---@type boolean
+	console = {
+		open_on_runcode = true, ---@type boolean
 
-        dir = "row", ---@type lc.direction
+		dir = "row", ---@type lc.direction
 
-        size = { ---@type lc.size
-            width = "90%",
-            height = "75%",
-        },
+		size = { ---@type lc.size
+			width = "90%",
+			height = "75%",
+		},
 
-        result = {
-            size = "60%", ---@type lc.size
+		result = {
+			size = "60%", ---@type lc.size
 
-            --- Lines of stdout the result shows, the rest is a press (or `f`) away.
-            stdout_lines = 50, ---@type integer
-        },
+			--- Lines of stdout the result shows, the rest is a press (or `f`) away.
+			stdout_lines = 50, ---@type integer
+		},
 
-        testcase = {
-            virt_text = true, ---@type boolean
+		testcase = {
+			virt_text = true, ---@type boolean
 
-            size = "40%", ---@type lc.size
-        },
-    },
+			size = "40%", ---@type lc.size
+		},
+	},
 
-    description = {
-        position = "left", ---@type lc.position
+	description = {
+		position = "left", ---@type lc.position
 
-        width = "40%", ---@type lc.size
+		width = "40%", ---@type lc.size
 
-        show_stats = true, ---@type boolean
-    },
+		show_stats = true, ---@type boolean
+	},
 
+	hooks = {
+		---@type fun()[]
+		["enter"] = {},
 
-    hooks = {
-        ---@type fun()[]
-        ["enter"] = {},
+		---@type fun(question: lc.ui.Question)[]
+		["question_enter"] = {},
 
-        ---@type fun(question: lc.ui.Question)[]
-        ["question_enter"] = {},
+		---@type fun()[]
+		["leave"] = {},
+	},
 
-        ---@type fun()[]
-        ["leave"] = {},
-    },
+	keys = {
+		toggle = { "q" }, ---@type string|string[]
+		confirm = { "<CR>" }, ---@type string|string[]
 
-    keys = {
-        toggle = { "q" }, ---@type string|string[]
-        confirm = { "<CR>" }, ---@type string|string[]
+		reset_testcases = "r", ---@type string
+		use_testcase = "U", ---@type string
+		focus_testcases = "H", ---@type string
+		focus_result = "L", ---@type string
+	},
 
-        reset_testcases = "r", ---@type string
-        use_testcase = "U", ---@type string
-        focus_testcases = "H", ---@type string
-        focus_result = "L", ---@type string
-    },
+	---@type lc.highlights
+	theme = {},
 
-    ---@type lc.highlights
-    theme = {},
+	---@type boolean
+	image_support = false,
 
-    ---@type boolean
-    image_support = false,
-
-    ui = {
-        animations = true, ---@type boolean Set to false to make everything jump to its end
-        confetti = true, ---@type boolean Celebrate accepted submissions
-    },
+	ui = {
+		animations = true, ---@type boolean Set to false to make everything jump to its end
+		confetti = true, ---@type boolean Celebrate accepted submissions
+	},
 }
 
 return M

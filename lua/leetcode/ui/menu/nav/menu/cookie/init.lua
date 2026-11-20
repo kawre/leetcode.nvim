@@ -4,11 +4,23 @@ local Item = require("leetcode.ui.menu.item")
 local BackButton = require("leetcode.ui.menu.button.back")
 
 return m.component(function()
-    local cmd = require("leetcode.cmd")
+	local cmd = require("leetcode.cmd")
 
-    return Items({
-        Item({ icon = "\u{f16ec}", title = "Cookie", desc = "paste a new session cookie", lhs = "u", on_submit = cmd.cookie_prompt }),
-        Item({ icon = "\u{f16ea}", title = "Sign out", desc = "forget this session", lhs = "d", on_submit = cmd.sign_out }),
-        BackButton({ page = "menu" }),
-    })
+	return Items({
+		Item({
+			icon = "\u{f16ec}",
+			title = "Cookie",
+			desc = "paste a new session cookie",
+			lhs = "u",
+			on_submit = cmd.cookie_prompt,
+		}),
+		Item({
+			icon = "\u{f16ea}",
+			title = "Sign out",
+			desc = "forget this session",
+			lhs = "d",
+			on_submit = cmd.sign_out,
+		}),
+		BackButton({ page = "menu" }),
+	})
 end)

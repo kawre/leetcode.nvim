@@ -12,7 +12,10 @@ return m.component(function(props)
 		m.block({ t(message), style = "leetcode_muted" }),
 		props.too_soon and m.block({
 			margin_top = 1,
-			m.inline("LeetCode takes a run every few seconds. Wait a moment, then ", "leetcode_muted"),
+			m.inline(
+				"LeetCode takes a run every few seconds. Wait a moment, then ",
+				"leetcode_muted"
+			),
 			m.inline(":Leet run", "leetcode_key"),
 			m.inline(" again.", "leetcode_muted"),
 		}),

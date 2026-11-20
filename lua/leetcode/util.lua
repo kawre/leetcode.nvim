@@ -42,7 +42,6 @@ function M.curr_question()
 			return ap
 		end
 	end
-
 end
 
 ---@return lc.language

@@ -28,7 +28,12 @@ T["kit"]["cuts text to a width"] = function()
 	child.lua([[kit = require("leetcode.ui.kit")]])
 	eq(child.lua_get("kit.truncate('short', 10)"), "short")
 	eq(child.lua_get("kit.truncate('a longer title', 8)"), "a longe…")
-	eq(child.lua_get("vim.api.nvim_strwidth(kit.truncate('日本語のタイトルです', 7))<= 7"), true)
+	eq(
+		child.lua_get(
+			"vim.api.nvim_strwidth(kit.truncate('日本語のタイトルです', 7))<= 7"
+		),
+		true
+	)
 end
 
 T["recent"] = new_set()
@@ -99,7 +104,10 @@ end
 
 T["diff"]["keeps equal text whole"] = function()
 	child.lua([[diff = require("leetcode.ui.problem.result.diff")]])
-	eq(child.lua_get([[{ diff.split("same", "same") }]]), { { { "same", false } }, { { "same", false } } })
+	eq(
+		child.lua_get([[{ diff.split("same", "same") }]]),
+		{ { { "same", false } }, { { "same", false } } }
+	)
 end
 
 T["diff"]["handles multibyte text and insertions"] = function()
@@ -145,7 +153,12 @@ T["confetti"]["keeps the floats below it visible"] = function()
 			return vim.api.nvim_win_get_config(win).zindex == 250
 		end, vim.api.nvim_list_wins())
 	]])
-	eq(child.lua_get("#vim.tbl_filter(function(win) local c = vim.api.nvim_win_get_config(win); return c.width ~= 1 or c.height ~= 1 end, wins)"), 0)
+	eq(
+		child.lua_get(
+			"#vim.tbl_filter(function(win) local c = vim.api.nvim_win_get_config(win); return c.width ~= 1 or c.height ~= 1 end, wins)"
+		),
+		0
+	)
 end
 
 T["confetti"]["stays away with reduced motion"] = function()
@@ -166,8 +179,12 @@ local problems = [[{
 
 local function filtered(filters)
 	child.lua(("filter = require('leetcode.ui.browser.filter'); problems = %s"):format(problems))
-	return child.lua_get(([[vim.tbl_map(function(p) return p.frontend_id end, filter.apply(problems,
-		vim.tbl_extend("force", { difficulty = "all", status = "all", free = false, query = "" }, %s)))]]):format(filters))
+	return child.lua_get(
+		([[vim.tbl_map(function(p) return p.frontend_id end, filter.apply(problems,
+		vim.tbl_extend("force", { difficulty = "all", status = "all", free = false, query = "" }, %s)))]]):format(
+			filters
+		)
+	)
 end
 
 T["filter"]["keeps everything by default"] = function()
@@ -200,7 +217,10 @@ end
 
 T["filter"]["splits a title around its matches"] = function()
 	child.lua("filter = require('leetcode.ui.browser.filter')")
-	eq(child.lua_get("filter.highlight('Two Sum', 'sum')"), { { "Two " }, { "Sum", "MarkupPickerMatch" } })
+	eq(
+		child.lua_get("filter.highlight('Two Sum', 'sum')"),
+		{ { "Two " }, { "Sum", "MarkupPickerMatch" } }
+	)
 	eq(child.lua_get("filter.highlight('Two Sum', 'zz')"), { { "Two Sum" } })
 end
 
@@ -278,7 +298,9 @@ T["browser"]["filters are reached with h and l"] = function()
 	]])
 
 	local function under_cursor()
-		return child.lua_get("vim.api.nvim_get_current_line():sub(vim.fn.col('.')):match('^%s*(%a+)')")
+		return child.lua_get(
+			"vim.api.nvim_get_current_line():sub(vim.fn.col('.')):match('^%s*(%a+)')"
+		)
 	end
 
 	eq(under_cursor(), "All")
@@ -532,7 +554,10 @@ T["browser"]["opens at full width right away"] = function()
 		Markup.animate.manual = true
 	]])
 	open_browser(5)
-	eq(child.lua_get("vim.api.nvim_win_get_width(browser.list.win)"), child.lua_get("math.floor(vim.o.columns * 0.5)"))
+	eq(
+		child.lua_get("vim.api.nvim_win_get_width(browser.list.win)"),
+		child.lua_get("math.floor(vim.o.columns * 0.5)")
+	)
 	eq(child.lua_get("Markup.animate.running()"), false)
 end
 
@@ -664,7 +689,12 @@ T["clicks"]["leetcode presses on a double click everywhere"] = function()
 		end
 	]])
 	eq(child.lua_get("#modes") > 0, true)
-	eq(child.lua_get("vim.tbl_count(vim.tbl_filter(function(mode) return mode ~= 'double' end, modes))"), 0)
+	eq(
+		child.lua_get(
+			"vim.tbl_count(vim.tbl_filter(function(mode) return mode ~= 'double' end, modes))"
+		),
+		0
+	)
 end
 
 T["browser"]["leet list still uses the picker"] = function()

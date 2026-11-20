@@ -5,7 +5,6 @@ local extras = require("leetcode.ui.problem.description.extras")
 local kit = require("leetcode.ui.kit")
 local t = require("leetcode.translator")
 
-
 ---@class leet.problem.description
 ---@field problem leet.problem
 ---@field win markup.window
@@ -53,7 +52,9 @@ function M:new(problem)
 		self.win:focus()
 	end
 	if config.user.image_support and not Markup.image.available() then
-		Markup.log.warn("`image_support` needs a Neovim with `vim.ui.img`, or image.nvim, links are shown instead")
+		Markup.log.warn(
+			"`image_support` needs a Neovim with `vim.ui.img`, or image.nvim, links are shown instead"
+		)
 	end
 end
 

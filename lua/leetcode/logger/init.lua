@@ -6,72 +6,71 @@ local lvls = vim.log.levels
 local logger = {}
 
 local function normalize(msg)
-    return type(msg) == "string" and t(msg) or vim.inspect(msg)
+	return type(msg) == "string" and t(msg) or vim.inspect(msg)
 end
 
-
 function logger.log(msg, lvl)
-    if not config.user.logging then
-        return
-    end
+	if not config.user.logging then
+		return
+	end
 
-    local title = config.name
-    lvl = lvl or lvls.INFO
-    msg = normalize(msg)
+	local title = config.name
+	lvl = lvl or lvls.INFO
+	msg = normalize(msg)
 
-    if lvl == lvls.DEBUG then
-        msg = debug.traceback(msg .. "\n")
-    end
+	if lvl == lvls.DEBUG then
+		msg = debug.traceback(msg .. "\n")
+	end
 
-    if not vim.in_fast_event() then
-        vim.notify(msg, lvl, { title = title })
-        return
-    end
-    vim.schedule(function()
-        vim.notify(msg, lvl, { title = title })
-    end)
+	if not vim.in_fast_event() then
+		vim.notify(msg, lvl, { title = title })
+		return
+	end
+	vim.schedule(function()
+		vim.notify(msg, lvl, { title = title })
+	end)
 end
 
 ---@param msg any
 logger.info = function(msg)
-    logger.log(msg)
+	logger.log(msg)
 end
 
 ---@param msg any
 logger.warn = function(msg)
-    logger.log(msg, lvls.WARN)
+	logger.log(msg, lvls.WARN)
 end
 
 ---@param msg any
 logger.error = function(msg)
-    logger.log(msg, lvls.ERROR)
-    logger.debug(msg)
+	logger.log(msg, lvls.ERROR)
+	logger.debug(msg)
 end
 
 ---@param err lc.err
 logger.err = function(err)
-    if not err then
-        return logger.error("error")
-    end
+	if not err then
+		return logger.error("error")
+	end
 
-    local msg = err.msg or ""
-    local lvl = err.lvl or lvls.ERROR
+	local msg = err.msg or ""
+	local lvl = err.lvl or lvls.ERROR
 
-    logger.log(msg, lvl)
+	logger.log(msg, lvl)
 end
 
 ---@param msg any
 ---@param show? boolean
 ---@return any
 logger.debug = function(msg, show)
-    if not config.debug then
-        return msg
-    end
+	if not config.debug then
+		return msg
+	end
 
-    local lvl = (show == nil or not show) and lvls.DEBUG or lvls.ERROR
-    logger.log(msg, lvl)
+	local lvl = (show == nil or not show) and lvls.DEBUG or lvls.ERROR
+	logger.log(msg, lvl)
 
-    return msg
+	return msg
 end
 
 return logger

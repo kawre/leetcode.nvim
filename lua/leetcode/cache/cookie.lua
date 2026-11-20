@@ -1,7 +1,8 @@
 local config = require("leetcode.config")
 local util = require("leetcode.util")
 
-local file = vim.fs.joinpath(config.storage.cache, ("cookie%s"):format(config.is_cn and "_cn" or ""))
+local file =
+	vim.fs.joinpath(config.storage.cache, ("cookie%s"):format(config.is_cn and "_cn" or ""))
 
 local hist = {}
 
@@ -16,84 +17,84 @@ local M = {}
 ---@param str string
 ---@return string|nil
 function M.set(str)
-    local _, cerr = M.parse(str)
-    if cerr then
-        return cerr
-    end
+	local _, cerr = M.parse(str)
+	if cerr then
+		return cerr
+	end
 
-    util.write_file(file, str)
-    local auth_api = require("leetcode.api.auth")
-    local _, aerr = auth_api.user()
+	util.write_file(file, str)
+	local auth_api = require("leetcode.api.auth")
+	local _, aerr = auth_api.user()
 
-    if aerr then
-        return aerr.msg
-    end
+	if aerr then
+		return aerr.msg
+	end
 end
 
 ---@return boolean
 function M.delete()
-    if not vim.uv.fs_stat(file) then
-        return false
-    end
-    return pcall(vim.fs.rm, file)
+	if not vim.uv.fs_stat(file) then
+		return false
+	end
+	return pcall(vim.fs.rm, file)
 end
 
 ---@return string|nil
 function M.read()
-    local contents = util.read_file(file)
+	local contents = util.read_file(file)
 
-    if not contents or type(contents) ~= "string" then
-        return
-    end
+	if not contents or type(contents) ~= "string" then
+		return
+	end
 
-    return select(1, contents:gsub("^%s*(.-)%s*$", "%1"))
+	return select(1, contents:gsub("^%s*(.-)%s*$", "%1"))
 end
 
 ---@return lc.cache.Cookie | nil
 function M.get()
-    local stat = vim.uv.fs_stat(file)
-    if not stat then
-        return
-    end
+	local stat = vim.uv.fs_stat(file)
+	if not stat then
+		return
+	end
 
-    local ftime = stat.mtime.sec
+	local ftime = stat.mtime.sec
 
-    local hcookie = hist[ftime]
-    if hcookie then
-        return hcookie
-    end
+	local hcookie = hist[ftime]
+	if hcookie then
+		return hcookie
+	end
 
-    local contents = M.read()
-    if not contents then
-        require("leetcode.cmd").delete_cookie()
-        return
-    end
+	local contents = M.read()
+	if not contents then
+		require("leetcode.cmd").delete_cookie()
+		return
+	end
 
-    local cookie = M.parse(contents)
-    if not cookie then
-        require("leetcode.cmd").delete_cookie()
-        return
-    end
+	local cookie = M.parse(contents)
+	if not cookie then
+		require("leetcode.cmd").delete_cookie()
+		return
+	end
 
-    hist[ftime] = cookie
-    return cookie
+	hist[ftime] = cookie
+	return cookie
 end
 
 ---@param str string
 ---
 ---@return lc.cache.Cookie|nil, string|nil
 function M.parse(str)
-    local csrf = str:match("csrftoken=([^;]+)")
-    if not csrf or csrf == "" then
-        return nil, "Bad csrf token format"
-    end
+	local csrf = str:match("csrftoken=([^;]+)")
+	if not csrf or csrf == "" then
+		return nil, "Bad csrf token format"
+	end
 
-    local ls = str:match("LEETCODE_SESSION=([^;]+)")
-    if not ls or ls == "" then
-        return nil, "Bad leetcode session token format"
-    end
+	local ls = str:match("LEETCODE_SESSION=([^;]+)")
+	if not ls or ls == "" then
+		return nil, "Bad leetcode session token format"
+	end
 
-    return { csrftoken = csrf, leetcode_session = ls, str = str }
+	return { csrftoken = csrf, leetcode_session = ls, str = str }
 end
 
 return M

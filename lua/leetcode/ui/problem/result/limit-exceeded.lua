@@ -14,7 +14,10 @@ local LimitExceed = m.component(function(props)
 			input = vim.split(item.last_testcase, "\n"),
 			params = item._.params,
 		}),
-		Stdout({ stdout = item._.submission and item.std_output or item.std_output_list[#item.std_output_list] }),
+		Stdout({
+			stdout = item._.submission and item.std_output
+				or item.std_output_list[#item.std_output_list],
+		}),
 	})
 end)
 
