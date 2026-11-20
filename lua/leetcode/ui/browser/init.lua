@@ -264,7 +264,7 @@ local Row = m.component(function(props)
 			end, "leetcode_accent"),
 			m.inline(function()
 				if busy() then
-					return m.loader({ style = "leetcode_accent" })
+					return kit.Loader("leetcode_accent")
 				end
 				return m.inline(
 					locked and config.icons.lock or (status and status[1] or " "),

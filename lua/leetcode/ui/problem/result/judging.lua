@@ -13,7 +13,7 @@ local RUNNER = 10
 ---@param props { state: fun(): string?, submit: boolean, lang?: string }
 return m.component(function(props)
 	-- One loader for the whole run, rather than a new one at every step.
-	local names = require("markup.view.components").loader_names()
+	local names = require("markup.view.components").loader_names(kit.loaders)
 	local loader = names[math.random(#names)]
 
 	local position = m.signal(0)

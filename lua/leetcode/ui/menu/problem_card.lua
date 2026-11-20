@@ -83,7 +83,7 @@ return m.component(function(props)
 					return (props.accent or focus() > 0.5) and "leetcode_accent" or "leetcode_muted"
 				end,
 				m.inline(function()
-					return busy() and m.inline({ m.loader(), " " }) or props.icon .. " "
+					return busy() and m.inline({ kit.Loader(), " " }) or props.icon .. " "
 				end),
 				m.inline(props.label, props.accent and "leetcode_accent" or nil),
 			}),
