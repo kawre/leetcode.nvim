@@ -165,6 +165,9 @@ jobs:
         with:
           path: deps
           key: deps-${{ runner.os }}-${{ hashFiles('Makefile') }}
+      # Images in descriptions are converted with ImageMagick or ffmpeg,
+      # whichever is installed; the runner has neither.
+      - run: sudo apt-get update && sudo apt-get install -y imagemagick
       - run: nvim --version | head -n 1
       - run: make test
 
@@ -204,6 +207,9 @@ jobs:
       # The headers cluacov builds against.
       - if: steps.rocks.outputs.cache-hit != 'true'
         run: sudo apt-get update && sudo apt-get install -y libluajit-5.1-dev
+      # Images in descriptions are converted with ImageMagick or ffmpeg,
+      # whichever is installed; the runner has neither.
+      - run: sudo apt-get update && sudo apt-get install -y imagemagick
       - name: Coverage
         shell: bash
         run: |
