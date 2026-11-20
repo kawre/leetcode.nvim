@@ -85,7 +85,7 @@ return m.component(function(p)
 				m.block({
 					m.inline(function()
 						if busy() then
-							return m.inline({ m.loader({ style = "leetcode_accent" }), " " })
+							return m.inline({ kit.Loader("leetcode_accent"), " " })
 						end
 						return m.inline(p.icon .. " ", fade(p.icon_hl or "Character"))
 					end),

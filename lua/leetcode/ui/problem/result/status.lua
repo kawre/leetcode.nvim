@@ -79,18 +79,4 @@ function M.Notice(title, kind)
 	})
 end
 
---- The judge at work, for the header while it is.
----@param submit boolean
-function M.Pending(submit)
-	return m.inline({
-		white_space = "nowrap",
-		snap = false,
-		m.loader({ style = "leetcode_accent" }),
-		m.inline(
-			" " .. (submit and i18n.header_submitting or i18n.header_running),
-			"leetcode_muted"
-		),
-	})
-end
-
 return M
