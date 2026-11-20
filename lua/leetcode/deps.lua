@@ -3,13 +3,13 @@
 local M = {}
 
 --- The markup.nvim API range used by leetcode.nvim.
-M.markup = "^0.2"
+M.markup = "^0.3"
 
 --- How to get markup.nvim, for every way of installing it.
 local INSTALL = table.concat({
 	"lazy.nvim installs it by itself on the next start of Neovim.",
 	"With another plugin manager, add https://github.com/kawre/markup.nvim and run",
-	"`nvim -l build.lua` in its directory, to build its engine (requires Rust for this revision).",
+	"`nvim -l build.lua` in its directory to install the engine.",
 	"To stay on the version before it, pin leetcode.nvim to the tag v0.3.1.",
 }, "\n")
 
