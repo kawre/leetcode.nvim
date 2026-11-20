@@ -1,0 +1,233 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+# A new push to a pull request cancels the run for the push before it. On
+# master each commit has a group of its own, so each one gets a result: in one
+# group a run waiting behind another is replaced by the next one that comes.
+# The runs of master still go one after another: the Changes job waits for the
+# ones started before it.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Nothing here needs a secret, so pull requests from forks run all of it.
+permissions:
+  contents: read
+
+jobs:
+  # What a change touches, so jobs with nothing to check are skipped: a pull
+  # request of the README runs no tests. A manual run checks everything.
+  changes:
+    name: Changes
+    runs-on: ubuntu-latest
+    # Long enough to wait for the runs of master before this one.
+    timeout-minutes: 60
+    # The files of a pull request come from the API, which needs this, and so
+    # do the runs of master before this one.
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
+    outputs:
+      code: ${{ steps.all.outputs.code }}
+    steps:
+      # The runs of master go one after another, in the order of the pushes:
+      # every job waits on this one, and this one on the runs of master that
+      # started before it. Pull requests do not wait.
+      - name: Wait for earlier runs on master
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          while true; do
+            earlier=$(gh api "repos/${{ github.repository }}/actions/workflows/ci.yml/runs?branch=master&event=push&per_page=50" \
+              --jq '[.workflow_runs[] | select(.id < ${{ github.run_id }}) | select(.status != "completed")] | length')
+            [ "$earlier" = 0 ] && break
+            echo "Waiting for $earlier earlier run(s) on master"
+            sleep 15
+          done
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            code:
+              - "lua/**"
+              - "queries/**"
+              - "tests/**"
+              - "scripts/**"
+              - "Makefile"
+              - ".stylua.toml"
+            ci:
+              - ".github/workflows/ci.yml"
+      - id: all
+        env:
+          EVERYTHING: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.ci == 'true' }}
+          CODE: ${{ steps.filter.outputs.code }}
+        run: |
+          code=$([ "$EVERYTHING" = true ] || [ "$CODE" = true ] && echo true || echo false)
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "Code changed: $code" >> "$GITHUB_STEP_SUMMARY"
+
+  format:
+    name: Format
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: 2.5.2
+          args: --check lua tests scripts
+
+  versions:
+    name: Neovim versions
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.list.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      # The newest patch of every release line from the oldest Neovim the
+      # plugin supports, as lua/leetcode/config/init.lua checks for it, and
+      # nightly.
+      - id: list
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          min=$(grep -oE 'has\("nvim-[0-9]+\.[0-9]+(\.[0-9]+)?"\)' lua/leetcode/config/init.lua | head -n 1 | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?')
+          test -n "$min" || { echo "::error::no has(\"nvim-x.y\") in lua/leetcode/config/init.lua"; exit 1; }
+          gh api 'repos/neovim/neovim/releases?per_page=100' --paginate \
+            --jq '.[] | select(.draft or .prerelease | not) | .tag_name' > tags.txt
+          gh api repos/neovim/neovim/releases/tags/nightly --jq .body > nightly.txt
+          matrix=$(MIN="$min" python3 -c '
+          import json, os, re
+          parse = lambda v: tuple(int(x) for x in v.lstrip("v").split("."))
+          tags = [t.strip() for t in open("tags.txt") if re.fullmatch(r"v\d+\.\d+\.\d+", t.strip())]
+          tags = sorted({t for t in tags if parse(t) >= parse(os.environ["MIN"])}, key=parse)
+          # The newest patch of each release line, such as v0.11.7 for 0.11.
+          latest = {}
+          for t in tags:
+              latest[parse(t)[:2]] = t
+          nightly = re.search(r"NVIM (v\S+)", open("nightly.txt").read())
+          label = nightly.group(1) + " nightly" if nightly else "nightly"
+          # One key, so GitHub names each job after it: "Tests (Neovim
+          # v0.11.7)". A name with ${{ matrix.* }} shows unexpanded on a
+          # skipped job.
+          include = [{"neovim": "Neovim " + t} for t in latest.values()]
+          include.append({"neovim": "Neovim " + label})
+          print(json.dumps({"include": include}))
+          ')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "Testing on Neovim $min and up: $matrix" >> "$GITHUB_STEP_SUMMARY"
+
+  test:
+    name: Tests
+    needs: [changes, versions]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Every version at once.
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.versions.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      # The version to install from the label: "Neovim v0.11.7" is v0.11.7,
+      # "Neovim v0.13.0-dev-... nightly" is nightly.
+      - id: version
+        shell: bash
+        run: |
+          v="${{ matrix.neovim }}"
+          v="${v#Neovim }"
+          [[ $v == *" nightly" ]] && v=nightly
+          echo "neovim=$v" >> "$GITHUB_OUTPUT"
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: ${{ steps.version.outputs.neovim }}
+      # mini.test and the release of markup.nvim the Makefile names, with its
+      # engine, again only when the Makefile changes.
+      - uses: actions/cache@v4
+        with:
+          path: deps
+          key: deps-${{ runner.os }}-${{ hashFiles('Makefile') }}
+      - run: nvim --version | head -n 1
+      - run: make test
+
+  coverage:
+    name: Coverage
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: nightly
+      - uses: actions/cache@v4
+        with:
+          path: deps
+          key: deps-${{ runner.os }}-${{ hashFiles('Makefile') }}
+      # LuaCov and cluacov in .tests/rocks, installed once for each version of
+      # the Makefile.
+      - uses: actions/cache@v4
+        id: rocks
+        with:
+          path: .tests/rocks
+          key: rocks-${{ hashFiles('Makefile') }}
+      # Only for LuaRocks, which LuaJIT cannot run: its manifest has more
+      # constants than LuaJIT allows in a function. LuaCov is plain Lua and
+      # runs in Neovim's LuaJIT.
+      - if: steps.rocks.outputs.cache-hit != 'true'
+        uses: leafo/gh-actions-lua@v11
+        with:
+          luaVersion: "5.1.5"
+      - if: steps.rocks.outputs.cache-hit != 'true'
+        uses: leafo/gh-actions-luarocks@v5
+      # The headers cluacov builds against.
+      - if: steps.rocks.outputs.cache-hit != 'true'
+        run: sudo apt-get update && sudo apt-get install -y libluajit-5.1-dev
+      - name: Coverage
+        shell: bash
+        run: |
+          make coverage | tee coverage.txt
+          {
+            echo '### Lua coverage'
+            echo '```'
+            tail -n 1 coverage.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: .tests/coverage/lua.lcov
+
+  # The one check branch protection requires: every job above passed, or was
+  # skipped for having nothing to check. Their names change with the Neovim
+  # versions, this one does not.
+  ci:
+    name: All checks
+    if: always()
+    needs: [changes, format, versions, test, coverage]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Every job passed or had nothing to check
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+        run: |
+          echo "$RESULTS"
+          echo "$RESULTS" | jq -e 'all(. == "success" or . == "skipped")'

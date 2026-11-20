@@ -3,3 +3,7 @@ README.zh.md
 
 # Local development files
 /.dev/
+
+# Test dependencies and coverage, from `make deps` and `make coverage`
+/deps/
+/.tests/

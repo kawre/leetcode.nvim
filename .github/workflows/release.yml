@@ -1,0 +1,36 @@
+name: Release
+
+# release-please keeps a pull request "chore(master): release x.y.z" up to date
+# from the conventional commits on master since the last release (v0.3.1 was
+# the last one made by hand), with CHANGELOG.md. Merging it tags the commit
+# and publishes the GitHub release.
+#
+# Its pull request needs CI to pass like any other. A pull request opened with
+# the default GITHUB_TOKEN starts no workflow, so set RELEASE_PLEASE_TOKEN: a
+# fine-grained token for this repository with Contents and Pull requests read
+# and write.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    name: Release PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
