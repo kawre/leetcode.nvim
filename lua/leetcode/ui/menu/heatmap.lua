@@ -4,7 +4,8 @@ local data = require("leetcode.ui.menu.data")
 
 local WEEKS = 53
 local DAY = 24 * 60 * 60
-local MONTHS = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" }
+local MONTHS =
+	{ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" }
 
 ---@class leet.ui.heatmap.summary
 ---@field total integer submissions in the shown days
@@ -91,7 +92,8 @@ end
 --- Rows of half blocks: two days fit in each cell, and the cells are square.
 local function Grid(summary)
 	local settled = Leet.menu.settled()
-	local reveal = m.animated(settled and WEEKS or 0, { duration = 900, delay = 100, easing = "out_cubic" })
+	local reveal =
+		m.animated(settled and WEEKS or 0, { duration = 900, delay = 100, easing = "out_cubic" })
 	if not settled then
 		reveal(WEEKS)
 	end

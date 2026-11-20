@@ -86,16 +86,26 @@ end
 T["description"]["says when text is hidden above"] = function()
 	run("open_problem()")
 	run([[vim.api.nvim_win_set_height(problem.description.win.win, 8)]])
-	eq(child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[1].win.win).hide"), true)
+	scroll_description(1)
+	eq(
+		child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[1].win.win).hide"),
+		true
+	)
 
 	-- Rows: the header, then a blank one, and then the text.
 	scroll_description(4)
 	eq(hint_has(" 3+ "), true)
 	eq(hint_has("───"), true)
-	eq(child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[1].win.win).hide"), false)
+	eq(
+		child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[1].win.win).hide"),
+		false
+	)
 
 	scroll_description(1)
-	eq(child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[1].win.win).hide"), true)
+	eq(
+		child.lua_get("vim.api.nvim_win_get_config(problem.description.view.fixed[1].win.win).hide"),
+		true
+	)
 end
 
 T["description"]["blank rows alone do not count as hidden"] = function()
@@ -173,7 +183,10 @@ T["description"]["sections sit on their own background"] = function()
 		end
 	]])
 	-- Barely lighter than the panel, a float.
-	eq(child.lua_get("vim.api.nvim_get_hl(0, { name = 'leetcode_section' }).bg"), child.lua_get("Markup.animate.mix(0x181825, 0xcdd6f4, 0.035)"))
+	eq(
+		child.lua_get("vim.api.nvim_get_hl(0, { name = 'leetcode_section' }).bg"),
+		child.lua_get("Markup.animate.mix(0x181825, 0xcdd6f4, 0.035)")
+	)
 	eq(child.lua_get("rows[example_row] ~= nil"), true)
 	eq(child.lua_get("rows[intro_row] == nil"), true)
 end
@@ -310,7 +323,12 @@ T["header"]["counts the hints"] = function()
 		fixture.problem.hints = { "a", "b", "c" }
 		open_problem()
 	]])
-	eq(child.lua_get([[buffer_text(problem.description.header.win.buf)[3]:find(" 3", 1, true) ~= nil]]), true)
+	eq(
+		child.lua_get(
+			[[buffer_text(problem.description.header.win.buf)[3]:find(" 3", 1, true) ~= nil]]
+		),
+		true
+	)
 end
 
 local function header_at(width)
@@ -970,7 +988,12 @@ T["console"]["stdout opens in a dimmed popup"] = function()
 
 	child.type_keys("q")
 	eq(child.lua_get("vim.api.nvim_win_is_valid(popup)"), false)
-	eq(child.lua_get("#vim.tbl_filter(function(w) return vim.api.nvim_win_get_config(w).relative ~= '' end, vim.api.nvim_list_wins())"), child.lua_get("floats_before"))
+	eq(
+		child.lua_get(
+			"#vim.tbl_filter(function(w) return vim.api.nvim_win_get_config(w).relative ~= '' end, vim.api.nvim_list_wins())"
+		),
+		child.lua_get("floats_before")
+	)
 	eq(child.lua_get("vim.api.nvim_get_current_win() == problem.console.win.win"), true)
 end
 
@@ -1173,7 +1196,17 @@ T["console"]["j passes over labels and the status of a run"] = function()
 	stops_on(words, "9")
 	stops_on(words, "[0,1]")
 	stops_on(words, "hello")
-	never_stops_on(words, { "^Input$", "^Output$", "^Expected$", "^nums$", "^target$", "^=$", "^Accepted$", "^0$", "^ms$" })
+	never_stops_on(words, {
+		"^Input$",
+		"^Output$",
+		"^Expected$",
+		"^nums$",
+		"^target$",
+		"^=$",
+		"^Accepted$",
+		"^0$",
+		"^ms$",
+	})
 end
 
 T["console"]["j passes over the labels and bars of a submission"] = function()
@@ -1185,7 +1218,10 @@ T["console"]["j passes over the labels and bars of a submission"] = function()
 	local words = stops()
 	stops_on(words, "12")
 	stops_on(words, "18.9")
-	never_stops_on(words, { "Runtime", "Memory", "^beats$", "[█▏▎▍▌▋▊▉]", "Python3" })
+	never_stops_on(
+		words,
+		{ "Runtime", "Memory", "^beats$", "[█▏▎▍▌▋▊▉]", "Python3" }
+	)
 end
 
 T["console"]["j only stops on the tabs while the judge works"] = function()
@@ -1523,7 +1559,8 @@ end
 --- is what taking the run answers, `checks` what each check of it does.
 ---@param opts { open: boolean, post?: string, checks?: string }
 local function notified_run(opts)
-	run(([[
+	run(
+		([[
 		open_problem()
 		Leet.config.debug = false
 		Leet.config.user.console.open_on_runcode = %s
@@ -1545,10 +1582,12 @@ local function notified_run(opts)
 		vim.wait(20, function() return false end, 5)
 		reactive.flush()
 	]]):format(
-		tostring(opts.open),
-		opts.checks or "{ { state = 'PENDING' }, { state = 'STARTED' }, { status_code = 16, status_msg = 'Internal Error' } }",
-		opts.post or "{ interpret_id = 'run1', test_case = '[2,7]\\n9' }"
-	))
+			tostring(opts.open),
+			opts.checks
+				or "{ { state = 'PENDING' }, { state = 'STARTED' }, { status_code = 16, status_msg = 'Internal Error' } }",
+			opts.post or "{ interpret_id = 'run1', test_case = '[2,7]\\n9' }"
+		)
+	)
 end
 
 T["console"]["says nothing while the console shows the run"] = function()
@@ -1659,7 +1698,9 @@ T["console"]["moves through every line with a visible cursor"] = function()
 	local visited = child.lua_get("visited")
 	local function at(text)
 		for i, line in ipairs(visited) do
-			if line:find(text, 1, true) then return i end
+			if line:find(text, 1, true) then
+				return i
+			end
 		end
 	end
 	-- Text as well as what can be pressed, top to bottom.
@@ -1781,7 +1822,12 @@ local function fetch(content, translated)
 end
 
 local function saved(name)
-	return child.lua_get(("vim.fn.filereadable(dev.problems_dir .. %q) == 1 and table.concat(vim.fn.readfile(dev.problems_dir .. %q), '\\n') or nil"):format(name, name))
+	return child.lua_get(
+		("vim.fn.filereadable(dev.problems_dir .. %q) == 1 and table.concat(vim.fn.readfile(dev.problems_dir .. %q), '\\n') or nil"):format(
+			name,
+			name
+		)
+	)
 end
 
 T["dev"]["is off by default"] = function()

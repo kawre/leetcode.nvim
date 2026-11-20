@@ -77,7 +77,12 @@ T["posts json through stdin"] = function()
 	eq(get("has_arg(1, 'POST')"), true)
 	eq(get("has_arg(1, '@-')"), true)
 	eq(get("vim.json.decode(calls[1].stdin)"), { lang = "python3", code = "print(1)" })
-	eq(get("vim.iter(calls[1].args):any(function(arg) return arg:find('print', 1, true) ~= nil end)"), false)
+	eq(
+		get(
+			"vim.iter(calls[1].args):any(function(arg) return arg:find('print', 1, true) ~= nil end)"
+		),
+		false
+	)
 end
 
 T["calls back on the main loop"] = function()

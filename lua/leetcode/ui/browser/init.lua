@@ -113,39 +113,48 @@ local SearchField = m.component(function(props)
 		white_space = "nowrap",
 		margin_bottom = 1,
 		style = fill,
-		m.block({ width = 1, shrink = 0, m.block("▌", edge), m.block("▌", edge), m.block("▌", edge) }),
-		m.flex({
-		grow = 1,
-		justify = "between",
-		padding = { 1, 1 },
-		m.inline({
-			shrink = 1,
-			m.inline(kit.icons.search .. " ", "leetcode_accent"),
-			m.inline({
-				style = function()
-					return state.query() == "" and "leetcode_muted" or "leetcode_strong"
-				end,
-				function()
-					local query = state.query()
-					return query == "" and "Search problems" or query
-				end,
-			}),
-		}),
-		m.inline({
+		m.block({
+			width = 1,
 			shrink = 0,
-			margin_left = 2,
-			m.inline(function()
-				-- The count matters once anything narrows the list, the hint before.
-				local everything = #state.filtered() == #state.problems
-				if everything and state.query() == "" and not state.typing() then
-					return m.inline({ m.inline("i ", "leetcode_key"), m.inline("to search", "leetcode_muted") })
-				end
-				return m.inline({
-					m.inline(tostring(#state.filtered()), "leetcode_strong"),
-					m.inline(" of " .. #state.problems, "leetcode_muted"),
-				})
-			end),
+			m.block("▌", edge),
+			m.block("▌", edge),
+			m.block("▌", edge),
 		}),
+		m.flex({
+			grow = 1,
+			justify = "between",
+			padding = { 1, 1 },
+			m.inline({
+				shrink = 1,
+				m.inline(kit.icons.search .. " ", "leetcode_accent"),
+				m.inline({
+					style = function()
+						return state.query() == "" and "leetcode_muted" or "leetcode_strong"
+					end,
+					function()
+						local query = state.query()
+						return query == "" and "Search problems" or query
+					end,
+				}),
+			}),
+			m.inline({
+				shrink = 0,
+				margin_left = 2,
+				m.inline(function()
+					-- The count matters once anything narrows the list, the hint before.
+					local everything = #state.filtered() == #state.problems
+					if everything and state.query() == "" and not state.typing() then
+						return m.inline({
+							m.inline("i ", "leetcode_key"),
+							m.inline("to search", "leetcode_muted"),
+						})
+					end
+					return m.inline({
+						m.inline(tostring(#state.filtered()), "leetcode_strong"),
+						m.inline(" of " .. #state.problems, "leetcode_muted"),
+					})
+				end),
+			}),
 		}),
 	})
 end)
@@ -199,7 +208,10 @@ local Row = m.component(function(props)
 			m.inline(function()
 				return hovered() and "▌" or " "
 			end, "leetcode_accent"),
-			m.inline(locked and config.icons.lock or (status and status[1] or " "), locked and "leetcode_medium" or status and status[2]),
+			m.inline(
+				locked and config.icons.lock or (status and status[1] or " "),
+				locked and "leetcode_medium" or status and status[2]
+			),
 			m.inline((" %5s  "):format(problem.frontend_id), "leetcode_muted"),
 			m.inline(function()
 				local title = Leet.util.translate(problem.title, problem.title_cn)
@@ -231,7 +243,10 @@ local List = m.component(function(props)
 		m.show(function()
 			return #state.filtered() == 0
 		end, function()
-			return m.block({ padding = { 2, 3 }, m.inline("No problems match these filters", "leetcode_muted") })
+			return m.block({
+				padding = { 2, 3 },
+				m.inline("No problems match these filters", "leetcode_muted"),
+			})
 		end),
 	})
 end)
@@ -307,7 +322,8 @@ local function search(state)
 	--- Neovim holds back TextChangedI while keys are queued, so whatever acts on
 	--- the query reads it first.
 	local function sync()
-		local text = api.nvim_buf_is_valid(buf) and api.nvim_buf_get_lines(buf, 0, 1, false)[1] or ""
+		local text = api.nvim_buf_is_valid(buf) and api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+			or ""
 		if text ~= state.query() then
 			state.query(text)
 			M.list_view:after_commit(M.to_top)

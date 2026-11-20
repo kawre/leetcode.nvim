@@ -18,7 +18,10 @@ local InvalidCase = m.component(function(props)
 	m.use_key("e", go)
 
 	return m.block({
-		m.block({ ("Case %d is not a valid input for this problem."):format(props.index), style = "leetcode_muted" }),
+		m.block({
+			("Case %d is not a valid input for this problem."):format(props.index),
+			style = "leetcode_muted",
+		}),
 		m.block({
 			margin_top = 1,
 			m.inline({
@@ -26,7 +29,8 @@ local InvalidCase = m.component(function(props)
 				on_press = go,
 				on_hover = hovered,
 				style = function()
-					return hovered() and "leetcode_console_case_active_hover" or "leetcode_console_case_active"
+					return hovered() and "leetcode_console_case_active_hover"
+						or "leetcode_console_case_active"
 				end,
 				(" \u{f03eb} Edit Case %d "):format(props.index),
 			}),
@@ -38,7 +42,9 @@ end)
 ---@param props { item: lc.runtime_error, console?: leet.problem.console }
 local RuntimeError = m.component(function(props)
 	local item = props.item
-	local invalid = item.invalid_testcase == true and type(item.case_idx) == "number" and props.console
+	local invalid = item.invalid_testcase == true
+		and type(item.case_idx) == "number"
+		and props.console
 
 	return m.block({
 		padding = { 0, 3 },

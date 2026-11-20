@@ -32,7 +32,8 @@ function M.detail(item)
 
 	-- LeetCode says "N/A" when there is no time to tell, which reads as noise.
 	local runtime = item.status_runtime
-	return type(runtime) == "string" and runtime ~= "N/A" and m.inline(runtime, "leetcode_muted") or nil
+	return type(runtime) == "string" and runtime ~= "N/A" and m.inline(runtime, "leetcode_muted")
+		or nil
 end
 
 ---@param item table

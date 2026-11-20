@@ -56,7 +56,7 @@ local function check_err(err)
 	if err.status then
 		if err.status == 401 or err.status == 403 then
 			err.msg =
-			"Your cookie may have expired, or LeetCode has temporarily restricted API access"
+				"Your cookie may have expired, or LeetCode has temporarily restricted API access"
 		end
 	end
 
@@ -72,7 +72,8 @@ local function handle_res(out)
 	if out.exit ~= 0 then
 		err = {
 			code = out.exit,
-			msg = "curl failed" .. (out.stderr and out.stderr ~= "" and (": " .. vim.trim(out.stderr)) or ""),
+			msg = "curl failed"
+				.. (out.stderr and out.stderr ~= "" and (": " .. vim.trim(out.stderr)) or ""),
 		}
 	elseif out.status >= 300 then
 		local ok, msg = pcall(function()
@@ -145,9 +146,13 @@ function M.request(method, url, params, done)
 
 	local opts = { text = true, stdin = params.body }
 	if done then
-		vim.system(args, opts, vim.schedule_wrap(function(proc)
-			done(parse(proc))
-		end))
+		vim.system(
+			args,
+			opts,
+			vim.schedule_wrap(function(proc)
+				done(parse(proc))
+			end)
+		)
 	else
 		return parse(vim.system(args, opts):wait())
 	end

@@ -19,7 +19,9 @@ function P.filter(problems, opts)
 	end
 
 	return vim.tbl_filter(function(problem)
-		if opts.difficulty and not vim.tbl_contains(opts.difficulty, problem.difficulty:lower()) then
+		if
+			opts.difficulty and not vim.tbl_contains(opts.difficulty, problem.difficulty:lower())
+		then
 			return false
 		end
 		if opts.status and not vim.tbl_contains(opts.status, problem.status) then
@@ -44,7 +46,11 @@ local function problem_item(problem)
 
 	return {
 		label = Leet.util.translate(problem.title, problem.title_cn),
-		keywords = ("%s %s %s"):format(problem.frontend_id, problem.title_slug, problem.title_cn or ""),
+		keywords = ("%s %s %s"):format(
+			problem.frontend_id,
+			problem.title_slug,
+			problem.title_cn or ""
+		),
 		prefix = {
 			marker,
 			{ " " .. config.icons.square .. " ", ui.diff_to_hl(problem.difficulty) },
@@ -83,7 +89,8 @@ function P.language(problem, cb)
 				label = lang.lang,
 				keywords = lang.slug,
 				prefix = { { lang.icon .. " ", lang.hl or ("leetcode_lang_" .. lang.slug) } },
-				suffix = problem.lang == lang.slug and { { t("current"), "leetcode_muted" } } or nil,
+				suffix = problem.lang == lang.slug and { { t("current"), "leetcode_muted" } }
+					or nil,
 				value = lang,
 			}
 		end

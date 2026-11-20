@@ -32,7 +32,9 @@ function M.split(a, b)
 	end
 
 	local chars_a, chars_b = vim.fn.split(a, "\\zs"), vim.fn.split(b, "\\zs")
-	local hunks = vim.text.diff(
+	-- vim.text.diff came in Neovim 0.12; 0.11 has it as vim.diff.
+	local diff = vim.text and vim.text.diff or vim.diff
+	local hunks = diff(
 		table.concat(chars_a, "\n") .. "\n",
 		table.concat(chars_b, "\n") .. "\n",
 		{ result_type = "indices" }
