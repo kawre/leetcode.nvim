@@ -2,15 +2,17 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    # markup-nvim is where the markup.nvim redesign comes together, through
+    # pull requests, before it goes to master.
+    branches: [master, markup-nvim]
   pull_request:
   workflow_dispatch:
 
-# A new push to a pull request cancels the run for the push before it. On
-# master each commit has a group of its own, so each one gets a result: in one
+# A new push to a pull request cancels the run for the push before it. On a
+# branch each commit has a group of its own, so each one gets a result: in one
 # group a run waiting behind another is replaced by the next one that comes.
-# The runs of master still go one after another: the Changes job waits for the
-# ones started before it.
+# The runs of a branch still go one after another: the Changes job waits for
+# the ones started before it.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -36,19 +38,20 @@ jobs:
     outputs:
       code: ${{ steps.all.outputs.code }}
     steps:
-      # The runs of master go one after another, in the order of the pushes:
-      # every job waits on this one, and this one on the runs of master that
-      # started before it. Pull requests do not wait.
-      - name: Wait for earlier runs on master
+      # The runs of a branch go one after another, in the order of the pushes:
+      # every job waits on this one, and this one on the runs of the same
+      # branch that started before it. Pull requests do not wait.
+      - name: Wait for earlier runs of this branch
         if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.ref_name }}
         run: |
           while true; do
-            earlier=$(gh api "repos/${{ github.repository }}/actions/workflows/ci.yml/runs?branch=master&event=push&per_page=50" \
+            earlier=$(gh api "repos/${{ github.repository }}/actions/workflows/ci.yml/runs?branch=$BRANCH&event=push&per_page=50" \
               --jq '[.workflow_runs[] | select(.id < ${{ github.run_id }}) | select(.status != "completed")] | length')
             [ "$earlier" = 0 ] && break
-            echo "Waiting for $earlier earlier run(s) on master"
+            echo "Waiting for $earlier earlier run(s) of $BRANCH"
             sleep 15
           done
       - uses: actions/checkout@v4
