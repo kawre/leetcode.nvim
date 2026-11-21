@@ -33,45 +33,46 @@ return m.component(function(p)
 	end
 	m.use_key(p.lhs, press, { noremap = false, silent = true, nowait = true })
 
-	local tile = kit.Card({
+	return Frame({
+		selected = selected,
 		width = p.width,
-		click = "double",
 		on_press = press,
 		on_hover = on_hover,
 		style = function()
 			return selected() and "leetcode_row_active" or "leetcode_surface"
 		end,
-		m.block({
-			white_space = "nowrap",
-			-- The key fills in when lit; at rest the same cells keep it in place.
-			m.inline({
-				style = function()
-					return selected() and "leetcode_tab_active"
-						or dimmed() and "leetcode_dim"
-						or "leetcode_key"
-				end,
-				" " .. p.lhs .. " ",
+		children = {
+			m.block({
+				white_space = "nowrap",
+				-- The key fills in when lit; at rest the same cells keep it in place.
+				m.inline({
+					style = function()
+						return selected() and "leetcode_tab_active"
+							or dimmed() and "leetcode_muted"
+							or "leetcode_key"
+					end,
+					" " .. p.lhs .. " ",
+				}),
+				m.inline({
+					style = function()
+						return dimmed() and "leetcode_soft" or "leetcode_strong"
+					end,
+					" " .. p.title,
+				}),
+				m.inline(function()
+					return busy() and m.inline({ " ", m.loader({ style = "leetcode_accent" }) })
+						or ""
+				end),
 			}),
-			m.inline({
-				style = function()
-					return dimmed() and "leetcode_muted" or "leetcode_strong"
-				end,
-				" " .. p.title,
+			m.block({
+				white_space = "nowrap",
+				m.inline({
+					style = function()
+						return dimmed() and "leetcode_dim" or "leetcode_muted"
+					end,
+					kit.truncate(p.desc, p.width - 4),
+				}),
 			}),
-			m.inline(function()
-				return busy() and m.inline({ " ", m.loader({ style = "leetcode_accent" }) }) or ""
-			end),
-		}),
-		m.block({
-			white_space = "nowrap",
-			m.inline({
-				style = function()
-					return dimmed() and "leetcode_dim" or "leetcode_muted"
-				end,
-				kit.truncate(p.desc, p.width - 4),
-			}),
-		}),
+		},
 	})
-
-	return Frame({ selected = selected, width = p.width, tile })
 end)

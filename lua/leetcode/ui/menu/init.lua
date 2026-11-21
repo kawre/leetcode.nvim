@@ -19,6 +19,7 @@ local M = {
 	home_page = m.signal("loading"),
 	stats_version = m.signal(0),
 	width = m.signal(vim.o.columns),
+	height = m.signal(vim.o.lines),
 	rows = 0,
 	rows_enter = true,
 	dashboards = 0,
@@ -72,13 +73,8 @@ local function sign_in()
 	end)
 end
 
---- Below this the pages stack into one column, such as beside the browser.
-local WIDE = 80
-local WIDTH = 78
-local NARROW = 46
-
---- Wide enough for the launcher, which keeps one width whatever the window.
-local LAUNCHER = 50
+--- Wide enough for the sign-in card, which keeps one width whatever the window.
+local LAUNCHER = 60
 
 --- The dashboard stands its cards and tiles side by side from here, at
 --- `DASHBOARD` wide, and stacks them below it.
@@ -97,6 +93,28 @@ function M.dashboard_width()
 	return math.max(math.min(width - 4, DASHBOARD_NARROW), 40), false
 end
 
+--- Rows of the band along the top.
+local BAND = 3
+
+--- About how tall what sits below the band is, to put it in the middle.
+---@return integer
+local function content_height()
+	local page = M.page()
+	if page == "loading" or page == "signin" then
+		return 8
+	end
+	if page ~= "menu" then
+		return 20
+	end
+	-- The dashboard: cards, tiles, the line below them and the recent work,
+	-- with a row between each.
+	local width, columns = M.dashboard_width()
+	local cards = width >= 70 and 6 or 13
+	local tiles = columns and 4 or 9
+	local recent = #require("leetcode.ui.menu.recent").list(columns and 3 or 2)
+	return cards + 1 + tiles + 1 + 1 + 1 + 2 + math.max(recent, 1)
+end
+
 local Home = m.component(function()
 	M.dashboards = M.dashboards + 1
 
@@ -104,9 +122,6 @@ local Home = m.component(function()
 		align = "center",
 		margin_top = 1,
 		function()
-			if M.home_page() ~= "menu" then
-				return m.block({ margin_top = 1, width = LAUNCHER, Nav({ width = LAUNCHER }) })
-			end
 			local width, columns = M.dashboard_width()
 			return m.block({ width = width, Nav({ width = width, columns = columns }) })
 		end,
@@ -120,8 +135,7 @@ local Gate = m.component(function()
 	return m.vflex({
 		align = "center",
 		margin_top = 2,
-		Band({ width = LAUNCHER }),
-		m.block({ margin_top = 2, width = LAUNCHER, Nav({ width = LAUNCHER }) }),
+		m.block({ width = LAUNCHER, Nav({ width = LAUNCHER }) }),
 	})
 end)
 
@@ -146,36 +160,44 @@ local App = m.component(function()
 		return page == "loading" or page == "signin"
 	end)
 
-	local wide = m.memo(function()
-		return M.width() >= WIDE
-	end)
-
 	return m.block({
-		margin_top = math.max(math.floor((vim.o.lines - 28) / 2), 1),
-		m.show(gated, Gate, function()
-			return m.vflex({
-				align = "center",
-				function()
-					local width, columns = M.dashboard_width()
-					return Band({ width = width, compact = not columns })
-				end,
-				m.slide(function()
-					return SLIDES[M.page()] or "home"
-				end, function(key)
-					if key == "home" then
-						return Home()
-					end
-					local Page = key == "stats" and Stats or Problems
-					return function()
-						return Page({ width = wide() and WIDTH or NARROW, columns = wide() })
-					end
-				end, {
-					forward = function(_, to)
-						return to ~= "home"
-					end,
-				}),
-			})
-		end),
+		-- The band runs along the top of the window, and the rest sits in the middle.
+		-- Pinned, so scrolling a short window leaves it in place.
+		m.block({
+			position = "fixed",
+			function()
+				local _, columns = M.dashboard_width()
+				return Band({ width = M.width(), compact = not columns })
+			end,
+		}),
+		m.block({
+			-- In the middle of what the band leaves, and again whenever the window
+			-- changes size.
+			margin_top = function()
+				return math.max(math.floor((M.height() - BAND - content_height()) / 2), 1)
+			end,
+			m.show(gated, Gate, function()
+				return m.vflex({
+					align = "center",
+					m.slide(function()
+						return SLIDES[M.page()] or "home"
+					end, function(key)
+						if key == "home" then
+							return Home()
+						end
+						local Page = key == "stats" and Stats or Problems
+						return function()
+							local width, columns = M.dashboard_width()
+							return Page({ width = width, columns = columns })
+						end
+					end, {
+						forward = function(_, to)
+							return to ~= "home"
+						end,
+					}),
+				})
+			end),
+		}),
 	})
 end)
 
@@ -183,12 +205,21 @@ function M.render()
 	if not M.view then
 		M.view = Markup.view(M.win, { snap = true, hide_cursor = true })
 		M.view:on_commit(function()
-			if M.win:valid() then
-				M.width(vim.api.nvim_win_get_width(M.win.win))
+			if not M.win:valid() then
+				return
+			end
+			M.width(vim.api.nvim_win_get_width(M.win.win))
+			M.height(vim.api.nvim_win_get_height(M.win.win))
+			-- Something is always lit on the dashboard, from the moment it shows:
+			-- the cursor goes to the nearest card until the user moves it.
+			if M.home_page() == "menu" and not focus.current() then
+				M.view.cursor = nil
+				M.view:snap_cursor()
 			end
 		end)
 	end
 	M.width(vim.api.nvim_win_get_width(M.win.win))
+	M.height(vim.api.nvim_win_get_height(M.win.win))
 	M.view:render(App())
 end
 

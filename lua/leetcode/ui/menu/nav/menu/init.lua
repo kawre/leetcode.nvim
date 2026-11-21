@@ -8,9 +8,9 @@ local kit = require("leetcode.ui.kit")
 local ProblemCard = require("leetcode.ui.menu.problem_card")
 local Tile = require("leetcode.ui.menu.dashboard.tile")
 local RecentRow = require("leetcode.ui.menu.dashboard.recent_row")
-local focus = require("leetcode.ui.menu.dashboard.focus")
 local data = require("leetcode.ui.menu.data")
 local recent = require("leetcode.ui.menu.recent")
+local Echo = require("leetcode.ui.menu.dashboard.echo")
 
 --- From this wide the two cards stand side by side.
 local CARDS_SIDE_BY_SIDE = 70
@@ -104,28 +104,6 @@ local function tiles(width)
 	}
 end
 
---- What the lit tile or card does, below the tiles.
-local function Echo(width)
-	return m.block(function()
-		local current = focus.current()
-		if not current or not current.detail then
-			return m.block(" ")
-		end
-		return m.flex({
-			width = width,
-			padding = { 0, 1 },
-			justify = "between",
-			white_space = "nowrap",
-			m.inline({
-				m.inline("▸ ", "leetcode_accent"),
-				m.inline(kit.truncate(current.title, 24), "leetcode_strong"),
-				m.inline("  " .. current.detail, "leetcode_muted"),
-			}),
-			m.inline({ kit.Key("<CR>"), m.inline(" " .. i18n.open_hint, "leetcode_muted") }),
-		})
-	end)
-end
-
 local function Recent(width, count)
 	local items = recent.list(count)
 	local rows = {}
@@ -142,7 +120,7 @@ local function Recent(width, count)
 			white_space = "nowrap",
 			m.inline({
 				style = function()
-					return focus.any() and "leetcode_dim" or "leetcode_muted"
+					return "leetcode_muted"
 				end,
 				i18n.recent,
 			}),
@@ -154,47 +132,49 @@ local function Recent(width, count)
 end
 
 ---@param props { width: integer, columns?: boolean }
+--- The space between cards, and between tiles, on both axes.
+local GAP = 2
+
+---@param props { width: integer, columns?: boolean }
 return m.component(function(props)
-	local width = props.width
 	m.use_key("q", function()
 		require("leetcode").stop()
 	end, { nowait = true })
 
+	-- Widths that divide evenly, so every gap is the same and every row ends on
+	-- the same column. The rest of the room is given up, not spread around.
+	local per_row = props.columns and 4 or 2
+	local tile = math.floor((props.width - GAP * (per_row - 1)) / per_row)
+	local width = tile * per_row + GAP * (per_row - 1)
+	local half = (width - GAP) / 2
+
 	-- Two cards fit side by side long after four tiles stop fitting in a row.
 	local cards
 	if width >= CARDS_SIDE_BY_SIDE then
-		local half = math.floor(width / 2) - 2
 		local continue = Continue(half)
-		cards = m.flex({
-			width = width,
-			justify = "between",
-			continue,
-			Today(continue and half or width - 2),
-		})
+		cards = m.flex({ spacing = GAP, continue, Today(continue and half or width) })
 	else
-		cards = m.vflex({ Continue(width - 2), Today(width - 2) })
+		cards = m.vflex({ spacing = 1, Continue(width), Today(width) })
 	end
 
+	local all = tiles(tile)
 	local row_of_tiles
 	if props.columns then
-		row_of_tiles = m.flex({
-			width = width,
-			justify = "between",
-			children = tiles(math.floor(width / 4) - 2),
-		})
+		row_of_tiles = m.flex({ spacing = GAP, children = all })
 	else
-		local all = tiles(math.floor(width / 2) - 2)
 		row_of_tiles = m.vflex({
-			m.flex({ width = width, justify = "between", all[1], all[2] }),
-			m.flex({ width = width, justify = "between", all[3], all[4] }),
+			spacing = 1,
+			m.flex({ spacing = GAP, all[1], all[2] }),
+			m.flex({ spacing = GAP, all[3], all[4] }),
 		})
 	end
 
 	return m.vflex({
 		align = "center",
+		width = width,
 		cards,
-		row_of_tiles,
-		Echo(width),
+		m.block({ margin_top = 1, row_of_tiles }),
+		m.block({ margin_top = 1, Echo(width) }),
 		m.block({ margin_top = 1, Recent(width, props.columns and 3 or 2) }),
 	})
 end)

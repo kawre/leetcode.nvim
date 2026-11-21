@@ -20,6 +20,10 @@ local function open(cookie)
 	child.lua(([[
 		_G.cookie = %s
 		menu = require("leetcode.ui.menu")
+		function band_buf()
+			local fixed = menu.view and menu.view.fixed[1]
+			return fixed and fixed.win.buf or -1
+		end
 		menu.win.buf = vim.api.nvim_get_current_buf()
 		menu.win:show()
 		menu.render()
@@ -29,7 +33,14 @@ local function open(cookie)
 end
 
 local function contains(text)
-	return child.lua_get(("contains(menu.win.buf, %q)"):format(text))
+	return child.lua_get(
+		("contains(menu.win.buf, %q) or contains(band_buf(), %q)"):format(text, text)
+	)
+end
+
+--- The line of the band, which is pinned above the menu in a float of its own.
+local function band()
+	return child.lua_get("vim.trim(table.concat(buffer_text(band_buf()), ' '))")
 end
 
 --- Creates solutions in the storage, each an hour older than the one before.
@@ -315,9 +326,9 @@ T["a short window can still show the whole dashboard"] = function()
 	for _ = 1, 60 do
 		child.type_keys("k")
 	end
-	-- Back at the top, where the band is.
+	-- Back at the top, with the band pinned above all along.
 	eq(child.lua_get("vim.fn.line('w0')"), 1)
-	eq(child.lua_get("visible('leetcode.nvim')"), true)
+	eq(band():find("leetcode.nvim", 1, true) ~= nil, true)
 end
 
 T["navigation explains itself"] = function()
@@ -326,17 +337,11 @@ T["navigation explains itself"] = function()
 	eq(contains("skills, heatmap"), true)
 end
 
-T["the band holds the streak and the numbers, above the cards"] = function()
+T["the band holds the streak and the numbers"] = function()
 	open(true)
-	child.lua([[
-		for i, line in ipairs(buffer_text(menu.win.buf)) do
-			if line:find("2 hard", 1, true) and not band then band = line; band_row = i end
-			if line:find("Daily challenge", 1, true) and not cards then cards = i end
-		end
-	]])
-	eq(child.lua_get("band:find('42', 1, true) ~= nil"), true)
-	eq(child.lua_get("band:find('30 solved', 1, true) ~= nil"), true)
-	eq(child.lua_get("band_row < cards"), true)
+	eq(band():find("42", 1, true) ~= nil, true)
+	eq(band():find("30 solved", 1, true) ~= nil, true)
+	eq(band():find("2 hard", 1, true) ~= nil, true)
 end
 
 T["what the cursor is on lights up, and the rest steps back"] = function()
@@ -344,8 +349,8 @@ T["what the cursor is on lights up, and the rest steps back"] = function()
 	cursor_to("Statistics")
 	-- Its key fills in, the others step back.
 	eq(hl_of("s", "Statistics"), "leetcode_tab_active")
-	eq(hl_of("p", "Problems"), "leetcode_dim")
-	eq(hl_of("Problems", "Problems"), "leetcode_muted")
+	eq(hl_of("p", "Problems"), "leetcode_muted")
+	eq(hl_of("Problems", "Problems"), "leetcode_soft")
 	eq(hl_of("Statistics", "Statistics"), "leetcode_strong")
 	-- Corners frame it, and only it.
 	child.lua([[
@@ -356,6 +361,95 @@ T["what the cursor is on lights up, and the rest steps back"] = function()
 		end
 	]])
 	eq(child.lua_get("corners"), 1)
+end
+
+T["something is lit from the start"] = function()
+	open(true)
+	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+	eq(
+		child.lua_get([[(require("leetcode.ui.menu.dashboard.focus").current() or {}).id]]),
+		"card.t"
+	)
+	eq(contains("┌"), true)
+end
+
+T["resizing the window keeps the dashboard in the middle"] = function()
+	open(true)
+	local function margins()
+		child.lua("vim.wait(100, function() reactive.flush(); return false end, 5)")
+		return child.lua_get([[(function()
+			local rows = buffer_text(menu.win.buf)
+			local top, bottom, left, right = nil, nil, 999, 0
+			-- Below the band, where the dashboard is.
+			for i = 4, #rows do
+				local line = rows[i]
+				if line:find("Daily challenge", 1, true) or line:find("Recent", 1, true) then
+					top = top or i
+					bottom = i
+					left = math.min(left, #line:match("^%s*"))
+					right = math.max(right, vim.fn.strdisplaywidth(line))
+				end
+			end
+			return {
+				above = top - 4,
+				below = vim.api.nvim_win_get_height(0) - bottom,
+				left = left,
+				right = vim.api.nvim_win_get_width(0) - right,
+			}
+		end)()]])
+	end
+
+	for _, size in ipairs({ { 200, 60 }, { 110, 34 } }) do
+		child.o.columns, child.o.lines = size[1], size[2]
+		local got = margins()
+		-- Even to within the rows and columns that cannot be split in two.
+		eq(math.abs(got.above - got.below) <= 4, true)
+		eq(math.abs(got.left - got.right) <= 2, true)
+	end
+end
+
+T["the band is pinned along the top of the window"] = function()
+	open(true)
+	child.lua([[
+		local fixed = menu.view.fixed[1]
+		config = vim.api.nvim_win_get_config(fixed.win.win)
+		width = vim.api.nvim_win_get_width(fixed.win.win)
+	]])
+	eq(child.lua_get("config.row"), 0)
+	eq(child.lua_get("width"), child.lua_get("vim.api.nvim_win_get_width(menu.win.win)"))
+	eq(band():find("leetcode.nvim", 1, true) ~= nil, true)
+end
+
+T["the band follows signing in that ends after it shows"] = function()
+	child.lua([[
+		local user = { name = "late", id = 1, is_signed_in = true, is_verified = true }
+		package.loaded["leetcode.api.auth"].user = function(cb)
+			vim.defer_fn(function()
+				Leet.auth(user)
+				cb(user)
+			end, 50)
+		end
+	]])
+	open(true)
+	child.lua("vim.wait(300, function() reactive.flush(); return menu.page() == 'menu' end, 5)")
+	child.lua("reactive.flush()")
+	eq(contains("not signed in"), false)
+	eq(contains("late"), true)
+end
+
+T["a long name leaves the band before anything overlaps"] = function()
+	open(true)
+	child.lua([[
+		Leet.auth().name = ("x"):rep(60)
+		vim.cmd("vnew")
+		vim.api.nvim_win_set_width(menu.win.win, 100)
+		menu.view:request_commit()
+		reactive.flush()
+		reactive.flush()
+	]])
+	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+	eq(band():find("xxxx", 1, true), nil)
+	eq(band():find("2 hard", 1, true) ~= nil, true)
 end
 
 T["the line below the tiles says what Enter does"] = function()
@@ -409,8 +503,8 @@ T["problems"]["slide in with their buttons"] = function()
 	open_problems()
 	eq(child.lua_get("menu.page()"), "menu.problems")
 	eq(contains("Random"), true)
-	eq(contains("Daily challenge"), true)
-	eq(contains("browse, random, recent"), false)
+	eq(contains("Daily"), true)
+	eq(contains("Refresh"), true)
 end
 
 T["problems"]["say when nothing was worked on"] = function()
@@ -438,6 +532,8 @@ end
 T["problems"]["color recent work by what it means"] = function()
 	worked_on(two_problems)
 	open_problems()
+	-- The rows step back while a tile is lit, so the cursor goes to the first.
+	cursor_to("Two Sum")
 
 	local function hl_of(text)
 		return child.lua_get(([[(function()
@@ -489,7 +585,7 @@ end
 
 T["problems"]["cut long titles"] = function()
 	worked_on([[{
-		{ title = "Longest Substring Without Repeating Characters In A String", title_cn = "",
+		{ title = "Longest Substring Without Repeating Characters In A String That Goes On And On For Ever", title_cn = "",
 		  title_slug = "long", frontend_id = "3", difficulty = "Medium", status = "ac" },
 	}]])
 	open_problems()
@@ -839,7 +935,7 @@ T["problems"]["refresh the problem list"] = function()
 		refreshed = false
 		require("leetcode.cmd").cache_update = function() refreshed = true end
 	]])
-	child.type_keys("r")
+	child.type_keys("u")
 	eq(child.lua_get("refreshed"), true)
 end
 

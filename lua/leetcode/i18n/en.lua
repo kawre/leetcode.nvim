@@ -10,7 +10,6 @@ local function plural(count, one, many)
 end
 
 -- Pages and the launcher
-M.welcome = "Welcome"
 M.account = "Account"
 M.menu = "Menu"
 M.problems = "Problems"
@@ -20,9 +19,7 @@ M.signing_in = "Signing in"
 M.continue = "Continue"
 M.daily_challenge = "Daily challenge"
 M.quit = "Quit"
-M.quit_desc = "close leetcode.nvim"
 M.back = "Back"
-M.back_desc = "return to the menu"
 
 -- The dashboard
 M.not_signed_in = "not signed in"
@@ -39,12 +36,22 @@ M.account_detail = "your session cookie, and signing out"
 M.open_recent_detail = "opens it again"
 M.open_hint = "open"
 M.quit_hint = "quit"
+M.daily_tile = "today's problem"
+M.browse_tile = "search, filter"
+M.refresh_tile = "fetch the list"
+M.daily = "Daily"
+M.signed_in_as = "Signed in as"
+M.cookie_tile = "paste a new one"
+M.sign_out_tile = "forget it"
+M.cookie_detail = "paste a new session cookie"
+M.sign_out_detail = "forget this session and sign out"
+M.sign_in_card = "Sign in to LeetCode"
+M.sign_in_hint = "Paste the session cookie from your browser."
+M.sign_in_local = "It stays on this machine."
 M.sign_in = "Sign in"
 M.sign_in_desc = "paste your session cookie"
 M.cookie = "Cookie"
-M.cookie_desc = "paste a new session cookie"
 M.sign_out = "Sign out"
-M.sign_out_desc = "forget this session"
 
 ---@param part "morning"|"afternoon"|"evening"|"night"
 ---@param name string
@@ -70,12 +77,10 @@ end
 
 -- The problems page
 M.browse = "Browse"
-M.browse_desc = "Search and filter every problem"
+M.browse_desc = "search and filter every problem"
 M.random = "Random"
-M.random_desc = "Pick one for me"
 M.refresh = "Refresh"
-M.refresh_desc = "Fetch the list again"
-M.todays_problem = "Today's problem"
+M.refresh_desc = "fetch the list of problems again"
 M.recent = "Recent"
 M.open = "Open"
 M.recent_empty = "Problems you work on will show up here"

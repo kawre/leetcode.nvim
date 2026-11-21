@@ -1,10 +1,12 @@
---- The page beside the dashboard, which slides in from the right.
+--- The page beside the dashboard, which slides in from the right: what was
+--- solved, the year of submissions, skills and languages, each a block the
+--- cursor stops on.
 
 local i18n = require("leetcode.i18n")
 local m = require("markup")
 local kit = require("leetcode.ui.kit")
 local data = require("leetcode.ui.menu.data")
-local PageBar = require("leetcode.ui.menu.page_bar")
+local Header = require("leetcode.ui.menu.dashboard.header")
 local solved = require("leetcode.ui.menu.solved")
 local Heatmap = require("leetcode.ui.menu.heatmap")
 
@@ -62,7 +64,7 @@ local function Bar(width)
 		end
 	end
 
-	return PageBar({
+	return Header({
 		title = i18n.statistics,
 		width = width,
 		actions = {
@@ -187,6 +189,7 @@ return m.component(function(props)
 	return m.vflex({
 		align = "center",
 		margin_top = 1,
+		spacing = 1,
 		Bar(width),
 		solved.Solved({ width = width }),
 		props.columns and Heatmap({ width = width }),

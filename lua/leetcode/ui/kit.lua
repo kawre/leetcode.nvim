@@ -54,25 +54,35 @@ function M.Card(props)
 	return m.block(card)
 end
 
---- A card the cursor can stop on, which lifts while it is there. Pressing it
---- does nothing unless it says so.
+--- A card the cursor can stop on, which lifts while it is there and is framed
+--- by corners, as on the dashboard. Pressing it does nothing unless it says so.
 ---@param props table
 function M.HoverCard(props)
+	local Frame = require("leetcode.ui.menu.dashboard.frame")
 	local focus = m.animated(0, { duration = 110 })
+	local hovered = m.signal(false)
 	local tint = Markup.animate.tint(
 		{ bg = M.color("leetcode_surface", "bg") },
 		{ bg = M.color("leetcode_row_active", "bg") },
 		focus
 	)
 
-	return M.Card(vim.tbl_extend("force", props, {
+	local children = {}
+	for _, child in ipairs(props) do
+		children[#children + 1] = child
+	end
+
+	return Frame({
+		selected = hovered,
+		width = props.width,
 		style = tint,
-		click = "double",
 		on_press = props.on_press or function() end,
-		on_hover = function(hovered)
-			focus(hovered and 1 or 0)
+		on_hover = function(on)
+			hovered(on)
+			focus(on and 1 or 0)
 		end,
-	}))
+		children = children,
+	})
 end
 
 --- Cuts text to a width, which shows with an ellipsis.
