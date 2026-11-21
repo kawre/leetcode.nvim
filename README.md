@@ -345,6 +345,10 @@ theme = {
 image_support = true,
 ```
 
+## Test coverage
+
+Coverage checks both the overall line coverage and the coverage of added or modified executable lines. The patch minimum is 80%. `make coverage` uses `pipx` to run diff-cover. Locally it compares with `HEAD^` by default, including working tree changes. For a whole feature branch, run `make coverage COVERAGE_BASE="$(git merge-base HEAD origin/markup-nvim)"`.
+
 ## 📋 Commands
 
 ### `Leet` opens menu dashboard

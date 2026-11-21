@@ -13,6 +13,11 @@ TEST_TIMEOUT ?= 10m
 COVERAGE_TIMEOUT ?= 20m
 # The least coverage, in percent
 COVERAGE_MIN ?= 75
+# Patch coverage uses the same LCOV report. Override the base for a longer series.
+PATCH_COVERAGE_MIN ?= 80
+COVERAGE_BASE ?= HEAD^
+DIFF_COVER = pipx run --spec diff-cover==11.0.4 diff-cover
+PATCH_CHECK = $(DIFF_COVER) --compare-branch "$(COVERAGE_BASE)" --diff-range-notation=.. --include-untracked --fail-under=$(PATCH_COVERAGE_MIN)
 # The headers of LuaJIT, to build cluacov for it
 LUAJIT_INCDIR ?= /usr/include/luajit-2.1
 
@@ -53,6 +58,7 @@ coverage: deps $(ROCKS)
 	@mkdir -p .tests/coverage
 	@failed=0; COVERAGE=1 scripts/run_tests.sh $(JOBS) $(COVERAGE_TIMEOUT) $(NVIM_TEST) || failed=1; \
 	COVERAGE_MIN=$(COVERAGE_MIN) nvim -l scripts/coverage.lua || failed=1; \
+	$(PATCH_CHECK) .tests/coverage/lua.lcov || failed=1; \
 	exit $$failed
 
 deps/mini.test:
