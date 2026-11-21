@@ -179,6 +179,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       # Measured on the Neovim users have, not on nightly.
       - uses: rhysd/action-setup-vim@v1
         with:
@@ -212,14 +214,22 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y imagemagick
       - name: Coverage
         shell: bash
+        env:
+          COVERAGE_BASE: ${{ github.event.pull_request.base.sha || github.event.before || 'HEAD^' }}
         run: |
-          make coverage | tee coverage.txt
+          # A newly pushed branch has no previous tip.
+          if [[ "$COVERAGE_BASE" == 0000000000000000000000000000000000000000 ]]; then
+            COVERAGE_BASE=$(git hash-object -w -t tree /dev/null)
+          fi
+          status=0
+          make coverage 2>&1 | tee coverage.txt || status=$?
           {
             echo '### Lua coverage'
             echo '```'
-            tail -n 1 coverage.txt
+            awk '/^Diff Coverage$/ { patch=1 } patch || /^ *[0-9.]+%.*total$/' coverage.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
       - uses: actions/upload-artifact@v4
         with:
           name: coverage

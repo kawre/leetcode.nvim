@@ -230,66 +230,72 @@ local Filters = m.component(function(props)
 end)
 
 local Row = m.component(function(props)
-	local problem, state = props.problem, props.state
+	local state = props.state
 	local hovered = m.signal(false)
 	local config = require("leetcode.config")
 
-	local status = config.icons.hl.status[problem.status]
-	local locked = problem.paid_only and not config.auth.is_premium
 	-- While the question is fetched. A row filtered away meanwhile opens nothing.
 	local busy, start = kit.use_task()
 
-	return m.flex({
-		click = "double",
-		on_press = function()
-			start(function(task)
-				state.open(problem, task)
-			end)
-		end,
-		on_hover = function(value)
-			hovered(value)
-			if value then
-				state.reached(props.index)
-			end
-		end,
-		style = function()
-			return hovered() and "leetcode_row_active" or nil
-		end,
-		justify = "between",
-		white_space = "nowrap",
-		m.inline({
-			shrink = 1,
-			m.inline(function()
-				return hovered() and "▌" or " "
-			end, "leetcode_accent"),
-			m.inline(function()
-				if busy() then
-					return m.loader({ style = "leetcode_accent" })
+	return function()
+		local problem = props.problem()
+		local status = config.icons.hl.status[problem.status]
+		local locked = problem.paid_only and not config.auth.is_premium
+		return m.flex({
+			click = "double",
+			on_press = function()
+				start(function(task)
+					state.open(problem, task)
+				end)
+			end,
+			on_hover = function(value)
+				hovered(value)
+				if value then
+					state.reached(props.index())
 				end
-				return m.inline(
-					locked and config.icons.lock or (status and status[1] or " "),
-					locked and "leetcode_medium" or status and status[2]
-				)
-			end),
-			m.inline((" %5s  "):format(problem.frontend_id), "leetcode_muted"),
-			m.inline(function()
-				local title = Leet.util.translate(problem.title, problem.title_cn)
-				return vim.tbl_map(function(span)
-					return m.inline(span[1], span[2])
-				end, filter.highlight(title, state.query()))
-			end),
-		}),
-		m.inline({
-			shrink = 0,
-			margin_right = 1,
-			m.inline(("  %5.1f%%  "):format(problem.ac_rate or 0), "leetcode_muted"),
-			-- Six cells, which a difficulty in Chinese takes fewer bytes than.
+			end,
+			style = function()
+				return hovered() and "leetcode_row_active" or nil
+			end,
+			justify = "between",
+			white_space = "nowrap",
 			m.inline({
-				width = 6,
-				m.inline(i18n.difficulty(problem.difficulty), ui.diff_to_hl(problem.difficulty)),
+				shrink = 1,
+				m.inline(function()
+					return hovered() and "▌" or " "
+				end, "leetcode_accent"),
+				m.inline(function()
+					if busy() then
+						return m.loader({ style = "leetcode_accent" })
+					end
+					return m.inline(
+						locked and config.icons.lock or (status and status[1] or " "),
+						locked and "leetcode_medium" or status and status[2]
+					)
+				end),
+				m.inline((" %5s  "):format(problem.frontend_id), "leetcode_muted"),
+				m.inline(function()
+					local title = Leet.util.translate(problem.title, problem.title_cn)
+					return vim.tbl_map(function(span)
+						return m.inline(span[1], span[2])
+					end, filter.highlight(title, state.query()))
+				end),
 			}),
-		}),
-	})
+			m.inline({
+				shrink = 0,
+				margin_right = 1,
+				m.inline(("  %5.1f%%  "):format(problem.ac_rate or 0), "leetcode_muted"),
+				-- Six cells, which a difficulty in Chinese takes fewer bytes than.
+				m.inline({
+					width = 6,
+					m.inline(
+						i18n.difficulty(problem.difficulty),
+						ui.diff_to_hl(problem.difficulty)
+					),
+				}),
+			}),
+		})
+	end
 end)
 
 local List = m.component(function(props)

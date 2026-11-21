@@ -1938,6 +1938,15 @@ T["console"]["adds, removes and resets cases"] = function()
 	eq(child.lua_get("#problem.console.testcase.cases()"), 2)
 end
 
+T["console"]["testcase tabs follow the current case numbers after deletion"] = function()
+	open_console()
+	child.type_keys("a", "2", "d")
+	run("reactive.flush()")
+	eq(console_has("Case 1"), true)
+	eq(console_has("Case 2"), true)
+	eq(console_has("Case 3"), false)
+end
+
 T["console"]["enter on a field types over it, and on a case picks it"] = function()
 	open_console()
 	run([[
