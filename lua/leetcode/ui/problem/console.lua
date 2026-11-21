@@ -123,7 +123,8 @@ local Testcases = m.component(function(props)
 						list[i] = i
 					end
 					return list
-				end, function(i)
+				end, function(case_number)
+					local i = case_number()
 					return Chip({
 						variant = "case",
 						label = (" %s "):format(i18n.case(i)),

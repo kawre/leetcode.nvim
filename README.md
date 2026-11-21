@@ -24,13 +24,13 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
 ## 📬 Requirements
 
-- [Neovim] >= 0.9.0
+- [Neovim] >= 0.11.0
 
 - [Picker](#picker)
 
 - [plenary.nvim]
 
-- [markup.nvim]
+- [markup.nvim] 0.5.x
 
 - [tree-sitter-html] _**(optional, but highly recommended)**_
   used for formatting the question description.
@@ -45,11 +45,12 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 ```lua
 {
     "kawre/leetcode.nvim",
+    branch = "markup-nvim",
     build = ":TSUpdate html", -- if you have `nvim-treesitter` installed
     dependencies = {
         -- include a picker of your choice, see picker section for more details
         "nvim-lua/plenary.nvim",
-        { "kawre/markup.nvim", build = "make build" },
+        { "kawre/markup.nvim", version = "^0.5" },
     },
     opts = {
         -- configuration goes here
@@ -343,6 +344,10 @@ theme = {
 ---@type boolean
 image_support = true,
 ```
+
+## Test coverage
+
+Coverage checks both the overall line coverage and the coverage of added or modified executable lines. The patch minimum is 80%. `make coverage` uses `pipx` to run diff-cover. Locally it compares with `HEAD^` by default, including working tree changes. For a whole feature branch, run `make coverage COVERAGE_BASE="$(git merge-base HEAD origin/markup-nvim)"`.
 
 ## 📋 Commands
 
