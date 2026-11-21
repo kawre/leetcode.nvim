@@ -536,6 +536,32 @@ T["browser"]["enter opens the problem under the cursor"] = function()
 	eq(child.lua_get("opened"), "p2")
 end
 
+T["browser"]["a retained slug shows and opens the current problem"] = function()
+	open_browser(9)
+	child.lua([[
+		items[3] = vim.tbl_extend("force", items[3], { title = "Updated title" })
+		package.loaded["leetcode.cmd"] = { open = function(problem) opened = problem end }
+	]])
+	child.type_keys("e")
+	child.lua("reactive.flush()")
+	eq(list_has("Updated title"), true)
+	child.lua("vim.api.nvim_win_set_cursor(browser.list.win, { 1, 12 })")
+	child.type_keys("<CR>")
+	eq(child.lua_get("opened == items[3]"), true)
+end
+
+T["browser"]["paging uses the row's index after filtering"] = function()
+	open_browser(660)
+	child.type_keys("e")
+	child.lua([[
+		reactive.flush()
+		vim.api.nvim_win_set_cursor(browser.list.win, { 64, 12 })
+		vim.api.nvim_exec_autocmds("CursorMoved", { buffer = browser.list.buf })
+		reactive.flush()
+	]])
+	eq(child.lua_get("#buffer_text(browser.list.buf)"), 200)
+end
+
 T["browser"]["mounts rows in batches"] = function()
 	open_browser(1000)
 	eq(child.lua_get("#buffer_text(browser.list.buf)"), 200)

@@ -3,7 +3,7 @@
 NVIM_TEST = nvim --headless --noplugin -u tests/init.lua
 # markup.nvim, the UI library, at a release: its build.lua downloads the
 # engine built for this platform, so no Rust is needed to test.
-MARKUP_VERSION ?= v0.3.0
+MARKUP_VERSION ?= v0.5.0
 MARKUP = deps/markup.nvim
 ROCKS = .tests/rocks
 # How many test files run at once

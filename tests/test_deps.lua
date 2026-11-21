@@ -44,17 +44,15 @@ T["says how to get markup.nvim when it is not there"] = function()
 	eq(problem:find("v0.3.1", 1, true) ~= nil, true)
 end
 
-T["reports the installed version when markup.nvim rejects the range"] = function()
-	child.lua([[
-		local config = require("markup.config")
-		config.version = "0.4.0"
-		config.supports = function(range)
-			requested = range
-			return false
-		end
-	]])
-	eq(child.lua_get("deps.check()"), "leetcode.nvim requires markup.nvim ^0.3 (installed: 0.4.0).")
-	eq(child.lua_get("requested"), dofile("lazy.lua")[1].version)
+T["reports an older markup.nvim release"] = function()
+	child.lua([[require("markup.config").version = "0.4.0"]])
+	eq(check(), "leetcode.nvim requires markup.nvim ^0.5 (installed: 0.4.0).")
+end
+
+T["accepts patch releases in the markup.nvim 0.5 series"] = function()
+	child.lua([[require("markup.config").version = "0.5.1"]])
+	eq(check(), vim.NIL)
+	eq(dofile("lazy.lua")[1].version, child.lua_get("deps.markup"))
 end
 
 T["says to build the engine when only it is missing"] = function()
