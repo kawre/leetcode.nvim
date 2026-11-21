@@ -4,7 +4,6 @@
 local i18n = require("leetcode.i18n")
 local m = require("markup")
 local recent = require("leetcode.ui.menu.recent")
-local Header = require("leetcode.ui.menu.dashboard.header")
 local Tile = require("leetcode.ui.menu.dashboard.tile")
 local RecentRow = require("leetcode.ui.menu.dashboard.recent_row")
 local Echo = require("leetcode.ui.menu.dashboard.echo")
@@ -79,6 +78,12 @@ end
 
 ---@param props { width: integer, columns?: boolean }
 return m.component(function(props)
+	local function back()
+		Leet.menu.set_page("menu")
+	end
+	m.use_key("q", back, { nowait = true })
+	Leet.menu.use_actions({ { title = i18n.back, lhs = "q" } })
+
 	-- The page moving in is the entrance, so the rows do not make one of their own.
 	Leet.menu.rows = 0
 	Leet.menu.rows_enter = false
@@ -97,20 +102,6 @@ return m.component(function(props)
 
 	return m.vflex({
 		align = "center",
-		margin_top = 1,
-		Header({
-			title = i18n.problems,
-			width = width,
-			actions = {
-				{
-					title = i18n.back,
-					lhs = "q",
-					press = function()
-						Leet.menu.set_page("menu")
-					end,
-				},
-			},
-		}),
 		row_of_tiles,
 		m.block({ margin_top = 1, Echo(width) }),
 		m.block({ margin_top = 1, Recent(width) }),

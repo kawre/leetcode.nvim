@@ -33,9 +33,33 @@ local function open(cookie)
 end
 
 local function contains(text)
-	return child.lua_get(
-		("contains(menu.win.buf, %q) or contains(band_buf(), %q)"):format(text, text)
-	)
+	return child.lua_get(([[(function()
+		if contains(menu.win.buf, %q) then return true end
+		-- The band and the header, pinned above in floats of their own.
+		for _, fixed in ipairs(menu.view.fixed) do
+			if contains(fixed.win.buf, %q) then return true end
+		end
+		return false
+	end)()]]):format(text, text))
+end
+
+--- The line of the header, just above the page.
+local function header()
+	return child.lua_get([[(function()
+		for _, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("Menu", 1, true) then return vim.trim(line) end
+		end
+		return ""
+	end)()]])
+end
+
+--- The row the header is on.
+local function header_row()
+	return child.lua_get([[(function()
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("Menu", 1, true) then return i end
+		end
+	end)()]])
 end
 
 --- The line of the band, which is pinned above the menu in a float of its own.
@@ -116,7 +140,7 @@ T["signed in shows the main page"] = function()
 	eq(child.lua_get("menu.page()"), "menu")
 	eq(contains("Problems"), true)
 	eq(contains("Statistics"), true)
-	eq(contains("quit"), true)
+	eq(contains("Quit"), true)
 end
 
 T["the greeting follows the signed in user"] = function()
@@ -222,10 +246,15 @@ T["coming back skips the intro and keeps the data"] = function()
 		Markup.animate.manual = true
 		fetches = streak_fetches
 	]])
+	-- One tick for the fall, one for the rise that follows it.
+	local through =
+		"reactive.flush(); Markup.animate.tick(3000); reactive.flush(); reactive.flush()"
 	child.type_keys("p")
-	child.lua("reactive.flush(); Markup.animate.tick(3000); reactive.flush(); reactive.flush()")
+	child.lua(through)
+	child.lua(through)
 	child.type_keys("q")
-	child.lua("reactive.flush(); Markup.animate.tick(3000); reactive.flush(); reactive.flush()")
+	child.lua(through)
+	child.lua(through)
 	eq(contains("solved"), true)
 	eq(child.lua_get("streak_fetches"), child.lua_get("fetches"))
 
@@ -294,11 +323,24 @@ T["tiles stand side by side when wide, two by two when narrow"] = function()
 	eq(child.lua_get("tiles:find('Statistics', 1, true) ~= nil"), false)
 end
 
-T["the breadcrumb shows only away from the menu"] = function()
+T["the header says where the menu is, and never moves"] = function()
 	open(true)
-	eq(contains("Menu"), false)
-	child.lua([[menu.set_page("menu.cookie"); reactive.flush()]])
-	eq(contains("Menu"), true)
+	local row = header_row()
+	eq(header():find("Menu", 1, true) ~= nil, true)
+	eq(header():find("›", 1, true), nil)
+	eq(header():find("Quit q", 1, true) ~= nil, true)
+
+	child.lua(
+		[[menu.set_page("menu.cookie"); vim.wait(50, function() reactive.flush(); return false end, 5)]]
+	)
+	eq(header():find("Menu › Account", 1, true) ~= nil, true)
+	eq(header():find("Back q", 1, true) ~= nil, true)
+	eq(header_row(), row)
+
+	child.lua(
+		[[menu.set_page("menu.statistics"); vim.wait(50, function() reactive.flush(); return false end, 5)]]
+	)
+	eq(header_row(), row)
 end
 
 T["a short window can still show the whole dashboard"] = function()
@@ -747,30 +789,11 @@ T["statistics"]["are fetched once, until updated"] = function()
 	eq(child.lua_get("fetched"), 2)
 end
 
-T["statistics"]["move between the buttons sideways"] = function()
+T["statistics"]["list update and back in the header"] = function()
 	open_stats()
-	child.lua([[
-		for i, line in ipairs(buffer_text(menu.win.buf)) do
-			local col = line:find("Update", 1, true)
-			if col then vim.api.nvim_win_set_cursor(0, { i, col - 2 }) end
-		end
-		menu.view.cursor = nil
-		menu.view:snap_cursor()
-	]])
-
-	local function under_cursor()
-		return child.lua_get(
-			"vim.api.nvim_get_current_line():sub(vim.fn.col('.')):match('^%s*(%a+)')"
-		)
-	end
-
-	eq(under_cursor(), "Update")
-	child.type_keys("l")
-	eq(under_cursor(), "Back")
-	child.type_keys("l")
-	eq(under_cursor(), "Back")
-	child.type_keys("h")
-	eq(under_cursor(), "Update")
+	eq(header():find("Menu › Statistics", 1, true) ~= nil, true)
+	eq(header():find("Update u", 1, true) ~= nil, true)
+	eq(header():find("Back q", 1, true) ~= nil, true)
 end
 
 T["statistics"]["update in the page, not in a notification"] = function()
@@ -829,11 +852,11 @@ T["statistics"]["every block is a stop for the cursor"] = function()
 	-- Solved, the year, skills and languages.
 	eq(child.lua_get("#stops"), 4)
 
-	-- Up above them, the buttons of the page.
+	-- Back up, the first of them.
 	for _ = 1, 12 do
 		child.type_keys("k")
 	end
-	eq(child.lua_get("vim.api.nvim_get_current_line():find('Update', 1, true) ~= nil"), true)
+	eq(child.lua_get("menu.view.hovered"), child.lua_get("stops[1]"))
 end
 
 T["statistics"]["a block lifts while the cursor is on it"] = function()
@@ -854,6 +877,33 @@ T["statistics"]["a block lifts while the cursor is on it"] = function()
 	]])
 	child.type_keys("j", "j")
 	eq(child.lua_get("lifted_now()"), child.lua_get("active"))
+end
+
+T["statistics"]["come in once the dashboard has fallen away"] = function()
+	open(true)
+	child.lua([[
+		Markup.animate.enabled = true
+		Markup.animate.manual = true
+	]])
+	local row = header_row()
+	child.type_keys("s")
+	child.lua("reactive.flush(); Markup.animate.tick(100); reactive.flush(); reactive.flush()")
+	-- Still falling: the old page is there, lower down, and the new one waits.
+	eq(contains("Daily challenge"), true)
+	eq(contains("Fundamental"), false)
+	eq(header_row(), row)
+	-- The cursor waits on the first row, under the band, rather than ride along.
+	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1]"), 1)
+
+	-- The fall, then the rise that follows it.
+	child.lua("Markup.animate.tick(3000); reactive.flush(); reactive.flush()")
+	child.lua("Markup.animate.tick(3000); reactive.flush(); reactive.flush()")
+	eq(contains("Daily challenge"), false)
+	eq(contains("Fundamental"), true)
+	eq(header_row(), row)
+	-- And lands on the page once it is in.
+	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1]") > row, true)
+	eq(child.lua_get("menu.dropping"), false)
 end
 
 T["statistics"]["open no popups"] = function()

@@ -3,7 +3,6 @@
 local m = require("markup")
 local i18n = require("leetcode.i18n")
 local kit = require("leetcode.ui.kit")
-local Header = require("leetcode.ui.menu.dashboard.header")
 local Tile = require("leetcode.ui.menu.dashboard.tile")
 local Echo = require("leetcode.ui.menu.dashboard.echo")
 
@@ -12,24 +11,16 @@ local GAP = 2
 ---@param props { width: integer }
 return m.component(function(props)
 	local cmd = require("leetcode.cmd")
+	m.use_key("q", function()
+		Leet.menu.set_page("menu")
+	end, { nowait = true })
+	Leet.menu.use_actions({ { title = i18n.back, lhs = "q" } })
+
 	local tile = math.floor((props.width - GAP) / 2)
 	local width = tile * 2 + GAP
 
 	return m.vflex({
 		width = width,
-		Header({
-			title = i18n.account,
-			width = width,
-			actions = {
-				{
-					title = i18n.back,
-					lhs = "q",
-					press = function()
-						Leet.menu.set_page("menu")
-					end,
-				},
-			},
-		}),
 		m.block({
 			-- The width of the box, padding included.
 			width = width - 4,

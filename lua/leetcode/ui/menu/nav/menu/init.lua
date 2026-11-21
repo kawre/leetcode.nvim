@@ -113,18 +113,10 @@ local function Recent(width, count)
 
 	return m.block({
 		width = width,
-		m.flex({
+		m.block({
 			padding = { 0, 1 },
 			margin_bottom = 1,
-			justify = "between",
-			white_space = "nowrap",
-			m.inline({
-				style = function()
-					return "leetcode_muted"
-				end,
-				i18n.recent,
-			}),
-			m.inline({ kit.Key("q"), m.inline(" " .. i18n.quit_hint, "leetcode_muted") }),
+			m.inline(i18n.recent, "leetcode_muted"),
 		}),
 		#rows > 0 and m.vflex({ children = rows })
 			or m.block({ padding = { 0, 1 }, m.inline(i18n.recent_empty, "leetcode_muted") }),
@@ -140,6 +132,7 @@ return m.component(function(props)
 	m.use_key("q", function()
 		require("leetcode").stop()
 	end, { nowait = true })
+	Leet.menu.use_actions({ { title = i18n.quit, lhs = "q" } })
 
 	-- Widths that divide evenly, so every gap is the same and every row ends on
 	-- the same column. The rest of the room is given up, not spread around.
