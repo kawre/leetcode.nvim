@@ -140,6 +140,12 @@ M.get = function()
 		surface = { bg = surface },
 		row_active = { bg = raised },
 		muted = { fg = muted },
+		-- What steps back while something else is lit, as on the dashboard: a
+		-- shade lighter than muted text for what was muted, and between muted
+		-- and full for what was strong.
+		dim = { fg = mix(bg, fg, 0.42) },
+		soft = { fg = mix(bg, fg, 0.75) },
+		band = { bg = header },
 		accent = { fg = accent },
 		strong = { fg = fg, bold = true },
 		key = { fg = mix(bg, accent, light and 1 or 0.75) },
