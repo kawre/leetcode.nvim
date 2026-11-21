@@ -1,6 +1,6 @@
---- A card of the dashboard. Its top and bottom rows are its padding, and hold
---- the corners that frame it while it is selected, like the viewfinder of a
---- camera, so nothing moves when they come and go.
+--- A card of the dashboard. While it is selected, a slim accent spine runs down
+--- its left edge, in a column of its padding, so nothing moves when it comes
+--- and goes.
 
 local m = require("markup")
 
@@ -12,26 +12,27 @@ local m = require("markup")
 ---@field on_hover? fun(hovered: boolean)
 ---@field children any[]
 
+--- Only the left side is drawn, so only the last character counts.
+local SPINE = { chars = "       ▎" }
+
 ---@param props leet.ui.menu.framed
 return function(props)
-	local function corner(char)
-		return m.inline(function()
-			return props.selected() and char or " "
-		end, "leetcode_accent")
-	end
-
-	local function edge(left, right)
-		return m.flex({ justify = "between", white_space = "nowrap", corner(left), corner(right) })
-	end
-
-	return m.block({
+	return m.flex({
 		width = props.width,
 		style = props.style,
 		click = "double",
 		on_press = props.on_press,
 		on_hover = props.on_hover,
-		edge("┌", "┐"),
-		m.block({ padding = { 0, 2 }, children = props.children }),
-		edge("└", "┘"),
+		-- The column stretches to the height of the card, whatever it holds.
+		m.show(props.selected, function()
+			return m.block({
+				border = SPINE,
+				border_sides = { "left" },
+				border_style = "leetcode_accent",
+			})
+		end, function()
+			return m.block({ width = 1 })
+		end),
+		m.block({ width = props.width - 4, padding = { 1, 2, 1, 1 }, children = props.children }),
 	})
 end

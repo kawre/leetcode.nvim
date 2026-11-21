@@ -32,10 +32,6 @@ function M.use(item)
 	end)
 
 	local function on_hover(hovered)
-		-- A page on its way out lights nothing up as it falls past the cursor.
-		if hovered and Leet.menu.dropping then
-			return
-		end
 		if hovered then
 			M.current(item)
 		elseif mine() then

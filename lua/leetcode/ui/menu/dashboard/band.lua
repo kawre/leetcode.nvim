@@ -58,8 +58,7 @@ local SignedIn = m.component(function(props)
 		)
 		if not props.compact then
 			for _, difficulty in ipairs({ "Easy", "Medium", "Hard" }) do
-				local count = solved.stat_of(difficulty).solved
-				text = text .. (" · %d %s"):format(count, i18n.difficulty(difficulty:lower()))
+				text = text .. (" · %d"):format(solved.stat_of(difficulty).solved)
 			end
 		end
 		return vim.api.nvim_strwidth(text) + 2
@@ -91,11 +90,12 @@ local SignedIn = m.component(function(props)
 		Count("All", "leetcode_strong", i18n.solved_count, 100),
 		not props.compact and m.inline({
 			separator,
-			Count("Easy", "leetcode_easy", i18n.difficulty("easy"), 200),
+			-- The colours tell the difficulties apart, which keeps room for the greeting.
+			Count("Easy", "leetcode_easy", nil, 200),
 			separator,
-			Count("Medium", "leetcode_medium", i18n.difficulty("medium"), 300),
+			Count("Medium", "leetcode_medium", nil, 300),
 			separator,
-			Count("Hard", "leetcode_hard", i18n.difficulty("hard"), 400),
+			Count("Hard", "leetcode_hard", nil, 400),
 		}),
 	})
 

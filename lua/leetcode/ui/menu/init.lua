@@ -6,16 +6,12 @@ local Nav = require("leetcode.ui.menu.nav")
 local Band = require("leetcode.ui.menu.dashboard.band")
 local focus = require("leetcode.ui.menu.dashboard.focus")
 local Header = require("leetcode.ui.menu.dashboard.header")
-local Drop = require("leetcode.ui.menu.dashboard.drop")
 local data = require("leetcode.ui.menu.data")
 local Stats = require("leetcode.ui.menu.stats")
 local Problems = require("leetcode.ui.menu.problems")
 
 --- Pages that are not part of the navigation, but take the dashboard's place.
 local SLIDES = { ["menu.statistics"] = "stats", ["menu.problems"] = "problems" }
-
---- Pages before there is a user, which do not drop.
-local SLIDES_GATED = { loading = true, signin = true }
 
 ---@class leet.menu
 local M = {
@@ -52,72 +48,10 @@ function M.use_actions(actions)
 	end)
 end
 
---- Whether a page is still on its way out, while the cursor waits for it.
-M.dropping = false
-
---- Where the cursor waits while pages drop and rise: the first row, under the
---- band, which nothing moves past. Snapping is off meanwhile, or it would pull
---- the cursor onto the page falling, and follow it down.
-local parked ---@type { win: integer, option: string, value: string }?
-
-local function park()
-	if parked or not M.win:valid() then
-		return
-	end
-	local win = M.win.win
-	-- Neovim 0.11 has no per-window list, so the global one stands in.
-	local local_option = vim.fn.exists("+eventignorewin") == 1
-	local option = local_option and "eventignorewin" or "eventignore"
-	local value = local_option and vim.wo[win][option] or vim.o[option]
-	local ignored = value == "" and "CursorMoved" or value .. ",CursorMoved"
-	if local_option then
-		vim.wo[win][option] = ignored
-	else
-		vim.o[option] = ignored
-	end
-	parked = { win = win, option = option, value = value }
-
-	vim.api.nvim_win_set_cursor(win, { 1, 0 })
-	if M.view then
-		M.view.cursor = nil
-	end
-	-- Never longer than a transition could take, whatever happens to it.
-	vim.defer_fn(M.unpark, 1500)
-end
-
---- Lets the cursor go, onto the nearest thing on the page that came in.
-function M.unpark()
-	M.dropping = false
-	if not parked then
-		return
-	end
-	local was = parked
-	parked = nil
-	if was.option == "eventignorewin" then
-		if vim.api.nvim_win_is_valid(was.win) then
-			vim.wo[was.win][was.option] = was.value
-		end
-	else
-		vim.o[was.option] = was.value
-	end
-
-	M.dropping = false
-	if M.view and M.win:valid() and vim.api.nvim_get_current_win() == M.win.win then
-		M.view.cursor = nil
-		M.view:snap_cursor()
-		M.view:update_hover()
-	end
-end
-
 ---@param page string
 function M.set_page(page)
-	-- What was lit belongs to the page being left, and the cursor waits for it
-	-- to be gone before it lands on the new one.
+	-- What was lit belongs to the page being left: the cursor lands on the new one.
 	focus.current(nil)
-	if M.page() ~= page and not SLIDES_GATED[M.page()] then
-		M.dropping = true
-		park()
-	end
 	if not SLIDES[page] then
 		M.home_page(page)
 	end
@@ -175,8 +109,8 @@ function M.dashboard_width()
 	return math.max(math.min(width - 4, DASHBOARD_NARROW), 40), false
 end
 
---- Rows of the band pinned along the top.
-local BAND = 3
+--- Rows of the band above the header, with the row below it.
+local BAND = 4
 --- Rows of the header above the page: its line, its rule and one row below.
 local HEADER = 3
 
@@ -228,9 +162,6 @@ end)
 
 local App = m.component(function()
 	local view = m.use_view()
-	-- Closing the menu mid-transition still lets the cursor go.
-	m.on_cleanup(M.unpark)
-
 	m.use_key("<CR>", function()
 		view:press()
 	end)
@@ -264,42 +195,45 @@ local App = m.component(function()
 		return m.vflex({ align = "center", Home({ page = key }) })
 	end
 
-	return m.block({
-		-- The band runs along the top of the window, pinned, so it stays as the
-		-- page below changes or scrolls.
-		m.block({
-			position = "fixed",
+	--- The band, as wide as the dashboard and just above it, where the eye
+	--- already is rather than along the top of a large window.
+	local function band()
+		return m.vflex({
+			align = "center",
+			margin_bottom = 1,
 			function()
-				local _, columns = M.dashboard_width()
-				return Band({ width = M.width(), compact = not columns })
+				local width, columns = M.dashboard_width()
+				return Band({ width = width, compact = not columns })
 			end,
-		}),
+		})
+	end
+
+	return m.block({
 		m.show(gated, function()
 			return m.block({
 				margin_top = function()
 					return math.max(math.floor((M.height() - BAND - 8) / 2), 1)
 				end,
+				band(),
 				Gate(),
 			})
 		end, function()
-			-- The header sits just above the page, and stays while pages drop
-			-- away and rise below it.
+			-- The band and the header sit just above the page, and stay as pages
+			-- change below them.
 			return m.block({
 				margin_top = top_margin,
+				band(),
 				Header({
 					width = function()
 						return (M.dashboard_width())
 					end,
 				}),
-				Drop({
-					key = M.page,
-					render = page_of,
-					-- Down to the bottom of the window, and no further.
-					depth = function()
-						return math.max(M.height() - BAND - top_margin() - HEADER, 1)
-					end,
-					on_arrived = M.unpark,
-				}),
+				function()
+					local page = M.page()
+					return m.untrack(function()
+						return page_of(page)
+					end)
+				end,
 			})
 		end),
 	})
@@ -316,7 +250,7 @@ function M.render()
 			M.height(vim.api.nvim_win_get_height(M.win.win))
 			-- Something is always lit on the dashboard, from the moment it shows:
 			-- the cursor goes to the nearest card until the user moves it.
-			if not M.dropping and not focus.current() then
+			if not focus.current() then
 				M.view.cursor = nil
 				M.view:snap_cursor()
 			end

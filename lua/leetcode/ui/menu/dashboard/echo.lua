@@ -20,7 +20,7 @@ return function(width)
 				justify = "between",
 				white_space = "nowrap",
 				m.inline({
-					m.inline("▸ ", "leetcode_accent"),
+					m.inline(kit.icons.select .. " ", "leetcode_accent"),
 					m.inline(kit.truncate(current.title, 24), "leetcode_strong"),
 					m.inline("  " .. current.detail, "leetcode_muted"),
 				}),

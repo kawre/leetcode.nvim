@@ -20,10 +20,6 @@ local function open(cookie)
 	child.lua(([[
 		_G.cookie = %s
 		menu = require("leetcode.ui.menu")
-		function band_buf()
-			local fixed = menu.view and menu.view.fixed[1]
-			return fixed and fixed.win.buf or -1
-		end
 		menu.win.buf = vim.api.nvim_get_current_buf()
 		menu.win:show()
 		menu.render()
@@ -62,9 +58,14 @@ local function header_row()
 	end)()]])
 end
 
---- The line of the band, which is pinned above the menu in a float of its own.
+--- The line of the band, just above the header.
 local function band()
-	return child.lua_get("vim.trim(table.concat(buffer_text(band_buf()), ' '))")
+	return child.lua_get([[(function()
+		for _, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("leetcode.nvim", 1, true) then return vim.trim(line) end
+		end
+		return ""
+	end)()]])
 end
 
 --- Creates solutions in the storage, each an hour older than the one before.
@@ -246,14 +247,11 @@ T["coming back skips the intro and keeps the data"] = function()
 		Markup.animate.manual = true
 		fetches = streak_fetches
 	]])
-	-- One tick for the fall, one for the rise that follows it.
 	local through =
 		"reactive.flush(); Markup.animate.tick(3000); reactive.flush(); reactive.flush()"
 	child.type_keys("p")
 	child.lua(through)
-	child.lua(through)
 	child.type_keys("q")
-	child.lua(through)
 	child.lua(through)
 	eq(contains("solved"), true)
 	eq(child.lua_get("streak_fetches"), child.lua_get("fetches"))
@@ -261,17 +259,6 @@ T["coming back skips the intro and keeps the data"] = function()
 	-- The row under the cursor may still fade in, but the intro takes far longer.
 	child.lua("Markup.animate.tick(200)")
 	eq(child.lua_get("Markup.animate.running()"), false)
-end
-
-T["a new page still makes an entrance"] = function()
-	open(true)
-	child.lua([[
-		Markup.animate.enabled = true
-		Markup.animate.manual = true
-	]])
-	child.type_keys("p")
-	child.lua("reactive.flush()")
-	eq(child.lua_get("Markup.animate.running()"), true)
 end
 
 T["the cursor only stops on cards and tiles"] = function()
@@ -368,9 +355,9 @@ T["a short window can still show the whole dashboard"] = function()
 	for _ = 1, 60 do
 		child.type_keys("k")
 	end
-	-- Back at the top, with the band pinned above all along.
+	-- Back at the top, band and all.
 	eq(child.lua_get("vim.fn.line('w0')"), 1)
-	eq(band():find("leetcode.nvim", 1, true) ~= nil, true)
+	eq(child.lua_get("visible('leetcode.nvim')"), true)
 end
 
 T["navigation explains itself"] = function()
@@ -383,7 +370,7 @@ T["the band holds the streak and the numbers"] = function()
 	open(true)
 	eq(band():find("42", 1, true) ~= nil, true)
 	eq(band():find("30 solved", 1, true) ~= nil, true)
-	eq(band():find("2 hard", 1, true) ~= nil, true)
+	eq(band():find("20 · 8 · 2", 1, true) ~= nil, true)
 end
 
 T["what the cursor is on lights up, and the rest steps back"] = function()
@@ -394,15 +381,19 @@ T["what the cursor is on lights up, and the rest steps back"] = function()
 	eq(hl_of("p", "Problems"), "leetcode_muted")
 	eq(hl_of("Problems", "Problems"), "leetcode_soft")
 	eq(hl_of("Statistics", "Statistics"), "leetcode_strong")
-	-- Corners frame it, and only it.
+	-- A spine runs down its left edge, the whole height of the tile, and
+	-- down no other.
 	child.lua([[
-		corners = 0
+		spine = {}
 		for _, line in ipairs(buffer_text(menu.win.buf)) do
-			local _, n = line:gsub("┌", "")
-			corners = corners + n
+			if line:find("▎", 1, true) then
+				spine[#spine + 1] = line
+			end
 		end
 	]])
-	eq(child.lua_get("corners"), 1)
+	eq(child.lua_get("#spine"), 4)
+	eq(child.lua_get("spine[2]"):find("Statistics", 1, true) ~= nil, true)
+	eq(child.lua_get("spine[2]"):match("▎%s*s%s+Statistics") ~= nil, true)
 end
 
 T["something is lit from the start"] = function()
@@ -412,7 +403,7 @@ T["something is lit from the start"] = function()
 		child.lua_get([[(require("leetcode.ui.menu.dashboard.focus").current() or {}).id]]),
 		"card.t"
 	)
-	eq(contains("┌"), true)
+	eq(contains("▎"), true)
 end
 
 T["resizing the window keeps the dashboard in the middle"] = function()
@@ -450,16 +441,21 @@ T["resizing the window keeps the dashboard in the middle"] = function()
 	end
 end
 
-T["the band is pinned along the top of the window"] = function()
+T["the band sits just above the header, as wide as the dashboard"] = function()
 	open(true)
 	child.lua([[
-		local fixed = menu.view.fixed[1]
-		config = vim.api.nvim_win_get_config(fixed.win.win)
-		width = vim.api.nvim_win_get_width(fixed.win.win)
+		lines = buffer_text(menu.win.buf)
+		for i, line in ipairs(lines) do
+			if line:find("leetcode.nvim", 1, true) then band_row = i end
+			if line:find("Menu", 1, true) then header_row = i end
+		end
 	]])
-	eq(child.lua_get("config.row"), 0)
-	eq(child.lua_get("width"), child.lua_get("vim.api.nvim_win_get_width(menu.win.win)"))
-	eq(band():find("leetcode.nvim", 1, true) ~= nil, true)
+	-- Its line, its lower edge and a blank row, then the header.
+	eq(child.lua_get("header_row - band_row"), 3)
+	local width = child.lua_get("vim.fn.strdisplaywidth(vim.trim(lines[band_row - 1]))")
+	eq(width, child.lua_get("(menu.dashboard_width())"))
+	-- In the middle, not along the top of the window.
+	eq(child.lua_get("band_row") > 2, true)
 end
 
 T["the band follows signing in that ends after it shows"] = function()
@@ -491,13 +487,13 @@ T["a long name leaves the band before anything overlaps"] = function()
 	]])
 	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
 	eq(band():find("xxxx", 1, true), nil)
-	eq(band():find("2 hard", 1, true) ~= nil, true)
+	eq(band():find("20 · 8 · 2", 1, true) ~= nil, true)
 end
 
 T["the line below the tiles says what Enter does"] = function()
 	open(true)
 	cursor_to("Random")
-	eq(contains("▸ Random  opens a problem at random"), true)
+	eq(contains("\u{f0cfd} Random  opens a problem at random"), true)
 	cursor_to("Account")
 	eq(contains("your session cookie, and signing out"), true)
 end
@@ -634,7 +630,7 @@ T["problems"]["cut long titles"] = function()
 	eq(contains("…"), true)
 end
 
-T["problems"]["keep their keys after the slide"] = function()
+T["problems"]["keep their keys while animations run"] = function()
 	open(true)
 	child.lua([[
 		Markup.animate.enabled = true
@@ -879,7 +875,7 @@ T["statistics"]["a block lifts while the cursor is on it"] = function()
 	eq(child.lua_get("lifted_now()"), child.lua_get("active"))
 end
 
-T["statistics"]["come in once the dashboard has fallen away"] = function()
+T["statistics"]["take the dashboard's place at once"] = function()
 	open(true)
 	child.lua([[
 		Markup.animate.enabled = true
@@ -887,23 +883,13 @@ T["statistics"]["come in once the dashboard has fallen away"] = function()
 	]])
 	local row = header_row()
 	child.type_keys("s")
-	child.lua("reactive.flush(); Markup.animate.tick(100); reactive.flush(); reactive.flush()")
-	-- Still falling: the old page is there, lower down, and the new one waits.
-	eq(contains("Daily challenge"), true)
-	eq(contains("Fundamental"), false)
-	eq(header_row(), row)
-	-- The cursor waits on the first row, under the band, rather than ride along.
-	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1]"), 1)
-
-	-- The fall, then the rise that follows it.
-	child.lua("Markup.animate.tick(3000); reactive.flush(); reactive.flush()")
-	child.lua("Markup.animate.tick(3000); reactive.flush(); reactive.flush()")
+	child.lua("reactive.flush(); reactive.flush()")
+	-- No page falls away first: the new one is there before any frame plays.
 	eq(contains("Daily challenge"), false)
 	eq(contains("Fundamental"), true)
 	eq(header_row(), row)
-	-- And lands on the page once it is in.
+	-- And the cursor is on it.
 	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1]") > row, true)
-	eq(child.lua_get("menu.dropping"), false)
 end
 
 T["statistics"]["open no popups"] = function()
@@ -912,29 +898,6 @@ T["statistics"]["open no popups"] = function()
 	child.type_keys("s")
 	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
 	eq(child.lua_get("#vim.api.nvim_list_wins()"), child.lua_get("wins"))
-end
-
-T["statistics"]["slide in and out"] = function()
-	open(true)
-	child.lua([[
-		Markup.animate.enabled = true
-		Markup.animate.manual = true
-	]])
-	child.type_keys("s")
-	child.lua([[
-		reactive.flush()
-		Markup.animate.tick(160)
-		reactive.flush()
-		reactive.flush()
-	]])
-	eq(child.lua_get("Markup.animate.running()"), true)
-	child.lua([[
-		Markup.animate.tick(3000)
-		reactive.flush()
-		reactive.flush()
-	]])
-	eq(contains("Fundamental"), true)
-	eq(contains("progress and skills"), false)
 end
 
 T["continue"] = new_set()
