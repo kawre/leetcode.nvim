@@ -167,8 +167,6 @@ M.step_judging = "Judging"
 M.step_result = "Result"
 M.judging_submit = "Submitting your solution"
 M.judging_run = "Running your testcases"
-M.header_submitting = "Submitting…"
-M.header_running = "Running…"
 
 -- Results
 M.runtime = "Runtime"

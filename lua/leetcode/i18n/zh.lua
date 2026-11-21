@@ -153,8 +153,6 @@ M.step_judging = "判题中"
 M.step_result = "结果"
 M.judging_submit = "正在提交你的代码"
 M.judging_run = "正在运行测试用例"
-M.header_submitting = "提交中…"
-M.header_running = "运行中…"
 
 -- Results
 M.runtime = "执行用时"

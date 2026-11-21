@@ -36,11 +36,10 @@ function M:judging(submit)
 	local state = m.signal("PENDING")
 	self.state = state
 	self.content({
+		-- No status for the header: the steps below are the one sign of the
+		-- judge at work.
 		render = function()
 			return Judging({ state = state, submit = submit })
-		end,
-		status = function()
-			return Status.Pending(submit)
 		end,
 	})
 end

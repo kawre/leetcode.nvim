@@ -107,11 +107,21 @@ function M.truncate(text, width)
 	return table.concat(result) .. "…"
 end
 
+--- The loaders leetcode.nvim draws from: Nerd Font icons, one cell wide.
+---@type markup.view.loader_pick
+M.loaders = { nerd_font = true, width = 1 }
+
+--- A loader, drawn at random from `M.loaders`.
+---@param style? string
+function M.Loader(style)
+	return m.loader({ style = style, pick = M.loaders })
+end
+
 --- Something that is on its way.
 ---@param text? string
 function M.Loading(text)
 	return m.inline({
-		m.loader({ style = "leetcode_accent" }),
+		M.Loader("leetcode_accent"),
 		m.inline(" " .. (text or i18n.loading), "leetcode_muted"),
 	})
 end

@@ -81,7 +81,7 @@ local function SimilarRow(props)
 					shrink = 0,
 					margin_left = 2,
 					margin_right = 1,
-					m.loader({ style = "leetcode_accent" }),
+					kit.Loader("leetcode_accent"),
 				})
 			end
 			if not hovered() then

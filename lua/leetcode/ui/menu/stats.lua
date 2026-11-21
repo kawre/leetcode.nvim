@@ -57,7 +57,7 @@ local function Presses()
 	local function progress()
 		local current = state()
 		if current == "busy" then
-			return m.inline({ m.loader(), m.inline(" " .. i18n.updating) })
+			return m.inline({ kit.Loader(), m.inline(" " .. i18n.updating) })
 		elseif current == "done" then
 			-- In the colors of the button, which may be lit by the cursor.
 			return m.inline(kit.icons.check .. " " .. i18n.updated)
