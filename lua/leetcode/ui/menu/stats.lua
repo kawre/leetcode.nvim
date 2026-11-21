@@ -1,10 +1,11 @@
---- The page beside the dashboard, which slides in from the right.
+--- The page beside the dashboard, which slides in from the right: what was
+--- solved, the year of submissions, skills and languages, each a block the
+--- cursor stops on.
 
 local i18n = require("leetcode.i18n")
 local m = require("markup")
 local kit = require("leetcode.ui.kit")
 local data = require("leetcode.ui.menu.data")
-local PageBar = require("leetcode.ui.menu.page_bar")
 local solved = require("leetcode.ui.menu.solved")
 local Heatmap = require("leetcode.ui.menu.heatmap")
 
@@ -29,7 +30,8 @@ end
 --- How long `Updated` shows before the button is plain again.
 local UPDATED_FOR = 1500
 
-local function Bar(width)
+--- Update and back, listed in the header.
+local function Presses()
 	local state = m.signal("idle")
 
 	local function back()
@@ -62,13 +64,11 @@ local function Bar(width)
 		end
 	end
 
-	return PageBar({
-		title = i18n.statistics,
-		width = width,
-		actions = {
-			{ title = i18n.update, lhs = "u", press = update, content = progress },
-			{ title = i18n.back, lhs = "q", press = back },
-		},
+	m.use_key("u", update, { nowait = true })
+	m.use_key("q", back, { nowait = true })
+	Leet.menu.use_actions({
+		{ title = i18n.update, lhs = "u", content = progress },
+		{ title = i18n.back, lhs = "q" },
 	})
 end
 
@@ -183,11 +183,11 @@ return m.component(function(props)
 	if not m.untrack(data.skills) then
 		data.load_details()
 	end
+	Presses()
 
 	return m.vflex({
 		align = "center",
-		margin_top = 1,
-		Bar(width),
+		spacing = 1,
 		solved.Solved({ width = width }),
 		props.columns and Heatmap({ width = width }),
 		Skills(width, props.columns),
