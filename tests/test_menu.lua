@@ -29,7 +29,104 @@ local function open(cookie)
 end
 
 local function contains(text)
-	return child.lua_get(("contains(menu.win.buf, %q)"):format(text))
+	return child.lua_get(([[(function()
+		if contains(menu.win.buf, %q) then return true end
+		-- The band and the header, pinned above in floats of their own.
+		for _, fixed in ipairs(menu.view.fixed) do
+			if contains(fixed.win.buf, %q) then return true end
+		end
+		return false
+	end)()]]):format(text, text))
+end
+
+--- The line of the header, just above the page.
+local function header()
+	return child.lua_get([[(function()
+		for _, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("Menu", 1, true) then return vim.trim(line) end
+		end
+		return ""
+	end)()]])
+end
+
+--- The row the header is on.
+local function header_row()
+	return child.lua_get([[(function()
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("Menu", 1, true) then return i end
+		end
+	end)()]])
+end
+
+--- The line of the band, just above the header.
+local function band()
+	return child.lua_get([[(function()
+		for _, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("leetcode.nvim", 1, true) then return vim.trim(line) end
+		end
+		return ""
+	end)()]])
+end
+
+--- Creates solutions in the storage, each an hour older than the one before.
+local function worked_on(problems)
+	child.lua(([[
+		_G.cached_problems = %s
+		local home = require("leetcode.config").storage.home
+		for i, problem in ipairs(_G.cached_problems) do
+			local path = ("%%s/%%s.%%s.py"):format(home, problem.frontend_id, problem.title_slug)
+			vim.fn.writefile({ "x" }, path)
+			local time = os.time() - i * 3600
+			vim.uv.fs_utime(path, time, time)
+		end
+	]]):format(problems))
+end
+
+local two_problems = [[{
+	{ title = "Two Sum", title_cn = "", title_slug = "two-sum", frontend_id = "1", difficulty = "Easy", status = "ac" },
+	{ title = "3Sum", title_cn = "", title_slug = "3sum", frontend_id = "15", difficulty = "Medium", status = "notac" },
+}]]
+
+--- Puts the cursor on the first `text`, as a move of the user would.
+local function cursor_to(text)
+	child.lua(([[
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			local col = line:find(%q, 1, true)
+			if col then
+				vim.api.nvim_win_set_cursor(0, { i, col })
+				break
+			end
+		end
+		menu.view.cursor = nil
+		menu.view:snap_cursor()
+		vim.api.nvim_exec_autocmds("CursorMoved", { buffer = menu.win.buf })
+		reactive.flush()
+	]]):format(text))
+end
+
+--- Moves with `keys`, and says what the dashboard lit after.
+local function lit_after(keys)
+	child.type_keys(keys)
+	child.lua([[
+		vim.api.nvim_exec_autocmds("CursorMoved", { buffer = menu.win.buf })
+		reactive.flush()
+	]])
+	return child.lua_get([[(require("leetcode.ui.menu.dashboard.focus").current() or {}).id]])
+end
+
+--- The highlight of the first `text` on the line holding `on`.
+local function hl_of(text, on)
+	return child.lua_get(([[(function()
+		local buf, ns = menu.win.buf, menu.view.ns
+		for row, line in ipairs(buffer_text(buf)) do
+			if line:find(%q, 1, true) then
+				for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, { row - 1, 0 }, { row - 1, -1 }, { details = true })) do
+					local got = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[2], mark[4].end_col, {})[1]
+					if vim.trim(got) == %q then return mark[4].hl_group end
+				end
+			end
+		end
+	end)()]]):format(on, text))
 end
 
 T["signed out shows the sign in page"] = function()
@@ -103,7 +200,7 @@ T["the launcher keeps its shape when narrow"] = function()
 		reactive.flush()
 		reactive.flush()
 	]])
-	eq(contains("progress and skills"), true)
+	eq(contains("skills, heatmap"), true)
 	eq(contains("Problems"), true)
 	eq(contains("solved"), true)
 end
@@ -132,8 +229,8 @@ T["enter presses the button under the cursor"] = function()
 	child.lua([[
 		local rows = buffer_text(menu.win.buf)
 		for i, line in ipairs(rows) do
-			if line:find("Statistics", 1, true) then
-				local col = #line:match("^%s*")
+			local col = line:find("Statistics", 1, true)
+			if col then
 				vim.api.nvim_win_set_cursor(0, { i, col })
 			end
 		end
@@ -150,10 +247,12 @@ T["coming back skips the intro and keeps the data"] = function()
 		Markup.animate.manual = true
 		fetches = streak_fetches
 	]])
+	local through =
+		"reactive.flush(); Markup.animate.tick(3000); reactive.flush(); reactive.flush()"
 	child.type_keys("p")
-	child.lua("reactive.flush(); Markup.animate.tick(3000); reactive.flush(); reactive.flush()")
+	child.lua(through)
 	child.type_keys("q")
-	child.lua("reactive.flush(); Markup.animate.tick(3000); reactive.flush(); reactive.flush()")
+	child.lua(through)
 	eq(contains("solved"), true)
 	eq(child.lua_get("streak_fetches"), child.lua_get("fetches"))
 
@@ -162,32 +261,11 @@ T["coming back skips the intro and keeps the data"] = function()
 	eq(child.lua_get("Markup.animate.running()"), false)
 end
 
-T["a new page still makes an entrance"] = function()
+T["the cursor only stops on cards and tiles"] = function()
 	open(true)
-	child.lua([[
-		Markup.animate.enabled = true
-		Markup.animate.manual = true
-	]])
-	child.type_keys("p")
-	child.lua("reactive.flush()")
-	eq(child.lua_get("Markup.animate.running()"), true)
-end
-
-T["the cursor only stops on buttons"] = function()
-	open(true)
-	child.lua([[
-		local rows = buffer_text(menu.win.buf)
-		for i, line in ipairs(rows) do
-			if line:find("Problems", 1, true) then
-				button_row = i
-				vim.api.nvim_win_set_cursor(0, { i, (line:find("Problems", 1, true)) })
-			end
-		end
-		menu.view.cursor = nil
-		menu.view:snap_cursor()
-	]])
-	child.type_keys("j")
-	eq(child.lua_get("vim.api.nvim_get_current_line():find('Statistics', 1, true) ~= nil"), true)
+	cursor_to("Problems")
+	eq(lit_after("k"), "card.t")
+	eq(lit_after("j"), "problems")
 end
 
 T["the selected row stands in for the cursor"] = function()
@@ -198,56 +276,65 @@ T["the selected row stands in for the cursor"] = function()
 	eq(child.lua_get("vim.o.guicursor:find('MarkupHiddenCursor', 1, true)"), vim.NIL)
 end
 
-T["one press moves between rows in both directions"] = function()
+T["h and l move between tiles, one press each"] = function()
 	open(true)
-	child.lua([[
-		for i, line in ipairs(buffer_text(menu.win.buf)) do
-			if line:find("Problems", 1, true) then
-				vim.api.nvim_win_set_cursor(0, { i, (line:find("Problems", 1, true)) })
-			end
-		end
-		menu.view.cursor = nil
-		menu.view:snap_cursor()
-	]])
-
-	local function on(text)
-		return child.lua_get(
-			("vim.api.nvim_get_current_line():find(%q, 1, true) ~= nil"):format(text)
-		)
-	end
-
-	child.type_keys("j")
-	eq(on("Statistics"), true)
-	child.type_keys("j")
-	eq(on("Account"), true)
-	child.type_keys("k")
-	eq(on("Statistics"), true)
-	child.type_keys("k")
-	eq(on("Problems"), true)
+	cursor_to("Problems")
+	eq(lit_after("l"), "random")
+	eq(lit_after("l"), "statistics")
+	eq(lit_after("l"), "account")
+	eq(lit_after("h"), "statistics")
+	eq(lit_after("h"), "random")
+	eq(lit_after("h"), "problems")
 end
 
-T["rows have a line between them"] = function()
+T["tiles stand side by side when wide, two by two when narrow"] = function()
 	open(true)
 	child.lua([[
-		for i, line in ipairs(buffer_text(menu.win.buf)) do
-			if line:find("Problems", 1, true) and not first then first = i end
-			if line:find("Statistics", 1, true) and not second then second = i end
+		for _, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("Problems", 1, true) then tiles = line break end
 		end
 	]])
-	eq(child.lua_get("second - first"), 2)
+	eq(child.lua_get("tiles:find('Account', 1, true) ~= nil"), true)
+
+	child.lua([[
+		vim.cmd("vnew")
+		vim.api.nvim_win_set_width(menu.win.win, 80)
+		menu.view:request_commit()
+		reactive.flush()
+		reactive.flush()
+		for _, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("Problems", 1, true) then tiles = line break end
+		end
+	]])
+	eq(child.lua_get("tiles:find('Random', 1, true) ~= nil"), true)
+	eq(child.lua_get("tiles:find('Statistics', 1, true) ~= nil"), false)
 end
 
-T["the breadcrumb shows only away from the menu"] = function()
+T["the header says where the menu is, and never moves"] = function()
 	open(true)
-	eq(contains("Menu"), false)
-	child.lua([[menu.set_page("menu.cookie"); reactive.flush()]])
-	eq(contains("Menu"), true)
+	local row = header_row()
+	eq(header():find("Menu", 1, true) ~= nil, true)
+	eq(header():find("›", 1, true), nil)
+	eq(header():find("Quit q", 1, true) ~= nil, true)
+
+	child.lua(
+		[[menu.set_page("menu.cookie"); vim.wait(50, function() reactive.flush(); return false end, 5)]]
+	)
+	eq(header():find("Menu › Account", 1, true) ~= nil, true)
+	eq(header():find("Back q", 1, true) ~= nil, true)
+	eq(header_row(), row)
+
+	child.lua(
+		[[menu.set_page("menu.statistics"); vim.wait(50, function() reactive.flush(); return false end, 5)]]
+	)
+	eq(header_row(), row)
 end
 
 T["a short window can still show the whole dashboard"] = function()
 	child.o.lines = 14
 	-- What many configs set, which used to undo every scroll.
 	child.o.scrolloff = 8
+	worked_on(two_problems)
 	open(true)
 	child.lua([[
 		visible = function(text)
@@ -258,61 +345,182 @@ T["a short window can still show the whole dashboard"] = function()
 			return false
 		end
 	]])
-	eq(child.lua_get("visible('hard')"), false)
+	eq(child.lua_get("visible('2h ago')"), false)
 
 	for _ = 1, 40 do
 		child.type_keys("j")
 	end
-	eq(child.lua_get("visible('hard')"), true)
+	eq(child.lua_get("visible('2h ago')"), true)
 
 	for _ = 1, 60 do
 		child.type_keys("k")
 	end
-	-- Back at the top, where the greeting is.
+	-- Back at the top, band and all.
 	eq(child.lua_get("vim.fn.line('w0')"), 1)
 	eq(child.lua_get("visible('leetcode.nvim')"), true)
 end
 
 T["navigation explains itself"] = function()
 	open(true)
-	eq(contains("browse, random, recent"), true)
-	eq(contains("progress and skills"), true)
+	eq(contains("browse, refresh"), true)
+	eq(contains("skills, heatmap"), true)
 end
 
-T["navigation comes before the numbers"] = function()
+T["the band holds the streak and the numbers"] = function()
 	open(true)
-	child.lua([[
-		for i, line in ipairs(buffer_text(menu.win.buf)) do
-			if line:find("Problems", 1, true) and not nav then nav = i end
-			if line:find("hard", 1, true) and not summary then summary = i end
-		end
-	]])
-	eq(child.lua_get("nav < summary"), true)
+	eq(band():find("42", 1, true) ~= nil, true)
+	eq(band():find("30 solved", 1, true) ~= nil, true)
+	eq(band():find("20 · 8 · 2", 1, true) ~= nil, true)
 end
 
-T["the row under the cursor is marked"] = function()
+T["what the cursor is on lights up, and the rest steps back"] = function()
 	open(true)
+	cursor_to("Statistics")
+	-- Its key fills in, the others step back.
+	eq(hl_of("s", "Statistics"), "leetcode_tab_active")
+	eq(hl_of("p", "Problems"), "leetcode_muted")
+	eq(hl_of("Problems", "Problems"), "leetcode_soft")
+	eq(hl_of("Statistics", "Statistics"), "leetcode_strong")
+	-- A spine runs down its left edge, the whole height of the tile, and
+	-- down no other.
 	child.lua([[
-		for i, line in ipairs(buffer_text(menu.win.buf)) do
-			if line:find("Statistics", 1, true) then
-				vim.api.nvim_win_set_cursor(0, { i, (line:find("Statistics", 1, true)) })
-				row = i
+		spine = {}
+		for _, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("▎", 1, true) then
+				spine[#spine + 1] = line
 			end
 		end
-		menu.view.cursor = nil
-		vim.api.nvim_exec_autocmds("CursorMoved", { buffer = menu.win.buf })
-		reactive.flush()
 	]])
-	-- The tile lifts its title into the accent color.
+	eq(child.lua_get("#spine"), 4)
+	eq(child.lua_get("spine[2]"):find("Statistics", 1, true) ~= nil, true)
+	eq(child.lua_get("spine[2]"):match("▎%s*s%s+Statistics") ~= nil, true)
+end
+
+T["something is lit from the start"] = function()
+	open(true)
+	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+	eq(
+		child.lua_get([[(require("leetcode.ui.menu.dashboard.focus").current() or {}).id]]),
+		"card.t"
+	)
+	eq(contains("▎"), true)
+end
+
+T["resizing the window keeps the dashboard in the middle"] = function()
+	open(true)
+	local function margins()
+		child.lua("vim.wait(100, function() reactive.flush(); return false end, 5)")
+		return child.lua_get([[(function()
+			local rows = buffer_text(menu.win.buf)
+			local top, bottom, left, right = nil, nil, 999, 0
+			-- Below the band, where the dashboard is.
+			for i = 4, #rows do
+				local line = rows[i]
+				if line:find("Daily challenge", 1, true) or line:find("Recent", 1, true) then
+					top = top or i
+					bottom = i
+					left = math.min(left, #line:match("^%s*"))
+					right = math.max(right, vim.fn.strdisplaywidth(line))
+				end
+			end
+			return {
+				above = top - 4,
+				below = vim.api.nvim_win_get_height(0) - bottom,
+				left = left,
+				right = vim.api.nvim_win_get_width(0) - right,
+			}
+		end)()]])
+	end
+
+	for _, size in ipairs({ { 200, 60 }, { 110, 34 } }) do
+		child.o.columns, child.o.lines = size[1], size[2]
+		local got = margins()
+		-- Even to within the rows and columns that cannot be split in two.
+		eq(math.abs(got.above - got.below) <= 4, true)
+		eq(math.abs(got.left - got.right) <= 2, true)
+	end
+end
+
+T["the band sits just above the header, as wide as the dashboard"] = function()
+	open(true)
 	child.lua([[
-		lit = nil
-		local buf, ns = menu.win.buf, menu.view.ns
-		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, { row - 1, 0 }, { row - 1, -1 }, { details = true })) do
-			local text = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[2], mark[4].end_col, {})[1]
-			if vim.trim(text) == "Statistics" then lit = mark[4].hl_group end
+		lines = buffer_text(menu.win.buf)
+		for i, line in ipairs(lines) do
+			if line:find("leetcode.nvim", 1, true) then band_row = i end
+			if line:find("Menu", 1, true) then header_row = i end
 		end
 	]])
-	eq(child.lua_get("lit"), "leetcode_accent")
+	-- Its line, its lower edge and a blank row, then the header.
+	eq(child.lua_get("header_row - band_row"), 3)
+	local width = child.lua_get("vim.fn.strdisplaywidth(vim.trim(lines[band_row - 1]))")
+	eq(width, child.lua_get("(menu.dashboard_width())"))
+	-- In the middle, not along the top of the window.
+	eq(child.lua_get("band_row") > 2, true)
+end
+
+T["the band follows signing in that ends after it shows"] = function()
+	child.lua([[
+		local user = { name = "late", id = 1, is_signed_in = true, is_verified = true }
+		package.loaded["leetcode.api.auth"].user = function(cb)
+			vim.defer_fn(function()
+				Leet.auth(user)
+				cb(user)
+			end, 50)
+		end
+	]])
+	open(true)
+	child.lua("vim.wait(300, function() reactive.flush(); return menu.page() == 'menu' end, 5)")
+	child.lua("reactive.flush()")
+	eq(contains("not signed in"), false)
+	eq(contains("late"), true)
+end
+
+T["a long name leaves the band before anything overlaps"] = function()
+	open(true)
+	child.lua([[
+		Leet.auth().name = ("x"):rep(60)
+		vim.cmd("vnew")
+		vim.api.nvim_win_set_width(menu.win.win, 100)
+		menu.view:request_commit()
+		reactive.flush()
+		reactive.flush()
+	]])
+	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
+	eq(band():find("xxxx", 1, true), nil)
+	eq(band():find("20 · 8 · 2", 1, true) ~= nil, true)
+end
+
+T["the line below the tiles says what Enter does"] = function()
+	open(true)
+	cursor_to("Random")
+	eq(contains("\u{f0cfd} Random  opens a problem at random"), true)
+	cursor_to("Account")
+	eq(contains("your session cookie, and signing out"), true)
+end
+
+T["r opens a random problem"] = function()
+	open(true)
+	child.lua([[
+		random = false
+		require("leetcode.cmd").random_question = function(_, task) random = true; task.done() end
+	]])
+	child.type_keys("r")
+	eq(child.lua_get("random"), true)
+end
+
+T["q quits from the dashboard"] = function()
+	open(true)
+	child.lua([[
+		stopped = false
+		require("leetcode").stop = function() stopped = true end
+	]])
+	child.type_keys("q")
+	eq(child.lua_get("stopped"), true)
+end
+
+T["signed out, the band says so"] = function()
+	open(false)
+	eq(contains("not signed in"), true)
 end
 
 local function open_stats()
@@ -322,25 +530,6 @@ local function open_stats()
 end
 
 T["problems"] = new_set()
-
---- Creates solutions in the storage, each an hour older than the one before.
-local function worked_on(problems)
-	child.lua(([[
-		_G.cached_problems = %s
-		local home = require("leetcode.config").storage.home
-		for i, problem in ipairs(_G.cached_problems) do
-			local path = ("%%s/%%s.%%s.py"):format(home, problem.frontend_id, problem.title_slug)
-			vim.fn.writefile({ "x" }, path)
-			local time = os.time() - i * 3600
-			vim.uv.fs_utime(path, time, time)
-		end
-	]]):format(problems))
-end
-
-local two_problems = [[{
-	{ title = "Two Sum", title_cn = "", title_slug = "two-sum", frontend_id = "1", difficulty = "Easy", status = "ac" },
-	{ title = "3Sum", title_cn = "", title_slug = "3sum", frontend_id = "15", difficulty = "Medium", status = "notac" },
-}]]
 
 local function open_problems()
 	open(true)
@@ -352,8 +541,8 @@ T["problems"]["slide in with their buttons"] = function()
 	open_problems()
 	eq(child.lua_get("menu.page()"), "menu.problems")
 	eq(contains("Random"), true)
-	eq(contains("Daily challenge"), true)
-	eq(contains("browse, random, recent"), false)
+	eq(contains("Daily"), true)
+	eq(contains("Refresh"), true)
 end
 
 T["problems"]["say when nothing was worked on"] = function()
@@ -381,6 +570,8 @@ end
 T["problems"]["color recent work by what it means"] = function()
 	worked_on(two_problems)
 	open_problems()
+	-- The rows step back while a tile is lit, so the cursor goes to the first.
+	cursor_to("Two Sum")
 
 	local function hl_of(text)
 		return child.lua_get(([[(function()
@@ -432,14 +623,14 @@ end
 
 T["problems"]["cut long titles"] = function()
 	worked_on([[{
-		{ title = "Longest Substring Without Repeating Characters In A String", title_cn = "",
+		{ title = "Longest Substring Without Repeating Characters In A String That Goes On And On For Ever", title_cn = "",
 		  title_slug = "long", frontend_id = "3", difficulty = "Medium", status = "ac" },
 	}]])
 	open_problems()
 	eq(contains("…"), true)
 end
 
-T["problems"]["keep their keys after the slide"] = function()
+T["problems"]["keep their keys while animations run"] = function()
 	open(true)
 	child.lua([[
 		Markup.animate.enabled = true
@@ -463,7 +654,7 @@ T["problems"]["q goes back"] = function()
 	child.type_keys("q")
 	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
 	eq(child.lua_get("menu.page()"), "menu")
-	eq(contains("progress and skills"), true)
+	eq(contains("skills, heatmap"), true)
 end
 
 T["problems"]["the menu keeps its keys after coming back"] = function()
@@ -551,7 +742,7 @@ T["statistics"]["q goes back to where the menu was"] = function()
 	child.type_keys("q")
 	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
 	eq(child.lua_get("menu.page()"), "menu")
-	eq(contains("progress and skills"), true)
+	eq(contains("skills, heatmap"), true)
 	eq(contains("Fundamental"), false)
 	eq(contains("Problems"), true)
 end
@@ -594,30 +785,11 @@ T["statistics"]["are fetched once, until updated"] = function()
 	eq(child.lua_get("fetched"), 2)
 end
 
-T["statistics"]["move between the buttons sideways"] = function()
+T["statistics"]["list update and back in the header"] = function()
 	open_stats()
-	child.lua([[
-		for i, line in ipairs(buffer_text(menu.win.buf)) do
-			local col = line:find("Update", 1, true)
-			if col then vim.api.nvim_win_set_cursor(0, { i, col - 2 }) end
-		end
-		menu.view.cursor = nil
-		menu.view:snap_cursor()
-	]])
-
-	local function under_cursor()
-		return child.lua_get(
-			"vim.api.nvim_get_current_line():sub(vim.fn.col('.')):match('^%s*(%a+)')"
-		)
-	end
-
-	eq(under_cursor(), "Update")
-	child.type_keys("l")
-	eq(under_cursor(), "Back")
-	child.type_keys("l")
-	eq(under_cursor(), "Back")
-	child.type_keys("h")
-	eq(under_cursor(), "Update")
+	eq(header():find("Menu › Statistics", 1, true) ~= nil, true)
+	eq(header():find("Update u", 1, true) ~= nil, true)
+	eq(header():find("Back q", 1, true) ~= nil, true)
 end
 
 T["statistics"]["update in the page, not in a notification"] = function()
@@ -676,11 +848,11 @@ T["statistics"]["every block is a stop for the cursor"] = function()
 	-- Solved, the year, skills and languages.
 	eq(child.lua_get("#stops"), 4)
 
-	-- Up above them, the buttons of the page.
+	-- Back up, the first of them.
 	for _ = 1, 12 do
 		child.type_keys("k")
 	end
-	eq(child.lua_get("vim.api.nvim_get_current_line():find('Update', 1, true) ~= nil"), true)
+	eq(child.lua_get("menu.view.hovered"), child.lua_get("stops[1]"))
 end
 
 T["statistics"]["a block lifts while the cursor is on it"] = function()
@@ -703,35 +875,29 @@ T["statistics"]["a block lifts while the cursor is on it"] = function()
 	eq(child.lua_get("lifted_now()"), child.lua_get("active"))
 end
 
+T["statistics"]["take the dashboard's place at once"] = function()
+	open(true)
+	child.lua([[
+		Markup.animate.enabled = true
+		Markup.animate.manual = true
+	]])
+	local row = header_row()
+	child.type_keys("s")
+	child.lua("reactive.flush(); reactive.flush()")
+	-- No page falls away first: the new one is there before any frame plays.
+	eq(contains("Daily challenge"), false)
+	eq(contains("Fundamental"), true)
+	eq(header_row(), row)
+	-- And the cursor is on it.
+	eq(child.lua_get("vim.api.nvim_win_get_cursor(0)[1]") > row, true)
+end
+
 T["statistics"]["open no popups"] = function()
 	open(true)
 	child.lua("wins = #vim.api.nvim_list_wins()")
 	child.type_keys("s")
 	child.lua("vim.wait(50, function() reactive.flush(); return false end, 5)")
 	eq(child.lua_get("#vim.api.nvim_list_wins()"), child.lua_get("wins"))
-end
-
-T["statistics"]["slide in and out"] = function()
-	open(true)
-	child.lua([[
-		Markup.animate.enabled = true
-		Markup.animate.manual = true
-	]])
-	child.type_keys("s")
-	child.lua([[
-		reactive.flush()
-		Markup.animate.tick(160)
-		reactive.flush()
-		reactive.flush()
-	]])
-	eq(child.lua_get("Markup.animate.running()"), true)
-	child.lua([[
-		Markup.animate.tick(3000)
-		reactive.flush()
-		reactive.flush()
-	]])
-	eq(contains("Fundamental"), true)
-	eq(contains("progress and skills"), false)
 end
 
 T["continue"] = new_set()
@@ -755,6 +921,22 @@ T["continue"]["opens it with c"] = function()
 	eq(child.lua_get("opened"), "two-sum")
 end
 
+T["continue"]["recent work shows below the tiles, opened with its number"] = function()
+	worked_on(two_problems)
+	open(true)
+	child.lua([[
+		for i, line in ipairs(buffer_text(menu.win.buf)) do
+			if line:find("Problems", 1, true) and not tiles then tiles = i end
+			if line:find("2h ago", 1, true) then second = i end
+		end
+		opened = nil
+		require("leetcode.cmd").open = function(problem) opened = problem.title_slug end
+	]])
+	eq(child.lua_get("tiles < second"), true)
+	child.type_keys("2")
+	eq(child.lua_get("opened"), "3sum")
+end
+
 T["continue"]["stays away before any work"] = function()
 	open(true)
 	eq(contains("Continue"), false)
@@ -766,7 +948,7 @@ T["problems"]["refresh the problem list"] = function()
 		refreshed = false
 		require("leetcode.cmd").cache_update = function() refreshed = true end
 	]])
-	child.type_keys("r")
+	child.type_keys("u")
 	eq(child.lua_get("refreshed"), true)
 end
 
