@@ -158,7 +158,20 @@ function cmd.random_question(opts)
         })[opts.status[1]]
     end
 
-    local q, err = question.random(opts)
+    -- `premium=paid` is filtered server-side; `premium=free` is not supported by
+    -- the API (premiumOnly=false is ignored), so it is enforced by redrawing.
+    -- Non-premium users default to free questions.
+    local premium = opts and opts.premium and opts.premium[1]
+    if opts then
+        opts.premium = nil
+    end
+    if premium == "paid" then
+        opts.premiumOnly = true
+    end
+    local free_only = premium == "free"
+        or (premium == nil and not require("leetcode.config").auth.is_premium)
+
+    local q, err = question.random(opts, free_only)
     if err then
         return log.err(err)
     end

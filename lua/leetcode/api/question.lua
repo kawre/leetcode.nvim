@@ -34,8 +34,10 @@ function question.by_title_slug(title_slug)
     return q
 end
 
+local MAX_FREE_DRAWS = 25
+
 ---@param filters? table
-function question.random(filters)
+local function draw_random(filters)
     local variables = {
         categorySlug = "algorithms",
         filters = filters or vim.empty_dict(),
@@ -68,11 +70,44 @@ function question.random(filters)
         }
     end
 
-    if not config.auth.is_premium and q.paid_only then
-        err = err or {}
-        err.msg = "Drawn question is for premium users only. Please try again"
-        err.lvl = vim.log.levels.WARN
+    return q
+end
+
+---@param filters? table
+---@param free_only? boolean redraw until a non-paid question is drawn
+function question.random(filters, free_only)
+    local q, err = draw_random(filters)
+
+    if free_only then
+        for _ = 2, MAX_FREE_DRAWS do
+            if err or not q.paid_only then
+                return q, err
+            end
+            q, err = draw_random(filters)
+        end
+        if err or not q.paid_only then
+            return q, err
+        end
+        return nil,
+            {
+                msg = ("No free question found after %d draws. Try different filters"):format(
+                    MAX_FREE_DRAWS
+                ),
+                lvl = vim.log.levels.WARN,
+            }
+    end
+
+    if err then
         return nil, err
+    end
+
+    local config = require("leetcode.config")
+    if not config.auth.is_premium and q.paid_only then
+        return nil,
+            {
+                msg = "Drawn question is for premium users only. Please try again",
+                lvl = vim.log.levels.WARN,
+            }
     end
 
     return q
