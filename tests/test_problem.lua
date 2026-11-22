@@ -140,7 +140,7 @@ T["description"]["a link underlines its text, not the icon after it"] = function
 	run([[
 		local buf, ns = problem.description.win.buf, problem.description.view.ns
 		underlined = {}
-		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, { details = true })) do
+		for _, mark in ipairs(view_marks(problem.description.view, 0, -1)) do
 			local group = mark[4].hl_group
 			if group and vim.api.nvim_get_hl(0, { name = group, link = false }).underline then
 				local text = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[2], mark[4].end_col, {})[1]
@@ -278,7 +278,7 @@ T["description"]["sections sit on their own background"] = function()
 		open_problem()
 		desc = problem.description
 		rows = {}
-		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(desc.win.buf, desc.view.ns, 0, -1, { details = true })) do
+		for _, mark in ipairs(view_marks(desc.view, 0, -1)) do
 			if mark[4].hl_group == "leetcode_section" then
 				rows[mark[2] + 1] = mark[4].end_col
 			end
@@ -315,7 +315,7 @@ T["description"]["a collapsed section stays one tinted row"] = function()
 			end
 		end
 		tinted = {}
-		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(desc.win.buf, desc.view.ns, { row - 1, 0 }, { row - 1, -1 }, { details = true })) do
+		for _, mark in ipairs(view_marks(desc.view, { row - 1, 0 }, { row - 1, -1 })) do
 			if mark[4].hl_group == "leetcode_section" then
 				tinted[#tinted + 1] = mark[2] + 1
 			end
@@ -487,7 +487,7 @@ T["header"]["the meter fills to the acceptance rate"] = function()
 		open_problem()
 		band = problem.description.header
 		marks = {}
-		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(band.win.buf, band.view.ns, 0, { 0, -1 }, { details = true })) do
+		for _, mark in ipairs(view_marks(band.view, 0, { 0, -1 })) do
 			if mark[4].hl_group == "leetcode_easy" then
 				filled = mark[4].end_col - mark[3]
 			end
@@ -505,7 +505,7 @@ T["header"]["the meter empties while stats are hidden"] = function()
 		reactive.flush()
 		band = problem.description.header
 		filled = nil
-		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(band.win.buf, band.view.ns, 0, { 0, -1 }, { details = true })) do
+		for _, mark in ipairs(view_marks(band.view, 0, { 0, -1 })) do
 			if mark[4].hl_group == "leetcode_easy" then filled = mark[4].end_col - mark[3] end
 		end
 	]])
@@ -1459,7 +1459,7 @@ T["console"]["the bar of what passed shows on the header, even empty"] = functio
 	run([[
 		local buf, ns = problem.console.win.buf, problem.console.view.ns
 		track = nil
-		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, { details = true })) do
+		for _, mark in ipairs(view_marks(problem.console.view, 0, -1)) do
 			if mark[4].hl_group == "leetcode_header_bar_track" then
 				track = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[2], mark[4].end_col, {})[1]
 			end
@@ -1536,7 +1536,7 @@ T["console"]["marks what differs from the expected output"] = function()
 		return child.lua_get(([[(function()
 			local result, buf = problem.console.result, problem.console.result.win.buf
 			local found = {}
-			for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, result.view.ns, 0, -1, { details = true })) do
+			for _, mark in ipairs(view_marks(result.view, 0, -1)) do
 				if mark[4].hl_group == %q then
 					found[#found + 1] = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[4].end_row, mark[4].end_col, {})[1]
 				end
@@ -2097,7 +2097,7 @@ T["real problems"] = function()
 
 				local lines = vim.api.nvim_buf_get_lines(win.buf, 0, -1, false)
 				local tinted = {}
-				for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(win.buf, view.ns, 0, -1, { details = true })) do
+				for _, mark in ipairs(view_marks(view, 0, -1)) do
 					if mark[4].hl_group == "leetcode_section" then
 						local before = lines[mark[2] + 1]:sub(1, mark[4].end_col)
 						tinted[#tinted + 1] = vim.fn.strdisplaywidth(before)

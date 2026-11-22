@@ -28,7 +28,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
 - [Picker](#picker)
 
-- [markup.nvim] >= 0.7.0
+- [markup.nvim] >= 0.7.1
 
 - [tree-sitter-html] _**(optional, but highly recommended)**_
   used for formatting the question description.
@@ -47,7 +47,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     build = ":TSUpdate html", -- if you have `nvim-treesitter` installed
     dependencies = {
         -- include a picker of your choice, see picker section for more details
-        { "kawre/markup.nvim", version = ">=0.7" },
+        { "kawre/markup.nvim", version = ">=0.7.1" },
     },
     opts = {
         -- configuration goes here

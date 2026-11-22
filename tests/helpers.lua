@@ -8,6 +8,32 @@ function H.boot(child)
 		m = require("markup")
 		reactive = require("markup.reactive")
 
+		--- The highlights of a markup.nvim view that start between `first` and
+		--- `last`, as nvim_buf_get_extmarks with `details` lists them: 0, -1 or
+		--- { row, col }. markup.nvim draws them as each line is drawn rather
+		--- than keep them on the buffer, so `view:highlights()` has them.
+		function view_marks(view, first, last)
+			local function at(position, default)
+				if type(position) == "table" then
+					return { position[1], position[2] == -1 and math.huge or position[2] }
+				end
+				return position == -1 and { math.huge, math.huge } or default
+			end
+			first, last = at(first, { 0, 0 }), at(last, { math.huge, math.huge })
+			local function before(a, b)
+				return a[1] < b[1] or (a[1] == b[1] and a[2] < b[2])
+			end
+			local marks = vim.tbl_filter(function(mark)
+				local start = { mark[2], mark[3] }
+				return not before(start, first) and not before(last, start)
+			end, view:highlights())
+			-- Each is on one row, which markup.nvim 0.7.1 leaves out.
+			for _, mark in ipairs(marks) do
+				mark[4].end_row = mark[4].end_row or mark[2]
+			end
+			return marks
+		end
+
 		_G.Leet = setmetatable({ active_problems = {} }, {
 			__index = function(t, k)
 				t[k] = require("leetcode." .. k)
