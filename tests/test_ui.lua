@@ -206,6 +206,14 @@ T["filter"]["by words of the title, in any order, or the number"] = function()
 	eq(filtered([[{ query = "nothing" }]]), {})
 end
 
+T["filter"]["accepts a numbered title"] = function()
+	eq(filtered([[{ query = "1. Two sum" }]]), { "1" })
+	eq(filtered([[{ query = "15. sum" }]]), { "15" })
+	eq(filtered([[{ query = " 1." }]]), { "1" })
+	eq(filtered([[{ query = "15. Two sum" }]]), {})
+	eq(child.lua_get("filter.ranges('Two Sum', '1. Two sum')"), { { 1, 3 }, { 5, 7 } })
+end
+
 T["filter"]["finds where the words are"] = function()
 	child.lua("filter = require('leetcode.ui.browser.filter')")
 	eq(child.lua_get("filter.ranges('Two Sum', 'sum')"), { { 5, 7 } })
@@ -226,7 +234,7 @@ end
 
 T["browser"] = new_set()
 
-local function open_browser(count)
+local function open_browser(count, first_title)
 	child.lua(([[
 		-- The highlight of the search field, which follows its state.
 		function browser_state_style()
@@ -250,9 +258,10 @@ local function open_browser(count)
 				ac_rate = 50, paid_only = false,
 			}
 		end
+		items[1].title = %s or items[1].title
 		browser.open(items)
 		reactive.flush()
-	]]):format(count))
+	]]):format(count, first_title and vim.inspect(first_title) or "nil"))
 end
 
 local function list_has(text)
@@ -268,6 +277,26 @@ T["browser"]["lists problems beside the menu"] = function()
 	eq(list_has("Problem 3"), true)
 	eq(filters_have("i to search"), true)
 	eq(child.lua_get("vim.api.nvim_get_current_win() == browser.list.win"), true)
+end
+
+T["browser"]["truncates long titles while keeping the metadata visible"] = function()
+	open_browser(5, ("字符"):rep(60) .. " Needle")
+	local line = child.lua_get("buffer_text(browser.list.buf)[1]")
+	eq(line:find("字符", 1, true) ~= nil, true)
+	eq(line:find("󰇘", 1, true) ~= nil, true)
+	eq(line:find("50.0%", 1, true) ~= nil, true)
+	eq(line:find("Medium", 1, true) ~= nil, true)
+	eq(line:find("Needle", 1, true), nil)
+	eq(
+		child.lua_get(
+			"vim.fn.strdisplaywidth(buffer_text(browser.list.buf)[1]) <= browser.picker.width()"
+		),
+		true
+	)
+
+	child.type_keys("/", "N", "e", "e", "d", "l", "e", "<Esc>")
+	eq(child.lua_get("browser.picker:current().item.title_slug"), "p1")
+	eq(filters_have("1 of 5"), true)
 end
 
 T["browser"]["keys filter from either window"] = function()
@@ -550,28 +579,61 @@ T["browser"]["a retained slug shows and opens the current problem"] = function()
 	eq(child.lua_get("opened == items[3]"), true)
 end
 
-T["browser"]["paging uses the row's index after filtering"] = function()
+T["browser"]["after filtering, G goes to the last match"] = function()
 	open_browser(660)
+	-- Every third problem is easy, so 220 of them.
 	child.type_keys("e")
-	child.lua([[
-		reactive.flush()
-		vim.api.nvim_win_set_cursor(browser.list.win, { 64, 12 })
-		vim.api.nvim_exec_autocmds("CursorMoved", { buffer = browser.list.buf })
-		reactive.flush()
-	]])
-	eq(child.lua_get("#buffer_text(browser.list.buf)"), 200)
+	child.lua("reactive.flush()")
+	child.type_keys("G")
+	child.lua("reactive.flush()")
+	eq(child.lua_get("browser.picker:current().item.title_slug"), "p660")
+	child.type_keys("gg")
+	eq(child.lua_get("browser.picker:current().item.title_slug"), "p3")
 end
 
-T["browser"]["mounts rows in batches"] = function()
+T["browser"]["mounts only the rows that fit"] = function()
 	open_browser(1000)
-	eq(child.lua_get("#buffer_text(browser.list.buf)"), 200)
+	local height = child.lua_get("vim.api.nvim_win_get_height(browser.list.win)")
+	eq(child.lua_get("#buffer_text(browser.list.buf)"), height)
 
+	-- A count goes as far as it says, and still only what fits is mounted.
+	child.type_keys("500j")
+	child.lua("reactive.flush()")
+	eq(child.lua_get("browser.picker:current().item.title_slug"), "p501")
+	eq(child.lua_get("#buffer_text(browser.list.buf)"), height)
+	eq(list_has("Problem 501"), true)
+end
+
+T["browser"]["moves as every picker does"] = function()
+	open_browser(40)
+	child.type_keys("3j")
+	eq(child.lua_get("browser.picker:current().item.title_slug"), "p4")
+	child.type_keys("<C-d>")
+	child.lua("reactive.flush()")
+	local half = math.floor(child.lua_get("vim.api.nvim_win_get_height(browser.list.win)") / 2)
+	eq(child.lua_get("browser.picker:current().item.title_slug"), "p" .. (4 + half))
+	child.type_keys("G", "k")
+	eq(child.lua_get("browser.picker:current().item.title_slug"), "p39")
+end
+
+T["browser"]["leaving the search however it ends goes back to the list"] = function()
+	open_browser(40)
+	-- As better-escape.nvim does it: jk sends <Esc>, unmapped.
 	child.lua([[
-		vim.api.nvim_win_set_cursor(browser.list.win, { 190, 12 })
-		vim.api.nvim_exec_autocmds("CursorMoved", { buffer = browser.list.buf })
-		reactive.flush()
+		vim.keymap.set("i", "jk", function()
+			vim.api.nvim_feedkeys(vim.keycode("<Esc>"), "in", false)
+		end)
 	]])
-	eq(child.lua_get("#buffer_text(browser.list.buf)"), 400)
+	child.type_keys("/", "1", "2")
+	child.lua("vim.wait(20, function() reactive.flush(); return false end, 5)")
+	child.type_keys("j", "k")
+	child.lua("vim.wait(20, function() reactive.flush(); return false end, 5)")
+	eq(child.lua_get("vim.api.nvim_get_current_win() == browser.list.win"), true)
+	eq(child.fn.mode(), "n")
+	-- The query stays, and j and k move in what it found.
+	eq(child.lua_get("browser.picker.query()"), "12")
+	child.type_keys("j")
+	eq(child.lua_get("browser.picker:current().item.title_slug"), "p12")
 end
 
 T["browser"]["opens at full width right away"] = function()

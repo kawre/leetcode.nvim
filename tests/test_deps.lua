@@ -45,14 +45,13 @@ T["says how to get markup.nvim when it is not there"] = function()
 end
 
 T["reports an older markup.nvim release"] = function()
-	child.lua([[require("markup.config").version = "0.4.0"]])
-	eq(check(), "leetcode.nvim requires markup.nvim >=0.5 (installed: 0.4.0).")
+	child.lua([[require("markup.config").version = "0.6.0"]])
+	eq(check(), "leetcode.nvim requires markup.nvim >=0.7 (installed: 0.6.0).")
 end
 
-T["accepts patch releases in the markup.nvim 0.5 series"] = function()
-	child.lua([[require("markup.config").version = "0.5.1"]])
+T["accepts patch releases in the markup.nvim 0.7 series"] = function()
+	child.lua([[require("markup.config").version = "0.7.1"]])
 	eq(check(), vim.NIL)
-	eq(dofile("lazy.lua")[1].version, child.lua_get("deps.markup"))
 end
 
 T["says to build the engine when only it is missing"] = function()
@@ -71,13 +70,10 @@ T["tells once, and stops the command"] = function()
 end
 
 T["the tests run on a markup.nvim the plugin asks for"] = function()
-	-- The release the Makefile clones for the tests (CI) must be in the range
-	-- lazy.lua and deps.lua ask for, or the tests check another markup.nvim
-	-- than the one users get.
 	local makefile = table.concat(vim.fn.readfile("Makefile"), "\n")
-	local tested = makefile:match("\nMARKUP_VERSION %?= v?([%d%.]+)")
-	eq(type(tested), "string")
+	local tested = assert(makefile:match("\nMARKUP_VERSION %?= v([%d%.]+)"))
 	local range = child.lua_get("deps.markup")
+	eq(dofile("lazy.lua")[1].version, range)
 	eq(vim.version.range(range):has(tested), true)
 end
 

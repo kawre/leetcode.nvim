@@ -7,6 +7,12 @@
 ---@class leet.ui.browser.filter
 local M = {}
 
+--- Splits a query into title words and an optional leading ID such as `1.`.
+local function parse_query(query)
+	local id, title = query:match("^%s*(%d+)%.%f[%s%z](.*)$")
+	return vim.split((title or query):lower(), "%s+", { trimempty = true }), id
+end
+
 --- A query matches on the number, or on all of its words in the title.
 ---@param problem leet.cache.problem
 ---@param words string[]
@@ -32,8 +38,9 @@ end
 function M.ranges(title, query)
 	local lower = title:lower()
 	local covered = {}
+	local words = parse_query(query)
 
-	for _, word in ipairs(vim.split(query:lower(), "%s+", { trimempty = true })) do
+	for _, word in ipairs(words) do
 		local start, finish = lower:find(word, 1, true)
 		for byte = start or 1, finish or 0 do
 			covered[byte] = true
@@ -77,10 +84,11 @@ end
 ---@param filters leet.ui.browser.filters
 ---@return leet.cache.problem[]
 function M.apply(problems, filters)
-	local words = vim.split(filters.query:lower(), "%s+", { trimempty = true })
+	local words, id = parse_query(filters.query)
 
 	return vim.tbl_filter(function(problem)
-		return (filters.difficulty == "all" or problem.difficulty:lower() == filters.difficulty)
+		return (not id or tostring(problem.frontend_id) == id)
+			and (filters.difficulty == "all" or problem.difficulty:lower() == filters.difficulty)
 			and (filters.status == "all" or problem.status == filters.status)
 			and not (filters.free and problem.paid_only)
 			and matches(problem, words)

@@ -672,6 +672,31 @@ T["problems"]["keep their keys while animations run"] = function()
 	eq(child.lua_get("browsed"), true)
 end
 
+T["problems"]["the band keeps its numbers when the browser opens and closes"] = function()
+	worked_on(two_problems)
+	open_problems()
+	local wide = band()
+	eq(wide:find("20 · 8 · 2", 1, true) ~= nil, true)
+	-- A newly mounted counter would stay at zero while the clock is paused.
+	child.lua([[
+		browser = require("leetcode.ui.browser")
+		Markup.animate.enabled = true
+		Markup.animate.manual = true
+	]])
+	child.type_keys("p")
+	child.lua("vim.wait(100, function() reactive.flush(); return menu.width() < 96 end, 5)")
+	eq(child.lua_get("browser.is_open()"), true)
+	local narrow = band()
+	eq(narrow:find("42", 1, true) ~= nil, true)
+	eq(narrow:find("30 solved", 1, true) ~= nil, true)
+	eq(narrow:find("20 · 8 · 2", 1, true), nil)
+
+	child.type_keys("q")
+	child.lua("vim.wait(100, function() reactive.flush(); return menu.width() >= 96 end, 5)")
+	eq(child.lua_get("browser.is_open()"), false)
+	eq(band(), wide)
+end
+
 T["problems"]["q goes back"] = function()
 	open_problems()
 	child.type_keys("q")

@@ -28,9 +28,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
 - [Picker](#picker)
 
-- [plenary.nvim]
-
-- [markup.nvim] 0.5.x
+- [markup.nvim] >= 0.7.0
 
 - [tree-sitter-html] _**(optional, but highly recommended)**_
   used for formatting the question description.
@@ -49,8 +47,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     build = ":TSUpdate html", -- if you have `nvim-treesitter` installed
     dependencies = {
         -- include a picker of your choice, see picker section for more details
-        "nvim-lua/plenary.nvim",
-        { "kawre/markup.nvim", version = ">=0.5" },
+        { "kawre/markup.nvim", version = ">=0.7" },
     },
     opts = {
         -- configuration goes here
@@ -548,5 +545,4 @@ You can then exit [leetcode.nvim] using `:Leet exit` command
 [fzf-lua]: https://github.com/ibhagwan/fzf-lua
 [snacks.nvim]: https://github.com/folke/snacks.nvim
 [tree-sitter-html]: https://github.com/tree-sitter/tree-sitter-html
-[plenary.nvim]: https://github.com/nvim-lua/plenary.nvim
 [mini-picker]: https://github.com/nvim-mini/mini.pick
