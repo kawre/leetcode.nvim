@@ -85,6 +85,7 @@ arguments.random = {
     difficulty = { "easy", "medium", "hard" },
     status = { "ac", "notac", "todo" },
     tags = topics,
+    premium = { "free", "paid" },
 }
 
 arguments.session_change = {

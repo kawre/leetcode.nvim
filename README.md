@@ -416,7 +416,7 @@ image_support = true,
 - `Leet random`
 
   ```
-  Leet random status=<status> difficulty=<difficulty> tags=<tags>
+  Leet random status=<status> difficulty=<difficulty> tags=<tags> premium=<free|paid>
   ```
 
 ## 🚀 Usage
