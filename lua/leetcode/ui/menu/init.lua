@@ -196,15 +196,20 @@ local App = m.component(function()
 	end
 
 	--- The band, as wide as the dashboard and just above it, where the eye
-	--- already is rather than along the top of a large window.
+	--- already is rather than along the top of a large window. It follows the
+	--- width rather than being made again for it, so its numbers count up once.
 	local function band()
 		return m.vflex({
 			align = "center",
 			margin_bottom = 1,
-			function()
-				local width, columns = M.dashboard_width()
-				return Band({ width = width, compact = not columns })
-			end,
+			Band({
+				width = function()
+					return (M.dashboard_width())
+				end,
+				compact = function()
+					return not select(2, M.dashboard_width())
+				end,
+			}),
 		})
 	end
 
