@@ -120,7 +120,7 @@ local function hl_of(text, on)
 		local buf, ns = menu.win.buf, menu.view.ns
 		for row, line in ipairs(buffer_text(buf)) do
 			if line:find(%q, 1, true) then
-				for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, { row - 1, 0 }, { row - 1, -1 }, { details = true })) do
+				for _, mark in ipairs(view_marks(menu.view, { row - 1, 0 }, { row - 1, -1 })) do
 					local got = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[2], mark[4].end_col, {})[1]
 					if vim.trim(got) == %q then return mark[4].hl_group end
 				end
@@ -599,7 +599,7 @@ T["problems"]["color recent work by what it means"] = function()
 	local function hl_of(text)
 		return child.lua_get(([[(function()
 			local buf, ns = menu.win.buf, menu.view.ns
-			for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, { details = true })) do
+			for _, mark in ipairs(view_marks(menu.view, 0, -1)) do
 				local found = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[4].end_row or mark[2], mark[4].end_col, {})[1]
 				if found == %q then
 					return mark[4].hl_group
@@ -909,7 +909,7 @@ T["statistics"]["a block lifts while the cursor is on it"] = function()
 		local function lifted()
 			local buf, ns = menu.win.buf, menu.view.ns
 			local row = vim.api.nvim_win_get_cursor(0)[1] - 1
-			for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, { row, 0 }, { row, -1 }, { details = true })) do
+			for _, mark in ipairs(view_marks(menu.view, { row, 0 }, { row, -1 })) do
 				local group = mark[4].hl_group or ""
 				if group:find("MarkupAnimated", 1, true) then
 					return vim.api.nvim_get_hl(0, { name = group, link = false }).bg

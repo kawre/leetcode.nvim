@@ -3,7 +3,7 @@
 local M = {}
 
 --- The markup.nvim API range used by leetcode.nvim.
-M.markup = ">=0.7"
+M.markup = ">=0.7.1"
 
 --- How to get markup.nvim, for every way of installing it.
 local INSTALL = table.concat({

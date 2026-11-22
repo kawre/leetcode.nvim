@@ -46,11 +46,16 @@ end
 
 T["reports an older markup.nvim release"] = function()
 	child.lua([[require("markup.config").version = "0.6.0"]])
-	eq(check(), "leetcode.nvim requires markup.nvim >=0.7 (installed: 0.6.0).")
+	eq(check(), "leetcode.nvim requires markup.nvim >=0.7.1 (installed: 0.6.0).")
 end
 
-T["accepts patch releases in the markup.nvim 0.7 series"] = function()
-	child.lua([[require("markup.config").version = "0.7.1"]])
+T["reports markup.nvim 0.7.0, whose picker does not light every word"] = function()
+	child.lua([[require("markup.config").version = "0.7.0"]])
+	eq(check(), "leetcode.nvim requires markup.nvim >=0.7.1 (installed: 0.7.0).")
+end
+
+T["accepts later patch releases in the markup.nvim 0.7 series"] = function()
+	child.lua([[require("markup.config").version = "0.7.2"]])
 	eq(check(), vim.NIL)
 end
 

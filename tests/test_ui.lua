@@ -240,7 +240,7 @@ local function open_browser(count, first_title)
 		function browser_state_style()
 			local style
 			local buf, ns = browser.filters.buf, browser.filters_view.ns
-			for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, { details = true })) do
+			for _, mark in ipairs(view_marks(browser.filters_view, 0, -1)) do
 				local text = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[2], mark[4].end_col, {})[1]
 				if text:find("Search problems", 1, true) or (mark[4].hl_group or ""):find("MarkupAnimated") then
 					style = style or (mark[4].hl_group:find("MarkupAnimated") and mark[4].hl_group)
@@ -379,7 +379,7 @@ T["browser"]["highlights what the search matched"] = function()
 		vim.wait(20, function() reactive.flush(); return false end, 5)
 		matched = {}
 		local buf, ns = browser.list.buf, browser.list_view.ns
-		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, { details = true })) do
+		for _, mark in ipairs(view_marks(browser.list_view, 0, -1)) do
 			if mark[4].hl_group == "MarkupPickerMatch" then
 				matched[#matched + 1] = vim.api.nvim_buf_get_text(buf, mark[2], mark[3], mark[2], mark[4].end_col, {})[1]
 			end
@@ -524,7 +524,7 @@ T["browser"]["the search field stands apart"] = function()
 		end
 		-- Padding above and below the text.
 		above, below = rows[field_row - 1], rows[field_row + 1]
-		for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, { field_row - 2, 0 }, { field_row, -1 }, { details = true })) do
+		for _, mark in ipairs(view_marks(browser.filters_view, { field_row - 2, 0 }, { field_row, -1 })) do
 			if mark[4].hl_group == browser_state_style() then lit = (lit or 0) + 1 end
 		end
 	]])
