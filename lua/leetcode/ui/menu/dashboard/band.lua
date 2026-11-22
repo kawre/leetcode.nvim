@@ -12,15 +12,32 @@ local function greeting()
 	return hour < 5 and "night" or hour < 12 and "morning" or hour < 18 and "afternoon" or "evening"
 end
 
-local function Count(difficulty, style, label, delay)
+--- A count of what was solved. With `hidden`, it shows nothing while that
+--- says so, but stays, so it does not count up again when it comes back.
+---@param hidden? fun(): boolean
+local function Count(difficulty, style, label, delay, hidden)
 	local count = kit.counter(function()
 		return solved.stat_of(difficulty).solved
 	end, { delay = delay, instant = Leet.menu.settled() })
 
+	local function shown(text)
+		return function()
+			return not (hidden and hidden()) and text() or ""
+		end
+	end
 	return m.inline({
-		m.inline(function()
-			return tostring(math.floor(count() + 0.5))
-		end, style),
+		hidden and m.inline(
+			shown(function()
+				return " · "
+			end),
+			"leetcode_muted"
+		),
+		m.inline(
+			shown(function()
+				return tostring(math.floor(count() + 0.5))
+			end),
+			style
+		),
 		label and m.inline(" " .. label, "leetcode_muted"),
 	})
 end
@@ -40,13 +57,14 @@ local function Brand(greeting_text, room)
 end
 
 --- The band of a signed in user: who it is, the streak and what was solved.
----@param props { width: integer, compact?: boolean, name: string }
+--- The width and whether it is compact are read as they change: the band
+--- stays, so its numbers do not count up again when the window resizes.
+---@param props { width: fun(): integer, compact: fun(): boolean, name: string }
 local SignedIn = m.component(function(props)
 	if not solved.data() then
 		solved.fetch()
 	end
 
-	local separator = m.inline(" · ", "leetcode_muted")
 	local hello = "   " .. i18n.greeting(greeting(), props.name)
 
 	--- How wide the right side is, as plain text.
@@ -56,7 +74,7 @@ local SignedIn = m.component(function(props)
 			solved.stat_of("All").solved,
 			i18n.solved_count
 		)
-		if not props.compact then
+		if not props.compact() then
 			for _, difficulty in ipairs({ "Easy", "Medium", "Hard" }) do
 				text = text .. (" · %d"):format(solved.stat_of(difficulty).solved)
 			end
@@ -88,24 +106,19 @@ local SignedIn = m.component(function(props)
 			})
 		end),
 		Count("All", "leetcode_strong", i18n.solved_count, 100),
-		not props.compact and m.inline({
-			separator,
-			-- The colours tell the difficulties apart, which keeps room for the greeting.
-			Count("Easy", "leetcode_easy", nil, 200),
-			separator,
-			Count("Medium", "leetcode_medium", nil, 300),
-			separator,
-			Count("Hard", "leetcode_hard", nil, 400),
-		}),
+		-- The colours tell the difficulties apart, which keeps room for the greeting.
+		Count("Easy", "leetcode_easy", nil, 200, props.compact),
+		Count("Medium", "leetcode_medium", nil, 300, props.compact),
+		Count("Hard", "leetcode_hard", nil, 400, props.compact),
 	})
 
 	local brand = Brand(hello, function()
-		return props.width - PADDING * 2 - 15 - right_width() - 2
+		return props.width() - PADDING * 2 - 15 - right_width() - 2
 	end)
 	return m.flex({ justify = "between", white_space = "nowrap", brand, right })
 end)
 
----@param props { width: integer, compact?: boolean }
+---@param props { width: fun(): integer, compact: fun(): boolean }
 return m.component(function(props)
 	return kit.Card({
 		width = props.width,

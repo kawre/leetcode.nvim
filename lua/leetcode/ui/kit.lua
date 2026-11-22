@@ -49,8 +49,13 @@ function M.Card(props)
 	})
 
 	-- Widths are the outer size here, so that cards line up with each other.
-	if card.width then
-		card.width = card.width - card.padding[2] * 2
+	local width, padding = card.width, card.padding[2] * 2
+	if type(width) == "function" then
+		card.width = function()
+			return width() - padding
+		end
+	elseif width then
+		card.width = width - padding
 	end
 	return m.block(card)
 end

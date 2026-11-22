@@ -406,6 +406,29 @@ T["something is lit from the start"] = function()
 	eq(contains("▎"), true)
 end
 
+T["the band keeps its numbers when the window resizes"] = function()
+	open(true)
+	-- Away from the dashboard, which counts the band as settled once it comes back.
+	child.type_keys("p")
+	child.lua("reactive.flush()")
+	-- Numbers that counted up again would stand at 0: the clock does not move.
+	child.lua("Markup.animate.enabled = true; Markup.animate.manual = true")
+	local function resize(columns)
+		child.o.columns = columns
+		child.lua("vim.wait(100, function() reactive.flush(); return false end, 5)")
+		return band()
+	end
+
+	-- Narrow, as when the problem browser opens beside the menu.
+	local narrow = resize(80)
+	eq(narrow:find("42", 1, true) ~= nil, true)
+	eq(narrow:find("30 solved", 1, true) ~= nil, true)
+	eq(narrow:find("20 · 8 · 2", 1, true), nil)
+
+	-- Wide again, the difficulties come back as they were.
+	eq(resize(120):find("20 · 8 · 2", 1, true) ~= nil, true)
+end
+
 T["resizing the window keeps the dashboard in the middle"] = function()
 	open(true)
 	local function margins()
