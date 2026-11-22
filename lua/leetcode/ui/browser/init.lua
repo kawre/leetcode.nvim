@@ -14,6 +14,8 @@ local ui = require("leetcode.ui.util")
 
 local animate = Markup.animate
 local api = vim.api
+local supports_text_overflow = type(Markup.picker.truncate) ~= "function"
+local ELLIPSIS = "󰇘"
 
 local FILTERS_HEIGHT = 9
 local WIDTH = 0.5
@@ -242,14 +244,14 @@ local function Row(state, problem, ctx)
 	local number = (" %5s  "):format(problem.frontend_id)
 	local rate = ("  %5.1f%%  "):format(problem.ac_rate or 0)
 	local difficulty_width = 6
-	-- Reserve the selection mark, number, acceptance rate, difficulty and right margin.
-	local title_width = ctx.width - vim.fn.strdisplaywidth(number .. rate) - difficulty_width - 2
 	return m.flex({
 		style = ctx.selected and "leetcode_row_active" or nil,
 		justify = "between",
 		white_space = "nowrap",
 		m.inline({
 			shrink = 1,
+			overflow_x = supports_text_overflow and "hidden" or nil,
+			text_overflow = supports_text_overflow and ELLIPSIS or nil,
 			m.inline(ctx.selected and "▌" or " ", "leetcode_accent"),
 			m.inline(function()
 				if state.busy()[problem.title_slug] then
@@ -260,15 +262,17 @@ local function Row(state, problem, ctx)
 			m.inline(number, "leetcode_muted"),
 			m.inline(function()
 				local title = Leet.util.translate(problem.title, problem.title_cn)
-				local marker_width = state.busy()[problem.title_slug] and 1
-					or vim.fn.strdisplaywidth(marker)
-				local spans = Markup.picker.truncate(
-					filter.highlight(title, state.query()),
-					title_width - marker_width
-				)
+				local spans = filter.highlight(title, state.query())
+				if not supports_text_overflow then
+					-- Markup v0.6.0 needs an explicit display width for picker truncation.
+					local marker_width = state.busy()[problem.title_slug] and 1
+						or vim.fn.strdisplaywidth(marker)
+					local metadata = vim.fn.strdisplaywidth(number .. rate) + difficulty_width + 2
+					spans = Markup.picker.truncate(spans, ctx.width - metadata - marker_width)
+				end
 				return vim.tbl_map(function(span)
 					if span[2] == "MarkupPickerEmpty" then
-						return m.inline("󰇘", "leetcode_muted")
+						return m.inline(ELLIPSIS, "leetcode_muted")
 					end
 					return m.inline(span[1], span[2])
 				end, spans)
