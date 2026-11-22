@@ -28,7 +28,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
 - [Picker](#picker)
 
-- [markup.nvim] with `text_overflow` support. The pinned development revision needs Cargo to build its engine.
+- [markup.nvim] >= 0.7.0
 
 - [tree-sitter-html] _**(optional, but highly recommended)**_
   used for formatting the question description.
@@ -47,7 +47,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     build = ":TSUpdate html", -- if you have `nvim-treesitter` installed
     dependencies = {
         -- include a picker of your choice, see picker section for more details
-        { "kawre/markup.nvim", commit = "c6e05dcce1444c8a12b55414ae514cd2c0f831d6" },
+        { "kawre/markup.nvim", version = ">=0.7" },
     },
     opts = {
         -- configuration goes here
