@@ -142,6 +142,7 @@ local M = {
 	ui = {
 		animations = true, ---@type boolean Set to false to make everything jump to its end
 		confetti = true, ---@type boolean Celebrate accepted submissions
+		snow = true, ---@type boolean Falling snow behind the menu
 		-- Language of the interface. Unset, it is Chinese on leetcode.cn with
 		-- `cn.translator` on, and English everywhere else.
 		locale = nil, ---@type "en"|"zh"|nil

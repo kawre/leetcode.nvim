@@ -6,6 +6,7 @@ local Nav = require("leetcode.ui.menu.nav")
 local Band = require("leetcode.ui.menu.dashboard.band")
 local focus = require("leetcode.ui.menu.dashboard.focus")
 local Header = require("leetcode.ui.menu.dashboard.header")
+local Snow = require("leetcode.ui.menu.snow")
 local data = require("leetcode.ui.menu.data")
 local Stats = require("leetcode.ui.menu.stats")
 local Problems = require("leetcode.ui.menu.problems")
@@ -214,6 +215,7 @@ local App = m.component(function()
 	end
 
 	return m.block({
+		Snow({ width = M.width, height = M.height }),
 		m.show(gated, function()
 			return m.block({
 				margin_top = function()

@@ -154,6 +154,11 @@ M.get = function()
 		flame = { fg = accent },
 		flame_off = { fg = muted },
 
+		-- background snowfall
+		snow_far = { fg = mix(bg, fg, 0.22) },
+		snow_mid = { fg = mix(bg, fg, 0.42) },
+		snow_near = { fg = mix(bg, fg, 0.68) },
+
 		-- verdicts
 		-- The status of a run in the console's header, text on its band.
 		status_ok = { fg = ok, bold = true },
