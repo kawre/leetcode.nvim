@@ -45,12 +45,12 @@ T["says how to get markup.nvim when it is not there"] = function()
 end
 
 T["reports an older markup.nvim release"] = function()
-	child.lua([[require("markup.config").version = "0.4.0"]])
-	eq(check(), "leetcode.nvim requires markup.nvim >=0.5 (installed: 0.4.0).")
+	child.lua([[require("markup.config").version = "0.5.1"]])
+	eq(check(), "leetcode.nvim requires markup.nvim >=0.6 (installed: 0.5.1).")
 end
 
-T["accepts patch releases in the markup.nvim 0.5 series"] = function()
-	child.lua([[require("markup.config").version = "0.5.1"]])
+T["accepts patch releases in the markup.nvim 0.6 series"] = function()
+	child.lua([[require("markup.config").version = "0.6.1"]])
 	eq(check(), vim.NIL)
 	eq(dofile("lazy.lua")[1].version, child.lua_get("deps.markup"))
 end

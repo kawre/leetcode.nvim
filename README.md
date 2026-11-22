@@ -30,7 +30,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
 - [plenary.nvim]
 
-- [markup.nvim] 0.5.x
+- [markup.nvim] 0.6.x
 
 - [tree-sitter-html] _**(optional, but highly recommended)**_
   used for formatting the question description.
@@ -50,7 +50,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     dependencies = {
         -- include a picker of your choice, see picker section for more details
         "nvim-lua/plenary.nvim",
-        { "kawre/markup.nvim", version = ">=0.5" },
+        { "kawre/markup.nvim", version = ">=0.6" },
     },
     opts = {
         -- configuration goes here
