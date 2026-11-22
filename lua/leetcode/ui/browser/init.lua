@@ -1,5 +1,9 @@
 --- Browses every problem from the menu, in a column beside it. Filters stay
 --- pinned in their own window, so they remain real buttons while the list scrolls.
+---
+--- The list is a `Markup.picker`, drawn into these windows: it moves, scrolls
+--- and searches as every picker does, counts and the mouse wheel included,
+--- with the filters, the rows and the search field of the browser's own.
 
 local i18n = require("leetcode.i18n")
 local m = require("markup")
@@ -11,8 +15,6 @@ local ui = require("leetcode.ui.util")
 local animate = Markup.animate
 local api = vim.api
 
---- Rows mounted at a time. Scrolling near the end brings in the next batch.
-local BATCH = 200
 local FILTERS_HEIGHT = 9
 local WIDTH = 0.5
 
@@ -229,93 +231,49 @@ local Filters = m.component(function(props)
 	})
 end)
 
-local Row = m.component(function(props)
-	local state = props.state
-	local hovered = m.signal(false)
+--- A row of the list. Rows show only while they fit, so what one is doing, such
+--- as opening its problem, is kept in the state rather than in the row.
+---@param state table
+local function Row(state, problem, ctx)
 	local config = require("leetcode.config")
-
-	-- While the question is fetched. A row filtered away meanwhile opens nothing.
-	local busy, start = kit.use_task()
-
-	return function()
-		local problem = props.problem()
-		local status = config.icons.hl.status[problem.status]
-		local locked = problem.paid_only and not config.auth.is_premium
-		return m.flex({
-			click = "double",
-			on_press = function()
-				start(function(task)
-					state.open(problem, task)
-				end)
-			end,
-			on_hover = function(value)
-				hovered(value)
-				if value then
-					state.reached(props.index())
+	local status = config.icons.hl.status[problem.status]
+	local locked = problem.paid_only and not config.auth.is_premium
+	return m.flex({
+		style = ctx.selected and "leetcode_row_active" or nil,
+		justify = "between",
+		white_space = "nowrap",
+		m.inline({
+			shrink = 1,
+			m.inline(ctx.selected and "▌" or " ", "leetcode_accent"),
+			m.inline(function()
+				if state.busy()[problem.title_slug] then
+					return m.loader({ style = "leetcode_accent" })
 				end
-			end,
-			style = function()
-				return hovered() and "leetcode_row_active" or nil
-			end,
-			justify = "between",
-			white_space = "nowrap",
-			m.inline({
-				shrink = 1,
-				m.inline(function()
-					return hovered() and "▌" or " "
-				end, "leetcode_accent"),
-				m.inline(function()
-					if busy() then
-						return m.loader({ style = "leetcode_accent" })
-					end
-					return m.inline(
-						locked and config.icons.lock or (status and status[1] or " "),
-						locked and "leetcode_medium" or status and status[2]
-					)
-				end),
-				m.inline((" %5s  "):format(problem.frontend_id), "leetcode_muted"),
-				m.inline(function()
-					local title = Leet.util.translate(problem.title, problem.title_cn)
-					return vim.tbl_map(function(span)
-						return m.inline(span[1], span[2])
-					end, filter.highlight(title, state.query()))
-				end),
-			}),
-			m.inline({
-				shrink = 0,
-				margin_right = 1,
-				m.inline(("  %5.1f%%  "):format(problem.ac_rate or 0), "leetcode_muted"),
-				-- Six cells, which a difficulty in Chinese takes fewer bytes than.
-				m.inline({
-					width = 6,
-					m.inline(
-						i18n.difficulty(problem.difficulty),
-						ui.diff_to_hl(problem.difficulty)
-					),
-				}),
-			}),
-		})
-	end
-end)
-
-local List = m.component(function(props)
-	local state = props.state
-
-	return m.block({
-		m.each(state.visible, function(problem, index)
-			return Row({ problem = problem, index = index, state = state })
-		end, {
-			key = function(problem)
-				return problem.title_slug
-			end,
+				return m.inline(
+					locked and config.icons.lock or (status and status[1] or " "),
+					locked and "leetcode_medium" or status and status[2]
+				)
+			end),
+			m.inline((" %5s  "):format(problem.frontend_id), "leetcode_muted"),
+			m.inline(function()
+				local title = Leet.util.translate(problem.title, problem.title_cn)
+				return vim.tbl_map(function(span)
+					return m.inline(span[1], span[2])
+				end, filter.highlight(title, state.query()))
+			end),
 		}),
-		m.show(function()
-			return #state.filtered() == 0
-		end, function()
-			return m.block({ padding = { 2, 3 }, m.inline(i18n.no_matches, "leetcode_muted") })
-		end),
+		m.inline({
+			shrink = 0,
+			margin_right = 1,
+			m.inline(("  %5.1f%%  "):format(problem.ac_rate or 0), "leetcode_muted"),
+			-- Six cells, which a difficulty in Chinese takes fewer bytes than.
+			m.inline({
+				width = 6,
+				m.inline(i18n.difficulty(problem.difficulty), ui.diff_to_hl(problem.difficulty)),
+			}),
+		}),
 	})
-end)
+end
 
 ---@param problems leet.cache.problem[]
 local function create_state(problems)
@@ -324,35 +282,28 @@ local function create_state(problems)
 		difficulty = m.signal("all"),
 		status = m.signal("all"),
 		free = m.signal(false),
-		query = m.signal(""),
 		typing = m.signal(false),
-		limit = m.signal(BATCH),
+		-- The problems being opened, by slug, each with its loader in its row.
+		busy = m.signal({}),
 	}
-
-	state.filtered = m.memo(function()
-		return filter.apply(problems, {
-			difficulty = state.difficulty(),
-			status = state.status(),
-			free = state.free(),
-			query = state.query(),
-		})
-	end)
-
-	state.visible = m.memo(function()
-		local filtered = state.filtered()
-		local limit = state.limit()
-		return #filtered > limit and vim.list_slice(filtered, 1, limit) or filtered
-	end)
 
 	function state.toggle_free()
 		state.free(not state.free())
 	end
 
-	--- Brings in more rows once the cursor nears the end.
-	function state.reached(index)
-		if index > state.limit() - 30 and state.limit() < #state.filtered() then
-			state.limit(state.limit() + BATCH)
-		end
+	--- Matches for the query and every filter, as the picker wants them.
+	function state.match(items, query)
+		return vim.tbl_map(
+			function(problem)
+				return { item = problem }
+			end,
+			filter.apply(items, {
+				difficulty = state.difficulty(),
+				status = state.status(),
+				free = state.free(),
+				query = query,
+			})
+		)
 	end
 
 	return state
@@ -362,7 +313,7 @@ end
 ---@param state table
 local function search(state)
 	local anchor = M.filters
-	if not (anchor and anchor:valid()) then
+	if not (anchor and anchor:valid()) or state.typing() then
 		return
 	end
 
@@ -384,82 +335,25 @@ local function search(state)
 	})
 	vim.wo[win].winhighlight = "NormalFloat:" .. (state.field_style or "leetcode_input_focus")
 	state.typing(true)
-
-	--- Neovim holds back TextChangedI while keys are queued, so whatever acts on
-	--- the query reads it first.
-	local function sync()
-		local text = api.nvim_buf_is_valid(buf) and api.nvim_buf_get_lines(buf, 0, 1, false)[1]
-			or ""
-		if text ~= state.query() then
-			state.query(text)
-			M.list_view:after_commit(M.to_top)
-			reactive.flush()
-		end
-	end
-
-	api.nvim_create_autocmd({ "TextChangedI", "TextChanged" }, {
-		buffer = buf,
-		callback = sync,
-	})
-
-	local function leave()
-		vim.cmd.stopinsert()
-		state.typing(false)
-		if api.nvim_win_is_valid(win) then
-			api.nvim_win_close(win, true)
-		end
-		M.list:focus()
-	end
-
-	local function move(by)
-		sync()
-		M.select_row(api.nvim_win_get_cursor(M.list.win)[1] + by)
-	end
-
-	local keys = {
-		["<Esc>"] = leave,
-		["<CR>"] = function()
-			sync()
-			leave()
-			M.list_view:press()
-		end,
-	}
-	for _, lhs in ipairs({ "<C-n>", "<Down>", "<C-j>" }) do
-		keys[lhs] = function()
-			move(1)
-		end
-	end
-	for _, lhs in ipairs({ "<C-p>", "<Up>", "<C-k>" }) do
-		keys[lhs] = function()
-			move(-1)
-		end
-	end
-	for lhs, action in pairs(keys) do
-		vim.keymap.set({ "i", "n" }, lhs, action, { buffer = buf, nowait = true })
-	end
-
+	state.search_win = win
+	M.picker:attach_input(buf, win)
 	vim.cmd.startinsert({ bang = true })
 end
 
---- Puts the cursor of the list on a row, and marks it, from any window.
----@param row integer
-function M.select_row(row)
-	if not (M.list and M.list:valid()) then
+--- Ends typing, however it ends, and goes back to the list.
+---@param state table
+local function leave_search(state)
+	if not state.typing() then
 		return
 	end
-
-	api.nvim_win_call(M.list.win, function()
-		local last = api.nvim_buf_line_count(M.list.buf)
-		api.nvim_win_set_cursor(0, { math.max(math.min(row, last), 1), 0 })
-		M.list_view.cursor = nil
-		M.list_view:snap_cursor()
-		M.list_view:update_hover()
-	end)
-end
-
---- Puts the cursor back on the first row, which filtering may have replaced.
-function M.to_top()
-	M.select_row(1)
+	state.typing(false)
+	M.picker:detach_input()
+	local win = state.search_win
+	state.search_win = nil
+	if win and api.nvim_win_is_valid(win) then
+		api.nvim_win_close(win, true)
+	end
+	M.picker:focus_list()
 end
 
 --- Goes to the filters on purpose, which moving between windows does not.
@@ -481,13 +375,18 @@ function M.open(problems)
 	end
 
 	local state = create_state(problems)
-	state.search = function()
-		search(state)
-	end
 
-	---@param task? leet.ui.task from the row pressed
-	state.open = function(problem, task)
-		if not task then
+	--- Opens a problem, with a loader in its row until it does.
+	---@param problem leet.cache.problem
+	---@param from_row? boolean false for one that was not picked from a row
+	state.open = function(problem, from_row)
+		local slug = problem.title_slug
+		if state.busy()[slug] then
+			return
+		end
+
+		local task
+		if from_row == false then
 			-- Nothing on screen started it, so the corner shows it, and closing
 			-- the browser meanwhile means it is not wanted.
 			local close = require("leetcode.ui.toast")(
@@ -506,8 +405,66 @@ function M.open(problems)
 				end,
 				done = close,
 			}
+		else
+			local picker = M.picker
+			local function set(busy)
+				local all = vim.deepcopy(state.busy())
+				all[slug] = busy or nil
+				state.busy(all)
+			end
+			set(true)
+			task = {
+				-- A browser closed meanwhile wants nothing opened.
+				cancelled = function()
+					return M.picker ~= picker or picker.closed
+				end,
+				done = function()
+					if not picker.closed then
+						set(false)
+					end
+				end,
+			}
 		end
 		require("leetcode.cmd").open(problem, task)
+	end
+
+	M.picker = Markup.picker.new({
+		items = problems,
+		filter = state.match,
+		click = "double",
+		-- It stays while a problem opens, and beside the menu.
+		close_on_select = false,
+		auto_close = false,
+		esc = "normal",
+		render = {
+			row = function(entry, ctx)
+				return Row(state, entry.item, ctx)
+			end,
+			empty = function()
+				return m.block({ padding = { 2, 3 }, m.inline(i18n.no_matches, "leetcode_muted") })
+			end,
+		},
+		on_select = function(problem)
+			leave_search(state)
+			state.open(problem)
+		end,
+		-- q, <Esc> and the like close the picker, and the browser with it.
+		on_close = function()
+			M.close()
+		end,
+		-- Typing happens in a float over the search field, there only while typing.
+		on_focus_input = function()
+			search(state)
+		end,
+		on_input_leave = function()
+			leave_search(state)
+		end,
+		keys = {},
+	})
+	state.query = M.picker.query
+	state.filtered = M.picker.filtered
+	state.search = function()
+		M.picker:focus_input()
 	end
 
 	local options = { show = false, minimal = true, wo = { winhighlight = "Normal:Normal" } }
@@ -534,7 +491,7 @@ function M.open(problems)
 	local function to_list(win)
 		vim.schedule(function()
 			if M.list and M.list:valid() and api.nvim_get_current_win() == win then
-				M.list:focus()
+				M.picker:focus_list()
 			end
 		end)
 	end
@@ -551,79 +508,75 @@ function M.open(problems)
 		to_list(M.filters.win)
 	end, { buf = true })
 
-	-- The marked row shows where the cursor is, so it only shows while typing.
+	-- The marked row shows where the selection is.
 	M.filters_view = Markup.view(M.filters, { snap = true, hide_cursor = true })
-	M.list_view = Markup.view(M.list, { snap = true, hide_cursor = true })
-
-	local function set_filter(signal, value)
-		signal(value)
-		state.limit(BATCH)
-		M.list_view:after_commit(M.to_top)
-	end
 
 	local keys = {
 		f = state.toggle_free,
-		q = M.close,
 		["<Tab>"] = function()
 			if api.nvim_get_current_win() == M.list.win then
 				M.focus_filters()
 			else
-				M.list:focus()
+				M.picker:focus_list()
 			end
 		end,
 		r = function()
-			local filtered = state.filtered()
+			local filtered = M.picker.filtered()
 			if #filtered > 0 then
-				state.open(filtered[math.random(#filtered)])
+				state.open(filtered[math.random(#filtered)].item, false)
 			end
 		end,
 	}
-	-- Like the keys that start insert mode anywhere else, these start typing.
-	for _, lhs in ipairs({ "/", "i", "a", "I", "A" }) do
-		keys[lhs] = state.search
-	end
 
 	-- A filter key turns its filter off again, which is how to get back to all.
 	local function toggles(options, signal)
 		for _, option in ipairs(options) do
 			if option.lhs then
 				keys[option.lhs] = function()
-					set_filter(signal, signal() == option.value and "all" or option.value)
+					signal(signal() == option.value and "all" or option.value)
 				end
 			end
 		end
 	end
 	toggles(difficulties, state.difficulty)
 	toggles(statuses, state.status)
-
-	for _, win in ipairs({ M.filters, M.list }) do
-		for lhs, action in pairs(keys) do
-			win:map("n", lhs, action, { nowait = true })
+	for lhs, action in pairs(keys) do
+		M.picker.opts.keys[lhs] = function()
+			action()
+			reactive.flush()
 		end
 	end
+
+	M.picker:own(M.layout.root.win)
+	M.picker:own(M.filters.win)
+	M.picker:bind(M.filters.buf, "other")
 	M.filters:map("n", "<CR>", function()
 		M.filters_view:press()
 	end)
-	M.list:map("n", "<CR>", function()
-		M.list_view:press()
-	end)
+	M.picker:attach_list(M.list)
+	M.list_view = M.picker.view
 
 	M.filters_view:render(Filters({ state = state }))
-	M.list_view:render(List({ state = state }))
-	M.list:focus()
+	M.picker:focus_list()
 end
 
 function M.close()
-	if not M.is_open() then
+	if not M.is_open() or M.closing then
 		return
 	end
+	M.closing = true
 
+	-- Closing the picker comes back here, which then has nothing to do.
+	local picker = M.picker
+	if picker and not picker.closed then
+		picker:close()
+	end
 	M.filters_view:destroy()
-	M.list_view:destroy()
 	M.filters:close()
 	M.list:close()
 	M.layout:close({ wins = false })
 	M.layout = nil
+	M.closing = false
 end
 
 return M
