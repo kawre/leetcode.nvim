@@ -234,7 +234,7 @@ end
 
 T["browser"] = new_set()
 
-local function open_browser(count)
+local function open_browser(count, first_title)
 	child.lua(([[
 		-- The highlight of the search field, which follows its state.
 		function browser_state_style()
@@ -258,9 +258,10 @@ local function open_browser(count)
 				ac_rate = 50, paid_only = false,
 			}
 		end
+		items[1].title = %s or items[1].title
 		browser.open(items)
 		reactive.flush()
-	]]):format(count))
+	]]):format(count, first_title and vim.inspect(first_title) or "nil"))
 end
 
 local function list_has(text)
@@ -276,6 +277,26 @@ T["browser"]["lists problems beside the menu"] = function()
 	eq(list_has("Problem 3"), true)
 	eq(filters_have("i to search"), true)
 	eq(child.lua_get("vim.api.nvim_get_current_win() == browser.list.win"), true)
+end
+
+T["browser"]["truncates long titles while keeping the metadata visible"] = function()
+	open_browser(5, ("字符"):rep(60) .. " Needle")
+	local line = child.lua_get("buffer_text(browser.list.buf)[1]")
+	eq(line:find("字符", 1, true) ~= nil, true)
+	eq(line:find("󰇘", 1, true) ~= nil, true)
+	eq(line:find("50.0%", 1, true) ~= nil, true)
+	eq(line:find("Medium", 1, true) ~= nil, true)
+	eq(line:find("Needle", 1, true), nil)
+	eq(
+		child.lua_get(
+			"vim.fn.strdisplaywidth(buffer_text(browser.list.buf)[1]) <= browser.picker.width()"
+		),
+		true
+	)
+
+	child.type_keys("/", "N", "e", "e", "d", "l", "e", "<Esc>")
+	eq(child.lua_get("browser.picker:current().item.title_slug"), "p1")
+	eq(filters_have("1 of 5"), true)
 end
 
 T["browser"]["keys filter from either window"] = function()

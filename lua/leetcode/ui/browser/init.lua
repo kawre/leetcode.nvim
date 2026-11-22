@@ -238,6 +238,12 @@ local function Row(state, problem, ctx)
 	local config = require("leetcode.config")
 	local status = config.icons.hl.status[problem.status]
 	local locked = problem.paid_only and not config.auth.is_premium
+	local marker = locked and config.icons.lock or (status and status[1] or " ")
+	local number = (" %5s  "):format(problem.frontend_id)
+	local rate = ("  %5.1f%%  "):format(problem.ac_rate or 0)
+	local difficulty_width = 6
+	-- Reserve the selection mark, number, acceptance rate, difficulty and right margin.
+	local title_width = ctx.width - vim.fn.strdisplaywidth(number .. rate) - difficulty_width - 2
 	return m.flex({
 		style = ctx.selected and "leetcode_row_active" or nil,
 		justify = "between",
@@ -247,28 +253,34 @@ local function Row(state, problem, ctx)
 			m.inline(ctx.selected and "▌" or " ", "leetcode_accent"),
 			m.inline(function()
 				if state.busy()[problem.title_slug] then
-					return m.loader({ style = "leetcode_accent" })
+					return kit.Loader("leetcode_accent")
 				end
-				return m.inline(
-					locked and config.icons.lock or (status and status[1] or " "),
-					locked and "leetcode_medium" or status and status[2]
-				)
+				return m.inline(marker, locked and "leetcode_medium" or status and status[2])
 			end),
-			m.inline((" %5s  "):format(problem.frontend_id), "leetcode_muted"),
+			m.inline(number, "leetcode_muted"),
 			m.inline(function()
 				local title = Leet.util.translate(problem.title, problem.title_cn)
+				local marker_width = state.busy()[problem.title_slug] and 1
+					or vim.fn.strdisplaywidth(marker)
+				local spans = Markup.picker.truncate(
+					filter.highlight(title, state.query()),
+					title_width - marker_width
+				)
 				return vim.tbl_map(function(span)
+					if span[2] == "MarkupPickerEmpty" then
+						return m.inline("󰇘", "leetcode_muted")
+					end
 					return m.inline(span[1], span[2])
-				end, filter.highlight(title, state.query()))
+				end, spans)
 			end),
 		}),
 		m.inline({
 			shrink = 0,
 			margin_right = 1,
-			m.inline(("  %5.1f%%  "):format(problem.ac_rate or 0), "leetcode_muted"),
+			m.inline(rate, "leetcode_muted"),
 			-- Six cells, which a difficulty in Chinese takes fewer bytes than.
 			m.inline({
-				width = 6,
+				width = difficulty_width,
 				m.inline(i18n.difficulty(problem.difficulty), ui.diff_to_hl(problem.difficulty)),
 			}),
 		}),
