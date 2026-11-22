@@ -1,9 +1,8 @@
 .PHONY: deps test test_file format format_check coverage
 
 NVIM_TEST = nvim --headless --noplugin -u tests/init.lua
-# markup.nvim, the UI library, at a release: its build.lua downloads the
-# engine built for this platform, so no Rust is needed to test.
-MARKUP_VERSION ?= v0.6.0
+# Keep CI on the same markup.nvim revision as lazy.lua.
+MARKUP_REVISION ?= c6e05dcce1444c8a12b55414ae514cd2c0f831d6
 MARKUP = deps/markup.nvim
 ROCKS = .tests/rocks
 # How many test files run at once
@@ -23,7 +22,7 @@ LUAJIT_INCDIR ?= /usr/include/luajit-2.1
 
 # A checkout of markup.nvim to test against: next to this repository when it
 # is there, as when working on both. Without one (as in CI), the release
-# MARKUP_VERSION is cloned into deps/.
+# MARKUP_REVISION is cloned into deps/.
 MARKUP_PATH ?= $(if $(wildcard ../markup.nvim/lua/markup),$(abspath ../markup.nvim),)
 export MARKUP_PATH
 
@@ -67,7 +66,8 @@ deps/mini.test:
 
 $(MARKUP):
 	@mkdir -p deps
-	git -c advice.detachedHead=false clone --quiet --filter=blob:none --branch $(MARKUP_VERSION) https://github.com/kawre/markup.nvim $@
+	git clone --quiet --filter=blob:none --no-checkout https://github.com/kawre/markup.nvim $@
+	git -C $@ checkout --quiet --detach $(MARKUP_REVISION)
 	cd $@ && nvim -l build.lua
 
 $(HTML_PARSER):

@@ -159,7 +159,7 @@ jobs:
         with:
           neovim: true
           version: ${{ steps.version.outputs.neovim }}
-      # mini.test and the release of markup.nvim the Makefile names, with its
+      # mini.test and the markup.nvim revision the Makefile names, with its
       # engine, again only when the Makefile changes.
       - uses: actions/cache@v4
         with:

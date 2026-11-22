@@ -52,7 +52,6 @@ end
 T["accepts patch releases in the markup.nvim 0.6 series"] = function()
 	child.lua([[require("markup.config").version = "0.6.1"]])
 	eq(check(), vim.NIL)
-	eq(dofile("lazy.lua")[1].version, child.lua_get("deps.markup"))
 end
 
 T["says to build the engine when only it is missing"] = function()
@@ -71,14 +70,10 @@ T["tells once, and stops the command"] = function()
 end
 
 T["the tests run on a markup.nvim the plugin asks for"] = function()
-	-- The release the Makefile clones for the tests (CI) must be in the range
-	-- lazy.lua and deps.lua ask for, or the tests check another markup.nvim
-	-- than the one users get.
+	-- CI should test the same markup.nvim revision lazy.nvim installs.
 	local makefile = table.concat(vim.fn.readfile("Makefile"), "\n")
-	local tested = makefile:match("\nMARKUP_VERSION %?= v?([%d%.]+)")
-	eq(type(tested), "string")
-	local range = child.lua_get("deps.markup")
-	eq(vim.version.range(range):has(tested), true)
+	local tested = assert(makefile:match("\nMARKUP_REVISION %?= (%x+)"))
+	eq(tested, dofile("lazy.lua")[1].commit)
 end
 
 return T
