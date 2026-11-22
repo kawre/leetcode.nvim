@@ -206,6 +206,14 @@ T["filter"]["by words of the title, in any order, or the number"] = function()
 	eq(filtered([[{ query = "nothing" }]]), {})
 end
 
+T["filter"]["accepts a numbered title"] = function()
+	eq(filtered([[{ query = "1. Two sum" }]]), { "1" })
+	eq(filtered([[{ query = "15. sum" }]]), { "15" })
+	eq(filtered([[{ query = " 1." }]]), { "1" })
+	eq(filtered([[{ query = "15. Two sum" }]]), {})
+	eq(child.lua_get("filter.ranges('Two Sum', '1. Two sum')"), { { 1, 3 }, { 5, 7 } })
+end
+
 T["filter"]["finds where the words are"] = function()
 	child.lua("filter = require('leetcode.ui.browser.filter')")
 	eq(child.lua_get("filter.ranges('Two Sum', 'sum')"), { { 5, 7 } })
