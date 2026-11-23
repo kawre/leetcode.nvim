@@ -81,7 +81,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         cache = vim.fn.stdpath("cache") .. "/leetcode",
     },
 
-    ---@type table<string, boolean>
+    ---@type table<string, boolean|string>
     plugins = {
         non_standalone = false,
     },
@@ -238,7 +238,7 @@ storage = {
 [plugins list](#-plugins)
 
 ```lua
----@type table<string, boolean>
+---@type table<string, boolean|string>
 plugins = {
     non_standalone = false,
 },
@@ -525,25 +525,25 @@ plugins = {
 
 You can then exit [leetcode.nvim] using `:Leet exit` command
 
-### Snow
+### Menu backgrounds
 
-Enable the optional winter animation behind the menu.
+Choose a background for the LeetCode menu.
 
 ```lua
 plugins = {
-    snow = true,
+    menu_background = "snow",
 }
 ```
 
-Snow respects `ui.animations` and requires a version of markup.nvim that
-provides `m.canvas`.
+The snow background adds falling snow and occasional reindeer. It respects
+`ui.animations` and requires a markup.nvim version that provides `m.canvas`.
+Omit `menu_background` or set it to `false` to disable it. Setting it to
+`true` selects the default background, currently `"snow"`.
 
-Menu background plugins can export `menu_background(props)` from
-`lua/leetcode-plugins/<name>/init.lua`. The function receives reactive
-`props.width` and `props.height` getters for the menu viewport and can return
-a markup element or `nil`. Use an absolute element with negative `z` and
-`inert = true` for a decorative background. Mount animations inside a
-markup component so they stop when the menu unmounts.
+New backgrounds live in `lua/leetcode-plugins/menu_background/backgrounds/`.
+Register each one by name in the plugin's `init.lua`. Its module exports a
+markup `component` that receives reactive `width` and `height` getters for
+the menu viewport.
 
 ## 🙌 Credits
 

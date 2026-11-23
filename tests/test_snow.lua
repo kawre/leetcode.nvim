@@ -20,7 +20,7 @@ T["snow"] = new_set()
 
 T["snow"]["moves flakes downward and wraps within bounds"] = function()
 	child.lua([[
-		snow = require("leetcode-plugins.snow.canvas")
+		snow = require("leetcode-plugins.menu_background.backgrounds.snow")
 		flake = {
 			x = 5,
 			y = 2,
@@ -51,7 +51,7 @@ T["snow"]["renders behind the menu and animates with zero layouts"] = function()
 		Markup.animate.enabled = true
 		Markup.animate.manual = true
 		local config = require("leetcode.config")
-		config.user.plugins = { snow = true }
+		config.user.plugins = { menu_background = "snow" }
 		config.load_plugins()
 		_G.cookie = { csrftoken = "x" }
 		menu = require("leetcode.ui.menu")
@@ -97,7 +97,7 @@ T["snow"]["draws flying reindeer across the canvas and retires them offscreen"] 
 			return
 		end
 		local canvas = require("markup.view.canvas")
-		local snow = require("leetcode-plugins.snow.canvas")
+		local snow = require("leetcode-plugins.menu_background.backgrounds.snow")
 		local ctx = canvas.context(40, 12)
 		local palette = snow.palette()
 		local herd = {
@@ -147,21 +147,31 @@ T["snow"]["leaves snow unloaded by default"] = function()
 		end, menu.view:highlights())
 	]])
 	eq(child.lua_get("snow_marks"), 0)
-	eq(child.lua_get("package.loaded[\"leetcode-plugins.snow\"] == nil"), true)
-	eq(child.lua_get("package.loaded[\"leetcode-plugins.snow.canvas\"] == nil"), true)
+	eq(child.lua_get("package.loaded[\"leetcode-plugins.menu_background\"] == nil"), true)
+	eq(
+		child.lua_get(
+			"package.loaded[\"leetcode-plugins.menu_background.backgrounds.snow\"] == nil"
+		),
+		true
+	)
 end
 
 T["snow"]["leaves the canvas unloaded when animations are disabled"] = function()
 	child.lua([[
 		local config = require("leetcode.config")
-		config.user.plugins = { snow = true }
+		config.user.plugins = { menu_background = "snow" }
 		config.load_plugins()
 		local background = config.menu_backgrounds[1]
 		local size = function() return 10 end
 		inactive = background({ width = size, height = size }) == nil
 	]])
 	eq(child.lua_get("inactive"), true)
-	eq(child.lua_get("package.loaded[\"leetcode-plugins.snow.canvas\"] == nil"), true)
+	eq(
+		child.lua_get(
+			"package.loaded[\"leetcode-plugins.menu_background.backgrounds.snow\"] == nil"
+		),
+		true
+	)
 end
 
 return T
