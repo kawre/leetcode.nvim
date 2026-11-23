@@ -64,6 +64,7 @@ local M = {
 	---@type table<string, boolean|string>
 	plugins = {
 		non_standalone = false,
+		menu_background = "snow",
 	},
 
 	---@type boolean

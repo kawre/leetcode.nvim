@@ -42,7 +42,7 @@ T["snow"]["moves flakes downward and wraps within bounds"] = function()
 	eq(child.lua_get("{ c2, r2 }"), { 8, 4 })
 end
 
-T["snow"]["renders behind the menu and animates with zero layouts"] = function()
+T["snow"]["renders by default and animates with zero layouts"] = function()
 	child.lua([[
 		if not m.canvas then
 			_G.skipped = true
@@ -50,9 +50,6 @@ T["snow"]["renders behind the menu and animates with zero layouts"] = function()
 		end
 		Markup.animate.enabled = true
 		Markup.animate.manual = true
-		local config = require("leetcode.config")
-		config.user.plugins = { menu_background = "snow" }
-		config.load_plugins()
 		_G.cookie = { csrftoken = "x" }
 		menu = require("leetcode.ui.menu")
 		menu.win.buf = vim.api.nvim_get_current_buf()
@@ -130,8 +127,10 @@ T["snow"]["draws flying reindeer across the canvas and retires them offscreen"] 
 	eq(child.lua_get("done_alive"), false)
 end
 
-T["snow"]["leaves snow unloaded by default"] = function()
+T["snow"]["leaves snow unloaded when the background is disabled"] = function()
 	child.lua([[
+		local config = require("leetcode.config")
+		config.apply({ plugins = { menu_background = false } })
 		Markup.animate.enabled = true
 		Markup.animate.manual = true
 		_G.cookie = { csrftoken = "x" }
@@ -147,7 +146,7 @@ T["snow"]["leaves snow unloaded by default"] = function()
 		end, menu.view:highlights())
 	]])
 	eq(child.lua_get("snow_marks"), 0)
-	eq(child.lua_get("package.loaded[\"leetcode-plugins.menu_background\"] == nil"), true)
+	eq(child.lua_get("#require(\"leetcode.config\").menu_backgrounds"), 0)
 	eq(
 		child.lua_get(
 			"package.loaded[\"leetcode-plugins.menu_background.backgrounds.snow\"] == nil"
@@ -159,8 +158,6 @@ end
 T["snow"]["leaves the canvas unloaded when animations are disabled"] = function()
 	child.lua([[
 		local config = require("leetcode.config")
-		config.user.plugins = { menu_background = "snow" }
-		config.load_plugins()
 		local background = config.menu_backgrounds[1]
 		local size = function() return 10 end
 		inactive = background({ width = size, height = size }) == nil

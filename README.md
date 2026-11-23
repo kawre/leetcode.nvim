@@ -84,6 +84,7 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
     ---@type table<string, boolean|string>
     plugins = {
         non_standalone = false,
+        menu_background = "snow",
     },
 
     ---@type boolean
@@ -241,6 +242,7 @@ storage = {
 ---@type table<string, boolean|string>
 plugins = {
     non_standalone = false,
+    menu_background = "snow",
 },
 ```
 
@@ -527,7 +529,7 @@ You can then exit [leetcode.nvim] using `:Leet exit` command
 
 ### Menu backgrounds
 
-Choose a background for the LeetCode menu.
+The LeetCode menu uses the snow background by default.
 
 ```lua
 plugins = {
@@ -537,7 +539,7 @@ plugins = {
 
 The snow background adds falling snow and occasional reindeer. It respects
 `ui.animations` and requires a markup.nvim version that provides `m.canvas`.
-Omit `menu_background` or set it to `false` to disable it. Setting it to
+Set `menu_background = false` to disable it. Setting it to
 `true` selects the default background, currently `"snow"`.
 
 New backgrounds live in `lua/leetcode-plugins/menu_background/backgrounds/`.
