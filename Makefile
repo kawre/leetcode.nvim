@@ -2,7 +2,7 @@
 
 NVIM_TEST = nvim --headless --noplugin -u tests/init.lua
 # markup.nvim's release ships a prebuilt engine.
-MARKUP_VERSION ?= v0.7.1
+MARKUP_VERSION ?= v0.8.0
 MARKUP = deps/markup.nvim
 ROCKS = .tests/rocks
 # How many test files run at once

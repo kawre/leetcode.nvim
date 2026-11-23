@@ -6,6 +6,7 @@ local Nav = require("leetcode.ui.menu.nav")
 local Band = require("leetcode.ui.menu.dashboard.band")
 local focus = require("leetcode.ui.menu.dashboard.focus")
 local Header = require("leetcode.ui.menu.dashboard.header")
+local config = require("leetcode.config")
 local data = require("leetcode.ui.menu.data")
 local Stats = require("leetcode.ui.menu.stats")
 local Problems = require("leetcode.ui.menu.problems")
@@ -160,6 +161,10 @@ local Gate = m.component(function()
 	})
 end)
 
+---@class leet.MenuBackgroundProps
+---@field width fun(): integer Menu viewport width in cells
+---@field height fun(): integer Menu viewport height in cells
+
 local App = m.component(function()
 	local view = m.use_view()
 	m.use_key("<CR>", function()
@@ -213,35 +218,38 @@ local App = m.component(function()
 		})
 	end
 
-	return m.block({
-		m.show(gated, function()
-			return m.block({
-				margin_top = function()
-					return math.max(math.floor((M.height() - BAND - 8) / 2), 1)
+	local children = {}
+	for _, background in ipairs(config.menu_backgrounds) do
+		children[#children + 1] = background({ width = M.width, height = M.height })
+	end
+	children[#children + 1] = m.show(gated, function()
+		return m.block({
+			margin_top = function()
+				return math.max(math.floor((M.height() - BAND - 8) / 2), 1)
+			end,
+			band(),
+			Gate(),
+		})
+	end, function()
+		-- The band and the header sit just above the page, and stay as pages
+		-- change below them.
+		return m.block({
+			margin_top = top_margin,
+			band(),
+			Header({
+				width = function()
+					return (M.dashboard_width())
 				end,
-				band(),
-				Gate(),
-			})
-		end, function()
-			-- The band and the header sit just above the page, and stay as pages
-			-- change below them.
-			return m.block({
-				margin_top = top_margin,
-				band(),
-				Header({
-					width = function()
-						return (M.dashboard_width())
-					end,
-				}),
-				function()
-					local page = M.page()
-					return m.untrack(function()
-						return page_of(page)
-					end)
-				end,
-			})
-		end),
-	})
+			}),
+			function()
+				local page = M.page()
+				return m.untrack(function()
+					return page_of(page)
+				end)
+			end,
+		})
+	end)
+	return m.block(children)
 end)
 
 function M.render()

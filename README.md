@@ -28,7 +28,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
 
 - [Picker](#picker)
 
-- [markup.nvim] >= 0.7.1
+- [markup.nvim] >= 0.8.0
 
 - [tree-sitter-html] _**(optional, but highly recommended)**_
   used for formatting the question description.
@@ -47,7 +47,7 @@ https://github.com/kawre/leetcode.nvim/assets/69250723/aee6584c-e099-4409-b114-1
     build = ":TSUpdate html", -- if you have `nvim-treesitter` installed
     dependencies = {
         -- include a picker of your choice, see picker section for more details
-        { "kawre/markup.nvim", version = ">=0.7.1" },
+        { "kawre/markup.nvim", version = ">=0.8.0" },
     },
     opts = {
         -- configuration goes here
@@ -81,9 +81,10 @@ To see full configuration types see [template.lua](./lua/leetcode/config/templat
         cache = vim.fn.stdpath("cache") .. "/leetcode",
     },
 
-    ---@type table<string, boolean>
+    ---@type table<string, boolean|string>
     plugins = {
         non_standalone = false,
+        menu_background = "snow",
     },
 
     ---@type boolean
@@ -238,9 +239,10 @@ storage = {
 [plugins list](#-plugins)
 
 ```lua
----@type table<string, boolean>
+---@type table<string, boolean|string>
 plugins = {
     non_standalone = false,
+    menu_background = "snow",
 },
 ```
 
@@ -524,6 +526,26 @@ plugins = {
 ```
 
 You can then exit [leetcode.nvim] using `:Leet exit` command
+
+### Menu backgrounds
+
+The LeetCode menu uses the snow background by default.
+
+```lua
+plugins = {
+    menu_background = "snow",
+}
+```
+
+The snow background adds falling snow and occasional reindeer. It respects
+`ui.animations` and requires a markup.nvim version that provides `m.canvas`.
+Set `menu_background = false` to disable it. Setting it to
+`true` selects the default background, currently `"snow"`.
+
+New backgrounds live in `lua/leetcode-plugins/menu_background/backgrounds/`.
+Register each one by name in the plugin's `init.lua`. Its module exports a
+markup `component` that receives reactive `width` and `height` getters for
+the menu viewport.
 
 ## 🙌 Credits
 
