@@ -525,6 +525,26 @@ plugins = {
 
 You can then exit [leetcode.nvim] using `:Leet exit` command
 
+### Snow
+
+Enable the optional winter animation behind the menu.
+
+```lua
+plugins = {
+    snow = true,
+}
+```
+
+Snow respects `ui.animations` and requires a version of markup.nvim that
+provides `m.canvas`.
+
+Menu background plugins can export `menu_background(props)` from
+`lua/leetcode-plugins/<name>/init.lua`. The function receives reactive
+`props.width` and `props.height` getters for the menu viewport and can return
+a markup element or `nil`. Use an absolute element with negative `z` and
+`inert = true` for a decorative background. Mount animations inside a
+markup component so they stop when the menu unmounts.
+
 ## 🙌 Credits
 
 - [Leetbuddy.nvim](https://github.com/Dhanus3133/Leetbuddy.nvim)

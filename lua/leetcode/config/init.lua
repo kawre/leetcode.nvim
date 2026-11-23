@@ -16,6 +16,7 @@ local config = {
 	storage = {}, ---@type { home: string, cache: string } absolute paths
 	theme = {}, ---@type lc.highlights
 	plugins = {},
+	menu_backgrounds = {}, ---@type (fun(props: leet.MenuBackgroundProps): markup.element?)[]
 
 	translator = false,
 
@@ -110,14 +111,17 @@ end
 
 function config.load_plugins()
 	config.plugins = {}
+	config.menu_backgrounds = {}
 	local plugins = {}
 
 	if config.user.cn.enabled then
 		table.insert(plugins, "cn")
 	end
 
-	for plugin, enabled in pairs(config.user.plugins) do
-		if enabled then
+	local names = vim.tbl_keys(config.user.plugins)
+	table.sort(names)
+	for _, plugin in ipairs(names) do
+		if config.user.plugins[plugin] then
 			table.insert(plugins, plugin)
 		end
 	end
@@ -126,10 +130,15 @@ function config.load_plugins()
 		local ok, plug = pcall(require, "leetcode-plugins." .. plugin)
 
 		if ok then
-			if not (plug.opts or {}).lazy then
-				plug.load()
-			else
-				table.insert(lazy_plugs, plug.load)
+			if plug.load then
+				if (plug.opts or {}).lazy then
+					table.insert(lazy_plugs, plug.load)
+				else
+					plug.load()
+				end
+			end
+			if plug.menu_background then
+				table.insert(config.menu_backgrounds, plug.menu_background)
 			end
 			config.plugins[plugin] = true
 		else

@@ -20,7 +20,7 @@ T["snow"] = new_set()
 
 T["snow"]["moves flakes downward and wraps within bounds"] = function()
 	child.lua([[
-		snow = require("leetcode.ui.menu.snow")
+		snow = require("leetcode-plugins.snow.canvas")
 		flake = {
 			x = 5,
 			y = 2,
@@ -50,7 +50,9 @@ T["snow"]["renders behind the menu and animates with zero layouts"] = function()
 		end
 		Markup.animate.enabled = true
 		Markup.animate.manual = true
-		require("leetcode.config").user.ui.snow = true
+		local config = require("leetcode.config")
+		config.user.plugins = { snow = true }
+		config.load_plugins()
 		_G.cookie = { csrftoken = "x" }
 		menu = require("leetcode.ui.menu")
 		menu.win.buf = vim.api.nvim_get_current_buf()
@@ -60,7 +62,7 @@ T["snow"]["renders behind the menu and animates with zero layouts"] = function()
 		reactive.flush()
 
 		before_marks = #vim.tbl_filter(function(mark)
-			return vim.startswith(mark[4].hl_group, "leetcode_snow_")
+			return vim.startswith(mark[4].hl_group, "MarkupCanvas_")
 		end, menu.view:highlights())
 
 		-- Let intro animations settle, then confirm snow redraws with zero layouts.
@@ -74,7 +76,7 @@ T["snow"]["renders behind the menu and animates with zero layouts"] = function()
 		tick_layouts = menu.view.stats.layouts
 		after_text = table.concat(buffer_text(menu.win.buf), "\n")
 		after_marks = #vim.tbl_filter(function(mark)
-			return vim.startswith(mark[4].hl_group, "leetcode_snow_")
+			return vim.startswith(mark[4].hl_group, "MarkupCanvas_")
 		end, menu.view:highlights())
 		has_dashboard = contains(menu.win.buf, "leetcode.nvim")
 	]])
@@ -88,11 +90,50 @@ T["snow"]["renders behind the menu and animates with zero layouts"] = function()
 	eq(child.lua_get("has_dashboard"), true)
 end
 
-T["snow"]["stays off when ui.snow is false"] = function()
+T["snow"]["draws flying reindeer across the canvas and retires them offscreen"] = function()
+	child.lua([[
+		if not m.canvas then
+			_G.skipped = true
+			return
+		end
+		local canvas = require("markup.view.canvas")
+		local snow = require("leetcode-plugins.snow.canvas")
+		local ctx = canvas.context(40, 12)
+		local palette = snow.palette()
+		local herd = {
+			dir = 1,
+			speed = 10,
+			base_y = 3,
+			started = 0,
+			width = 40,
+			members = { { offset_x = 0, offset_y = 0, bob_phase = 0, rudolph = true } },
+		}
+		mid_alive = snow.draw_reindeer(ctx, herd, 2, palette)
+		has_antlers = table.concat(ctx.chars):find("\\Y/", 1, true) ~= nil
+		has_nose = false
+		local nose_id = require("markup.view.hl").id(palette.reindeer_nose)
+		for _, id in ipairs(ctx.hls) do
+			if id == nose_id then
+				has_nose = true
+				break
+			end
+		end
+		ctx:clear()
+		done_alive = snow.draw_reindeer(ctx, herd, 20, palette)
+	]])
+	if child.lua_get("_G.skipped == true") then
+		return
+	end
+	eq(child.lua_get("mid_alive"), true)
+	eq(child.lua_get("has_antlers"), true)
+	eq(child.lua_get("has_nose"), true)
+	eq(child.lua_get("done_alive"), false)
+end
+
+T["snow"]["leaves snow unloaded by default"] = function()
 	child.lua([[
 		Markup.animate.enabled = true
 		Markup.animate.manual = true
-		require("leetcode.config").user.ui.snow = false
 		_G.cookie = { csrftoken = "x" }
 		menu = require("leetcode.ui.menu")
 		menu.win.buf = vim.api.nvim_get_current_buf()
@@ -102,10 +143,25 @@ T["snow"]["stays off when ui.snow is false"] = function()
 		reactive.flush()
 
 		snow_marks = #vim.tbl_filter(function(mark)
-			return vim.startswith(mark[4].hl_group, "leetcode_snow_")
+			return vim.startswith(mark[4].hl_group, "MarkupCanvas_")
 		end, menu.view:highlights())
 	]])
 	eq(child.lua_get("snow_marks"), 0)
+	eq(child.lua_get("package.loaded[\"leetcode-plugins.snow\"] == nil"), true)
+	eq(child.lua_get("package.loaded[\"leetcode-plugins.snow.canvas\"] == nil"), true)
+end
+
+T["snow"]["leaves the canvas unloaded when animations are disabled"] = function()
+	child.lua([[
+		local config = require("leetcode.config")
+		config.user.plugins = { snow = true }
+		config.load_plugins()
+		local background = config.menu_backgrounds[1]
+		local size = function() return 10 end
+		inactive = background({ width = size, height = size }) == nil
+	]])
+	eq(child.lua_get("inactive"), true)
+	eq(child.lua_get("package.loaded[\"leetcode-plugins.snow.canvas\"] == nil"), true)
 end
 
 return T
